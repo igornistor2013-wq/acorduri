@@ -6,172 +6,133 @@
 <title>Acorduri — Asistență Externă, Republica Moldova</title>
 <style>
   :root{
-    --bg:#ffffff;
-    --panel:#ffffff;
-    --line:#e4e7ef;
-    --line-strong:#c9ceda;
-    --ink:#1c2230;
-    --ink-dim:#6b7284;
-    --navy:#22406b;
-    --navy-deep:#16294a;
-    --blue-bg:#eaf0fb;
-    --gold:#c8871a;
-    --gold-bg:#fdf1dc;
-    --red:#c0402c;
-    --red-bg:#fbe8e3;
-    --green-bg:#e6f4ea;
-    --green-ink:#276c3e;
-    --purple:#6b4a85;
-    --purple-bg:#f1ebf6;
-    --teal-ink:#155a52;
-    --teal-bg:#e0f2f0;
+    --bg:#ffffff;--panel:#ffffff;--line:#e4e7ef;--line-strong:#c9ceda;
+    --ink:#1c2230;--ink-dim:#6b7284;--navy:#22406b;--navy-deep:#16294a;
+    --blue-bg:#eaf0fb;--gold:#c8871a;--gold-bg:#fdf1dc;--red:#c0402c;--red-bg:#fbe8e3;
+    --green-bg:#e6f4ea;--green-ink:#276c3e;--purple:#6b4a85;--purple-bg:#f1ebf6;
+    --teal-ink:#155a52;--teal-bg:#e0f2f0;
     --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,'Courier New',monospace;
-    --radius:10px;
-    --shadow:0 1px 2px rgba(20,30,60,.04), 0 4px 14px rgba(20,30,60,.05);
+    --radius:10px;--shadow:0 1px 2px rgba(20,30,60,.04), 0 4px 14px rgba(20,30,60,.05);
   }
   *{box-sizing:border-box}
-  body{
-    margin:0;background:var(--bg);color:var(--ink);
+  body{margin:0;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-    font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;
-  }
+    font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
   .wrap{max-width:1280px;margin:0 auto;padding:26px 22px 60px}
 
-  /* ── Antet ────────────────────────────────────────────── */
-  .top{
-    display:flex;justify-content:space-between;align-items:flex-end;
-    gap:24px;flex-wrap:wrap;
-    padding-bottom:22px;margin-bottom:24px;
-    border-bottom:1px solid var(--line-strong);
-  }
+  .top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+    padding-bottom:22px;margin-bottom:24px;border-bottom:1px solid var(--line-strong)}
   .title-row{display:flex;align-items:center;gap:13px}
-  .logo-badge{
-    width:38px;height:38px;border-radius:9px;flex:none;
-    background:linear-gradient(135deg,var(--navy),#2f5691);
-    display:flex;align-items:center;justify-content:center;
-  }
+  .logo-badge{width:38px;height:38px;border-radius:9px;flex:none;
+    background:linear-gradient(135deg,var(--navy),#2f5691);display:flex;align-items:center;justify-content:center}
   .logo-badge svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.1}
-  h1{
-    font-weight:800;font-size:clamp(26px,3.2vw,38px);
-    line-height:1.12;margin:0;color:var(--navy-deep);letter-spacing:-.015em;
-  }
-  .top-sub{margin:9px 0 0;color:var(--ink-dim);font-size:13.5px;max-width:52ch}
-  .top-meta{
-    font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);
-    display:flex;flex-direction:column;gap:4px;
-  }
+  h1{font-weight:800;font-size:clamp(26px,3.2vw,38px);line-height:1.12;margin:0;
+    color:var(--navy-deep);letter-spacing:-.015em}
+  .top-sub{margin:9px 0 0;color:var(--ink-dim);font-size:13.5px;max-width:54ch}
+  .top-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);
+    display:flex;flex-direction:column;gap:4px}
   .top-meta b{color:var(--navy-deep);font-weight:700}
   .navbtns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-  .navbtn{
-    display:inline-flex;align-items:center;gap:8px;text-decoration:none;
-    border-radius:var(--radius);padding:11px 20px;
-    font-size:14px;font-weight:800;white-space:nowrap;cursor:pointer;
-    letter-spacing:.01em;border:1.5px solid transparent;
-  }
+  .navbtn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;border-radius:var(--radius);
+    padding:11px 20px;font-size:14px;font-weight:800;white-space:nowrap;letter-spacing:.01em;
+    border:1.5px solid transparent}
   .navbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.3}
   .navbtn.here{background:linear-gradient(135deg,var(--navy),#2f5691);color:#fff}
   .navbtn.away{background:#fff;color:var(--navy);border-color:var(--navy)}
   .navbtn.away:hover{background:var(--blue-bg)}
   .navbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
-  /* ── KPI ──────────────────────────────────────────────── */
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
   @media (max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}}
-  .kpi{
-    background:var(--panel);border:1px solid var(--line);
-    border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;
-  }
-  .kpi .lbl{
-    font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
-    color:var(--ink-dim);font-weight:700;margin-bottom:7px;
-  }
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px 18px}
+  .kpi .lbl{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-dim);
+    font-weight:700;margin-bottom:7px}
   .kpi .val{font-size:27px;font-weight:800;color:var(--navy-deep);line-height:1;letter-spacing:-.02em}
   .kpi .sub{font-size:11.5px;color:var(--ink-dim);margin-top:6px;font-family:var(--mono)}
 
-  /* ── Panouri ──────────────────────────────────────────── */
-  .panel{
-    background:var(--panel);border:1px solid var(--line);
-    border-radius:var(--radius);box-shadow:var(--shadow);
-    overflow:hidden;margin-bottom:20px;
-  }
-  .panel-head{
-    display:flex;justify-content:space-between;align-items:center;gap:14px;
-    flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line);
-  }
-  h2{
-    font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;
-    color:var(--navy);margin:0;font-weight:700;
-    display:flex;align-items:center;gap:8px;
-  }
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:14px 18px;border-bottom:1px solid var(--line)}
+  h2{font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);margin:0;
+    font-weight:700;display:flex;align-items:center;gap:8px}
   h2 svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2}
   .panel-body{padding:16px 18px}
 
-  /* ── Filtre ───────────────────────────────────────────── */
   .btns{display:flex;flex-wrap:wrap;gap:6px}
-  .btns button{
-    background:var(--panel);border:1px solid var(--line-strong);color:var(--navy);
-    font-family:inherit;font-size:11.5px;font-weight:600;border-radius:6px;
-    padding:6px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
-  }
+  .btns button{background:var(--panel);border:1px solid var(--line-strong);color:var(--navy);
+    font-family:inherit;font-size:11.5px;font-weight:600;border-radius:6px;padding:6px 11px;
+    cursor:pointer;display:inline-flex;align-items:center;gap:7px}
   .btns button:hover{background:var(--blue-bg)}
   .btns button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
   .btns button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
-  .btns button i{width:8px;height:8px;border-radius:2px;flex:none;background:currentColor}
   .btns button .n{font-family:var(--mono);opacity:.72;font-size:10.5px}
-  .seek{
-    border:1px solid var(--line-strong);border-radius:6px;padding:7px 12px;
-    font-family:inherit;font-size:12px;color:var(--ink);min-width:210px;flex:1;max-width:340px;
-  }
+  .seek{border:1px solid var(--line-strong);border-radius:6px;padding:7px 12px;font-family:inherit;
+    font-size:12px;color:var(--ink);min-width:200px;flex:1;max-width:320px}
   .seek:focus{outline:2px solid var(--gold);outline-offset:1px}
 
-  /* ── Tabel ────────────────────────────────────────────── */
   .tbl-scroll{overflow-x:auto}
-  table{border-collapse:collapse;width:100%;min-width:940px}
-  th{
-    font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);
-    font-weight:700;text-align:left;padding:11px 14px;
-    border-bottom:1px solid var(--line-strong);white-space:nowrap;background:#fbfcfe;
-  }
-  td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
-  tbody tr:last-child td{border-bottom:none}
-  tbody tr:hover{background:#fafbfd}
+  table{border-collapse:collapse;width:100%;min-width:1000px}
+  th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;
+    text-align:left;padding:11px 14px;border-bottom:1px solid var(--line-strong);
+    white-space:nowrap;background:#fbfcfe}
+  td{padding:14px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr.acord{cursor:pointer}
+  tr.acord:hover{background:#fafbfd}
+  tr.acord td{border-bottom:1px solid var(--line)}
+  tr.detalii td{background:#fbfcfe;padding:0 14px 14px}
+  tr.detalii.hid{display:none}
 
-  .tag{
-    display:inline-block;padding:3px 9px;border-radius:5px;
-    font-size:10.5px;font-weight:700;letter-spacing:.02em;white-space:nowrap;
-  }
+  .tag{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10.5px;
+    font-weight:700;letter-spacing:.02em;white-space:nowrap}
   .t-grant{background:var(--teal-bg);color:var(--teal-ink)}
   .t-imprumut{background:var(--red-bg);color:var(--red)}
   .t-finantare{background:var(--gold-bg);color:#8a5c0d}
   .t-contract{background:var(--blue-bg);color:var(--navy)}
   .t-credit{background:var(--purple-bg);color:var(--purple)}
   .t-alt{background:#eef0f4;color:var(--ink-dim)}
+  .t-simpl{background:var(--green-bg);color:var(--green-ink)}
 
   .org{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--navy-deep);white-space:nowrap}
-  .titlu{max-width:56ch;line-height:1.5;font-size:13.5px}
-  .actnr{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);white-space:nowrap}
-  .semnat{
-    font-family:var(--mono);font-size:11.5px;font-weight:700;
-    background:var(--gold-bg);color:#8a5c0d;padding:3px 8px;border-radius:5px;white-space:nowrap;
-  }
+  .pname{font-size:14px;font-weight:700;color:var(--navy-deep);line-height:1.4;max-width:44ch}
+  .pmeta{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:5px}
+  .semnat{font-family:var(--mono);font-size:11.5px;font-weight:700;background:var(--gold-bg);
+    color:#8a5c0d;padding:3px 8px;border-radius:5px;white-space:nowrap}
   .nil{color:var(--line-strong)}
-  .src{font-family:var(--mono);font-size:11px;color:var(--navy);text-decoration:none;white-space:nowrap}
-  .src:hover{text-decoration:underline;color:var(--gold)}
+  .caret{display:inline-block;width:14px;color:var(--ink-dim);font-size:10px;transition:transform .15s}
+  tr.acord[aria-expanded="true"] .caret{transform:rotate(90deg)}
 
-  /* traseul actului */
-  .stage{display:flex;flex-direction:column;gap:6px;min-width:132px}
-  .stage .rail{display:flex;align-items:center}
-  .stage .dot{width:8px;height:8px;border-radius:50%;flex:none;border:1.5px solid var(--line-strong);background:#fff}
-  .stage .seg{height:1.5px;flex:1;background:var(--line-strong)}
-  .stage .dot.done{background:var(--navy);border-color:var(--navy)}
-  .stage .seg.done{background:var(--navy)}
-  .stage .dot.here{width:11px;height:11px;background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,135,26,.18)}
-  .stage .now{font-size:11px;font-weight:700;color:var(--navy-deep)}
+  /* etapele acordului */
+  .steps{display:flex;align-items:flex-start;gap:0;min-width:250px}
+  .step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative}
+  .step .bead{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:10.5px;font-weight:800;font-family:var(--mono);
+    border:1.5px solid var(--line-strong);background:#fff;color:var(--line-strong);z-index:1}
+  .step.on .bead{background:var(--navy);border-color:var(--navy);color:#fff}
+  .step.last .bead{background:var(--gold);border-color:var(--gold);color:#fff;
+    box-shadow:0 0 0 3px rgba(200,135,26,.2)}
+  .step .cap{font-size:9.5px;line-height:1.25;text-align:center;color:var(--ink-dim);max-width:64px}
+  .step.on .cap{color:var(--navy-deep);font-weight:700}
+  .step:not(:last-child):after{content:'';position:absolute;top:10.5px;left:50%;width:100%;
+    height:1.5px;background:var(--line-strong)}
+  .step.on:not(:last-child):after{background:var(--navy)}
+  .simpl-note{font-size:11px;color:var(--green-ink);font-weight:700;
+    background:var(--green-bg);padding:6px 10px;border-radius:6px;display:inline-block}
 
-  /* bare distribuție */
+  .acte-list{margin:0;padding:0;list-style:none;border-left:2px solid var(--line-strong);margin-left:6px}
+  .acte-list li{padding:9px 0 9px 15px;position:relative}
+  .acte-list li:before{content:'';position:absolute;left:-5px;top:15px;width:8px;height:8px;
+    border-radius:50%;background:var(--navy)}
+  .acte-list .a-nr{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy)}
+  .acte-list .a-tit{font-size:12.5px;line-height:1.5;color:var(--ink);margin-top:3px;max-width:88ch}
+  .acte-list .a-src{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-top:3px}
+  .acte-list .a-src a{color:var(--navy);text-decoration:none}
+  .acte-list .a-src a:hover{text-decoration:underline;color:var(--gold)}
+
   .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:9px}
   .bar-row:last-child{margin-bottom:0}
-  .bar-lbl{font-size:11.5px;color:var(--ink);min-width:150px;font-weight:600}
+  .bar-lbl{font-size:11.5px;color:var(--ink);min-width:170px;font-weight:600}
   .bar-track{flex:1;height:8px;background:#eef0f4;border-radius:4px;overflow:hidden}
   .bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--navy),#3d6ba8)}
   .bar-val{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);min-width:26px;text-align:right}
@@ -179,17 +140,9 @@
   .empty-state{padding:34px 18px;text-align:center;color:var(--ink-dim);font-size:13px}
   .empty-state strong{display:block;color:var(--navy-deep);font-size:15px;font-weight:700;margin-bottom:6px}
   .empty-state code{font-family:var(--mono);background:#f2f4f8;padding:2px 6px;border-radius:4px}
-
-  .footer-source{
-    border-top:1px solid var(--line);padding-top:16px;margin-top:8px;
-    font-size:12px;color:var(--ink-dim);max-width:78ch;
-  }
-  @media (max-width:900px){
-    .stage{min-width:0}
-  }
-  @media (prefers-reduced-motion:no-preference){
-    .bar-fill{transition:width .5s cubic-bezier(.2,.7,.3,1)}
-  }
+  .footer-source{border-top:1px solid var(--line);padding-top:16px;margin-top:8px;
+    font-size:12px;color:var(--ink-dim);max-width:80ch}
+  @media (prefers-reduced-motion:no-preference){.bar-fill{transition:width .5s cubic-bezier(.2,.7,.3,1)}}
 </style>
 </head>
 <body>
@@ -203,7 +156,7 @@
         </div>
         <h1>Acorduri de asistență externă</h1>
       </div>
-      <p class="top-sub">Acte publicate în Monitorul Oficial: granturi, împrumuturi, contracte de finanțare și facilități de credit.</p>
+      <p class="top-sub">Un acord, un rând. Actele publicate în Monitorul Oficial sunt grupate pe acordul din care fac parte, cu etapa la care a ajuns fiecare.</p>
     </div>
     <div class="top-meta" id="topMeta"></div>
     <div class="navbtns">
@@ -223,7 +176,7 @@
   </div>
 
   <div class="footer-source">
-    Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova. Un acord parcurge mai multe etape, fiecare publicată ca act separat — coloana „Etapă" arată unde se află fiecare. Data semnării apare doar când e menționată în denumirea actului.
+    Un acord parcurge patru etape, fiecare publicată ca act separat: hotărârea de inițiere a negocierilor, hotărârea de aprobare a semnării, decretul prezidențial și legea de ratificare. Acordurile publicate prin ordin de minister au fost încheiate prin procedură simplificată și nu trec prin ratificare. Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova.
   </div>
 
 </div>
@@ -232,11 +185,27 @@
 (function(){
   var DATA_URL = "date.json";
 
-  var STAGES = ['Negociere','Semnare','Ratificare','Promulgare','În vigoare'];
-  var CLS = {
-    'Grant':'t-grant','Împrumut':'t-imprumut','Finanțare':'t-finantare',
-    'Contract de finanțare':'t-contract','Credit':'t-credit'
-  };
+  var STEPS = [
+    {k:'neg',  n:'1', cap:'Inițiere negocieri'},
+    {k:'sem',  n:'2', cap:'Aprobare semnare'},
+    {k:'dec',  n:'3', cap:'Decret prezidențial'},
+    {k:'lege', n:'4', cap:'Lege de ratificare'}
+  ];
+
+  // Acronime și formulări diferite pentru același proiect.
+  // Adaugă aici perechi noi dacă vezi un acord împărțit greșit în două rânduri.
+  var ALIAS = [
+    {nume:'Competitivitatea întreprinderilor micro, mici și mijlocii (ÎMMM)',
+     m:['immm','competitivitate a intreprinderilor micro','intreprinderilor micro, mici si mijlocii']},
+    {nume:'Programul de dezvoltare integrată a agriculturii și irigațiilor (iDRIP)',
+     m:['idrip','dezvoltare integrata a agriculturii']},
+    {nume:'RLF — Răspuns de urgență, Căile Ferate din Moldova', m:['caile ferate']},
+    {nume:'Reabilitarea drumurilor din Moldova — Proiectul V', m:['proiectului v de reabilitare','proiectul v de reabilitare']},
+    {nume:'Reabilitarea drumurilor din Moldova — Proiectul VI', m:['proiectului vi de reabilitare','proiectul vi de reabilitare']}
+  ];
+
+  var CLS = {'Grant':'t-grant','Împrumut':'t-imprumut','Finanțare':'t-finantare',
+    'Contract de finanțare':'t-contract','Credit':'t-credit'};
 
   var app = document.getElementById('app'), topMeta = document.getElementById('topMeta');
   var db = null, fCat = 'all', fOrg = 'all', seek = '';
@@ -252,107 +221,152 @@
     return String(s||'').toLowerCase()
       .replace(/[ăâ]/g,'a').replace(/î/g,'i').replace(/[șş]/g,'s').replace(/[țţ]/g,'t');
   }
-  function stageOf(t){
-    t = fold(t);
-    if (/intrarii in vigoare|intrat in vigoare|intrarea in vigoare/.test(t)) return 4;
-    if (/promulgare|promulgarea/.test(t)) return 3;
-    if (/ratificare|ratificarea/.test(t)) return 2;
-    if (/initierea negocierilor/.test(t) && !/aprobarea semnarii/.test(t)) return 0;
-    if (/aprobarea semnarii|aprobarea acordului|aprobarea amendamentului/.test(t)) return 1;
-    if (/initierea negocierilor/.test(t)) return 0;
-    return 1;
+
+  // Denumirea proiectului: alias cunoscut → text între ghilimele → sintagma „Proiectul …"
+  function proiect(t){
+    var f = fold(t);
+    for (var i = 0; i < ALIAS.length; i++)
+      if (ALIAS[i].m.some(function(x){ return f.indexOf(x) > -1; })) return ALIAS[i].nume;
+    var quotes = t.match(/[„"]([^"”„]{6,200})[”"]/g);
+    if (quotes && quotes.length){
+      var best = quotes.map(function(s){ return s.replace(/^[„"]|[”"]$/g,'').trim(); })
+        .sort(function(a,b){ return b.length - a.length; })[0];
+      if (best) return best;
+    }
+    var p = t.match(/[Pp]roiectul(?:ui)?\s+(?:de\s+)?([^,\.;]{10,110})/);
+    if (p) return p[1].trim();
+    return t.slice(0, 70).trim();
   }
+
+  // Ce etapă reprezintă actul
+  function etapa(a){
+    var t = fold(a.titlu), nr = fold(a.act);
+    if (/^ordin|ordin cu privire/.test(t) || /nr\.\s*\d+,/.test(nr) && /^ordin/.test(t)) {}
+    if (/^ordin/.test(t)) return 'ord';
+    if (/^decret/.test(t) || /-x/.test(nr)) return 'dec';
+    if (/^lege/.test(t)) return 'lege';
+    if (/initierea negocierilor/.test(t) && !/aprobarea semnarii/.test(t)) return 'neg';
+    if (/aprobarea semnarii|aprobarea acordului|aprobarea amendamentului|aprobarea proiectului de lege/.test(t)) return 'sem';
+    if (/initierea negocierilor/.test(t)) return 'neg';
+    return 'sem';
+  }
+
   function ord(a){
     var m = /(\d{2})\.(\d{2})\.(\d{4})/.exec(a.data_editie||'');
     return m ? m[3]+m[2]+m[1] : '0';
   }
-  function rail(i){
-    var h = '<div class="stage"><span class="rail">';
-    for (var s = 0; s < 5; s++){
-      if (s) h += '<span class="seg' + (s <= i ? ' done' : '') + '"></span>';
-      h += '<span class="dot' + (s < i ? ' done' : s === i ? ' here' : '') + '"></span>';
-    }
-    return h + '</span><span class="now">' + STAGES[i] + '</span></div>';
+
+  function grupeaza(acte){
+    var map = {};
+    acte.forEach(function(a){
+      var nume = proiect(a.titlu), k = fold(nume);
+      if (!map[k]) map[k] = {nume:nume, acte:[], et:{}, orgs:{}, cats:{}, semnat:'', simpl:false};
+      var g = map[k];
+      g.acte.push(a);
+      var e = etapa(a);
+      if (e === 'ord') g.simpl = true; else g.et[e] = true;
+      if (a.semnat && !g.semnat) g.semnat = a.semnat;
+      if (a.categorie) g.cats[a.categorie] = true;
+      (a.partener||'').split(' / ').forEach(function(o){ o = o.trim(); if (o) g.orgs[o] = true; });
+    });
+    return Object.keys(map).map(function(k){
+      var g = map[k];
+      g.acte.sort(function(x,y){ return ord(y).localeCompare(ord(x)); });
+      g.ultim = g.acte[0];
+      g.parteneri = Object.keys(g.orgs).join(' / ');
+      g.categorie = Object.keys(g.cats)[0] || '—';
+      return g;
+    }).sort(function(x,y){ return ord(y.ultim).localeCompare(ord(x.ultim)); });
+  }
+
+  function steps(g){
+    if (g.simpl && !Object.keys(g.et).length)
+      return '<span class="simpl-note">Procedură simplificată — ordin</span>';
+    var last = -1;
+    STEPS.forEach(function(s, i){ if (g.et[s.k]) last = i; });
+    return '<div class="steps">' + STEPS.map(function(s, i){
+      var on = g.et[s.k], cls = 'step' + (on ? ' on' : '') + (i === last ? ' last' : '');
+      return '<div class="' + cls + '"><span class="bead">' + (on ? '✓' : s.n) + '</span>' +
+        '<span class="cap">' + s.cap + '</span></div>';
+    }).join('') + '</div>' +
+    (g.simpl ? '<div style="margin-top:8px"><span class="simpl-note">+ ordin de punere în aplicare</span></div>' : '');
   }
 
   function paint(){
-    var all = Object.keys(db.acte||{}).map(function(k){ return db.acte[k]; });
-    all.sort(function(x,y){ return ord(y).localeCompare(ord(x)); });
-
-    var cats = {}, orgs = {}, stages = {}, signed = 0;
-    all.forEach(function(a){
-      cats[a.categorie] = (cats[a.categorie]||0)+1;
-      stages[STAGES[stageOf(a.titlu)]] = (stages[STAGES[stageOf(a.titlu)]]||0)+1;
-      if (a.semnat) signed++;
-      (a.partener||'').split(' / ').forEach(function(o){
-        o = o.trim(); if (o) orgs[o] = (orgs[o]||0)+1;
-      });
-    });
-    var nOrg = Object.keys(orgs).length;
+    var acte = Object.keys(db.acte||{}).map(function(k){ return db.acte[k]; });
+    var grupuri = grupeaza(acte);
 
     topMeta.innerHTML =
       '<span>Ultima verificare: <b>' + esc(db.ultima_rulare||'—') + '</b></span>' +
       '<span>Ediții parcurse: <b>' + ((db.editii_vazute||[]).length) + '</b></span>';
 
-    if (!all.length){
+    if (!grupuri.length){
       app.innerHTML = '<div class="panel"><div class="empty-state"><strong>Registrul e gol</strong>' +
-        'Fișierul a fost citit, dar nu conține acte. Pornește o rulare din fila Actions.</div></div>';
+        'Fișierul a fost citit, dar nu conține acte.</div></div>';
       return;
     }
 
-    var kpis =
-      kpi('Acte în registru', all.length, 'ianuarie – august 2026') +
-      kpi('Creditori', nOrg, Object.keys(orgs).sort(function(a,b){return orgs[b]-orgs[a];}).slice(0,3).join(' · ')) +
-      kpi('Categorii', Object.keys(cats).length, Object.keys(cats).sort().join(' · ').slice(0,42)) +
-      kpi('Cu dată de semnare', signed, signed + ' din ' + all.length + ' acte');
+    var cats = {}, orgs = {}, simpl = 0, cuSemnat = 0, dist = {};
+    grupuri.forEach(function(g){
+      cats[g.categorie] = (cats[g.categorie]||0)+1;
+      Object.keys(g.orgs).forEach(function(o){ orgs[o] = (orgs[o]||0)+1; });
+      if (g.simpl) simpl++;
+      if (g.semnat) cuSemnat++;
+      STEPS.forEach(function(s){ if (g.et[s.k]) dist[s.cap] = (dist[s.cap]||0)+1; });
+    });
 
-    var maxS = Math.max.apply(null, STAGES.map(function(s){ return stages[s]||0; }));
-    var bars = STAGES.map(function(s){
-      var n = stages[s]||0, w = maxS ? Math.round(n/maxS*100) : 0;
-      return '<div class="bar-row"><span class="bar-lbl">' + s + '</span>' +
-        '<span class="bar-track"><span class="bar-fill" style="width:' + w + '%"></span></span>' +
+    var kpis =
+      kpi('Acorduri', grupuri.length, 'din ' + acte.length + ' acte publicate') +
+      kpi('Creditori', Object.keys(orgs).length,
+        Object.keys(orgs).sort(function(a,b){return orgs[b]-orgs[a];}).slice(0,3).join(' · ')) +
+      kpi('Cu dată de semnare', cuSemnat, cuSemnat + ' din ' + grupuri.length) +
+      kpi('Procedură simplificată', simpl, 'prin ordin, fără ratificare');
+
+    var maxD = Math.max(1, Math.max.apply(null, STEPS.map(function(s){ return dist[s.cap]||0; })));
+    var bars = STEPS.map(function(s){
+      var n = dist[s.cap]||0;
+      return '<div class="bar-row"><span class="bar-lbl">' + s.n + '. ' + s.cap + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' +
+          Math.round(n/maxD*100) + '%"></span></span>' +
         '<span class="bar-val">' + n + '</span></div>';
     }).join('');
 
-    var orgBtns = ['<button data-org="all" aria-pressed="true">Toți <span class="n">' + all.length + '</span></button>']
-      .concat(Object.keys(orgs).sort(function(a,b){ return orgs[b]-orgs[a]; }).map(function(o){
+    var orgBtns = ['<button data-org="all" aria-pressed="true">Toți <span class="n">' +
+      grupuri.length + '</span></button>'].concat(
+      Object.keys(orgs).sort(function(a,b){ return orgs[b]-orgs[a]; }).map(function(o){
         return '<button data-org="' + esc(o) + '" aria-pressed="false">' + esc(o) +
           ' <span class="n">' + orgs[o] + '</span></button>';
       })).join('');
 
-    var catBtns = ['<button data-cat="all" aria-pressed="true">Toate <span class="n">' + all.length + '</span></button>']
-      .concat(Object.keys(cats).sort().map(function(c){
+    var catBtns = ['<button data-cat="all" aria-pressed="true">Toate <span class="n">' +
+      grupuri.length + '</span></button>'].concat(
+      Object.keys(cats).sort().map(function(c){
         return '<button data-cat="' + esc(c) + '" aria-pressed="false">' + esc(c) +
           ' <span class="n">' + cats[c] + '</span></button>';
       })).join('');
 
     app.innerHTML =
       '<div class="kpis">' + kpis + '</div>' +
-
-      '<div class="panel"><div class="panel-head">' +
-        '<h2><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="13" y="6" width="3" height="11"/></svg>Distribuția pe etape</h2>' +
-      '</div><div class="panel-body">' + bars + '</div></div>' +
-
-      '<div class="panel"><div class="panel-head">' +
-        '<h2><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Creditori și parteneri</h2>' +
-      '</div><div class="panel-body"><div class="btns" id="orgBtns">' + orgBtns + '</div></div></div>' +
-
-      '<div class="panel"><div class="panel-head">' +
-        '<h2><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Acte publicate</h2>' +
+      '<div class="panel"><div class="panel-head"><h2>' + ico('bar') +
+        'Câte acorduri au trecut de fiecare etapă</h2></div>' +
+        '<div class="panel-body">' + bars + '</div></div>' +
+      '<div class="panel"><div class="panel-head"><h2>' + ico('layers') +
+        'Creditori și parteneri</h2></div>' +
+        '<div class="panel-body"><div class="btns" id="orgBtns">' + orgBtns + '</div></div></div>' +
+      '<div class="panel"><div class="panel-head"><h2>' + ico('file') + 'Acorduri</h2>' +
         '<div class="btns" id="catBtns">' + catBtns + '</div>' +
-        '<input class="seek" type="search" id="seek" placeholder="Caută în denumiri…" aria-label="Caută în denumiri">' +
-      '</div><div class="tbl-scroll"><table>' +
-        '<thead><tr><th>Partener</th><th>Categorie</th><th>Denumirea actului</th>' +
-        '<th>Etapă</th><th>Semnat</th><th>Publicat</th></tr></thead>' +
-        '<tbody id="rows"></tbody></table></div>' +
-        '<div id="none"></div></div>';
+        '<input class="seek" type="search" id="seek" placeholder="Caută…" aria-label="Caută">' +
+      '</div><div class="tbl-scroll"><table><thead><tr>' +
+        '<th>Partener</th><th>Acordul</th><th>Categorie</th>' +
+        '<th>Etape parcurse</th><th>Semnat</th></tr></thead>' +
+        '<tbody id="rows"></tbody></table></div><div id="none"></div></div>';
 
     bind('#orgBtns button', 'org', function(v){ fOrg = v; });
     bind('#catBtns button', 'cat', function(v){ fCat = v; });
-    var box = document.getElementById('seek');
-    box.addEventListener('input', function(){ seek = fold(box.value); rows(all); });
-
-    rows(all);
+    document.getElementById('seek').addEventListener('input', function(){
+      seek = fold(this.value); rows(grupuri);
+    });
+    rows(grupuri);
 
     function bind(sel, key, set){
       var list = app.querySelectorAll(sel);
@@ -360,53 +374,79 @@
         b.addEventListener('click', function(){
           set(b.dataset[key]);
           list.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
-          rows(all);
+          rows(grupuri);
         });
       });
     }
   }
 
-  function kpi(lbl, val, sub){
-    return '<div class="kpi"><div class="lbl">' + esc(lbl) + '</div>' +
-      '<div class="val">' + val + '</div><div class="sub">' + esc(sub) + '</div></div>';
+  function ico(t){
+    var p = {
+      bar:'<path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="13" y="6" width="3" height="11"/>',
+      layers:'<path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
+      file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>'
+    }[t];
+    return '<svg viewBox="0 0 24 24">' + p + '</svg>';
   }
 
-  function rows(all){
-    var out = all.filter(function(a){
-      if (fCat !== 'all' && a.categorie !== fCat) return false;
-      if (fOrg !== 'all' && (a.partener||'').indexOf(fOrg) === -1) return false;
-      if (seek && fold(a.titlu + ' ' + a.act).indexOf(seek) === -1) return false;
+  function kpi(lbl, val, sub){
+    return '<div class="kpi"><div class="lbl">' + esc(lbl) + '</div><div class="val">' + val +
+      '</div><div class="sub">' + esc(sub) + '</div></div>';
+  }
+
+  function rows(grupuri){
+    var out = grupuri.filter(function(g){
+      if (fCat !== 'all' && g.categorie !== fCat) return false;
+      if (fOrg !== 'all' && !g.orgs[fOrg]) return false;
+      if (seek){
+        var hay = fold(g.nume + ' ' + g.parteneri + ' ' +
+          g.acte.map(function(a){ return a.titlu + ' ' + a.act; }).join(' '));
+        if (hay.indexOf(seek) === -1) return false;
+      }
       return true;
     });
 
-    document.getElementById('rows').innerHTML = out.map(function(a){
-      return '<tr>' +
-        '<td class="org">' + esc(a.partener || '—') + '</td>' +
-        '<td><span class="tag ' + (CLS[a.categorie]||'t-alt') + '">' + esc(a.categorie) + '</span></td>' +
-        '<td><div class="titlu">' + esc(a.titlu) + '</div>' +
-          '<div class="actnr" style="margin-top:6px">' + esc(a.act) + '</div></td>' +
-        '<td>' + rail(stageOf(a.titlu)) + '</td>' +
-        '<td>' + (a.semnat ? '<span class="semnat">' + esc(a.semnat) + '</span>' : '<span class="nil">—</span>') + '</td>' +
-        '<td><a class="src" href="' + esc(a.url) + '" target="_blank" rel="noopener">MO ' +
-          esc(a.editie) + '</a><div class="actnr" style="margin-top:5px">' + esc(a.data_editie) + '</div></td>' +
-      '</tr>';
+    document.getElementById('rows').innerHTML = out.map(function(g, i){
+      var lista = g.acte.map(function(a){
+        return '<li><div class="a-nr">' + esc(a.act) + '</div>' +
+          '<div class="a-tit">' + esc(a.titlu) + '</div>' +
+          '<div class="a-src"><a href="' + esc(a.url) + '" target="_blank" rel="noopener">MO ' +
+            esc(a.editie) + '</a> · ' + esc(a.data_editie) + '</div></li>';
+      }).join('');
+
+      return '<tr class="acord" data-i="' + i + '" aria-expanded="false">' +
+        '<td class="org">' + esc(g.parteneri || '—') + '</td>' +
+        '<td><div class="pname"><span class="caret">▶</span>' + esc(g.nume) + '</div>' +
+          '<div class="pmeta">' + g.acte.length + (g.acte.length === 1 ? ' act' : ' acte') +
+          ' · ultimul: ' + esc(g.ultim.data_editie) + '</div></td>' +
+        '<td><span class="tag ' + (CLS[g.categorie]||'t-alt') + '">' + esc(g.categorie) + '</span>' +
+          (g.simpl ? ' <span class="tag t-simpl">simplificată</span>' : '') + '</td>' +
+        '<td>' + steps(g) + '</td>' +
+        '<td>' + (g.semnat ? '<span class="semnat">' + esc(g.semnat) + '</span>'
+          : '<span class="nil">—</span>') + '</td></tr>' +
+        '<tr class="detalii hid" data-d="' + i + '"><td colspan="5">' +
+          '<ul class="acte-list">' + lista + '</ul></td></tr>';
     }).join('');
 
+    document.querySelectorAll('tr.acord').forEach(function(tr){
+      tr.addEventListener('click', function(){
+        var d = document.querySelector('tr.detalii[data-d="' + tr.dataset.i + '"]');
+        var open = d.classList.toggle('hid');
+        tr.setAttribute('aria-expanded', String(!open));
+      });
+    });
+
     document.getElementById('none').innerHTML = out.length ? '' :
-      '<div class="empty-state"><strong>Niciun act</strong>' +
-      'Nimic nu corespunde filtrelor. Alege „Toate" sau golește căutarea.</div>';
+      '<div class="empty-state"><strong>Niciun acord</strong>Nimic nu corespunde filtrelor.</div>';
   }
 
   fetch(DATA_URL + (DATA_URL.indexOf('?')>-1?'&':'?') + '_=' + Date.now(), {cache:'no-store'})
     .then(function(r){ if(!r.ok) throw new Error('serverul a răspuns ' + r.status); return r.json(); })
-    .then(function(j){
-      if (!j || !j.acte) throw new Error('fișierul nu are structura așteptată');
-      db = j; paint();
-    })
+    .then(function(j){ if(!j||!j.acte) throw new Error('structură neașteptată'); db = j; paint(); })
     .catch(function(e){
       app.innerHTML = '<div class="panel"><div class="empty-state">' +
-        '<strong>Registrul nu a putut fi citit</strong>' +
-        'Am cerut <code>' + esc(DATA_URL) + '</code> și am primit: ' + esc(e.message) + '.<br><br>' +
+        '<strong>Registrul nu a putut fi citit</strong>Am cerut <code>' + esc(DATA_URL) +
+        '</code> și am primit: ' + esc(e.message) + '.<br><br>' +
         'Dacă ai deschis pagina prin dublu-click, browserul blochează citirea fișierelor locale. ' +
         'Deschide-o de pe site.</div></div>';
     });
