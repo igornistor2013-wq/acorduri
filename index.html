@@ -3,233 +3,413 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Asistență externă — Monitorul Oficial</title>
+<title>Acorduri — Asistență Externă, Republica Moldova</title>
 <style>
   :root{
-    --ink:#111C2E;--soft:#46586F;--rule:#CBD4DE;--paper:#EDF1F5;--card:#fff;
-    --oxide:#A2382A;--brass:#8A6A2F;--sage:#3F6B54;--azure:#2F5D7C;--plum:#6B4A7A;
+    --bg:#ffffff;
+    --panel:#ffffff;
+    --line:#e4e7ef;
+    --line-strong:#c9ceda;
+    --ink:#1c2230;
+    --ink-dim:#6b7284;
+    --navy:#22406b;
+    --navy-deep:#16294a;
+    --blue-bg:#eaf0fb;
+    --gold:#c8871a;
+    --gold-bg:#fdf1dc;
+    --red:#c0402c;
+    --red-bg:#fbe8e3;
+    --green-bg:#e6f4ea;
+    --green-ink:#276c3e;
+    --purple:#6b4a85;
+    --purple-bg:#f1ebf6;
+    --teal-ink:#155a52;
+    --teal-bg:#e0f2f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,'Courier New',monospace;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(20,30,60,.04), 0 4px 14px rgba(20,30,60,.05);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);padding:30px 18px 60px;
-    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-  .wrap{max-width:1240px;margin:0 auto}
-  header{border-top:3px solid var(--ink);border-bottom:1px solid var(--rule);
-    padding:20px 0 16px;margin-bottom:20px}
-  .eyebrow{font:600 11px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;
-    text-transform:uppercase;color:var(--oxide);margin-bottom:11px}
-  h1{font:400 28px/1.2 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;margin:0 0 8px}
-  .lede{max-width:68ch;color:var(--soft);margin:0;font-size:14px}
-  .stats{display:flex;flex-wrap:wrap;gap:10px 30px;margin:16px 0 18px;
-    font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;color:var(--soft)}
-  .stats b{color:var(--ink);font-size:15px}
-  .live{display:inline-flex;align-items:center;gap:7px}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--sage);flex:none}
-  .filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
-  .filters button,.btn{font:600 12px/1 ui-monospace,Menlo,Consolas,monospace;padding:9px 13px;
-    border:1px solid var(--rule);background:var(--card);color:var(--soft);
-    border-radius:2px;cursor:pointer}
-  .filters button:hover,.btn:hover{border-color:var(--soft);color:var(--ink)}
-  .filters button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
-  .filters button:focus-visible,.btn:focus-visible{outline:2px solid var(--oxide);outline-offset:2px}
-  .scroll{overflow-x:auto;background:var(--card);border:1px solid var(--rule);border-radius:2px}
-  table{border-collapse:collapse;width:100%;min-width:1000px}
-  th{font:600 11px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--soft);text-align:left;padding:13px 13px 9px;
-    border-bottom:1px solid var(--ink);white-space:nowrap}
-  td{padding:12px 13px;border-bottom:1px solid var(--rule);vertical-align:top;font-size:13.5px}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1280px;margin:0 auto;padding:26px 22px 60px}
+
+  /* ── Antet ────────────────────────────────────────────── */
+  .top{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    gap:24px;flex-wrap:wrap;
+    padding-bottom:22px;margin-bottom:24px;
+    border-bottom:1px solid var(--line-strong);
+  }
+  .title-row{display:flex;align-items:center;gap:13px}
+  .logo-badge{
+    width:38px;height:38px;border-radius:9px;flex:none;
+    background:linear-gradient(135deg,var(--navy),#2f5691);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .logo-badge svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.1}
+  h1{
+    font-weight:800;font-size:clamp(26px,3.2vw,38px);
+    line-height:1.12;margin:0;color:var(--navy-deep);letter-spacing:-.015em;
+  }
+  .top-sub{margin:9px 0 0;color:var(--ink-dim);font-size:13.5px;max-width:52ch}
+  .top-meta{
+    font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .top-meta b{color:var(--navy-deep);font-weight:700}
+  .navbtns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .navbtn{
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+    border-radius:var(--radius);padding:11px 20px;
+    font-size:14px;font-weight:800;white-space:nowrap;cursor:pointer;
+    letter-spacing:.01em;border:1.5px solid transparent;
+  }
+  .navbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.3}
+  .navbtn.here{background:linear-gradient(135deg,var(--navy),#2f5691);color:#fff}
+  .navbtn.away{background:#fff;color:var(--navy);border-color:var(--navy)}
+  .navbtn.away:hover{background:var(--blue-bg)}
+  .navbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  /* ── KPI ──────────────────────────────────────────────── */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  @media (max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;
+  }
+  .kpi .lbl{
+    font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--ink-dim);font-weight:700;margin-bottom:7px;
+  }
+  .kpi .val{font-size:27px;font-weight:800;color:var(--navy-deep);line-height:1;letter-spacing:-.02em}
+  .kpi .sub{font-size:11.5px;color:var(--ink-dim);margin-top:6px;font-family:var(--mono)}
+
+  /* ── Panouri ──────────────────────────────────────────── */
+  .panel{
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);
+    overflow:hidden;margin-bottom:20px;
+  }
+  .panel-head{
+    display:flex;justify-content:space-between;align-items:center;gap:14px;
+    flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line);
+  }
+  h2{
+    font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;
+    color:var(--navy);margin:0;font-weight:700;
+    display:flex;align-items:center;gap:8px;
+  }
+  h2 svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2}
+  .panel-body{padding:16px 18px}
+
+  /* ── Filtre ───────────────────────────────────────────── */
+  .btns{display:flex;flex-wrap:wrap;gap:6px}
+  .btns button{
+    background:var(--panel);border:1px solid var(--line-strong);color:var(--navy);
+    font-family:inherit;font-size:11.5px;font-weight:600;border-radius:6px;
+    padding:6px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  }
+  .btns button:hover{background:var(--blue-bg)}
+  .btns button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+  .btns button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .btns button i{width:8px;height:8px;border-radius:2px;flex:none;background:currentColor}
+  .btns button .n{font-family:var(--mono);opacity:.72;font-size:10.5px}
+  .seek{
+    border:1px solid var(--line-strong);border-radius:6px;padding:7px 12px;
+    font-family:inherit;font-size:12px;color:var(--ink);min-width:210px;flex:1;max-width:340px;
+  }
+  .seek:focus{outline:2px solid var(--gold);outline-offset:1px}
+
+  /* ── Tabel ────────────────────────────────────────────── */
+  .tbl-scroll{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;min-width:940px}
+  th{
+    font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);
+    font-weight:700;text-align:left;padding:11px 14px;
+    border-bottom:1px solid var(--line-strong);white-space:nowrap;background:#fbfcfe;
+  }
+  td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top}
   tbody tr:last-child td{border-bottom:none}
-  tbody tr:hover{background:#F7F9FB}
-  td.rail{width:5px;padding:0;background:var(--soft)}
-  tr[data-cat="Grant"] td.rail{background:var(--sage)}
-  tr[data-cat="Împrumut"] td.rail{background:var(--oxide)}
-  tr[data-cat="Finanțare"] td.rail{background:var(--brass)}
-  tr[data-cat="Contract de finanțare"] td.rail{background:var(--azure)}
-  tr[data-cat="Credit"] td.rail{background:var(--plum)}
-  .act,.cat,.part,.sig{font:600 12px/1.4 ui-monospace,Menlo,Consolas,monospace;white-space:nowrap}
-  .cat{color:var(--soft);font-weight:400}
-  .sig{color:var(--oxide)}
-  .titlu{max-width:58ch;line-height:1.45}
-  .ed{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;white-space:nowrap}
-  .ed a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)}
-  .ed a:hover{color:var(--oxide);border-color:var(--oxide)}
-  .ed span{display:block;color:var(--soft);margin-top:3px}
-  .note{padding:30px 22px;background:var(--card);border:1px solid var(--rule);border-radius:2px}
-  .note h2{font:600 12px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--oxide);margin:0 0 12px}
-  .note p{margin:0 0 12px;color:var(--soft);font-size:14px;max-width:70ch}
-  .note code{background:var(--paper);padding:2px 6px;border-radius:2px;
-    font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--ink);word-break:break-all}
-  .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-  input[type=url]{flex:1;min-width:260px;padding:10px;border:1px solid var(--rule);
-    border-radius:2px;font:12px ui-monospace,Menlo,Consolas,monospace;color:var(--ink)}
-  input[type=url]:focus{outline:2px solid var(--oxide);outline-offset:1px}
-  footer{margin-top:26px;border-top:1px solid var(--rule);padding-top:16px;
-    font-size:13px;color:var(--soft);max-width:74ch}
-  @media (max-width:640px){body{padding:20px 12px 44px}h1{font-size:23px}}
+  tbody tr:hover{background:#fafbfd}
+
+  .tag{
+    display:inline-block;padding:3px 9px;border-radius:5px;
+    font-size:10.5px;font-weight:700;letter-spacing:.02em;white-space:nowrap;
+  }
+  .t-grant{background:var(--teal-bg);color:var(--teal-ink)}
+  .t-imprumut{background:var(--red-bg);color:var(--red)}
+  .t-finantare{background:var(--gold-bg);color:#8a5c0d}
+  .t-contract{background:var(--blue-bg);color:var(--navy)}
+  .t-credit{background:var(--purple-bg);color:var(--purple)}
+  .t-alt{background:#eef0f4;color:var(--ink-dim)}
+
+  .org{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--navy-deep);white-space:nowrap}
+  .titlu{max-width:56ch;line-height:1.5;font-size:13.5px}
+  .actnr{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);white-space:nowrap}
+  .semnat{
+    font-family:var(--mono);font-size:11.5px;font-weight:700;
+    background:var(--gold-bg);color:#8a5c0d;padding:3px 8px;border-radius:5px;white-space:nowrap;
+  }
+  .nil{color:var(--line-strong)}
+  .src{font-family:var(--mono);font-size:11px;color:var(--navy);text-decoration:none;white-space:nowrap}
+  .src:hover{text-decoration:underline;color:var(--gold)}
+
+  /* traseul actului */
+  .stage{display:flex;flex-direction:column;gap:6px;min-width:132px}
+  .stage .rail{display:flex;align-items:center}
+  .stage .dot{width:8px;height:8px;border-radius:50%;flex:none;border:1.5px solid var(--line-strong);background:#fff}
+  .stage .seg{height:1.5px;flex:1;background:var(--line-strong)}
+  .stage .dot.done{background:var(--navy);border-color:var(--navy)}
+  .stage .seg.done{background:var(--navy)}
+  .stage .dot.here{width:11px;height:11px;background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,135,26,.18)}
+  .stage .now{font-size:11px;font-weight:700;color:var(--navy-deep)}
+
+  /* bare distribuție */
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+  .bar-row:last-child{margin-bottom:0}
+  .bar-lbl{font-size:11.5px;color:var(--ink);min-width:150px;font-weight:600}
+  .bar-track{flex:1;height:8px;background:#eef0f4;border-radius:4px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--navy),#3d6ba8)}
+  .bar-val{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);min-width:26px;text-align:right}
+
+  .empty-state{padding:34px 18px;text-align:center;color:var(--ink-dim);font-size:13px}
+  .empty-state strong{display:block;color:var(--navy-deep);font-size:15px;font-weight:700;margin-bottom:6px}
+  .empty-state code{font-family:var(--mono);background:#f2f4f8;padding:2px 6px;border-radius:4px}
+
+  .footer-source{
+    border-top:1px solid var(--line);padding-top:16px;margin-top:8px;
+    font-size:12px;color:var(--ink-dim);max-width:78ch;
+  }
+  @media (max-width:900px){
+    .stage{min-width:0}
+  }
   @media (prefers-reduced-motion:no-preference){
-    .dot{animation:p 2.4s ease-in-out infinite}
-    @keyframes p{0%,100%{opacity:1}50%{opacity:.35}}
+    .bar-fill{transition:width .5s cubic-bezier(.2,.7,.3,1)}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-<header>
-  <div class="eyebrow">Monitorul Oficial al Republicii Moldova</div>
-  <h1>Acorduri de asistență externă</h1>
-  <p class="lede">Granturi, împrumuturi, finanțare și credite externe, colectate din
-  cuprinsurile Monitorului Oficial. Pagina citește datele de la sursă la fiecare deschidere.</p>
-</header>
+  <header class="top">
+    <div>
+      <div class="title-row">
+        <div class="logo-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+        </div>
+        <h1>Acorduri de asistență externă</h1>
+      </div>
+      <p class="top-sub">Acte publicate în Monitorul Oficial: granturi, împrumuturi, contracte de finanțare și facilități de credit.</p>
+    </div>
+    <div class="top-meta" id="topMeta"></div>
+    <div class="navbtns">
+      <span class="navbtn here">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Acorduri
+      </span>
+      <a class="navbtn away" href="donatori.html">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg>
+        Donatori și proiecte →
+      </a>
+    </div>
+  </header>
 
-<div id="app">
-  <div class="note"><h2>Se încarcă</h2><p>Preiau datele…</p></div>
-</div>
+  <div id="app">
+    <div class="panel"><div class="empty-state"><strong>Se încarcă</strong>Preiau registrul.</div></div>
+  </div>
 
-<footer>
-  Un acord generează de regulă mai multe acte — inițierea negocierilor, aprobarea semnării,
-  proiectul de lege, ratificarea, promulgarea. Coloana „Semnat" apare doar când data e menționată
-  explicit în denumirea actului.
-</footer>
+  <div class="footer-source">
+    Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova. Un acord parcurge mai multe etape, fiecare publicată ca act separat — coloana „Etapă" arată unde se află fiecare. Data semnării apare doar când e menționată în denumirea actului.
+  </div>
 
 </div>
 
 <script>
 (function(){
-  // ─────────────────────────────────────────────────────────────
-  // Pune aici adresa fișierului date.json. Exemplu GitHub:
-  // https://raw.githubusercontent.com/UTILIZATOR/REPO/main/date.json
   var DATA_URL = "date.json";
-  // ─────────────────────────────────────────────────────────────
 
-  var app = document.getElementById('app');
-  var filter = 'all';
-  var db = null;
+  var STAGES = ['Negociere','Semnare','Ratificare','Promulgare','În vigoare'];
+  var CLS = {
+    'Grant':'t-grant','Împrumut':'t-imprumut','Finanțare':'t-finantare',
+    'Contract de finanțare':'t-contract','Credit':'t-credit'
+  };
+
+  var app = document.getElementById('app'), topMeta = document.getElementById('topMeta');
+  var db = null, fCat = 'all', fOrg = 'all', seek = '';
 
   var q = new URLSearchParams(location.search).get('src');
   if (q) DATA_URL = q;
 
   function esc(s){
-    return String(s == null ? '' : s)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
-
-  function setup(msg, detail){
-    app.innerHTML =
-      '<div class="note"><h2>' + esc(msg) + '</h2>' +
-      '<p>' + detail + '</p>' +
-      '<div class="row">' +
-      '<input type="url" id="u" placeholder="https://raw.githubusercontent.com/…/date.json" value="' + esc(DATA_URL) + '">' +
-      '<button class="btn" id="go">Încarcă</button></div></div>';
-    document.getElementById('go').addEventListener('click', function(){
-      var v = document.getElementById('u').value.trim();
-      if (v) location.search = '?src=' + encodeURIComponent(v);
-    });
-    document.getElementById('u').addEventListener('keydown', function(e){
-      if (e.key === 'Enter') document.getElementById('go').click();
-    });
+  function fold(s){
+    return String(s||'').toLowerCase()
+      .replace(/[ăâ]/g,'a').replace(/î/g,'i').replace(/[șş]/g,'s').replace(/[țţ]/g,'t');
+  }
+  function stageOf(t){
+    t = fold(t);
+    if (/intrarii in vigoare|intrat in vigoare|intrarea in vigoare/.test(t)) return 4;
+    if (/promulgare|promulgarea/.test(t)) return 3;
+    if (/ratificare|ratificarea/.test(t)) return 2;
+    if (/initierea negocierilor/.test(t) && !/aprobarea semnarii/.test(t)) return 0;
+    if (/aprobarea semnarii|aprobarea acordului|aprobarea amendamentului/.test(t)) return 1;
+    if (/initierea negocierilor/.test(t)) return 0;
+    return 1;
+  }
+  function ord(a){
+    var m = /(\d{2})\.(\d{2})\.(\d{4})/.exec(a.data_editie||'');
+    return m ? m[3]+m[2]+m[1] : '0';
+  }
+  function rail(i){
+    var h = '<div class="stage"><span class="rail">';
+    for (var s = 0; s < 5; s++){
+      if (s) h += '<span class="seg' + (s <= i ? ' done' : '') + '"></span>';
+      h += '<span class="dot' + (s < i ? ' done' : s === i ? ' here' : '') + '"></span>';
+    }
+    return h + '</span><span class="now">' + STAGES[i] + '</span></div>';
   }
 
-  function key(a){
-    var m = /(\d{2})\.(\d{2})\.(\d{4})/.exec(a.data_editie || '');
-    return m ? m[3] + m[2] + m[1] : '0';
-  }
+  function paint(){
+    var all = Object.keys(db.acte||{}).map(function(k){ return db.acte[k]; });
+    all.sort(function(x,y){ return ord(y).localeCompare(ord(x)); });
 
-  function render(){
-    var acte = Object.keys(db.acte || {}).map(function(k){ return db.acte[k]; });
-    acte.sort(function(a,b){ return key(b).localeCompare(key(a)); });
+    var cats = {}, orgs = {}, stages = {}, signed = 0;
+    all.forEach(function(a){
+      cats[a.categorie] = (cats[a.categorie]||0)+1;
+      stages[STAGES[stageOf(a.titlu)]] = (stages[STAGES[stageOf(a.titlu)]]||0)+1;
+      if (a.semnat) signed++;
+      (a.partener||'').split(' / ').forEach(function(o){
+        o = o.trim(); if (o) orgs[o] = (orgs[o]||0)+1;
+      });
+    });
+    var nOrg = Object.keys(orgs).length;
 
-    if (!acte.length){
-      app.innerHTML = '<div class="note"><h2>Registru gol</h2>' +
-        '<p>Fișierul a fost citit, dar nu conține niciun act. Rulează scriptul de colectare.</p></div>';
+    topMeta.innerHTML =
+      '<span>Ultima verificare: <b>' + esc(db.ultima_rulare||'—') + '</b></span>' +
+      '<span>Ediții parcurse: <b>' + ((db.editii_vazute||[]).length) + '</b></span>';
+
+    if (!all.length){
+      app.innerHTML = '<div class="panel"><div class="empty-state"><strong>Registrul e gol</strong>' +
+        'Fișierul a fost citit, dar nu conține acte. Pornește o rulare din fila Actions.</div></div>';
       return;
     }
 
-    var cats = {}, semnate = 0;
-    acte.forEach(function(a){
-      cats[a.categorie] = (cats[a.categorie]||0)+1;
-      if (a.semnat) semnate++;
-    });
+    var kpis =
+      kpi('Acte în registru', all.length, 'ianuarie – august 2026') +
+      kpi('Creditori', nOrg, Object.keys(orgs).sort(function(a,b){return orgs[b]-orgs[a];}).slice(0,3).join(' · ')) +
+      kpi('Categorii', Object.keys(cats).length, Object.keys(cats).sort().join(' · ').slice(0,42)) +
+      kpi('Cu dată de semnare', signed, signed + ' din ' + all.length + ' acte');
 
-    var fbtn = ['<button data-f="all">Toate (' + acte.length + ')</button>'];
-    Object.keys(cats).sort().forEach(function(c){
-      fbtn.push('<button data-f="' + esc(c) + '">' + esc(c) + ' (' + cats[c] + ')</button>');
-    });
-
-    var rows = acte.map(function(a){
-      return '<tr data-cat="' + esc(a.categorie) + '">' +
-        '<td class="rail"></td>' +
-        '<td class="act">' + esc(a.act) + '</td>' +
-        '<td class="cat">' + esc(a.categorie) + '</td>' +
-        '<td class="part">' + esc(a.partener || '—') + '</td>' +
-        '<td class="titlu">' + esc(a.titlu) + '</td>' +
-        '<td class="sig">' + esc(a.semnat || '—') + '</td>' +
-        '<td class="ed"><a href="' + esc(a.url) + '" target="_blank" rel="noopener">' +
-          esc(a.editie) + '</a><span>' + esc(a.data_editie) + '</span></td>' +
-        '</tr>';
+    var maxS = Math.max.apply(null, STAGES.map(function(s){ return stages[s]||0; }));
+    var bars = STAGES.map(function(s){
+      var n = stages[s]||0, w = maxS ? Math.round(n/maxS*100) : 0;
+      return '<div class="bar-row"><span class="bar-lbl">' + s + '</span>' +
+        '<span class="bar-track"><span class="bar-fill" style="width:' + w + '%"></span></span>' +
+        '<span class="bar-val">' + n + '</span></div>';
     }).join('');
 
-    app.innerHTML =
-      '<div class="stats">' +
-        '<div><b>' + acte.length + '</b> acte</div>' +
-        '<div><b>' + semnate + '</b> cu dată de semnare</div>' +
-        '<div><b>' + ((db.editii_vazute||[]).length) + '</b> ediții parcurse</div>' +
-        '<div class="live"><span class="dot"></span>ultima verificare: <b>' +
-          esc(db.ultima_rulare || '—') + '</b></div>' +
-        '<div><button class="btn" id="rf">Reîmprospătează</button></div>' +
-      '</div>' +
-      '<div class="filters" role="group" aria-label="Filtrare după categorie">' + fbtn.join('') + '</div>' +
-      '<div class="scroll"><table><thead><tr>' +
-        '<th></th><th>Act</th><th>Categorie</th><th>Partener</th>' +
-        '<th>Denumire</th><th>Semnat</th><th>Ediția</th>' +
-      '</tr></thead><tbody id="rows">' + rows + '</tbody></table></div>';
+    var orgBtns = ['<button data-org="all" aria-pressed="true">Toți <span class="n">' + all.length + '</span></button>']
+      .concat(Object.keys(orgs).sort(function(a,b){ return orgs[b]-orgs[a]; }).map(function(o){
+        return '<button data-org="' + esc(o) + '" aria-pressed="false">' + esc(o) +
+          ' <span class="n">' + orgs[o] + '</span></button>';
+      })).join('');
 
-    var btns = app.querySelectorAll('.filters button');
-    btns.forEach(function(b){
-      b.setAttribute('aria-pressed', String(b.dataset.f === filter));
-      b.addEventListener('click', function(){
-        filter = b.dataset.f;
-        btns.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
-        app.querySelectorAll('#rows tr').forEach(function(r){
-          r.hidden = !(filter === 'all' || r.dataset.cat === filter);
+    var catBtns = ['<button data-cat="all" aria-pressed="true">Toate <span class="n">' + all.length + '</span></button>']
+      .concat(Object.keys(cats).sort().map(function(c){
+        return '<button data-cat="' + esc(c) + '" aria-pressed="false">' + esc(c) +
+          ' <span class="n">' + cats[c] + '</span></button>';
+      })).join('');
+
+    app.innerHTML =
+      '<div class="kpis">' + kpis + '</div>' +
+
+      '<div class="panel"><div class="panel-head">' +
+        '<h2><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="13" y="6" width="3" height="11"/></svg>Distribuția pe etape</h2>' +
+      '</div><div class="panel-body">' + bars + '</div></div>' +
+
+      '<div class="panel"><div class="panel-head">' +
+        '<h2><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Creditori și parteneri</h2>' +
+      '</div><div class="panel-body"><div class="btns" id="orgBtns">' + orgBtns + '</div></div></div>' +
+
+      '<div class="panel"><div class="panel-head">' +
+        '<h2><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Acte publicate</h2>' +
+        '<div class="btns" id="catBtns">' + catBtns + '</div>' +
+        '<input class="seek" type="search" id="seek" placeholder="Caută în denumiri…" aria-label="Caută în denumiri">' +
+      '</div><div class="tbl-scroll"><table>' +
+        '<thead><tr><th>Partener</th><th>Categorie</th><th>Denumirea actului</th>' +
+        '<th>Etapă</th><th>Semnat</th><th>Publicat</th></tr></thead>' +
+        '<tbody id="rows"></tbody></table></div>' +
+        '<div id="none"></div></div>';
+
+    bind('#orgBtns button', 'org', function(v){ fOrg = v; });
+    bind('#catBtns button', 'cat', function(v){ fCat = v; });
+    var box = document.getElementById('seek');
+    box.addEventListener('input', function(){ seek = fold(box.value); rows(all); });
+
+    rows(all);
+
+    function bind(sel, key, set){
+      var list = app.querySelectorAll(sel);
+      list.forEach(function(b){
+        b.addEventListener('click', function(){
+          set(b.dataset[key]);
+          list.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
+          rows(all);
         });
       });
-    });
-    app.querySelectorAll('#rows tr').forEach(function(r){
-      r.hidden = !(filter === 'all' || r.dataset.cat === filter);
-    });
-    document.getElementById('rf').addEventListener('click', load);
-  }
-
-  function load(){
-    if (!DATA_URL){
-      setup('Adresa datelor lipsește',
-        'Această pagină citește fișierul <code>date.json</code> produs de scriptul de colectare. ' +
-        'Lipește mai jos adresa lui publică, sau editează linia <code>DATA_URL</code> din codul paginii.');
-      return;
     }
-    var url = DATA_URL + (DATA_URL.indexOf('?') > -1 ? '&' : '?') + '_=' + Date.now();
-    fetch(url, {cache:'no-store'})
-      .then(function(r){
-        if (!r.ok) throw new Error('Serverul a răspuns ' + r.status);
-        return r.json();
-      })
-      .then(function(j){
-        if (!j || typeof j !== 'object' || !j.acte) throw new Error('structură neașteptată');
-        db = j; render();
-      })
-      .catch(function(e){
-        setup('Datele nu au putut fi citite',
-          'Adresa încercată: <code>' + esc(DATA_URL) + '</code><br><br>' +
-          'Motiv: ' + esc(e.message) + '.<br><br>' +
-          'Verifică dacă adresa e publică și duce direct la fișierul brut. ' +
-          'Pe GitHub, folosește linkul de tip <code>raw.githubusercontent.com</code>, ' +
-          'nu pe cel din interfața web.');
-      });
   }
 
-  load();
+  function kpi(lbl, val, sub){
+    return '<div class="kpi"><div class="lbl">' + esc(lbl) + '</div>' +
+      '<div class="val">' + val + '</div><div class="sub">' + esc(sub) + '</div></div>';
+  }
+
+  function rows(all){
+    var out = all.filter(function(a){
+      if (fCat !== 'all' && a.categorie !== fCat) return false;
+      if (fOrg !== 'all' && (a.partener||'').indexOf(fOrg) === -1) return false;
+      if (seek && fold(a.titlu + ' ' + a.act).indexOf(seek) === -1) return false;
+      return true;
+    });
+
+    document.getElementById('rows').innerHTML = out.map(function(a){
+      return '<tr>' +
+        '<td class="org">' + esc(a.partener || '—') + '</td>' +
+        '<td><span class="tag ' + (CLS[a.categorie]||'t-alt') + '">' + esc(a.categorie) + '</span></td>' +
+        '<td><div class="titlu">' + esc(a.titlu) + '</div>' +
+          '<div class="actnr" style="margin-top:6px">' + esc(a.act) + '</div></td>' +
+        '<td>' + rail(stageOf(a.titlu)) + '</td>' +
+        '<td>' + (a.semnat ? '<span class="semnat">' + esc(a.semnat) + '</span>' : '<span class="nil">—</span>') + '</td>' +
+        '<td><a class="src" href="' + esc(a.url) + '" target="_blank" rel="noopener">MO ' +
+          esc(a.editie) + '</a><div class="actnr" style="margin-top:5px">' + esc(a.data_editie) + '</div></td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('none').innerHTML = out.length ? '' :
+      '<div class="empty-state"><strong>Niciun act</strong>' +
+      'Nimic nu corespunde filtrelor. Alege „Toate" sau golește căutarea.</div>';
+  }
+
+  fetch(DATA_URL + (DATA_URL.indexOf('?')>-1?'&':'?') + '_=' + Date.now(), {cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw new Error('serverul a răspuns ' + r.status); return r.json(); })
+    .then(function(j){
+      if (!j || !j.acte) throw new Error('fișierul nu are structura așteptată');
+      db = j; paint();
+    })
+    .catch(function(e){
+      app.innerHTML = '<div class="panel"><div class="empty-state">' +
+        '<strong>Registrul nu a putut fi citit</strong>' +
+        'Am cerut <code>' + esc(DATA_URL) + '</code> și am primit: ' + esc(e.message) + '.<br><br>' +
+        'Dacă ai deschis pagina prin dublu-click, browserul blochează citirea fișierelor locale. ' +
+        'Deschide-o de pe site.</div></div>';
+    });
 })();
 </script>
 </body>
