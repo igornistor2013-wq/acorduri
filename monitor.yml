@@ -1,0 +1,47 @@
+name: Verifică Monitorul Oficial
+
+on:
+  schedule:
+    # 06:00 UTC = 09:00 ora Chișinăului (vara). Luni–vineri.
+    - cron: "0 6 * * 1-5"
+  workflow_dispatch:        # permite pornirea manuală din interfața GitHub
+
+permissions:
+  contents: write
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  verifica:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Descarcă repository-ul
+        uses: actions/checkout@v4
+
+      - name: Pregătește Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalează bibliotecile
+        run: pip install --quiet requests beautifulsoup4
+
+      - name: Rulează colectarea
+        run: python monitor_watch.py
+
+      - name: Salvează dacă au apărut acte noi
+        run: |
+          if [ -z "$(git status --porcelain date.json dashboard.html)" ]; then
+            echo "Nimic nou — nu fac commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add date.json dashboard.html
+          git commit -m "Acte noi — $(date +%d.%m.%Y)"
+          git push
+          echo "Publicat."
