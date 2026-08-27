@@ -35,7 +35,7 @@
     },
     "nr. 157, 30 iulie 2026|3314": {
       "act": "nr. 157, 30 iulie 2026",
-      "titlu": "Lege pentru ratificarea Amendamentului, încheiat prin schimb de scrisori, la Acordul de împrumut dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare (BIRD) pentru realizarea Proiectului de competitivitate a întreprinderilor micro, mici și mijlocii și la Acordul de finanțare dintre Republica Moldova și Asociația Internațională pentru Dezvoltare (AID)",
+      "titlu": "Lege pentru ratificarea Amendamentului, încheiat prin schimb de scrisori, la Acordul de împrumut dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare (BIRD) pentru realizarea Proiectului de competitivitate a întreprinderilor micro, mici și mijlocii (Proiectul ÎMMM) și la Acordul de finanțare dintre Republica Moldova și Asociația Internațională pentru Dezvoltare (AID) pentru realizarea Proiectului de competitivitate a întreprinderilor micro, mici și mijlocii (Proiectul ÎMMM)",
       "categorie": "Împrumut",
       "partener": "BIRD / AID",
       "semnat": "",
@@ -46,7 +46,7 @@
     },
     "nr. 716-X, 5 august 2026|3314": {
       "act": "nr. 716-X, 5 august 2026",
-      "titlu": "Decret cu privire la promulgarea Legii pentru ratificarea Amendamentului la Acordul de împrumut dintre Republica Moldova și BIRD și la Acordul de finanțare dintre Republica Moldova și AID pentru Proiectul ÎMMM",
+      "titlu": "Decret cu privire la promulgarea Legii pentru ratificarea Amendamentului, încheiat prin schimb de scrisori, la Acordul de împrumut dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare (BIRD) pentru realizarea Proiectului de competitivitate a întreprinderilor micro, mici și mijlocii (Proiectul ÎMMM) și la Acordul de finanțare dintre Republica Moldova și Asociația Internațională pentru Dezvoltare (AID) pentru realizarea Proiectului de competitivitate a întreprinderilor micro, mici și mijlocii (Proiectul ÎMMM)",
       "categorie": "Împrumut",
       "partener": "BIRD / AID",
       "semnat": "",
@@ -87,6 +87,17 @@
       "data_editie": "31.07.2026",
       "editie_id": "3312",
       "url": "https://monitorul.gov.md/ro/monitor/3312"
+    },
+    "nr. 741-X, 21 august 2026|3322": {
+      "act": "nr. 741-X, 21 august 2026",
+      "titlu": "Decret pentru inițierea negocierilor și aprobarea semnării Amendamentului la Acordurile de finanțare dintre Republica Moldova și Asociația Internațională pentru Dezvoltare privind Proiectul de dezvoltare a sistemului electroenergetic",
+      "categorie": "Finanțare",
+      "partener": "AID",
+      "semnat": "",
+      "editie": "390-393",
+      "data_editie": "25.08.2026",
+      "editie_id": "3322",
+      "url": "https://monitorul.gov.md/ro/monitor/3322"
     }
   },
   "editii_vazute": [
@@ -100,7 +111,8 @@
     "3319",
     "3320",
     "3321",
-    "3322"
+    "3322",
+    "3323"
   ],
-  "ultima_rulare": "26.08.2026 08:11"
+  "ultima_rulare": "27.08.2026 06:55"
 }
