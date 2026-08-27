@@ -7,10 +7,11 @@ finanțare, credit).
 
 Rulare:
     python3 monitor_watch.py
+    python3 monitor_watch.py --backfill 3300 3323   # recuperează ediții vechi
 
 Ce face:
   1. Citește lista edițiilor recente de pe monitorul.gov.md
-  2. Deschide fiecare ediție nouă (cele deja văzute sunt sărite)
+  2. Recitește TOATE edițiile din listă la fiecare rulare (nu doar cele noi)
   3. Extrage actele care conțin termeni de finanțare externă
   4. Salvează în date.json (cumulativ, fără duplicate)
   5. Regenerează dashboard.html
@@ -42,46 +43,92 @@ UA = {"User-Agent": "Mozilla/5.0 (compatible; monitor-watch/1.0)"}
 # ---------------------------------------------------------------- clasificare
 
 # Termeni care indică un act de finanțare externă.
+#
+# Tiparele se aplică pe text NORMALIZAT (litere mici, fără diacritice), de aceea
+# sunt scrise aici direct fără diacritice — vezi norm() mai jos.
+#
+# ACORD acoperă și pluralul. Vechea versiune accepta doar „acord / acordul /
+# acordului" și rata acte reale: „Amendament la ACORDURILE de finanțare dintre
+# Republica Moldova și AID" (MO nr. 390-393 din 25.08.2026, poz. 421) n-a intrat
+# niciodată în registru din cauza unei singure litere.
+ACORD = r"acord(?:ul|ului|uri|urile|urilor)?"
+CONTRACT = r"contract(?:ul|ului|e|ele|elor)?"
+
 INCLUDE = [
-    (r"acord(ul|ului)?\s+de\s+grant", "Grant"),
-    (r"grant\s+investi", "Grant"),
-    (r"acord(ul|ului)?\s+de\s+[iî]mprumut", "Împrumut"),
-    (r"acord(ul|ului)?\s+de\s+finan", "Finanțare"),
-    (r"contract(ul|ului)?\s+de\s+finan", "Contract de finanțare"),
+    # granturi
+    (ACORD + r"\s+de\s+grant", "Grant"),
+    (r"grant(?:ul|ului|uri|urile|urilor)?\s+investi", "Grant"),
+    (r"din\s+contul\s+grantului", "Grant"),
+    (r"asistent[aă]\s+financiara\s+nerambursabila", "Grant"),
+    (ACORD + r"\s+de\s+colaborare\s+dintre", "Grant"),
+    # împrumuturi
+    (ACORD + r"\s+de\s+imprumut", "Împrumut"),
+    (CONTRACT + r"\s+de\s+imprumut", "Împrumut"),
+    # finanțare
+    (ACORD + r"\s+de\s+finan", "Finanțare"),
+    (r"conventi(?:a|e|ei|i|ile|ilor)?\s+de\s+finan", "Finanțare"),
+    (r"cooperare\s+si\s+finantare", "Finanțare"),
+    (ACORD + r"\s+de\s+cooperare\s+financiara", "Finanțare"),
+    (ACORD + r"\s+de\s+(?:asistenta|sprijin)\s+financiar", "Finanțare"),
+    (r"asistenta\s+(?:financiara\s+)?(?:externa|macrofinanciara)", "Finanțare"),
+    (r"memorandum[^.]{0,80}?(?:finantare|imprumut|macrofinanciar)", "Finanțare"),
+    (r"suport\s+bugetar", "Finanțare"),
+    # contract de finanțare (mai specific decât „finanțare")
+    (CONTRACT + r"\s+de\s+finan", "Contract de finanțare"),
+    # credite
     (r"facilitate\s+de\s+credit", "Credit"),
-    (r"acord(ul|ului)?\s+de\s+credit", "Credit"),
-    (r"contract(ul|ului)?\s+de\s+credit", "Credit"),
-    (r"cooperare\s+[sș]i\s+finan[tț]are", "Finanțare"),
-    (r"acord(ul|ului)?\s+de\s+colaborare\s+dintre", "Grant"),
-    (r"asisten[tț][aă]\s+financiar[aă]\s+(extern|macrofinanciar)", "Finanțare"),
+    (r"linie\s+de\s+credit", "Credit"),
+    (ACORD + r"\s+de\s+credit", "Credit"),
+    (CONTRACT + r"\s+de\s+credit", "Credit"),
 ]
 
 # Termeni care înseamnă că actul NU e despre finanțare externă,
 # chiar dacă a trecut de filtrul de mai sus.
 EXCLUDE = [
-    r"[iî]mprumut\s+interbibliotecar",
-    r"asocia[tț]i(i|ile|ilor)\s+de\s+economii\s+[sș]i\s+[iî]mprumut",
-    r"risc(ul|ului)?\s+de\s+credit",
+    r"imprumut\s+interbibliotecar",
+    r"asociati(?:i|ile|ilor)\s+de\s+economii\s+si\s+imprumut",
+    r"risc(?:ul|ului)?\s+de\s+credit",
     r"istoriil?e?\s+de\s+credit",
-    r"birou(l|ri|rile)\s+istoriilor\s+de\s+credit",
-    r"credite?\s+f[aă]r[aă]\s+dob[aâ]nd[aă]\s+.*(electoral|concuren[tț])",
-    r"cooperativ[ea]\s+de\s+[iî]ntrajutorare",
+    r"birou(?:l|ri|rile)\s+istoriilor\s+de\s+credit",
+    r"credite?\s+fara\s+dobanda\s+.*(?:electoral|concurent)",
+    r"cooperativ[ea]\s+de\s+intrajutorare",
+    # sprijin financiar intern pentru producători — nu e asistență externă
+    r"sprijin(?:ul|ului)?\s+financiar\s+(?:pentru\s+)?(?:producator|agricultor|fermier)",
+    # finanțarea partidelor / campaniilor
+    r"finantarea\s+(?:partidelor|campaniei|concurentilor)",
 ]
 
 # Partenerii externi recunoscuți, pentru coloana „Partener".
+# Tiparele se aplică tot pe text normalizat (fără diacritice), ca să prindem și
+# „Asociaţia" cu ş-cedilă, și „Asociația" cu ș-virgulă — în Monitor apar ambele.
 PARTNERS = [
-    (r"\bBIRD\b|Banca Interna[tț]ional[aă] pentru Reconstruc[tț]ie", "BIRD"),
-    (r"\bBERD\b|Banca European[aă] pentru Reconstruc[tț]ie", "BERD"),
-    (r"\bBEI\b|Banca European[aă] de Investi[tț]ii", "BEI"),
-    (r"\bAID\b|Asocia[tț]ia Interna[tț]ional[aă] pentru Dezvoltare", "AID"),
-    (r"Agen[tț]ia Francez[aă]|\bAFD\b", "AFD"),
-    (r"\bJICA\b|Agen[tț]ia Japonez[aă]", "JICA"),
-    (r"\bGIZ\b", "GIZ"),
-    (r"\bPNUD\b|Programul Na[tț]iunilor Unite", "PNUD"),
-    (r"\bFICR\b|Cruce Ro[sș]ie", "FICR"),
-    (r"Banca de Dezvoltare a Consiliului Europei|\bBDCE\b", "BDCE"),
-    (r"Uniunea European[aă]|Comisia European[aă]", "UE"),
-    (r"\bFMI\b|Fondul Monetar", "FMI"),
+    (r"\bbird\b|banca internationala pentru reconstructie", "BIRD"),
+    (r"\bberd\b|banca europeana pentru reconstructie", "BERD"),
+    (r"\bbei\b|banca europeana de investitii", "BEI"),
+    (r"\baid\b|asociatia internationala pentru dezvoltare", "AID"),
+    (r"banca mondiala|grupul bancii mondiale", "Banca Mondială"),
+    (r"\bbdce\b|banca de dezvoltare a consiliului europei", "BDCE"),
+    (r"\bafd\b|agentia franceza", "AFD"),
+    (r"\bkfw\b", "KfW"),
+    (r"\bjica\b|agentia japoneza", "JICA"),
+    (r"\bgiz\b", "GIZ"),
+    (r"\bpnud\b|programul natiunilor unite", "PNUD"),
+    (r"\bunicef\b", "UNICEF"),
+    (r"\bunhcr\b|inaltul comisariat.{0,30}refugiat", "UNHCR"),
+    (r"\bficr\b|cruce ro[sș]ie|crucii rosii", "FICR"),
+    (r"\bfida\b|fondul international pentru dezvoltare agricola", "FIDA"),
+    # și la genitiv: „din partea Uniunii Europene", „a Comisiei Europene"
+    (r"uniunea europeana|uniunii europene|comisia europeana|comisiei europene", "UE"),
+    (r"consiliul(?:ui)? europei", "Consiliul Europei"),
+    (r"\bfmi\b|fondul(?:ui)?\s+monetar", "FMI"),
+    (r"\busaid\b|statele unite ale americii|guvernul sua", "SUA"),
+    (r"guvernul japoniei", "Japonia"),
+    (r"guvernul germaniei|republicii federale germania", "Germania"),
+    (r"guvernul romaniei", "România"),
+    (r"guvernul elvetiei|confederatiei elvetiene", "Elveția"),
+    (r"\bsida\b|guvernul suediei", "Suedia"),
+    (r"guvernul poloniei", "Polonia"),
+    (r"guvernul turciei|\btika\b", "Turcia"),
 ]
 
 MONTHS = {
@@ -125,12 +172,22 @@ def classify(title):
     return hits[0]
 
 
+# Când o instituție specifică e recunoscută, denumirea mai generală care apare
+# în propriul ei nume devine zgomot: „Banca de Dezvoltare a Consiliului Europei"
+# e BDCE, nu „BDCE / Consiliul Europei".
+REDUNDANT = {"BDCE": "Consiliul Europei"}
+
+
 def partner(title):
+    n = norm(title)
     found = []
     for pat, name in PARTNERS:
-        if re.search(pat, title, re.IGNORECASE):
+        if re.search(norm(pat), n):
             if name not in found:
                 found.append(name)
+    for specific, generic in REDUNDANT.items():
+        if specific in found and generic in found:
+            found.remove(generic)
     return " / ".join(found)
 
 
@@ -182,18 +239,30 @@ def recent_editions(html):
 
 
 def parse_edition(eid, label):
+    """Returnează (a_reușit_descărcarea, listă_de_acte).
+
+    Distincția contează. Versiunea veche întorcea listă goală și când ediția
+    n-avea acte de finanțare, și când pagina nu s-a putut descărca — iar main()
+    o marca oricum drept „văzută". O eroare de rețea de o secundă însemna că
+    ediția aceea nu mai era citită NICIODATĂ.
+    """
     html = get(f"{BASE}/ro/monitor/{eid}")
     if not html:
-        return []
+        return False, []
     soup = BeautifulSoup(html, "html.parser")
     for tag in soup(["script", "style", "nav", "footer"]):
         tag.decompose()
     text = soup.get_text("\n")
 
-    # Data ediției din eticheta "Monitorul Oficial Nr. 375-378 din 13.08.2026"
-    m = re.search(r"din\s+(\d{2}\.\d{2}\.\d{4})", label)
+    # Data ediției din eticheta "Monitorul Oficial Nr. 375-378 din 13.08.2026".
+    # La backfill nu avem etichetă, așa că o luăm din pagină.
+    source = label or ""
+    m = re.search(r"din\s+(\d{2}\.\d{2}\.\d{4})", source)
+    if not m:
+        m = re.search(r"Nr\.\s*[\d\-]+\s*\n?\s*din\s+(\d{2}\.\d{2}\.\d{4})", text)
     ed_date = m.group(1) if m else ""
-    m = re.search(r"Nr\.\s*([\d\-]+)", label)
+    m = re.search(r"Nr\.\s*([\d\-]+)", source) or re.search(
+        r"Monitorul Oficial Nr\.\s*([\d\-]+)", text)
     ed_nr = m.group(1) if m else eid
 
     found = []
@@ -219,7 +288,7 @@ def parse_edition(eid, label):
             "editie_id": eid,
             "url": f"{BASE}/ro/monitor/{eid}",
         })
-    return found
+    return True, found
 
 
 def load():
@@ -407,8 +476,55 @@ TEMPLATE = """<!DOCTYPE html>
 
 # ----------------------------------------------------------------------- main
 
+def culege(db, eid, label):
+    """Citește o ediție și adaugă/actualizează actele în registru.
+
+    Returnează (a_reușit, acte_noi). Actele deja existente se REÎMPROSPĂTEAZĂ:
+    dacă tiparele de clasificare se îmbunătățesc, categoria și partenerul se
+    corectează singure la rulările următoare, fără să ștergem nimic.
+    """
+    ok, acte = parse_edition(eid, label)
+    if not ok:
+        return False, 0
+    noi = 0
+    for act in acte:
+        key = act["act"] + "|" + act["editie_id"]
+        if key not in db["acte"]:
+            db["acte"][key] = act
+            noi += 1
+            print(f"     + {act['categorie']}: {act['titlu'][:78]}…")
+        else:
+            db["acte"][key].update(act)
+    return True, noi
+
+
 def main():
     db = load()
+
+    # Mod recuperare: python3 monitor_watch.py --backfill 3300 3323
+    if "--backfill" in sys.argv:
+        i = sys.argv.index("--backfill")
+        try:
+            de_la, pana_la = int(sys.argv[i + 1]), int(sys.argv[i + 2])
+        except (IndexError, ValueError):
+            sys.exit("Folosire: --backfill PRIMUL_ID ULTIMUL_ID  (ex. --backfill 3300 3323)")
+        print(f"Recuperez edițiile {de_la}–{pana_la}…")
+        noi = 0
+        for num in range(de_la, pana_la + 1):
+            eid = str(num)
+            print(f" → ediția {eid}")
+            ok, n = culege(db, eid, "")
+            noi += n
+            if ok and eid not in db["editii_vazute"]:
+                db["editii_vazute"].append(eid)
+            time.sleep(1)
+        db["ultima_rulare"] = datetime.now().strftime("%d.%m.%Y %H:%M")
+        save(db)
+        with open(OUT, "w", encoding="utf-8") as f:
+            f.write(build_html(db))
+        print(f"\n{noi} acte noi. Total în registru: {len(db['acte'])}.")
+        return
+
     print("Verific Monitorul Oficial…")
 
     home = get(HOME)
@@ -419,20 +535,25 @@ def main():
     if not editions:
         sys.exit("Nu am găsit nicio ediție pe pagina principală.")
 
+    # Recitim TOATE edițiile afișate pe prima pagină, nu doar cele nemarcate.
+    # Sunt zece pagini, cu o pauză de o secundă între ele — sub un minut. În
+    # schimb, orice îmbunătățire a filtrului recuperează retroactiv actele
+    # ratate, în loc să le lase pierdute pentru totdeauna.
     noi = 0
+    esecuri = []
     for eid, label in editions:
-        if eid in db["editii_vazute"]:
-            continue
         print(f" → ediția {label or eid}")
-        for act in parse_edition(eid, label):
-            key = act["act"] + "|" + act["editie_id"]
-            if key not in db["acte"]:
-                db["acte"][key] = act
-                noi += 1
-                print(f"     + {act['categorie']}: {act['titlu'][:78]}…")
-        db["editii_vazute"].append(eid)
+        ok, n = culege(db, eid, label)
+        noi += n
+        if ok:
+            if eid not in db["editii_vazute"]:
+                db["editii_vazute"].append(eid)
+        else:
+            # NU o marcăm ca văzută — o reluăm mâine.
+            esecuri.append(label or eid)
         time.sleep(1)
 
+    db["editii_vazute"] = sorted(set(db["editii_vazute"]), key=lambda x: int(x) if x.isdigit() else 0)
     db["ultima_rulare"] = datetime.now().strftime("%d.%m.%Y %H:%M")
     save(db)
 
@@ -444,6 +565,8 @@ def main():
         print(f"\n{noi} acte noi. Total în registru: {total}.")
     else:
         print(f"\nNimic nou. Total în registru: {total}.")
+    if esecuri:
+        print("Ediții nedescărcate (se reiau la rularea următoare): " + ", ".join(esecuri))
     print(f"Dashboard: {OUT}")
 
     if PUBLICA and noi:

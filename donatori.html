@@ -4841,8 +4841,12 @@ document.getElementById('backFromUpdateBtn').addEventListener('click', showMainV
    Reîmprospătare o dată pe zi: rezultatul se ține în localStorage cu data
    descărcării; la o nouă zi se re-descarcă automat la încărcarea paginii.
    ============================================================ */
-const IATI_API_PAGE_SIZE = 1000;   // pagina d-portal — nu o limită de rezultate
-const IATI_API_URL       = url => 'https://d-portal.org/q.json?from=act,country,sector&country_code=MD&limit=' + IATI_API_PAGE_SIZE + '&offset=' + url;
+const IATI_API_PAGE_SIZE = 1000;   // pagina cerută — serverul poate onora mai puțin (vezi iatiFetchFresh)
+/* „orderby=aid\" nu e cosmetic. Paginarea cu offset fără o ordonare stabilă e
+   nedefinită: serverul poate întoarce aceleași rânduri de două ori pe pagini
+   diferite și poate sări complet peste altele. Cu ordonare fixă, offset-ul
+   înseamnă mereu același lucru. */
+const IATI_API_URL       = url => 'https://d-portal.org/q.json?from=act,country,sector&country_code=MD&orderby=aid&limit=' + IATI_API_PAGE_SIZE + '&offset=' + url;
 const IATI_ACT_URL     = aid => 'https://d-portal.org/ctrack.html?aid=' + encodeURIComponent(aid) + '#view=act';
 const IATI_MD_SEARCH_URL = 'https://d-portal.iatistandard.org/ctrack.html?search&country=MD#view=main';
 const IATI_CACHE_KEY   = 'iatiMdActivities_v4';
@@ -4853,6 +4857,10 @@ let IATI_AID_TO_AMP = new Map(); // iati aid -> proiect AMP potrivit (invers)
 let IATI_FETCH_DATE = null;
 let IATI_LOAD_ERROR = null;
 let IATI_TRUNCATED  = false;   // s-a atins pragul de siguranță anti-buclă (foarte puțin probabil)
+/* Reîmprospătarea de azi a eșuat, dar aveam o copie mai veche în cache și o
+   afișăm pe aceea. Fără acest steag, pagina arăta datele vechi ca și cum ar fi
+   proaspete — utilizatorul n-avea cum să știe că azi nu s-a putut actualiza. */
+let IATI_STALE      = false;
 
 function iatiSetStatus(msg, kind){
   const el = document.getElementById('iatiStatus');
@@ -5117,6 +5125,10 @@ async function iatiApply(){
   }catch(e){}
   if(IATI_LOAD_ERROR){
     iatiSetStatus(t('iatiErrPrefix') + esc(IATI_LOAD_ERROR) + t('iatiErrSuffix'), 'err');
+  } else if(IATI_STALE && IATI_ACTIVITIES.length){
+    iatiSetStatus(t('iatiStalePrefix') + esc(IATI_FETCH_DATE || '?') + t('iatiStaleSuffix') +
+      IATI_ACTIVITIES.length.toLocaleString(t('localeTag')) + t('iatiActivitiesFor') +
+      IATI_MATCHES.size.toLocaleString(t('localeTag')) + t('iatiMatchesFound'), 'warn');
   } else if(IATI_ACTIVITIES.length){
     iatiSetStatus(t('iatiDataPrefix') + esc(IATI_FETCH_DATE || '?') + t('iatiDataMid') +
       IATI_ACTIVITIES.length.toLocaleString(t('localeTag')) + t('iatiActivitiesFor') +
@@ -5140,26 +5152,45 @@ function iatiWriteCache(rows, date){
 }
 
 /* Descarcă TOATE activitățile IATI pentru Moldova, nu doar primele N.
-   d-portal limitează fiecare răspuns la câteva mii de rânduri, așa că
-   paginăm cu offset până când o pagină vine incompletă (semn că am ajuns
-   la capăt). Prag de siguranță anti-buclă: 100 de pagini (100.000 de
-   activități) — cu mult peste orice volum real pentru o singură țară;
-   dacă vreodată se atinge, e semn de eroare de server, nu de date lipsă. */
+   Prag de siguranță anti-buclă: 100 de pagini — cu mult peste orice volum
+   real pentru o singură țară; dacă se atinge, e semn de eroare de server.
+
+   ATENȚIE, aici a fost un bug tăcut: versiunea veche cerea limit=1000 și se
+   oprea când o pagină venea cu mai puțin de 1000 de rânduri. Dar d-portal are
+   propriul plafon pe răspuns. Dacă serverul onorează, să zicem, doar 500 de
+   rânduri, PRIMA pagină vine deja „incompletă\" față de cele 1000 cerute, bucla
+   se oprește imediat și restul activităților nu se descarcă niciodată — fără
+   eroare, fără avertisment, doar cifre mai mici decât realitatea.
+
+   Corect e să nu presupunem nimic despre cât onorează serverul: luăm mărimea
+   primei pagini ca pas real de paginare și continuăm până când o pagină vine
+   mai mică decât ACEST pas. */
 const IATI_SAFETY_MAX_PAGES = 100;
+
+async function iatiFetchPage(offset){
+  const res = await fetch(IATI_API_URL(offset), { mode: 'cors' });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  if(!data || !Array.isArray(data.rows)) throw new Error('răspuns neașteptat');
+  return data.rows;
+}
 
 async function iatiFetchFresh(){
   const all = [];
-  let offset = 0, page = 0;
-  while(true){
-    const res = await fetch(IATI_API_URL(offset), { mode: 'cors' });
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if(!data || !Array.isArray(data.rows)) throw new Error('răspuns neașteptat');
-    all.push(...data.rows);
-    page++;
-    if(data.rows.length < IATI_API_PAGE_SIZE) break;      // ultima pagină, incompletă
-    if(page >= IATI_SAFETY_MAX_PAGES){ IATI_TRUNCATED = true; break; }
-    offset += IATI_API_PAGE_SIZE;
+  const firstRows = await iatiFetchPage(0);
+  all.push(...firstRows);
+
+  const step = firstRows.length;          // pasul real, onorat de server
+  if(step > 0 && step >= firstRows.length){
+    let offset = step, page = 1;
+    while(true){
+      const rows = await iatiFetchPage(offset);
+      all.push(...rows);
+      page++;
+      if(rows.length < step) break;                        // ultima pagină
+      if(page >= IATI_SAFETY_MAX_PAGES){ IATI_TRUNCATED = true; break; }
+      offset += step;
+    }
   }
   /* Interogarea include acum și tabelul de sectoare (join „act,country,sector"),
      ca la pagina d-portal să putem arăta repartiția pe sectoare DAC. Efectul unui
@@ -5211,7 +5242,8 @@ async function iatiEnsureData(force){
   const cached = iatiReadCache();
 
   if(!force && cached && cached.date === today){
-    IATI_ACTIVITIES = cached.rows; IATI_FETCH_DATE = cached.date; IATI_LOAD_ERROR = null;
+    IATI_ACTIVITIES = cached.rows; IATI_FETCH_DATE = cached.date;
+    IATI_LOAD_ERROR = null; IATI_STALE = false;
     await iatiApply();
     return;
   }
@@ -5222,11 +5254,14 @@ async function iatiEnsureData(force){
   iatiSetStatus('Se descarcă activitățile IATI pentru Moldova…', 'info');
   try{
     const rows = await iatiFetchFresh();
-    IATI_ACTIVITIES = rows; IATI_FETCH_DATE = today; IATI_LOAD_ERROR = null;
+    IATI_ACTIVITIES = rows; IATI_FETCH_DATE = today;
+    IATI_LOAD_ERROR = null; IATI_STALE = false;
     iatiWriteCache(rows, today);
   }catch(e){
-    if(!cached){ IATI_ACTIVITIES = []; IATI_LOAD_ERROR = e.message || String(e); }
-    else { IATI_LOAD_ERROR = null; }   // păstrăm copia veche, e mai bună decât nimic
+    if(!cached){ IATI_ACTIVITIES = []; IATI_LOAD_ERROR = e.message || String(e); IATI_STALE = false; }
+    /* Păstrăm copia veche — e mai bună decât nimic — dar o marcăm ca veche,
+       ca să scrie pe pagină din ce zi sunt datele și că azi n-am reușit. */
+    else { IATI_LOAD_ERROR = null; IATI_STALE = true; }
   }
   await iatiApply();
 }
@@ -6447,6 +6482,8 @@ document.querySelectorAll('#exportSourceTabs .exp-src').forEach(b => {
 /* ---------- Traduceri suplimentare (mesaje dinamice) ---------- */
 Object.assign(I18N.ro, {
  "iatiShown": "proiecte afișate",
+ "iatiStalePrefix": "Azi nu am putut actualiza datele IATI. Se afișează copia din <b>",
+ "iatiStaleSuffix": "</b> — ",
  "iatiErrPrefix": "Nu am putut descărca datele IATI: ",
  "iatiErrSuffix": ".<br>Cauza cea mai probabilă e blocarea cererii de către browser (CORS) când fișierul e deschis direct de pe disc. Butoanele „Caută manual\" funcționează în continuare.",
  "dpErrSuffix": ". Cauza cea mai probabilă e blocarea cererii de către browser (CORS) când fișierul e deschis direct de pe disc.",
@@ -6464,6 +6501,8 @@ Object.assign(I18N.ro, {
 });
 Object.assign(I18N.en, {
  "iatiShown": "projects shown",
+ "iatiStalePrefix": "Today's IATI refresh failed. Showing the copy from <b>",
+ "iatiStaleSuffix": "</b> — ",
  "iatiErrPrefix": "Could not download the IATI data: ",
  "iatiErrSuffix": ".<br>The most likely cause is the browser blocking the request (CORS) when the file is opened directly from disk. The “Search manually” buttons still work.",
  "dpErrSuffix": ". The most likely cause is the browser blocking the request (CORS) when the file is opened directly from disk.",
