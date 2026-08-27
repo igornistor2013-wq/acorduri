@@ -3276,13 +3276,35 @@ const AMP_QUERY   = {
   querySettings: { info: ['generatedHeaders'] }
 };
 
+/* Termen-limită pe cererea de rețea. Fără el, o cerere care nu primește
+   niciodată răspuns — proxy picat, pagină deschisă de pe `file://`, rețea
+   filtrată — lasă pagina în așteptare la nesfârșit: utilizatorul vede un ecran
+   care pare gol și n-are cum să știe că e o problemă de rețea, nu de date.
+   Cu termen-limită, după 20 de secunde cădem curat pe arhiva încorporată și
+   scriem pe ecran ce s-a întâmplat. */
+const AMP_TIMEOUT_MS = 20000;
+
+async function fetchCuTermen(url, optiuni, ms){
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  try{
+    return await fetch(url, Object.assign({}, optiuni, { signal: ctrl.signal }));
+  }catch(e){
+    if(e && e.name === 'AbortError')
+      throw new Error('serverul nu a răspuns în ' + Math.round(ms / 1000) + ' secunde');
+    throw e;
+  }finally{
+    clearTimeout(t);
+  }
+}
+
 async function fetchAmpCsv(lang){
   const url = `${AMP_PROXY}/rest/data/saikureport/export/csv/${AMP_REPORT}?language=${lang}`;
-  const res = await fetch(url, {
+  const res = await fetchCuTermen(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: 'query=' + encodeURIComponent(JSON.stringify(AMP_QUERY))
-  });
+  }, AMP_TIMEOUT_MS);
   if(!res.ok) throw new Error('HTTP ' + res.status + ' la ' + url);
   const text = await res.text();
   if(!text || text.length < 100) throw new Error('Răspuns gol de la AMP');
@@ -5168,7 +5190,7 @@ function iatiWriteCache(rows, date){
 const IATI_SAFETY_MAX_PAGES = 100;
 
 async function iatiFetchPage(offset){
-  const res = await fetch(IATI_API_URL(offset), { mode: 'cors' });
+  const res = await fetchCuTermen(IATI_API_URL(offset), { mode: 'cors' }, AMP_TIMEOUT_MS);
   if(!res.ok) throw new Error('HTTP ' + res.status);
   const data = await res.json();
   if(!data || !Array.isArray(data.rows)) throw new Error('răspuns neașteptat');
