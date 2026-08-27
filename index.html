@@ -126,6 +126,21 @@
   .acte-list li:before{content:'';position:absolute;left:-5px;top:15px;width:8px;height:8px;
     border-radius:50%;background:var(--navy)}
   .acte-list .a-nr{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy)}
+
+  /* comutatorul de vedere: acorduri / acte */
+  .seg{border:1px solid var(--line-strong);border-radius:7px;padding:2px;gap:2px}
+  .seg button{border:none;border-radius:5px;padding:6px 13px}
+  .seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+
+  /* banda de filtre pe categorii, sub antetul panoului */
+  .panel-sub{padding:12px 18px;border-bottom:1px solid var(--line);background:#fbfcfe}
+
+  /* rândurile din vederea „acte" refolosesc stilurile listei de acte */
+  td.a-nr{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy);white-space:nowrap}
+  td.a-src{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);white-space:nowrap}
+  td.a-src a{color:var(--navy);text-decoration:none;font-weight:700}
+  td.a-src a:hover{text-decoration:underline;color:var(--gold)}
+  .a-tit{font-size:12.5px;line-height:1.5;color:var(--ink);max-width:70ch}
   .acte-list .a-tit{font-size:12.5px;line-height:1.5;color:var(--ink);margin-top:3px;max-width:88ch}
   .acte-list .a-src{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-top:3px}
   .acte-list .a-src a{color:var(--navy);text-decoration:none}
@@ -209,7 +224,10 @@
     'Contract de finanțare':'t-contract','Credit':'t-credit'};
 
   var app = document.getElementById('app'), topMeta = document.getElementById('topMeta');
-  var db = null, fCat = 'all', fOrg = 'all', seek = '';
+  // „acorduri" = un rând per acord, cu etapele lui. „acte" = lista plată a
+  // actelor publicate, în ordinea apariției în Monitor. Aceleași date, aceleași
+  // filtre — doar felul de a le citi diferă.
+  var db = null, fCat = 'all', fOrg = 'all', seek = '', vedere = 'acorduri';
 
   var q = new URLSearchParams(location.search).get('src');
   if (q) DATA_URL = q;
@@ -308,12 +326,19 @@
     }
 
     var cats = {}, orgs = {}, simpl = 0, cuSemnat = 0, dist = {};
+    var catsA = {}, orgsA = {};      // aceleași chei, dar numărate în acte
     grupuri.forEach(function(g){
       cats[g.categorie] = (cats[g.categorie]||0)+1;
       Object.keys(g.orgs).forEach(function(o){ orgs[o] = (orgs[o]||0)+1; });
       if (g.simpl) simpl++;
       if (g.semnat) cuSemnat++;
       STEPS.forEach(function(s){ if (g.et[s.k]) dist[s.cap] = (dist[s.cap]||0)+1; });
+    });
+    acte.forEach(function(a){
+      catsA[a.categorie] = (catsA[a.categorie]||0)+1;
+      (a.partener||'').split(' / ').forEach(function(o){
+        o = o.trim(); if (o) orgsA[o] = (orgsA[o]||0)+1;
+      });
     });
 
     var kpis =
@@ -332,19 +357,29 @@
         '<span class="bar-val">' + n + '</span></div>';
     }).join('');
 
-    var orgBtns = ['<button data-org="all" aria-pressed="true">Toți <span class="n">' +
+    var orgBtns = ['<button data-org="all" data-a="' + grupuri.length + '" data-b="' +
+      acte.length + '" aria-pressed="true">Toți <span class="n">' +
       grupuri.length + '</span></button>'].concat(
       Object.keys(orgs).sort(function(a,b){ return orgs[b]-orgs[a]; }).map(function(o){
-        return '<button data-org="' + esc(o) + '" aria-pressed="false">' + esc(o) +
+        return '<button data-org="' + esc(o) + '" data-a="' + orgs[o] + '" data-b="' +
+          (orgsA[o]||0) + '" aria-pressed="false">' + esc(o) +
           ' <span class="n">' + orgs[o] + '</span></button>';
       })).join('');
 
-    var catBtns = ['<button data-cat="all" aria-pressed="true">Toate <span class="n">' +
+    var catBtns = ['<button data-cat="all" data-a="' + grupuri.length + '" data-b="' +
+      acte.length + '" aria-pressed="true">Toate <span class="n">' +
       grupuri.length + '</span></button>'].concat(
       Object.keys(cats).sort().map(function(c){
-        return '<button data-cat="' + esc(c) + '" aria-pressed="false">' + esc(c) +
+        return '<button data-cat="' + esc(c) + '" data-a="' + cats[c] + '" data-b="' +
+          (catsA[c]||0) + '" aria-pressed="false">' + esc(c) +
           ' <span class="n">' + cats[c] + '</span></button>';
       })).join('');
+
+    var vedBtns =
+      '<button data-ved="acorduri" aria-pressed="true">Acorduri <span class="n">' +
+        grupuri.length + '</span></button>' +
+      '<button data-ved="acte" aria-pressed="false">Acte <span class="n">' +
+        acte.length + '</span></button>';
 
     app.innerHTML =
       '<div class="kpis">' + kpis + '</div>' +
@@ -354,20 +389,38 @@
       '<div class="panel"><div class="panel-head"><h2>' + ico('layers') +
         'Creditori și parteneri</h2></div>' +
         '<div class="panel-body"><div class="btns" id="orgBtns">' + orgBtns + '</div></div></div>' +
-      '<div class="panel"><div class="panel-head"><h2>' + ico('file') + 'Acorduri</h2>' +
-        '<div class="btns" id="catBtns">' + catBtns + '</div>' +
+      '<div class="panel"><div class="panel-head"><h2>' + ico('file') +
+        '<span id="titluLista">Acorduri</span></h2>' +
+        '<div class="btns seg" id="vedBtns">' + vedBtns + '</div>' +
         '<input class="seek" type="search" id="seek" placeholder="Caută…" aria-label="Caută">' +
-      '</div><div class="tbl-scroll"><table><thead><tr>' +
-        '<th>Partener</th><th>Acordul</th><th>Categorie</th>' +
-        '<th>Etape parcurse</th><th>Semnat</th></tr></thead>' +
+      '</div>' +
+      '<div class="panel-sub"><div class="btns" id="catBtns">' + catBtns + '</div></div>' +
+      '<div class="tbl-scroll"><table id="tabel"><thead id="cap"></thead>' +
         '<tbody id="rows"></tbody></table></div><div id="none"></div></div>';
 
     bind('#orgBtns button', 'org', function(v){ fOrg = v; });
     bind('#catBtns button', 'cat', function(v){ fCat = v; });
+    bind('#vedBtns button', 'ved', function(v){ vedere = v; numere(); });
     document.getElementById('seek').addEventListener('input', function(){
-      seek = fold(this.value); rows(grupuri);
+      seek = fold(this.value); rows(grupuri, acte);
     });
-    rows(grupuri);
+    numere();
+    rows(grupuri, acte);
+
+    // Butoanele de filtrare arată câte acorduri sau câte acte le corespund,
+    // după vederea aleasă. Altfel „BERD 12" ar rămâne pe ecran lângă o listă
+    // de 39 de acte BERD și cifra ar părea greșită.
+    function numere(){
+      var cheie = vedere === 'acte' ? 'b' : 'a';
+      app.querySelectorAll('#catBtns button, #orgBtns button, #vedBtns button')
+        .forEach(function(b){
+          if (b.dataset.ved) return;
+          var n = b.dataset[cheie];
+          if (n !== undefined) b.querySelector('.n').textContent = n;
+        });
+      document.getElementById('titluLista').textContent =
+        vedere === 'acte' ? 'Acte publicate' : 'Acorduri';
+    }
 
     function bind(sel, key, set){
       var list = app.querySelectorAll(sel);
@@ -375,7 +428,7 @@
         b.addEventListener('click', function(){
           set(b.dataset[key]);
           list.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
-          rows(grupuri);
+          rows(grupuri, acte);
         });
       });
     }
@@ -395,7 +448,48 @@
       '</div><div class="sub">' + esc(sub) + '</div></div>';
   }
 
-  function rows(grupuri){
+  function rows(grupuri, acte){
+    if (vedere === 'acte') return randActe(acte);
+    return randAcorduri(grupuri);
+  }
+
+  // Lista plată: un act, un rând, în ordinea publicării în Monitor.
+  function randActe(acte){
+    var out = acte.filter(function(a){
+      if (fCat !== 'all' && a.categorie !== fCat) return false;
+      if (fOrg !== 'all' && (a.partener||'').split(' / ').indexOf(fOrg) === -1) return false;
+      if (seek){
+        var hay = fold([a.titlu, a.act, a.partener, a.editie].join(' '));
+        if (hay.indexOf(seek) === -1) return false;
+      }
+      return true;
+    }).sort(function(x, y){ return ord(y).localeCompare(ord(x)); });
+
+    document.getElementById('cap').innerHTML = '<tr>' +
+      '<th>Act</th><th>Categorie</th><th>Partener</th>' +
+      '<th>Denumire</th><th>Semnat</th><th>Ediția</th></tr>';
+
+    document.getElementById('rows').innerHTML = out.map(function(a){
+      return '<tr>' +
+        '<td class="a-nr">' + esc(a.act) + '</td>' +
+        '<td><span class="tag ' + (CLS[a.categorie]||'t-alt') + '">' + esc(a.categorie) + '</span></td>' +
+        '<td class="org">' + esc(a.partener || '—') + '</td>' +
+        '<td><div class="a-tit">' + esc(a.titlu) + '</div></td>' +
+        '<td>' + (a.semnat ? '<span class="semnat">' + esc(a.semnat) + '</span>'
+          : '<span class="nil">—</span>') + '</td>' +
+        '<td class="a-src"><a href="' + esc(a.url) + '" target="_blank" rel="noopener">MO ' +
+          esc(a.editie) + '</a><br>' + esc(a.data_editie) + '</td></tr>';
+    }).join('');
+
+    document.getElementById('none').innerHTML = out.length ? '' :
+      '<div class="empty-state"><strong>Niciun act</strong>Nimic nu corespunde filtrelor.</div>';
+  }
+
+  function randAcorduri(grupuri){
+    document.getElementById('cap').innerHTML = '<tr>' +
+      '<th>Partener</th><th>Acordul</th><th>Categorie</th>' +
+      '<th>Etape parcurse</th><th>Semnat</th></tr>';
+
     var out = grupuri.filter(function(g){
       if (fCat !== 'all' && g.categorie !== fCat) return false;
       if (fOrg !== 'all' && !g.orgs[fOrg]) return false;
