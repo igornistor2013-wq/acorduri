@@ -97,6 +97,8 @@
 
   .org{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--navy-deep);white-space:nowrap}
   .pname{font-size:14px;font-weight:700;color:var(--navy-deep);line-height:1.4;max-width:58ch}
+  .pname-sub{display:block;font-size:11px;font-weight:600;color:var(--ink-dim);
+    font-family:var(--mono);margin-top:3px}
   .pmeta{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:5px}
   .semnat{font-family:var(--mono);font-size:11.5px;font-weight:700;background:var(--gold-bg);
     color:#8a5c0d;padding:3px 8px;border-radius:5px;white-space:nowrap}
@@ -119,7 +121,22 @@
     height:1.5px;background:var(--line-strong)}
   .step.on:not(:last-child):after{background:var(--navy)}
   .vig-note{margin-top:7px;font-size:10.5px;font-weight:700;color:var(--green-ink);
-    background:var(--green-bg);display:inline-block;padding:3px 8px;border-radius:5px}
+    background:var(--green-bg);display:inline-block;padding:3px 8px;border-radius:5px;
+    font-family:var(--mono);cursor:help}
+  .vig-note span{font-weight:400;opacity:.75}
+
+  /* filele panoului „Cum se încheie un acord" */
+  .fila-intro{font-size:12.5px;color:var(--ink);line-height:1.55;margin:0 0 16px;max-width:86ch}
+  .fila-intro b{color:var(--navy-deep)}
+  .def-list{list-style:none;margin:0;padding:0;display:grid;
+    grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:860px){.def-list{grid-template-columns:1fr}}
+  .def-list li{border:1px solid var(--line);border-radius:9px;padding:13px 15px;background:#fbfcfe}
+  .d-cap{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
+  .d-cap b{font-size:13px;color:var(--navy-deep)}
+  .d-def{font-size:12.5px;color:var(--ink);line-height:1.5;margin:0 0 8px}
+  .d-traseu{font-size:12px;color:var(--ink);line-height:1.5;margin:0 0 8px;
+    padding-left:11px;border-left:2px solid var(--line-strong)}
 
   /* butonul de export și rândurile de filtre etichetate */
   .xls{display:inline-flex;align-items:center;gap:7px;background:var(--green-bg);
@@ -136,7 +153,7 @@
   @media (max-width:640px){.filtru-rand{flex-direction:column;gap:6px}.f-lbl{padding-top:0}}
 
   /* fluxul interactiv al etapelor */
-  .flux{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+  .flux{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
   @media (max-width:980px){.flux{grid-template-columns:repeat(3,1fr)}}
   @media (max-width:560px){.flux{grid-template-columns:repeat(2,1fr)}}
   .et-card{position:relative;text-align:left;background:var(--panel);cursor:pointer;
@@ -276,7 +293,7 @@
   </div>
 
   <div class="footer-source">
-    Un acord parcurge cinci etape care pot fi urmărite act cu act în Monitorul Oficial: hotărârea sau decretul de inițiere a negocierilor, aprobarea semnării, hotărârea de aprobare a proiectului de lege, legea de ratificare (ori hotărârea de aprobare, pentru acordurile de competența Guvernului) și decretul de promulgare. Intrarea în vigoare nu e a șasea etapă: pentru tratatele ratificate data rezultă din clauzele tratatului, publicat împreună cu actul de ratificare, iar ordinul ministrului afacerilor externe cerut de pct. 180 din HG 442/2015 este colectiv și nu numește acordul. Ordinul apare separat doar la acordurile interinstituționale, încheiate ca contracte de stat. Alte etape obligatorii — avizarea, parafarea, deplinele puteri, semnarea propriu-zisă — nu produc niciun act publicat. Temeiul: HG 442/2015 și HG 377/2018, anexa nr. 1¹. Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova.
+    Un acord parcurge cinci etape care pot fi urmărite act cu act în Monitorul Oficial: hotărârea sau decretul de inițiere a negocierilor, aprobarea semnării, hotărârea de aprobare a proiectului de lege, legea de ratificare (ori hotărârea de aprobare, pentru acordurile de competența Guvernului) și decretul de promulgare. Intrarea în vigoare nu e o a șasea etapă. Data afișată sub etape este cea la care a intrat în vigoare legea de ratificare — articolul ei final prevede că legea intră în vigoare la data publicării în Monitor, iar aceea e chiar data ediției. Acordul propriu-zis intră în vigoare mai târziu, după schimbul instrumentelor de ratificare; acea dată nu se poate deduce din cuprins, fiindcă ordinul ministrului afacerilor externe care o anunță este colectiv și nu numește acordul. Alte etape obligatorii — avizarea, parafarea, deplinele puteri, semnarea propriu-zisă — nu produc niciun act publicat. O parte din acordurile de aici nu sunt tratate internaționale, ci contracte de stat, care urmează un traseu propriu: categoria contractului — cu impact asupra bugetului de stat, asupra bugetului autorității, fără impact bugetar sau de colaborare interinstituțională — decide cine îl aprobă și când intră în vigoare. Tipurile de finanțare afișate pe rânduri (grant, împrumut, credit, finanțare) sunt deduse din denumirea actului; definițiile lor legale sunt în panoul „Cum se încheie un acord". Temeiul: HG 442/2015, HG 377/2018 cu anexele nr. 1 și nr. 1¹, și Legea nr. 419/2006 pentru împrumuturile de stat. Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova.
   </div>
 
 </div>
@@ -307,31 +324,90 @@
      act:'Hotărâre prin care Guvernul trimite Parlamentului proiectul legii de ratificare',
      ref:'HG 442/2015, pct. 165 lit. e)'},
     {k:'rat', n:'4', cap:'Ratificare sau aprobare',  emitent:'Parlament sau Guvern',
-     act:'Lege de ratificare; la acordurile de competența Guvernului, hotărâre de aprobare',
+     act:'Lege de ratificare; la acordurile de competența Guvernului, hotărâre de aprobare. ' +
+         'Articolul final prevede că legea intră în vigoare la data publicării în Monitor — ' +
+         'acordul propriu-zis intră în vigoare separat, după schimbul instrumentelor',
      ref:'HG 442/2015, pct. 165 și 169; HG 377/2018, anexa 1¹, pct. 25–26'},
     {k:'prm', n:'5', cap:'Decret de promulgare',     emitent:'Președinte',
      act:'Decret de promulgare a legii de ratificare',
      ref:'Constituția, art. 93'}
   ];
 
-  /* Intrarea în vigoare NU e a șasea etapă a lanțului, deși pct. 180 din
-     HG 442/2015 cere un ordin al ministrului afacerilor externe. Motivul e
-     practic: acel ordin e colectiv — „Ordin cu privire la intrarea în vigoare
-     și stingerea unor tratate internaționale" — și nu numește niciun acord în
-     titlu, deci din cuprinsul Monitorului nu poate fi legat de un acord anume.
-     Pentru tratatele ratificate, data intrării în vigoare rezultă din clauzele
-     tratatului însuși, publicat împreună cu actul de ratificare (pct. 203).
+  /* Intrarea în vigoare NU e o etapă a lanțului și nu apare ca al șaselea card.
+     Sunt trei date diferite, ușor de confundat:
 
-     Ordinele pe care le vedem în registru sunt altceva: acorduri
-     interinstituționale încheiate ca CONTRACTE DE STAT, unde autoritatea
-     responsabilă publică un ordin care numește acordul (HG 377/2018, anexa 1¹,
-     pct. 44). Acelea le marcăm separat, ca semn distinctiv, nu ca etapă. */
-  var VIGOARE = {k:'vig', n:'+', cap:'Ordin de intrare în vigoare',
-                 emitent:'Autoritatea responsabilă',
-                 act:'Ordin care anunță data intrării în vigoare, numind acordul',
+     1. Legea de ratificare intră în vigoare la data publicării în Monitor —
+        articolul final al oricărei legi de ratificare o spune explicit. Data
+        aceasta o știm: e chiar data ediției în care apare legea, deci o
+        derivăm din registru, fără să mai fie nevoie de vreun act separat.
+     2. Acordul propriu-zis intră în vigoare mai târziu, după schimbul
+        instrumentelor de ratificare sau conform propriilor clauze. Ordinul
+        ministrului afacerilor externe cerut de pct. 180 din HG 442/2015 anunță
+        data asta, dar e un ordin colectiv — „cu privire la intrarea în vigoare
+        și stingerea unor tratate internaționale" — care nu numește acordul,
+        deci din cuprins nu poate fi legat de un acord anume.
+     3. La acordurile interinstituționale, încheiate ca contracte de stat,
+        autoritatea responsabilă publică un ordin care CHIAR numește acordul
+        (HG 377/2018, anexa 1¹, pct. 44). Pe acela îl arătăm ca informație
+        derivată, nu ca etapă. */
+  var VIGOARE = {k:'vig', cap:'Ordin de punere în aplicare',
                  ref:'HG 377/2018, anexa 1¹, pct. 44'};
 
   // Etapele care nu lasă urmă în Monitorul Oficial.
+  /* Definițiile tipurilor de finanțare, din HG 377/2018, anexa nr. 1, pct. 9.
+     Categoriile din registru sunt deduse din denumirea actului, deci nu se
+     suprapun perfect peste noțiunile legale; legătura o facem explicit aici,
+     ca cititorul să știe ce înseamnă eticheta de pe rând. */
+  var TIPURI = [
+    {cat:'Grant', def:'Asistență financiară externă nerambursabilă, transmisă de partenerul ' +
+      'extern de dezvoltare beneficiarului sau implementatorului pentru realizarea unor ' +
+      'proiecte ori programe.', ref:'HG 377/2018, anexa nr. 1, pct. 9.13 și 9.3¹'},
+    {cat:'Împrumut', def:'Formă de asistență financiară rambursabilă. Contractele de împrumut ' +
+      'de stat extern se încheie după procedura din Legea nr. 419/2006 privind datoria ' +
+      'sectorului public, nu după cea a contractelor de stat.',
+      ref:'HG 377/2018, anexa nr. 1, pct. 9.2, 14.5 și 35'},
+    {cat:'Credit', def:'Tot asistență financiară rambursabilă, denumită astfel când acordul ' +
+      'îmbracă forma unei facilități sau linii de credit deschise de finanțator.',
+      ref:'HG 377/2018, anexa nr. 1, pct. 9.2'},
+    {cat:'Finanțare', def:'Acord de finanțare — categorie care acoperă și suportul bugetar: ' +
+      'asistență transferată direct într-un buget component al bugetului public național, ' +
+      'pentru susținerea reformelor agreate. Grupul de negociere pentru suport bugetar este ' +
+      'condus de Ministerul Finanțelor.',
+      ref:'HG 377/2018, anexa nr. 1, pct. 9.20¹ și 14.3'},
+    {cat:'Contract de finanțare', def:'Denumirea folosită mai ales de Banca Europeană de ' +
+      'Investiții pentru instrumentul prin care finanțează proiecte de investiții.',
+      ref:'HG 377/2018, anexa nr. 1, pct. 9.20'}
+  ];
+
+  /* Categoriile de contracte de stat și traseul fiecăreia, din HG 377/2018,
+     anexa nr. 1¹. Contractele de stat NU sunt tratate internaționale: sunt
+     acordurile care nu se supun dreptului internațional public sau care spun
+     chiar în text că nu constituie tratat. De aceea o parte din acordurile din
+     registru nu ajung niciodată în Parlament. */
+  var CONTRACTE = [
+    {tip:'Cu impact financiar asupra bugetului de stat',
+     def:'Implică angajamente care cer alocări suplimentare din bugetul de stat.',
+     traseu:'Hotărâre de Guvern pentru aprobarea semnării, apoi lege de ratificare a ' +
+       'Parlamentului. Intră în vigoare la data ultimei notificări dintre părți.',
+     ref:'anexa 1¹, pct. 3.1, 26 și 28'},
+    {tip:'Cu impact asupra bugetului autorității',
+     def:'Angajamentele se acoperă din mijloacele deja aprobate în bugetul autorității.',
+     traseu:'Hotărâre de Guvern pentru aprobarea semnării, apoi hotărâre de Guvern de ' +
+       'aprobare a contractului. Intră în vigoare după aprobarea Guvernului.',
+     ref:'anexa 1¹, pct. 3.2 și 25'},
+    {tip:'Fără impact bugetar',
+     def:'Nu cere alocarea de resurse din bugetul de stat.',
+     traseu:'Se semnează direct de conducătorul autorității, fără avizare și fără hotărâre ' +
+       'de Guvern. Intră în vigoare la semnare. În Monitor apare doar ordinul care anunță ' +
+       'data intrării în vigoare, publicat în 10 zile împreună cu textul contractului.',
+     ref:'anexa 1¹, pct. 3.3, 6, 24 și 44'},
+    {tip:'De colaborare interinstituțională',
+     def:'Nu conține prevederi despre asistență externă și nu implică angajamente ' +
+       'financiare suplimentare.',
+     traseu:'Semnat direct de conducătorul autorității, fără procedura de avizare.',
+     ref:'anexa 1¹, pct. 3.4 și 6'}
+  ];
+
   var INVIZIBILE = [
     ['Consultări prealabile și examinarea oportunității', 'HG 442/2015, cap. II'],
     ['Avizarea de către ministere și avizul Comisiei politică externă', 'HG 442/2015, pct. 33–41; HG 377/2018, anexa 1¹, pct. 14 și 19'],
@@ -340,7 +416,7 @@
     ['Eliberarea deplinelor puteri', 'HG 442/2015, cap. IX'],
     ['Semnarea propriu-zisă', 'HG 442/2015, cap. X'],
     ['Instrumentul de ratificare și schimbul instrumentelor', 'HG 442/2015, pct. 173–177'],
-    ['Intrarea în vigoare a tratatelor ratificate — ordinul MAE e colectiv și nu numește acordul', 'HG 442/2015, pct. 180'],
+    ['Intrarea în vigoare a acordului însuși — se produce la schimbul instrumentelor, iar ordinul MAE care o anunță e colectiv și nu numește acordul', 'HG 442/2015, pct. 173–177 și 180'],
     ['Contractele de stat fără impact bugetar, semnate direct', 'HG 377/2018, anexa 1¹, pct. 6 și 24']
   ];
 
@@ -404,6 +480,13 @@
      loc de acord. Fiind și cheie de grupare, unea acorduri fără legătură care
      se nimereau să înceapă la fel: un împrumut BIRD ajunsese în același rând cu
      unul al Băncii Naționale. */
+  /* Ghilimelele conțin de obicei numele proiectului, dar nu întotdeauna: în
+     „Acordul de grant dintre Ministerul Energiei, Banca Germană «Kreditanstalt
+     für Wiederaufbau (KfW)» și …" ghilimelele încadrează numele băncii. Luat
+     ca denumire, rândul ajungea să se numească „Kreditanstalt für Wiederaufbau
+     (KfW)", ceea ce nu spune nimic despre ce se finanțează. */
+  var INSTITUTIE = /\b(bank|banca|banka|kreditanstalt|gmbh|\bAB\b|\bAG\b|\bSA\b|corporation|holding|agentur)\b/i;
+
   function denumire(t){
     var f = fold(t), i;
     for (i = 0; i < ALIAS.length; i++)
@@ -412,6 +495,7 @@
     var quotes = t.match(/[„"]([^"”„]{6,200})[”"]/g);
     if (quotes && quotes.length){
       var best = quotes.map(function(s){ return s.replace(/^[„"]|[”"]$/g,'').trim(); })
+        .filter(function(s){ return !INSTITUTIE.test(s); })
         .sort(function(a,b){ return b.length - a.length; })[0];
       if (best) return best;
     }
@@ -435,9 +519,17 @@
   }
 
   /* Taie coada procedurală din denumire. „…și împuternicirea delegației
-     oficiale pentru negocieri" descrie ce face Guvernul, nu acordul, și
-     lungește inutil eticheta cu încă un rând pe ecran. */
+     oficiale pentru negocieri" descrie ce face Guvernul, nu acordul.
+
+     Atenție la „semnat la": uneori e la final și se taie, dar alteori e o
+     paranteză în mijlocul frazei — „Acordul de modificare nr. 4, semnat la
+     Chișinău la 26 iunie 2025, la Acordul de împrumut dintre…". Acolo tăierea
+     ștergea tot ce urma și rândul rămânea „Acordul de modificare nr. 4", fără
+     să spună la ce acord se referă. Când mai vine text după, scoatem doar
+     inserția și lipim restul. */
   function coada(s){
+    s = s.replace(/,\s*semnat[ăa]?\s+la\s+[^,]{3,60},\s*(?=\S)/i, ', ')
+         .replace(/,\s+la\s+(?=Acord|Contract|Conven|Memorand)/i, ' la ');
     return s.replace(/[\s,]+(?:și|si)\s+(?:acordarea|împuternicirea|imputernicirea|împuternicirilor|imputernicirilor|desemnarea)\b[\s\S]*$/i, '')
             .replace(/[\s,]+semnat[ăa]?\s+la\s+[\s\S]*$/i, '')
             .replace(/[\s,;\.]+$/, '');
@@ -454,7 +546,10 @@
     k = k.replace(/\b(acordului|acordul)\b/g, 'acord')
          .replace(/\b(contractului|contractul)\b/g, 'contract')
          .replace(/\b(conventiei|conventia)\b/g, 'conventie')
-         .replace(/\b(memorandumului|memorandumul)\b/g, 'memorandum');
+         .replace(/\b(memorandumului|memorandumul)\b/g, 'memorandum')
+         // „între Republica Moldova" și „dintre Republica Moldova" sunt
+         // folosite alternativ în același acord, de la o etapă la alta.
+         .replace(/\bdintre\b/g, 'intre');
     k = k.split(/\s(?:si\s+(?:acordarea|imputernicirea|imputernicirilor|desemnarea)|semnat[aă]?\s+la\s|incheiat[aă]?\s+la\s|intocmit\s+la\s)/)[0];
     return k.replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
   }
@@ -653,21 +748,44 @@
     }).sort(function(x,y){ return ord(y.ultim).localeCompare(ord(x.ultim)); });
   }
 
+  /* „În vigoare din" — data pe care o putem afirma cu temei.
+
+     Legea de ratificare intră în vigoare la data publicării în Monitor, așa
+     cum prevede articolul ei final, iar acea dată e chiar data ediției în care
+     apare legea. O luăm de acolo, nu dintr-un act separat.
+
+     Acordul propriu-zis intră în vigoare mai târziu, după schimbul
+     instrumentelor. Data aia nu e deductibilă din cuprinsul Monitorului, deci
+     nu o inventăm — scriem explicit la ce se referă data afișată. */
+  function inVigoareDin(g){
+    var lege = null, ordin = null;
+    g.acte.forEach(function(a){
+      var e = etapa(a);
+      if (e.indexOf('rat') > -1 && (!lege || ord(a) < ord(lege))) lege = a;
+      if (e.indexOf('vig') > -1 && (!ordin || ord(a) < ord(ordin))) ordin = a;
+    });
+    if (lege)  return { data: lege.data_editie,  ce: 'legea de ratificare',
+      titlu: 'Legea de ratificare a intrat în vigoare la publicarea în Monitor. ' +
+             'Acordul intră în vigoare separat, după schimbul instrumentelor.' };
+    if (ordin) return { data: ordin.data_editie, ce: 'ordin de punere în aplicare',
+      titlu: 'Acord interinstituțional: autoritatea responsabilă a publicat ordinul ' +
+             'care anunță data intrării în vigoare (HG 377/2018, anexa 1¹, pct. 44).' };
+    return null;
+  }
+
   function steps(g){
     var last = -1;
     STEPS.forEach(function(s, i){ if (g.et[s.k]) last = i; });
-    var vig = g.et.vig
-      ? '<div class="vig-note" title="' + esc(VIGOARE.ref) + '">✓ ' + VIGOARE.cap + '</div>'
-      : '';
-    // Acordurile interinstituționale nu trec prin niciuna dintre cele cinci
-    // etape: apar în Monitor direct cu ordinul de intrare în vigoare.
+    var v = inVigoareDin(g);
+    var nota = v ? '<div class="vig-note" title="' + esc(v.titlu) + '">În vigoare din ' +
+      esc(v.data) + ' <span>· ' + esc(v.ce) + '</span></div>' : '';
     if (last < 0)
-      return vig || '<span class="simpl-note">etapă neidentificată</span>';
+      return nota || '<span class="simpl-note">etapă neidentificată</span>';
     return '<div class="steps">' + STEPS.map(function(s, i){
       var on = g.et[s.k], cls = 'step' + (on ? ' on' : '') + (i === last ? ' last' : '');
       return '<div class="' + cls + '" title="' + esc(s.ref) + '"><span class="bead">' +
         (on ? '✓' : s.n) + '</span><span class="cap">' + s.cap + '</span></div>';
-    }).join('') + '</div>' + vig;
+    }).join('') + '</div>' + nota;
   }
 
   /* Exportă exact ce e pe ecran: aceleași filtre, aceeași ordine, aceeași
@@ -711,7 +829,8 @@
       randuri.push(['Acordul','Partener','Tip de finanțare','Ani','Nr. acte',
                     'Prima publicare','Ultima publicare','Etape parcurse',
                     'Etapa atinsă','Semnat'].concat(STEPS.map(function(s){
-                      return s.n + '. ' + s.cap; })).concat([VIGOARE.cap]));
+                      return s.n + '. ' + s.cap; }))
+                      .concat(['În vigoare din', 'Temeiul datei']));
       grupuri.filter(function(g){
         if (!trece_grup(g)) return false;
         if (seek){
@@ -722,6 +841,7 @@
         return true;
       }).forEach(function(g){
         var atinse = STEPS.filter(function(s){ return g.et[s.k]; });
+        var v = inVigoareDin(g);
         var ultima = atinse.length ? atinse[atinse.length - 1] : null;
         var dt = g.acte.map(ord).sort();
         function frumos(v){ return v && v !== '0' ? v.slice(6,8)+'.'+v.slice(4,6)+'.'+v.slice(0,4) : ''; }
@@ -730,7 +850,7 @@
           atinse.length + ' din ' + STEPS.length,
           ultima ? ultima.n + '. ' + ultima.cap : '', g.semnat || ''
         ].concat(STEPS.map(function(s){ return g.et[s.k] ? 'da' : ''; }))
-         .concat([g.et.vig ? 'da' : '']));
+         .concat([v ? v.data : '', v ? v.ce : '']));
       });
     }
 
@@ -765,12 +885,12 @@
       return;
     }
 
-    var cats = {}, orgs = {}, inVigoare = 0, cuSemnat = 0, dist = {};
+    var cats = {}, orgs = {}, cuVigoare = 0, cuSemnat = 0, dist = {};
     var catsA = {}, orgsA = {};      // aceleași chei, dar numărate în acte
     grupuri.forEach(function(g){
       cats[g.categorie] = (cats[g.categorie]||0)+1;
       Object.keys(g.orgs).forEach(function(o){ orgs[o] = (orgs[o]||0)+1; });
-      if (g.et.vig) inVigoare++;
+      if (inVigoareDin(g)) cuVigoare++;
       if (g.semnat) cuSemnat++;
       STEPS.forEach(function(s){ if (g.et[s.k]) dist[s.cap] = (dist[s.cap]||0)+1; });
     });
@@ -787,7 +907,8 @@
         Object.keys(orgs).sort(function(a,b){return orgs[b]-orgs[a];}).slice(0,3).join(' · ')) +
       kpi('Ratificate sau aprobate', dist['Ratificare sau aprobare'] || 0,
         'au trecut de etapa 4 din 5') +
-      kpi('Cu ordin de intrare în vigoare', inVigoare, 'doar acordurile interinstituționale');
+      kpi('Cu dată de intrare în vigoare', cuVigoare,
+        'derivată din legea de ratificare');
 
     var orgBtns = ['<button data-org="all" data-a="' + grupuri.length + '" data-b="' +
       acte.length + '" aria-pressed="true">Toți <span class="n">' +
@@ -835,21 +956,20 @@
       etapa(a).forEach(function(k){ (acteEt[k] = acteEt[k] || []).push(a); });
     });
 
-    var toate = STEPS.concat([VIGOARE]);
-    var maxE = Math.max.apply(null, toate.map(function(s){
-      return s.k === 'vig' ? inVigoare : (dist[s.cap] || 0); }));
+    var toate = STEPS;
+    var maxE = Math.max.apply(null, STEPS.map(function(s){ return dist[s.cap] || 0; }));
 
-    var flux = toate.map(function(s, i){
-      var n = s.k === 'vig' ? inVigoare : (dist[s.cap] || 0);
+    var flux = STEPS.map(function(s, i){
+      var n = dist[s.cap] || 0;
       var pierdut = '';
-      if (i > 0 && i < STEPS.length){
+      if (i > 0){
         var ant = dist[STEPS[i-1].cap] || 0;
         if (ant > n) pierdut = '<span class="et-drop" title="cu ' + (ant - n) +
           ' mai puține decât la etapa anterioară — fie n-au ajuns încă aici, ' +
           'fie au urmat alt traseu">−' + (ant - n) + '</span>';
       }
-      return '<button class="et-card' + (s.k === 'vig' ? ' aparte' : '') +
-        (fEt === s.k ? ' activ' : '') + '" data-et="' + s.k + '" aria-expanded="false">' +
+      return '<button class="et-card' + (fEt === s.k ? ' activ' : '') +
+        '" data-et="' + s.k + '" aria-expanded="false">' +
         '<span class="et-top"><span class="et-n">' + s.n + '</span>' + pierdut + '</span>' +
         '<span class="et-cap">' + esc(s.cap) + '</span>' +
         '<span class="et-val">' + n + '</span>' +
@@ -862,18 +982,58 @@
              '<span class="inv-ref">' + esc(x[1]) + '</span></li>';
     }).join('');
 
+    var tipuriHtml = TIPURI.map(function(t){
+      var n = catsA[t.cat] || 0, ng = cats[t.cat] || 0;
+      return '<li><div class="d-cap"><span class="tag ' + (CLS[t.cat]||'t-alt') + '">' +
+        esc(t.cat) + '</span><span class="inv-n">' + ng + ' acorduri · ' + n + ' acte</span></div>' +
+        '<p class="d-def">' + esc(t.def) + '</p>' +
+        '<span class="inv-ref">' + esc(t.ref) + '</span></li>';
+    }).join('');
+
+    var contracteHtml = CONTRACTE.map(function(c){
+      return '<li><div class="d-cap"><b>' + esc(c.tip) + '</b></div>' +
+        '<p class="d-def">' + esc(c.def) + '</p>' +
+        '<p class="d-traseu"><span class="det-lbl">Traseul până la intrarea în vigoare</span>' +
+        esc(c.traseu) + '</p>' +
+        '<span class="inv-ref">HG 377/2018, ' + esc(c.ref) + '</span></li>';
+    }).join('');
+
     app.innerHTML =
       '<div class="kpis">' + kpis + '</div>' +
       '<div class="panel"><div class="panel-head"><h2>' + ico('file') +
         'Cum se încheie un acord</h2>' +
+        '<div class="btns seg" id="filaBtns">' +
+          '<button data-fila="etape" aria-pressed="true">Etapele</button>' +
+          '<button data-fila="tipuri" aria-pressed="false">Tipuri de finanțare</button>' +
+          '<button data-fila="contracte" aria-pressed="false">Contracte de stat</button>' +
+        '</div>' +
         '<span class="count" id="etHint">Apasă o etapă pentru detalii</span></div>' +
-        '<div class="panel-body">' +
+
+        '<div class="panel-body fila" data-fila="etape">' +
           '<div class="flux" id="flux">' + flux + '</div>' +
           '<div class="et-detail" id="etDetail" hidden></div>' +
           '<details class="inv-wrap"><summary>Etape obligatorii care nu produc ' +
             'niciun act publicat în Monitor <b>(' + INVIZIBILE.length + ')</b></summary>' +
             '<ul class="inv-list">' + invizibile + '</ul></details>' +
-        '</div></div>' +
+        '</div>' +
+
+        '<div class="panel-body fila" data-fila="tipuri" hidden>' +
+          '<p class="fila-intro">Etichetele de pe rânduri sunt deduse din denumirea actului. ' +
+          'Iată ce înseamnă fiecare în termenii Regulamentului cu privire la cadrul ' +
+          'instituțional și mecanismul de coordonare și management al asistenței externe.</p>' +
+          '<ul class="def-list">' + tipuriHtml + '</ul></div>' +
+
+        '<div class="panel-body fila" data-fila="contracte" hidden>' +
+          '<p class="fila-intro">O parte din acordurile de aici nu sunt tratate ' +
+          'internaționale, ci <b>contracte de stat</b>: acorduri care nu se supun dreptului ' +
+          'internațional public sau care prevăd chiar în text că nu constituie tratat. ' +
+          'Ele urmează un traseu propriu, stabilit de anexa nr. 1¹ la HG 377/2018, iar ' +
+          'categoria contractului decide cine îl aprobă și când intră în vigoare. ' +
+          'Banca Națională a Moldovei aplică proceduri proprii, iar contractele fără impact ' +
+          'financiar pot fi încheiate prin schimb de scrisori.</p>' +
+          '<ul class="def-list">' + contracteHtml + '</ul>' +
+          '<span class="inv-ref">Excepțiile: anexa 1¹, pct. 7 și 30</span></div>' +
+      '</div>' +
       '<div class="panel"><div class="panel-head"><h2>' + ico('layers') +
         'Creditori și parteneri</h2></div>' +
         '<div class="panel-body"><div class="btns" id="orgBtns">' + orgBtns + '</div></div></div>' +
@@ -898,18 +1058,34 @@
     bind('#vedBtns button', 'ved', function(v){ vedere = v; numere(); });
 
     var detaliu = document.getElementById('etDetail'), deschis = null;
+
+    // Comutarea între file. Indiciul din dreapta antetului e valabil doar la
+    // fila cu etape, unde chiar ai ce apăsa.
+    app.querySelectorAll('#filaBtns button').forEach(function(b){
+      b.addEventListener('click', function(){
+        var f = b.dataset.fila;
+        app.querySelectorAll('#filaBtns button').forEach(function(o){
+          o.setAttribute('aria-pressed', String(o === b));
+        });
+        app.querySelectorAll('.fila').forEach(function(p){
+          p.hidden = (p.dataset.fila !== f);
+        });
+        document.getElementById('etHint').textContent =
+          f === 'etape' ? 'Apasă o etapă pentru detalii' : '';
+      });
+    });
     app.querySelectorAll('#flux .et-card').forEach(function(b){
       b.addEventListener('click', function(){
         var k = b.dataset.et;
         if (deschis === k){ inchideDetaliu(); return; }
         deschis = k;
-        var s = toate.filter(function(x){ return x.k === k; })[0];
-        var n = k === 'vig' ? inVigoare : (dist[s.cap] || 0);
+        var s = STEPS.filter(function(x){ return x.k === k; })[0];
+        var n = dist[s.cap] || 0;
         var ex = (acteEt[k] || []).slice()
           .sort(function(x, y){ return ord(y).localeCompare(ord(x)); }).slice(0, 3);
 
         detaliu.innerHTML =
-          '<div class="det-cap">' + esc(s.n === '+' ? '' : s.n + '. ') + esc(s.cap) + '</div>' +
+          '<div class="det-cap">' + esc(s.n + '. ' + s.cap) + '</div>' +
           '<div class="det-grid">' +
             '<div><span class="det-lbl">Cine emite actul</span>' + esc(s.emitent) + '</div>' +
             '<div><span class="det-lbl">Ce act apare în Monitor</span>' + esc(s.act) + '</div>' +
@@ -1093,6 +1269,13 @@
   }
 
   function randAcorduri(grupuri){
+    /* Un proiect mare are mai multe acorduri — „Eficiența energetică" are un
+       grant BEI și un contract de finanțare tot de la BEI. Sunt rânduri
+       diferite, corect separate, dar cu aceeași denumire arată a dublură.
+       Unde numele se repetă, adăugăm dedesubt instrumentul și finanțatorul. */
+    var deCateOri = {};
+    grupuri.forEach(function(g){ deCateOri[g.nume] = (deCateOri[g.nume] || 0) + 1; });
+
     document.getElementById('cap').innerHTML = '<tr>' +
       '<th>Partener</th><th>Acordul</th><th>Categorie</th>' +
       '<th>Etape parcurse</th><th>Semnat</th></tr>';
@@ -1117,11 +1300,15 @@
 
       return '<tr class="acord" data-i="' + i + '" aria-expanded="false">' +
         '<td class="org">' + esc(g.parteneri || '—') + '</td>' +
-        '<td><div class="pname"><span class="caret">▶</span>' + esc(g.nume) + '</div>' +
+        '<td><div class="pname"><span class="caret">▶</span>' + esc(g.nume) +
+          (deCateOri[g.nume] > 1
+            ? '<span class="pname-sub">' + esc(g.categorie) +
+              (g.parteneri ? ' · ' + esc(g.parteneri) : '') + '</span>'
+            : '') + '</div>' +
           '<div class="pmeta">' + g.acte.length + (g.acte.length === 1 ? ' act' : ' acte') +
           ' · ultimul: ' + esc(g.ultim.data_editie) + '</div></td>' +
         '<td><span class="tag ' + (CLS[g.categorie]||'t-alt') + '">' + esc(g.categorie) + '</span>' +
-          (g.et.vig ? ' <span class="tag t-simpl">ordin de intrare în vigoare</span>' : '') + '</td>' +
+          '</td>' +
         '<td>' + steps(g) + '</td>' +
         '<td>' + (g.semnat ? '<span class="semnat">' + esc(g.semnat) + '</span>'
           : '<span class="nil">—</span>') + '</td></tr>' +
