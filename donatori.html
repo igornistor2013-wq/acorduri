@@ -3719,7 +3719,18 @@ function rebuildAll(records){
   // Cât timp rulează animația de intro, ea deține selecția de ani — nu i-o smulgem
   // de sub picioare dacă datele live sosesc la mijlocul rulării.
   if(!window.__introRunning) state.selectedYears = new Set(ALL_KEYS);
-  state.selectedDonors = new Set(DONORS);
+  /* Selecția cerută prin ?donator= supraviețuiește reconstrucțiilor. Datele
+     live sosesc după prima randare și rulează rebuildAll din nou; fără linia
+     asta, filtrul venit din registrul de acorduri era resetat la „toți
+     donatorii" la câteva secunde după deschidere, fără ca nimeni să atingă
+     ceva. */
+  var cerutDinLink = window.__donatorCerut &&
+    DONORS.filter(function(d){
+      var a = String(d).toLowerCase(), b = window.__donatorCerut.toLowerCase();
+      return a === b || a.indexOf(b) > -1 || b.indexOf(a) > -1;
+    });
+  state.selectedDonors = (cerutDinLink && cerutDinLink.length)
+    ? new Set(cerutDinLink) : new Set(DONORS);
   mapState.selected = null;
 
   buildYearUI();
@@ -7004,6 +7015,27 @@ function canonicalToa(t){var f=__toaFold(t);if(__TOA_CANON[f])return __TOA_CANON
 
 /* ---------- Pornire: mai întâi arhiva, apoi datele live ---------- */
 rebuildAll(archiveRecords());
+
+/* Dacă pagina e deschisă cu ?donator=… — de pildă dintr-un rând al registrului
+   de acorduri — pornim cu acel finanțator selectat, în loc să-l caute
+   utilizatorul printre 153. Cererea o reține rebuildAll, ca să reziste și
+   reconstrucției care urmează sosirii datelor live. */
+(function(){
+  try{
+    var cerut = new URLSearchParams(location.search).get('donator');
+    if(!cerut) return;
+    window.__donatorCerut = cerut;
+    var potriviri = DONORS.filter(function(d){
+      var a = String(d).toLowerCase(), b = cerut.toLowerCase();
+      return a === b || a.indexOf(b) > -1 || b.indexOf(a) > -1;
+    });
+    if(!potriviri.length) return;
+    window.__donatorDinLink = potriviri.join(' / ');
+    state.selectedDonors = new Set(potriviri);
+    renderDonorList();
+    render();
+  }catch(e){ console.warn('filtru din link', e); }
+})();
 applyStaticTranslations();
 /* ---------- logo animat: harta Republicii Moldova cu asistență „venind" din
    afară — 3 particule curg continuu spre țară, absorbindu-se în ea. Funcție

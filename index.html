@@ -113,6 +113,13 @@
     justify-content:center;font-size:10.5px;font-weight:800;font-family:var(--mono);
     border:1.5px solid var(--line-strong);background:#fff;color:var(--line-strong);z-index:1}
   .step.on .bead{background:var(--navy);border-color:var(--navy);color:#fff}
+  /* etapă parcursă sigur, dar fără act în registru */
+  .step.necunoscut .bead{background:#fff;border-color:var(--gold);color:var(--gold);
+    border-style:dashed;cursor:help}
+  .step.necunoscut .cap{color:var(--ink-dim)}
+  /* etapă care nu se aplică pe traseul guvernamental */
+  .step.nu .bead{background:#f2f4f8;border-color:var(--line);color:var(--line-strong);cursor:help}
+  .step.nu .cap{color:var(--line-strong)}
   .step.last .bead{background:var(--gold);border-color:var(--gold);color:#fff;
     box-shadow:0 0 0 3px rgba(200,135,26,.2)}
   .step .cap{font-size:9.5px;line-height:1.25;text-align:center;color:var(--ink-dim);max-width:64px}
@@ -124,6 +131,40 @@
     background:var(--green-bg);display:inline-block;padding:3px 8px;border-radius:5px;
     font-family:var(--mono);cursor:help}
   .vig-note span{font-weight:400;opacity:.75}
+
+  /* 7. denumirile lungi: două rânduri în listă, textul întreg la deschidere */
+  .pname{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  tr.acord[aria-expanded="true"] .pname{-webkit-line-clamp:unset;overflow:visible}
+  .det-nume{font-size:13.5px;font-weight:700;color:var(--navy-deep);line-height:1.45;
+    margin-bottom:10px;max-width:90ch}
+  /* 3. puntea către pagina cu sume */
+  .spre-sume{display:inline-block;margin-top:10px;font-size:12px;font-weight:700;
+    color:var(--navy);text-decoration:none;border-bottom:1.5px solid var(--line-strong);
+    padding-bottom:2px}
+  .spre-sume:hover{color:var(--gold);border-color:var(--gold)}
+  /* 5. rândul primește focus vizibil */
+  tr.acord:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+
+  /* 6. pe ecran îngust tabelul devine listă de carduri */
+  @media (max-width:700px){
+    .tbl-scroll{overflow-x:visible}
+    #tabel{min-width:0;display:block}
+    #tabel thead{display:none}
+    #tabel tbody{display:block}
+    tr.acord{display:block;border:1px solid var(--line-strong);border-radius:10px;
+      padding:12px 14px;margin-bottom:10px;background:var(--panel)}
+    tr.acord td{display:block;border:none;padding:5px 0}
+    tr.acord td[data-l]:before{content:attr(data-l);display:block;font-size:9.5px;
+      letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);
+      font-weight:700;margin-bottom:3px}
+    .pname{-webkit-line-clamp:3;max-width:none}
+    tr.detalii{display:block}
+    tr.detalii td{display:block;padding:0 0 12px}
+    .steps{flex-wrap:wrap;gap:10px}
+    .step{flex:0 0 auto;flex-direction:row;gap:6px}
+    .step .cap{max-width:none;text-align:left;font-size:10.5px}
+    .step:not(:last-child):after{display:none}
+  }
 
   /* filele panoului „Cum se încheie un acord" */
   .fila-intro{font-size:12.5px;color:var(--ink);line-height:1.55;margin:0 0 16px;max-width:86ch}
@@ -540,6 +581,20 @@
      formă unică, amendamentul se atașează acordului pe care îl modifică, iar
      cozile procedurale se taie. Fără ultima, „…semnat la 5 iunie 2026" și „…și
      acordarea împuternicirilor" rupeau un singur acord în trei rânduri. */
+  /* Sursa fondului. Două acorduri pot avea aceeași denumire de proiect,
+     același finanțator și același instrument, și totuși să fie acorduri
+     diferite: proiectul Termoelectrica are un grant BERD din Fondul Regional
+     E5P și altul din Platforma de Investiții pentru Vecinătate a Comisiei
+     Europene. Singurul lucru care le deosebește în titlu e fondul din care
+     vin banii, așa că îl scoatem și îl punem în cheie. Se declanșează rar —
+     pe câteva acte din tot registrul — deci nu riscă să spargă altceva. */
+  function sursa(t){
+    var m = t.match(/\bdin\s+(?:cadrul\s+|partea\s+)?((?:Fondul|Fondului|Platform\w+|Facilitat\w+|Mecanism\w+|Instrument\w+|Programul|Programului|Inițiativ\w+)[^,\.]{5,90})/i);
+    if (!m) return '';
+    return fold(m[1]).replace(/\b(in vederea|pentru realizarea|privind)\b[\s\S]*$/, '')
+      .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+  }
+
   function cheie(nume){
     var k = fold(nume);
     k = k.replace(/^amendament\S*[\s\S]*?\bla\s+(?=acord|contract|conventi|memorandum)/, '');
@@ -551,6 +606,8 @@
          // folosite alternativ în același acord, de la o etapă la alta.
          .replace(/\bdintre\b/g, 'intre');
     k = k.split(/\s(?:si\s+(?:acordarea|imputernicirea|imputernicirilor|desemnarea)|semnat[aă]?\s+la\s|incheiat[aă]?\s+la\s|intocmit\s+la\s)/)[0];
+    // Aceleași cuvinte scrise altfel de la o etapă la alta.
+    k = k.replace(/\bmunicipiul\b/g, 'mun').replace(/\brepublicii moldova\b/g, 'republica moldova');
     return k.replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
@@ -716,6 +773,42 @@
     return Object.keys(s).sort().reverse();
   }
 
+  function contopeste(map){
+    var chei = Object.keys(map);
+    function cuvinte(k){
+      var o = {}, l = k.split('\u0001')[0].split(' ');
+      l.forEach(function(w){ if (w.length > 2) o[w] = true; });
+      return o;
+    }
+    function inclus(a, b){
+      return Object.keys(a).every(function(w){ return b[w]; });
+    }
+    var alias = {};
+    chei.forEach(function(x){
+      chei.forEach(function(y){
+        if (x === y) return;
+        var A = x.split('\u0001'), B = y.split('\u0001');
+        if (A[1] !== B[1] || A[2] !== B[2] || A[3] !== B[3]) return;   // alt finanțator, instrument sau fond
+        var ca = cuvinte(x), cb = cuvinte(y);
+        if (Object.keys(ca).length < Object.keys(cb).length && inclus(ca, cb)) alias[x] = y;
+      });
+    });
+    var out = {};
+    chei.forEach(function(k){
+      var t = k, n = 0;
+      while (alias[t] && n++ < 5) t = alias[t];        // lanț scurt, fără bucle
+      if (!out[t]) out[t] = map[t];
+      if (t !== k){
+        out[t].acte = out[t].acte.concat(map[k].acte);
+        Object.keys(map[k].et).forEach(function(e){ out[t].et[e] = true; });
+        Object.keys(map[k].orgs).forEach(function(o){ out[t].orgs[o] = true; });
+        Object.keys(map[k].cats).forEach(function(c){ out[t].cats[c] = true; });
+        if (!out[t].semnat) out[t].semnat = map[k].semnat;
+      }
+    });
+    return out;
+  }
+
   function grupeaza(acte){
     var map = {};
     acte.forEach(function(a){
@@ -728,8 +821,8 @@
          patru-cinci acorduri ajungeau pe un singur rând, iar bifele de etape
          se amestecau: rândul arăta toate cele șase etape parcurse, deși niciun
          acord în parte nu ajunsese acolo. */
-      var k = cheie(nume) + '|' + (a.partener || '').split(' / ')[0].trim() +
-              '|' + (a.categorie || '');
+      var k = cheie(nume) + '\u0001' + (a.partener || '').split(' / ')[0].trim() +
+              '\u0001' + (a.categorie || '') + '\u0001' + sursa(a.titlu);
       if (!map[k]) map[k] = {nume:nume, acte:[], et:{}, orgs:{}, cats:{}, semnat:''};
       var g = map[k];
       g.acte.push(a);
@@ -738,6 +831,15 @@
       if (a.categorie) g.cats[a.categorie] = true;
       (a.partener||'').split(' / ').forEach(function(o){ o = o.trim(); if (o) g.orgs[o] = true; });
     });
+    /* Ultima trecere: contopim cheile care descriu evident același acord.
+       Titlul oficial variază de la o etapă la alta — o hotărâre scrie
+       „Optimizarea sistemului de alimentare cu energie termică", legea scrie
+       „…de alimentare CENTRALIZATĂ cu energie termică". Nu e o greșeală de-a
+       noastră, e chiar textul publicat. Când toate cuvintele unei denumiri se
+       regăsesc în cealaltă, iar finanțatorul, instrumentul și fondul coincid,
+       e același acord. */
+    map = contopeste(map);
+
     return Object.keys(map).map(function(k){
       var g = map[k];
       g.acte.sort(function(x,y){ return ord(y).localeCompare(ord(x)); });
@@ -773,6 +875,22 @@
     return null;
   }
 
+  /* Traseul acordului decide ce etape i se aplică. Cele ratificate prin lege
+     trec prin Parlament, deci au și hotărârea de aprobare a proiectului de
+     lege (etapa 3) și decretul de promulgare (etapa 5). Cele aprobate prin
+     hotărâre de Guvern nu au niciuna din ele — pct. 169 din HG 442/2015. */
+  function traseu(g){
+    var prinLege = g.acte.some(function(a){
+      return etapa(a).indexOf('rat') > -1 && /^lege/.test(fold(a.titlu));
+    });
+    var prinGuvern = g.acte.some(function(a){
+      return etapa(a).indexOf('rat') > -1 && /^hotarare/.test(fold(a.titlu));
+    });
+    if (prinLege) return 'parlament';
+    if (prinGuvern) return 'guvern';
+    return '';                       // încă nu se știe
+  }
+
   function steps(g){
     var last = -1;
     STEPS.forEach(function(s, i){ if (g.et[s.k]) last = i; });
@@ -781,10 +899,28 @@
       esc(v.data) + ' <span>· ' + esc(v.ce) + '</span></div>' : '';
     if (last < 0)
       return nota || '<span class="simpl-note">etapă neidentificată</span>';
+
+    var rut = traseu(g);
     return '<div class="steps">' + STEPS.map(function(s, i){
-      var on = g.et[s.k], cls = 'step' + (on ? ' on' : '') + (i === last ? ' last' : '');
-      return '<div class="' + cls + '" title="' + esc(s.ref) + '"><span class="bead">' +
-        (on ? '✓' : s.n) + '</span><span class="cap">' + s.cap + '</span></div>';
+      var on = g.et[s.k];
+      // Etapă neaplicabilă pe traseul guvernamental.
+      var nuSeAplica = (rut === 'guvern' && (s.k === 'plg' || s.k === 'prm'));
+      /* Etapă anterioară uneia atinse, dar fără act în registru. Nu înseamnă
+         că nu s-a întâmplat: un acord nu poate fi ratificat fără să fi fost
+         semnat. Fie actul e dinainte de perioada acoperită (registrul începe
+         în ianuarie 2025), fie n-a fost prins de filtru. Bifa goală ar minți;
+         semnul întrebării spune adevărul. */
+      var necunoscut = !on && !nuSeAplica && i < last;
+      var cls = 'step' + (on ? ' on' : necunoscut ? ' necunoscut' : nuSeAplica ? ' nu' : '') +
+        (i === last ? ' last' : '');
+      var titlu = nuSeAplica
+        ? 'Nu se aplică: acordul a fost aprobat prin hotărâre de Guvern (HG 442/2015, pct. 169)'
+        : necunoscut
+          ? 'Etapă parcursă obligatoriu, dar fără act în registru — probabil publicată înainte de perioada acoperită'
+          : s.ref;
+      return '<div class="' + cls + '" title="' + esc(titlu) + '"><span class="bead">' +
+        (on ? '✓' : nuSeAplica ? '–' : necunoscut ? '?' : s.n) + '</span>' +
+        '<span class="cap">' + s.cap + '</span></div>';
     }).join('') + '</div>' + nota;
   }
 
@@ -871,7 +1007,27 @@
     setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
   }
 
+  /* Cele două pagini numesc aceiași finanțatori altfel: registrul folosește
+     acronime scoase din titlul actului („BERD"), pagina de donatori folosește
+     denumirile complete din AMP („Banca Europeană pentru Reconstrucție și
+     Dezvoltare"). Fără traducerea asta, linkul ar duce la o pagină nefiltrată,
+     ceea ce e mai rău decât niciun link: promite ceva și nu livrează.
+     Acronimele fără corespondent în AMP nu primesc link. */
+  var SPRE_DONATORI = {
+    'BIRD':  'Banca Internațională pentru Reconstrucție și Dezvoltare',
+    'BERD':  'Banca Europeană pentru Reconstrucție și Dezvoltare',
+    'BEI':   'Banca Europeană de Investiții',
+    'UE':    'Uniunea Europeană',
+    'KfW':   'Banca de Dezvoltare a Germaniei KfW',
+    'GIZ':   'Agenția de Cooperare Internațională a Germaniei',
+    'PNUD':  'Programul Națiunilor Unite pentru Dezvoltare',
+    'JICA':  'Agenția Japoneză pentru Cooperare Internațională',
+    'BDCE':  'Banca de Dezvoltare a Consiliului Europei',
+    'Suedia':'Regatul Suediei'
+  };
+
   function paint(){
+    citesteURL();          // filtrele din link, înainte de a desena butoanele
     var acte = Object.keys(db.acte||{}).map(function(k){ return db.acte[k]; });
     var grupuri = grupeaza(acte);
 
@@ -911,20 +1067,20 @@
         'derivată din legea de ratificare');
 
     var orgBtns = ['<button data-org="all" data-a="' + grupuri.length + '" data-b="' +
-      acte.length + '" aria-pressed="true">Toți <span class="n">' +
+      acte.length + '" aria-pressed="' + (fOrg === 'all') + '">Toți <span class="n">' +
       grupuri.length + '</span></button>'].concat(
       Object.keys(orgs).sort(function(a,b){ return orgs[b]-orgs[a]; }).map(function(o){
         return '<button data-org="' + esc(o) + '" data-a="' + orgs[o] + '" data-b="' +
-          (orgsA[o]||0) + '" aria-pressed="false">' + esc(o) +
+          (orgsA[o]||0) + '" aria-pressed="' + (fOrg === o) + '">' + esc(o) +
           ' <span class="n">' + orgs[o] + '</span></button>';
       })).join('');
 
     var catBtns = ['<button data-cat="all" data-a="' + grupuri.length + '" data-b="' +
-      acte.length + '" aria-pressed="true">Toate <span class="n">' +
+      acte.length + '" aria-pressed="' + (fCat === 'all') + '">Toate <span class="n">' +
       grupuri.length + '</span></button>'].concat(
       Object.keys(cats).sort().map(function(c){
         return '<button data-cat="' + esc(c) + '" data-a="' + cats[c] + '" data-b="' +
-          (catsA[c]||0) + '" aria-pressed="false">' + esc(c) +
+          (catsA[c]||0) + '" aria-pressed="' + (fCat === c) + '">' + esc(c) +
           ' <span class="n">' + cats[c] + '</span></button>';
       })).join('');
 
@@ -932,18 +1088,18 @@
     grupuri.forEach(function(g){ aniGrup(g).forEach(function(y){ ani[y] = (ani[y]||0)+1; }); });
     acte.forEach(function(a){ var y = an(a); if (y) aniA[y] = (aniA[y]||0)+1; });
     var anBtns = ['<button data-an="all" data-a="' + grupuri.length + '" data-b="' +
-      acte.length + '" aria-pressed="true">Toți anii <span class="n">' +
+      acte.length + '" aria-pressed="' + (fAn === 'all') + '">Toți anii <span class="n">' +
       grupuri.length + '</span></button>'].concat(
       Object.keys(ani).sort().reverse().map(function(y){
         return '<button data-an="' + y + '" data-a="' + ani[y] + '" data-b="' +
-          (aniA[y]||0) + '" aria-pressed="false">' + y +
+          (aniA[y]||0) + '" aria-pressed="' + (fAn === y) + '">' + y +
           ' <span class="n">' + ani[y] + '</span></button>';
       })).join('');
 
     var vedBtns =
-      '<button data-ved="acorduri" aria-pressed="true">Acorduri <span class="n">' +
-        grupuri.length + '</span></button>' +
-      '<button data-ved="acte" aria-pressed="false">Acte <span class="n">' +
+      '<button data-ved="acorduri" aria-pressed="' + (vedere === 'acorduri') +
+        '">Acorduri <span class="n">' + grupuri.length + '</span></button>' +
+      '<button data-ved="acte" aria-pressed="' + (vedere === 'acte') + '">Acte <span class="n">' +
         acte.length + '</span></button>';
 
     /* Fluxul etapelor. Fiecare card se deschide și arată cine emite actul, cum
@@ -1041,7 +1197,8 @@
         '<span id="titluLista">Acorduri</span></h2>' +
         '<span class="chip" id="etChip" hidden></span>' +
         '<div class="btns seg" id="vedBtns">' + vedBtns + '</div>' +
-        '<input class="seek" type="search" id="seek" placeholder="Caută…" aria-label="Caută">' +
+        '<input class="seek" type="search" id="seek" placeholder="Caută…" aria-label="Caută" value="' +
+          esc(seek) + '">' +
         '<button class="xls" id="export" title="Descarcă exact rândurile filtrate">' +
           ico('down') + 'Excel</button>' +
       '</div>' +
@@ -1188,7 +1345,42 @@
       '</div><div class="sub">' + esc(sub) + '</div></div>';
   }
 
+  /* Starea filtrelor trăiește în adresa paginii, ca un link să poată fi
+     trimis mai departe: „acordurile BERD din 2025 ajunse la ratificare" e o
+     întrebare pe care cineva vrea s-o partajeze, nu s-o reconstruiască prin
+     clicuri. Folosim hash, nu query, ca să nu forțăm reîncărcarea paginii. */
+  var CAMPURI = {an:'fAn', org:'fOrg', cat:'fCat', et:'fEt', v:'vedere', q:'seek'};
+
+  function scrieURL(){
+    var p = [];
+    if (fAn  !== 'all') p.push('an=' + encodeURIComponent(fAn));
+    if (fOrg !== 'all') p.push('org=' + encodeURIComponent(fOrg));
+    if (fCat !== 'all') p.push('cat=' + encodeURIComponent(fCat));
+    if (fEt  !== 'all') p.push('et=' + encodeURIComponent(fEt));
+    if (vedere !== 'acorduri') p.push('v=' + vedere);
+    if (seek) p.push('q=' + encodeURIComponent(seek));
+    var nou = p.length ? '#' + p.join('&') : ' ';
+    if (('#' + location.hash.replace(/^#/, '')) !== ('#' + p.join('&')))
+      history.replaceState(null, '', location.pathname + location.search + nou);
+  }
+
+  function citesteURL(){
+    var h = location.hash.replace(/^#/, '');
+    if (!h) return;
+    h.split('&').forEach(function(bucata){
+      var x = bucata.split('='), k = x[0], v = decodeURIComponent(x.slice(1).join('=') || '');
+      if (!v) return;
+      if (k === 'an') fAn = v;
+      else if (k === 'org') fOrg = v;
+      else if (k === 'cat') fCat = v;
+      else if (k === 'et')  fEt = v;
+      else if (k === 'v' && (v === 'acte' || v === 'acorduri')) vedere = v;
+      else if (k === 'q')   seek = fold(v);
+    });
+  }
+
   function rows(grupuri, acte){
+    scrieURL();
     /* Filtrul pe etapă se aplică dintr-un alt panou, aflat mai sus pe pagină.
        Fără un indicator lângă listă, cine derulează direct la tabel vede 38 de
        rânduri în loc de 73 și n-are cum să înțeleagă de ce. */
@@ -1298,29 +1490,51 @@
             esc(a.editie) + '</a> · ' + esc(a.data_editie) + '</div></li>';
       }).join('');
 
+      /* Legătura cu pagina de donatori: acolo sunt sumele, aici sunt actele.
+         Fără ea, cele două jumătăți ale registrului nu comunică deloc. */
+      var principal = (g.parteneri || '').split(' / ')[0].trim();
+      var numeAmp = SPRE_DONATORI[principal];
+      var spreSume = numeAmp
+        ? '<a class="spre-sume" href="donatori.html?donator=' +
+          encodeURIComponent(numeAmp) + '" target="_blank" rel="noopener">' +
+          'Vezi proiectele și sumele ' + esc(principal) + ' →</a>'
+        : '';
+
       return '<tr class="acord" data-i="' + i + '" aria-expanded="false">' +
-        '<td class="org">' + esc(g.parteneri || '—') + '</td>' +
-        '<td><div class="pname"><span class="caret">▶</span>' + esc(g.nume) +
+        '<td class="org" data-l="Partener">' + esc(g.parteneri || '—') + '</td>' +
+        '<td data-l="Acordul"><div class="pname" title="' + esc(g.nume) + '">' +
+          '<span class="caret">▶</span>' + esc(g.nume) +
           (deCateOri[g.nume] > 1
             ? '<span class="pname-sub">' + esc(g.categorie) +
               (g.parteneri ? ' · ' + esc(g.parteneri) : '') + '</span>'
             : '') + '</div>' +
           '<div class="pmeta">' + g.acte.length + (g.acte.length === 1 ? ' act' : ' acte') +
           ' · ultimul: ' + esc(g.ultim.data_editie) + '</div></td>' +
-        '<td><span class="tag ' + (CLS[g.categorie]||'t-alt') + '">' + esc(g.categorie) + '</span>' +
-          '</td>' +
-        '<td>' + steps(g) + '</td>' +
-        '<td>' + (g.semnat ? '<span class="semnat">' + esc(g.semnat) + '</span>'
+        '<td data-l="Categorie"><span class="tag ' + (CLS[g.categorie]||'t-alt') + '">' +
+          esc(g.categorie) + '</span></td>' +
+        '<td data-l="Etape parcurse">' + steps(g) + '</td>' +
+        '<td data-l="Semnat">' + (g.semnat ? '<span class="semnat">' + esc(g.semnat) + '</span>'
           : '<span class="nil">—</span>') + '</td></tr>' +
         '<tr class="detalii hid" data-d="' + i + '"><td colspan="5">' +
-          '<ul class="acte-list">' + lista + '</ul></td></tr>';
+          '<div class="det-nume">' + esc(g.nume) + '</div>' +
+          '<ul class="acte-list">' + lista + '</ul>' + spreSume + '</td></tr>';
     }).join('');
 
     document.querySelectorAll('tr.acord').forEach(function(tr){
-      tr.addEventListener('click', function(){
+      /* Rândul e un buton, nu doar o zonă pe care se poate da clic: primește
+         focus, se anunță ca atare cititoarelor de ecran și se deschide cu
+         Enter sau Space. Fără asta, cine navighează din tastatură nu poate
+         vedea deloc actele unui acord. */
+      tr.setAttribute('tabindex', '0');
+      tr.setAttribute('role', 'button');
+      function comuta(){
         var d = document.querySelector('tr.detalii[data-d="' + tr.dataset.i + '"]');
         var open = d.classList.toggle('hid');
         tr.setAttribute('aria-expanded', String(!open));
+      }
+      tr.addEventListener('click', comuta);
+      tr.addEventListener('keydown', function(ev){
+        if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); comuta(); }
       });
     });
 
