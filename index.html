@@ -96,7 +96,7 @@
   .t-simpl{background:var(--green-bg);color:var(--green-ink)}
 
   .org{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--navy-deep);white-space:nowrap}
-  .pname{font-size:14px;font-weight:700;color:var(--navy-deep);line-height:1.4;max-width:44ch}
+  .pname{font-size:14px;font-weight:700;color:var(--navy-deep);line-height:1.4;max-width:58ch}
   .pmeta{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:5px}
   .semnat{font-family:var(--mono);font-size:11.5px;font-weight:700;background:var(--gold-bg);
     color:#8a5c0d;padding:3px 8px;border-radius:5px;white-space:nowrap}
@@ -241,20 +241,85 @@
       .replace(/[ăâ]/g,'a').replace(/î/g,'i').replace(/[șş]/g,'s').replace(/[țţ]/g,'t');
   }
 
-  // Denumirea proiectului: alias cunoscut → text între ghilimele → sintagma „Proiectul …"
-  function proiect(t){
-    var f = fold(t);
-    for (var i = 0; i < ALIAS.length; i++)
+  // Cuvintele care deschid denumirea unui acord, în orice formă gramaticală.
+  var TIP  = /(acord|contract|conven[țţ]i|memorandum|amendament|protocol)/i;
+  // Dacă textul de după „Proiectul…" începe cu unul dintre astea, nu e un nume
+  // de proiect: „proiectul de lege", „proiectul Acordului de împrumut".
+  var NOTP = /^(acord|contract|conven[țţ]i|memorandum|amendament|protocol|lege|hot[aă]r[aâ]re)/i;
+  // Aducem primul cuvânt la nominativ, ca titlul rândului să se citească normal:
+  // „Acordul de împrumut…", nu „Acordului de împrumut…".
+  var NOM = {
+    'acordului':'Acordul', 'acordul':'Acordul',
+    'contractului':'Contractul', 'contractul':'Contractul',
+    'convenției':'Convenția', 'convenţiei':'Convenția', 'convenția':'Convenția',
+    'memorandumului':'Memorandumul', 'memorandumul':'Memorandumul',
+    'amendamentului':'Amendamentul', 'amendamentul':'Amendamentul',
+    'protocolului':'Protocolul', 'protocolul':'Protocolul'
+  };
+
+  /* Denumirea rândului, în ordinea preferinței:
+       1. alias cunoscut         2. textul dintre ghilimele
+       3. sintagma „Proiectul …" 4. denumirea acordului, INTEGRAL
+
+     Punctul 4 înlocuiește vechea tăiere la 70 de caractere. Aceea producea
+     etichete ca „Decret privind promulgarea Legii pentru ratificarea Acordului
+     de împru" — rupte la mijloc de cuvânt și, mai rău, arătând tipul actului în
+     loc de acord. Fiind și cheie de grupare, unea acorduri fără legătură care
+     se nimereau să înceapă la fel: un împrumut BIRD ajunsese în același rând cu
+     unul al Băncii Naționale. */
+  function denumire(t){
+    var f = fold(t), i;
+    for (i = 0; i < ALIAS.length; i++)
       if (ALIAS[i].m.some(function(x){ return f.indexOf(x) > -1; })) return ALIAS[i].nume;
+
     var quotes = t.match(/[„"]([^"”„]{6,200})[”"]/g);
     if (quotes && quotes.length){
       var best = quotes.map(function(s){ return s.replace(/^[„"]|[”"]$/g,'').trim(); })
         .sort(function(a,b){ return b.length - a.length; })[0];
       if (best) return best;
     }
-    var p = t.match(/[Pp]roiectul(?:ui)?\s+(?:de\s+)?([^,\.;]{10,110})/);
-    if (p) return p[1].trim();
-    return t.slice(0, 70).trim();
+
+    /* Păstrăm și cuvântul „Proiectul", altfel eticheta iese ciuntită și cu
+       literă mică: „dezvoltare a sistemului electroenergetic" în loc de
+       „Proiectul de dezvoltare a sistemului electroenergetic". */
+    var p = t.match(/[Pp]roiectul(?:ui)?\s+(?:de\s+)?([^,\.;]{10,})/);
+    if (p && !NOTP.test(p[1].trim()))
+      return coada(t.slice(p.index).split(/[,\.;]/)[0].trim()
+                    .replace(/^Proiectului\b/, 'Proiectul'));
+
+    var m = TIP.exec(t);
+    if (m){
+      var s = t.slice(m.index).trim().replace(/[\s,;\.]+$/, '');
+      var w = s.split(/\s/)[0], n = NOM[w.toLowerCase()];
+      if (n) s = n + s.slice(w.length);
+      return coada(s);
+    }
+    return coada(t.trim());
+  }
+
+  /* Taie coada procedurală din denumire. „…și împuternicirea delegației
+     oficiale pentru negocieri" descrie ce face Guvernul, nu acordul, și
+     lungește inutil eticheta cu încă un rând pe ecran. */
+  function coada(s){
+    return s.replace(/[\s,]+(?:și|si)\s+(?:acordarea|împuternicirea|imputernicirea|împuternicirilor|imputernicirilor|desemnarea)\b[\s\S]*$/i, '')
+            .replace(/[\s,]+semnat[ăa]?\s+la\s+[\s\S]*$/i, '')
+            .replace(/[\s,;\.]+$/, '');
+  }
+
+  /* Cheia de grupare. Aceeași denumire scrisă puțin altfel de la o etapă la
+     alta trebuie să cadă pe același rând, așa că normalizăm: declinările devin
+     formă unică, amendamentul se atașează acordului pe care îl modifică, iar
+     cozile procedurale se taie. Fără ultima, „…semnat la 5 iunie 2026" și „…și
+     acordarea împuternicirilor" rupeau un singur acord în trei rânduri. */
+  function cheie(nume){
+    var k = fold(nume);
+    k = k.replace(/^amendament\S*[\s\S]*?\bla\s+(?=acord|contract|conventi|memorandum)/, '');
+    k = k.replace(/\b(acordului|acordul)\b/g, 'acord')
+         .replace(/\b(contractului|contractul)\b/g, 'contract')
+         .replace(/\b(conventiei|conventia)\b/g, 'conventie')
+         .replace(/\b(memorandumului|memorandumul)\b/g, 'memorandum');
+    k = k.split(/\s(?:si\s+(?:acordarea|imputernicirea|imputernicirilor|desemnarea)|semnat[aă]?\s+la\s|incheiat[aă]?\s+la\s|intocmit\s+la\s)/)[0];
+    return k.replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
   // Ce etapă reprezintă actul
@@ -278,7 +343,7 @@
   function grupeaza(acte){
     var map = {};
     acte.forEach(function(a){
-      var nume = proiect(a.titlu), k = fold(nume);
+      var nume = denumire(a.titlu), k = cheie(nume);
       if (!map[k]) map[k] = {nume:nume, acte:[], et:{}, orgs:{}, cats:{}, semnat:'', simpl:false};
       var g = map[k];
       g.acte.push(a);
