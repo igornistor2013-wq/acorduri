@@ -41,13 +41,13 @@ jobs:
 
       - name: Salvează dacă au apărut acte noi
         run: |
-          if [ -z "$(git status --porcelain date.json dashboard.html)" ]; then
+          if [ -z "$(git status --porcelain date.json)" ]; then
             echo "Nimic nou — nu fac commit."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add date.json dashboard.html
+          git add date.json
           git commit -m "Acte noi — $(date +%d.%m.%Y)"
 
           # Dacă main a avansat între checkout și acum (o altă rulare, un fișier
