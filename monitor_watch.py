@@ -14,7 +14,7 @@ Ce face:
   2. Recitește TOATE edițiile din listă la fiecare rulare (nu doar cele noi)
   3. Extrage actele care conțin termeni de finanțare externă
   4. Salvează în date.json (cumulativ, fără duplicate)
-  5. Regenerează dashboard.html
+  5. Pagina index.html citește date.json direct — nu se generează nimic
 
 Fișierele apar lângă script.
 """
@@ -36,7 +36,6 @@ BASE = "https://monitorul.gov.md"
 HOME = BASE + "/ro"
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "date.json")
-OUT = os.path.join(HERE, "dashboard.html")
 
 UA = {"User-Agent": "Mozilla/5.0 (compatible; monitor-watch/1.0)"}
 
@@ -96,6 +95,16 @@ EXCLUDE = [
     r"sprijin(?:ul|ului)?\s+financiar\s+(?:pentru\s+)?(?:producator|agricultor|fermier)",
     # finanțarea partidelor / campaniilor
     r"finantarea\s+(?:partidelor|campaniei|concurentilor)",
+    # dosare la Curtea Constituțională despre împrumuturi/credite din dreptul
+    # civil: „contract de împrumut" apare acolo ca noțiune de Cod civil, nu ca
+    # acord cu un partener extern
+    r"decizie\s+de\s+inadmisibilitate",
+    r"exceptia\s+de\s+neconstitutionalitate",
+    r"codul\s+civil",
+    # rapoartele Curții de Conturi despre proiecte finanțate extern sunt
+    # despre execuția banilor, nu sunt acorduri — registrul urmărește acorduri
+    r"raport(?:ul|ului)?\s+de\s+audit",
+    r"raportul\s+auditului",
 ]
 
 # Partenerii externi recunoscuți, pentru coloana „Partener".
@@ -111,14 +120,17 @@ PARTNERS = [
     (r"\bafd\b|agentia franceza", "AFD"),
     (r"\bkfw\b", "KfW"),
     (r"\bjica\b|agentia japoneza", "JICA"),
-    (r"\bgiz\b", "GIZ"),
+    (r"\bgiz\b|agentia de cooperare internationala a germaniei", "GIZ"),
     (r"\bpnud\b|programul natiunilor unite", "PNUD"),
     (r"\bunicef\b", "UNICEF"),
     (r"\bunhcr\b|inaltul comisariat.{0,30}refugiat", "UNHCR"),
     (r"\bficr\b|cruce ro[sș]ie|crucii rosii", "FICR"),
     (r"\bfida\b|fondul international pentru dezvoltare agricola", "FIDA"),
     # și la genitiv: „din partea Uniunii Europene", „a Comisiei Europene"
-    (r"uniunea europeana|uniunii europene|comisia europeana|comisiei europene", "UE"),
+    # Agențiile executive ale UE (EISMEA, CINEA, HaDEA) semnează direct
+    # acorduri de grant cu beneficiari din Moldova.
+    (r"uniunea europeana|uniunii europene|comisia europeana|comisiei europene"
+     r"|agentia executiva pentru|\beismea\b|\bcinea\b|\bhadea\b", "UE"),
     (r"consiliul(?:ui)? europei", "Consiliul Europei"),
     (r"\bfmi\b|fondul(?:ui)?\s+monetar", "FMI"),
     (r"\busaid\b|statele unite ale americii|guvernul sua", "SUA"),
@@ -129,6 +141,8 @@ PARTNERS = [
     (r"\bsida\b|guvernul suediei", "Suedia"),
     (r"guvernul poloniei", "Polonia"),
     (r"guvernul turciei|\btika\b", "Turcia"),
+    (r"guvernul regatului belgiei|guvernul belgiei", "Belgia"),
+    (r"\bswedfund\b", "Suedia"),
 ]
 
 MONTHS = {
@@ -302,178 +316,6 @@ def save(db):
     with open(DATA, "w", encoding="utf-8") as f:
         json.dump(db, f, ensure_ascii=False, indent=2)
 
-
-# ----------------------------------------------------------------- dashboard
-
-def sort_key(a):
-    d = a.get("data_editie") or ""
-    m = re.match(r"(\d{2})\.(\d{2})\.(\d{4})", d)
-    return (m.group(3) + m.group(2) + m.group(1)) if m else "0"
-
-
-def build_html(db):
-    acte = sorted(db["acte"].values(), key=sort_key, reverse=True)
-    cats = {}
-    for a in acte:
-        cats[a["categorie"]] = cats.get(a["categorie"], 0) + 1
-    semnate = [a for a in acte if a.get("semnat")]
-
-    def esc(s):
-        return (str(s).replace("&", "&amp;").replace("<", "&lt;")
-                .replace(">", "&gt;").replace('"', "&quot;"))
-
-    rows = []
-    for a in acte:
-        rows.append(
-            '<tr data-cat="{c}">'
-            '<td class="rail"></td>'
-            '<td class="act">{act}</td>'
-            '<td class="cat">{c}</td>'
-            '<td class="part">{p}</td>'
-            '<td class="titlu">{t}</td>'
-            '<td class="sig">{s}</td>'
-            '<td class="ed"><a href="{u}" target="_blank" rel="noopener">{e}</a>'
-            '<span>{d}</span></td>'
-            "</tr>".format(
-                c=esc(a["categorie"]), act=esc(a["act"]), p=esc(a["partener"] or "—"),
-                t=esc(a["titlu"]), s=esc(a["semnat"] or "—"),
-                u=esc(a["url"]), e=esc(a["editie"]), d=esc(a["data_editie"]),
-            )
-        )
-
-    filters = ['<button data-f="all" aria-pressed="true">Toate ({})</button>'.format(len(acte))]
-    for c in sorted(cats):
-        filters.append('<button data-f="{0}" aria-pressed="false">{0} ({1})</button>'.format(esc(c), cats[c]))
-
-    return TEMPLATE.format(
-        total=len(acte),
-        semnate=len(semnate),
-        editii=len(db["editii_vazute"]),
-        rulare=esc(db.get("ultima_rulare") or "—"),
-        filtre="\n    ".join(filters),
-        randuri="\n".join(rows) if rows else
-        '<tr><td colspan="7" class="gol">Niciun act colectat încă. Rulează scriptul.</td></tr>',
-    )
-
-
-TEMPLATE = """<!DOCTYPE html>
-<html lang="ro">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Asistență externă — acte publicate în Monitorul Oficial</title>
-<style>
-  :root{{
-    --ink:#111C2E;--soft:#46586F;--rule:#CBD4DE;--paper:#EDF1F5;--card:#fff;
-    --oxide:#A2382A;--brass:#8A6A2F;--sage:#3F6B54;--azure:#2F5D7C;--plum:#6B4A7A;
-  }}
-  *{{box-sizing:border-box}}
-  body{{margin:0;background:var(--paper);color:var(--ink);padding:30px 18px 60px;
-    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}}
-  .wrap{{max-width:1240px;margin:0 auto}}
-  header{{border-top:3px solid var(--ink);border-bottom:1px solid var(--rule);
-    padding:20px 0 16px;margin-bottom:20px}}
-  .eyebrow{{font:600 11px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;
-    text-transform:uppercase;color:var(--oxide);margin-bottom:11px}}
-  h1{{font:400 28px/1.2 "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;margin:0 0 8px}}
-  .lede{{max-width:68ch;color:var(--soft);margin:0;font-size:14px}}
-  .stats{{display:flex;flex-wrap:wrap;gap:10px 30px;margin:16px 0 18px;
-    font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;color:var(--soft)}}
-  .stats b{{color:var(--ink);font-size:15px}}
-  .filters{{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}}
-  .filters button{{font:600 12px/1 ui-monospace,Menlo,Consolas,monospace;padding:9px 13px;
-    border:1px solid var(--rule);background:var(--card);color:var(--soft);
-    border-radius:2px;cursor:pointer}}
-  .filters button:hover{{border-color:var(--soft);color:var(--ink)}}
-  .filters button[aria-pressed="true"]{{background:var(--ink);border-color:var(--ink);color:#fff}}
-  .filters button:focus-visible{{outline:2px solid var(--oxide);outline-offset:2px}}
-  .scroll{{overflow-x:auto;background:var(--card);border:1px solid var(--rule);border-radius:2px}}
-  table{{border-collapse:collapse;width:100%;min-width:1000px}}
-  th{{font:600 11px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--soft);text-align:left;padding:13px 13px 9px;
-    border-bottom:1px solid var(--ink);white-space:nowrap}}
-  td{{padding:12px 13px;border-bottom:1px solid var(--rule);vertical-align:top;font-size:13.5px}}
-  tbody tr:last-child td{{border-bottom:none}}
-  tbody tr:hover{{background:#F7F9FB}}
-  td.rail{{width:5px;padding:0;background:var(--soft)}}
-  tr[data-cat="Grant"] td.rail{{background:var(--sage)}}
-  tr[data-cat="Împrumut"] td.rail{{background:var(--oxide)}}
-  tr[data-cat="Finanțare"] td.rail{{background:var(--brass)}}
-  tr[data-cat="Contract de finanțare"] td.rail{{background:var(--azure)}}
-  tr[data-cat="Credit"] td.rail{{background:var(--plum)}}
-  .act,.cat,.part,.sig{{font:600 12px/1.4 ui-monospace,Menlo,Consolas,monospace;white-space:nowrap}}
-  .cat{{color:var(--soft);font-weight:400}}
-  .sig{{color:var(--oxide)}}
-  .titlu{{max-width:58ch;line-height:1.45}}
-  .ed{{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;white-space:nowrap}}
-  .ed a{{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)}}
-  .ed a:hover{{color:var(--oxide);border-color:var(--oxide)}}
-  .ed span{{display:block;color:var(--soft);margin-top:3px}}
-  .gol{{padding:34px;text-align:center;color:var(--soft)}}
-  footer{{margin-top:26px;border-top:1px solid var(--rule);padding-top:16px;
-    font-size:13px;color:var(--soft);max-width:74ch}}
-  @media (max-width:640px){{body{{padding:20px 12px 44px}}h1{{font-size:23px}}}}
-</style>
-</head>
-<body>
-<div class="wrap">
-<header>
-  <div class="eyebrow">Monitorul Oficial al Republicii Moldova</div>
-  <h1>Acorduri de asistență externă</h1>
-  <p class="lede">Acte privind granturi, împrumuturi, finanțare și credite externe, colectate
-  automat din cuprinsurile Monitorului Oficial. Fiecare rând trimite la ediția în care a fost publicat.</p>
-</header>
-
-<div class="stats">
-  <div><b>{total}</b> acte</div>
-  <div><b>{semnate}</b> cu dată de semnare</div>
-  <div><b>{editii}</b> ediții parcurse</div>
-  <div>ultima verificare: <b>{rulare}</b></div>
-</div>
-
-<div class="filters" role="group" aria-label="Filtrare după categorie">
-    {filtre}
-</div>
-
-<div class="scroll">
-<table>
-  <thead><tr>
-    <th></th><th>Act</th><th>Categorie</th><th>Partener</th>
-    <th>Denumire</th><th>Semnat</th><th>Ediția</th>
-  </tr></thead>
-  <tbody id="rows">
-{randuri}
-  </tbody>
-</table>
-</div>
-
-<footer>
-  Coloana „Semnat" se completează doar când data apare explicit în denumirea actului.
-  Un singur acord poate genera mai multe acte — inițierea negocierilor, aprobarea semnării,
-  proiectul de lege, ratificarea și promulgarea.
-</footer>
-</div>
-
-<script>
-(function(){{
-  var btns=document.querySelectorAll('.filters button');
-  var rows=document.querySelectorAll('#rows tr');
-  btns.forEach(function(b){{
-    b.addEventListener('click',function(){{
-      var f=b.dataset.f;
-      btns.forEach(function(o){{o.setAttribute('aria-pressed',String(o===b));}});
-      rows.forEach(function(r){{
-        r.hidden=!(f==='all'||r.dataset.cat===f);
-      }});
-    }});
-  }});
-}})();
-</script>
-</body>
-</html>
-"""
-
-
 # ----------------------------------------------------------------------- main
 
 def culege(db, eid, label):
@@ -486,11 +328,25 @@ def culege(db, eid, label):
     ok, acte = parse_edition(eid, label)
     if not ok:
         return False, 0
+
+    # Același act poate fi deja în registru sub altă cheie, dacă a venit din
+    # PDF (import_pdf.py) unde nu se știa ID-ul ediției. Fără verificarea asta,
+    # ar apărea de două ori în listă: o dată cu link către arhivă, o dată
+    # cu link către ediție. Versiunea de pe site câștigă, fiindcă are linkul bun.
+    dupa_act = {norm(a["act"]): k for k, a in db["acte"].items()}
+
     noi = 0
     for act in acte:
         key = act["act"] + "|" + act["editie_id"]
+        veche = dupa_act.get(norm(act["act"]))
+        if veche and veche != key:
+            db["acte"].pop(veche, None)
+            db["acte"][key] = act
+            dupa_act[norm(act["act"])] = key
+            continue
         if key not in db["acte"]:
             db["acte"][key] = act
+            dupa_act[norm(act["act"])] = key
             noi += 1
             print(f"     + {act['categorie']}: {act['titlu'][:78]}…")
         else:
@@ -520,8 +376,6 @@ def main():
             time.sleep(1)
         db["ultima_rulare"] = datetime.now().strftime("%d.%m.%Y %H:%M")
         save(db)
-        with open(OUT, "w", encoding="utf-8") as f:
-            f.write(build_html(db))
         print(f"\n{noi} acte noi. Total în registru: {len(db['acte'])}.")
         return
 
@@ -557,9 +411,6 @@ def main():
     db["ultima_rulare"] = datetime.now().strftime("%d.%m.%Y %H:%M")
     save(db)
 
-    with open(OUT, "w", encoding="utf-8") as f:
-        f.write(build_html(db))
-
     total = len(db["acte"])
     if noi:
         print(f"\n{noi} acte noi. Total în registru: {total}.")
@@ -567,7 +418,7 @@ def main():
         print(f"\nNimic nou. Total în registru: {total}.")
     if esecuri:
         print("Ediții nedescărcate (se reiau la rularea următoare): " + ", ".join(esecuri))
-    print(f"Dashboard: {OUT}")
+    print("Pagina index.html citește date.json direct — nu e nimic de regenerat.")
 
     if PUBLICA and noi:
         publica()
@@ -579,7 +430,7 @@ PUBLICA = False
 
 
 def publica():
-    """Urcă date.json și dashboard.html pe GitHub."""
+    """Urcă date.json pe GitHub."""
     import subprocess
     def rulez(*args):
         return subprocess.run(args, cwd=HERE, capture_output=True, text=True)
@@ -587,7 +438,7 @@ def publica():
     if rulez("git", "rev-parse", "--git-dir").returncode != 0:
         print("! Folderul nu e un repository git. Sar peste publicare.")
         return
-    rulez("git", "add", "date.json", "dashboard.html")
+    rulez("git", "add", "date.json")
     msg = "date " + datetime.now().strftime("%d.%m.%Y")
     c = rulez("git", "commit", "-m", msg)
     if c.returncode != 0 and "nothing to commit" not in (c.stdout + c.stderr):
