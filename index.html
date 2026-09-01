@@ -93,6 +93,7 @@
   .t-contract{background:var(--blue-bg);color:var(--navy)}
   .t-credit{background:var(--purple-bg);color:var(--purple)}
   .t-tehnica{background:#e8eef7;color:#3d5a80}
+  .t-suport{background:var(--purple-bg);color:var(--purple)}
   .t-alt{background:#eef0f4;color:var(--ink-dim)}
   .t-simpl{background:var(--green-bg);color:var(--green-ink)}
 
@@ -469,25 +470,29 @@
      ref:'pct. 9.9'}
   ];
 
-  /* Traducerea etichetelor din registru în noțiunile de mai sus. */
+  /* Cum e dedusă categoria din titlul actului. Categoriile sunt chiar cele din
+     regulament; ce explicăm aici e regula prin care un titlu ajunge la una
+     dintre ele, fiindcă titlurile nu folosesc mereu cuvintele din lege. */
   var ETICHETE = [
-    {cat:'Grant', legal:'Grant (pct. 9.13) — asistență financiară nerambursabilă',
-     nota:'Se suprapune exact peste noțiunea legală.'},
-    {cat:'Împrumut', legal:'Împrumut (pct. 9.2) — asistență financiară rambursabilă',
-     nota:'Se suprapune exact peste noțiunea legală.'},
-    {cat:'Credit', legal:'Împrumut (pct. 9.2)',
-     nota:'Nu e o categorie distinctă în regulament. Eticheta apare când acordul se numește ' +
-       'facilitate sau linie de credit — juridic e tot asistență financiară rambursabilă.'},
-    {cat:'Finanțare', legal:'Asistență financiară (pct. 9.2), inclusiv suport bugetar (pct. 9.20¹)',
-     nota:'Acoperă acordurile intitulate „de finanțare", printre care și programele de ' +
-       'suport bugetar cu Uniunea Europeană.'},
-    {cat:'Contract de finanțare', legal:'Asistență financiară (pct. 9.2)',
-     nota:'Nu e o categorie legală, ci denumirea instrumentului folosit mai ales de Banca ' +
-       'Europeană de Investiții pentru proiectele de investiții.'},
-    {cat:'Asistență tehnică', legal:'Asistență tehnică (pct. 9.3)',
-     nota:'Consultanță, instruire, studii, expertiză, transfer de tehnologii. Apare în ' +
-       'Monitor doar prin ordinul autorității care semnează contractul, nu prin hotărâre ' +
-       'de Guvern sau lege.'}
+    {cat:'Împrumut', legal:'Asistență financiară rambursabilă (pct. 9.2)',
+     nota:'Prinde „acord de împrumut", dar și denumirile comerciale ale aceluiași lucru: ' +
+       'facilitate sau linie de credit, ori contractul de finanțare al Băncii Europene de ' +
+       'Investiții. Niciuna nu e o categorie legală separată.'},
+    {cat:'Grant', legal:'Asistență financiară nerambursabilă (pct. 9.13)',
+     nota:'„Acord de grant", grant investițional, asistență financiară nerambursabilă. ' +
+       'Un grant care plătește servicii de consultanță rămâne grant: contează instrumentul.'},
+    {cat:'Suport bugetar', legal:'Transferat direct în bugetul public (pct. 9.20¹)',
+     nota:'Contractul de performanță pentru reforma sectorială al Uniunii Europene, ' +
+       'asistența macrofinanciară, Facilitatea de reformă și creștere. Când actul spune ' +
+       'totuși „acord de împrumut", câștigă împrumutul — suportul bugetar descrie cum ajung ' +
+       'banii, nu dacă se întorc.'},
+    {cat:'Asistență tehnică', legal:'Consultanță, instruire, expertiză (pct. 9.3)',
+     nota:'Acord sau contract de asistență ori cooperare tehnică, memorandum privind ' +
+       'consultanța sau instruirea. Ajunge în Monitor prin ordinul autorității semnatare.'},
+    {cat:'Asistență financiară', legal:'Categoria-părinte (pct. 9.2)',
+     nota:'Folosită doar când titlul spune „acord de finanțare" fără să arate dacă banii ' +
+       'sunt rambursabili — cazul acordurilor cu AID sau al celor de cooperare și finanțare ' +
+       'cu FICR. Nu ghicim: lăsăm noțiunea din care ambele forme fac parte.'}
   ];
 
   /* Categoriile de contracte de stat și traseul fiecăreia, din HG 377/2018,
@@ -543,9 +548,10 @@
     {nume:'Reabilitarea drumurilor din Moldova — Proiectul VI', m:['proiectului vi de reabilitare','proiectul vi de reabilitare']}
   ];
 
-  var CLS = {'Grant':'t-grant','Împrumut':'t-imprumut','Finanțare':'t-finantare',
-    'Contract de finanțare':'t-contract','Credit':'t-credit',
-    'Asistență tehnică':'t-tehnica'};
+  /* Categoriile sunt cele din HG 377/2018, anexa nr. 1, pct. 9. */
+  var CLS = {'Grant':'t-grant', 'Împrumut':'t-imprumut',
+    'Suport bugetar':'t-suport', 'Asistență tehnică':'t-tehnica',
+    'Asistență financiară':'t-finantare'};
 
   var app = document.getElementById('app'), topMeta = document.getElementById('topMeta');
   // „acorduri" = un rând per acord, cu etapele lui. „acte" = lista plată a
@@ -1259,11 +1265,10 @@
           'financiară și tehnică, iar nerambursabilitatea e o însușire care poate însoți ' +
           'oricare dintre ele. Iată clasificarea, cu trimiterile exacte.</p>' +
           '<ul class="tax-list">' + taxHtml + '</ul>' +
-          '<h3 class="sub-h">Ce înseamnă etichetele din registru</h3>' +
-          '<p class="fila-intro">Etichetele sunt deduse din denumirea actului publicat, nu ' +
-          'preluate dintr-o clasificare oficială. Două dintre ele — „Credit" și „Contract de ' +
-          'finanțare" — nu există ca noțiuni în regulament. Apasă o etichetă ca să filtrezi ' +
-          'registrul după ea.</p>' +
+          '<h3 class="sub-h">Cum ajunge un act într-o categorie</h3>' +
+          '<p class="fila-intro">Categoriile de pe rânduri sunt chiar cele de mai sus. ' +
+          'Titlurile actelor nu folosesc însă mereu cuvintele din lege, așa că iată regula ' +
+          'după care fiecare titlu ajunge la o categorie. Apasă una ca să filtrezi registrul.</p>' +
           '<ul class="def-list map-list">' + etichHtml + '</ul>' +
           '<p class="fila-intro"><b>Asistența tehnică ajunge în Monitor pe altă cale.</b> ' +
           'Contractele de stat fără impact bugetar care privesc proiecte de asistență ' +
