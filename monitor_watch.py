@@ -79,6 +79,30 @@ INCLUDE = [
     (r"linie\s+de\s+credit", "Credit"),
     (ACORD + r"\s+de\s+credit", "Credit"),
     (CONTRACT + r"\s+de\s+credit", "Credit"),
+    # asistență tehnică — pct. 9.3 din anexa nr. 1 la HG 377/2018
+    #
+    # Lipsea complet din filtru. Contractele de stat de asistență tehnică fără
+    # impact bugetar nu trec prin Guvern (anexa 1¹, pct. 6), dar SE PUBLICĂ:
+    # autoritatea care le semnează emite un ordin cu data intrării în vigoare,
+    # publicat în 10 zile împreună cu textul contractului (pct. 40 și 44). Deci
+    # lasă urmă în Monitor, doar sub formă de ordin — iar tiparele de mai sus,
+    # construite în jurul împrumuturilor și granturilor, nu-l prindeau.
+    (ACORD + r"\s+de\s+asistenta\s+tehnica", "Asistență tehnică"),
+    (CONTRACT + r"\s+de\s+asistenta\s+tehnica", "Asistență tehnică"),
+    (ACORD + r"\s+de\s+cooperare\s+tehnica", "Asistență tehnică"),
+    (r"memorandum[^.]{0,60}?asistenta\s+tehnica", "Asistență tehnică"),
+    (r"proiect(?:ul|ului)?\s+de\s+asistenta\s+tehnica", "Asistență tehnică"),
+    # Instrumentele „moi" prin care se acordă tot asistență tehnică. Nu putem
+    # cere ca termenul să stea lângă cuvântul „acord": în titlurile reale, între
+    # ele încap denumirile complete ale ambelor părți — „Acordului de înțelegere
+    # între Ministerul Dezvoltării Economice și Digitalizării și Agenția
+    # Elvețiană pentru Dezvoltare și Cooperare (SDC) privind consultanța…" are
+    # 140 de caractere între cele două. Cerem ambele, oriunde în titlu.
+    # Consultanța, instruirea și expertiza sunt chiar conținutul definiției
+    # asistenței tehnice din pct. 9.3.
+    (r"(?=.*\b(?:acord|acordul|acordului|memorandum|memorandumul|memorandumului)\b)"
+     r".*\b(?:consultanta|instruire|expertiza|transfer\s+de\s+cunostinte)",
+     "Asistență tehnică"),
 ]
 
 # Termeni care înseamnă că actul NU e despre finanțare externă,
@@ -123,6 +147,9 @@ PARTNERS = [
     (r"\bgiz\b|agentia de cooperare internationala a germaniei", "GIZ"),
     (r"\bpnud\b|programul natiunilor unite", "PNUD"),
     (r"\bunicef\b", "UNICEF"),
+    (r"\bunops\b|oficiul natiunilor unite pentru servicii de proiect", "UNOPS"),
+    (r"\bpam\b|programul alimentar mondial|\bwfp\b", "PAM"),
+    (r"\bsdc\b|agentia elvetiana pentru dezvoltare", "Elveția"),
     (r"\bunhcr\b|inaltul comisariat.{0,30}refugiat", "UNHCR"),
     (r"\bficr\b|cruce ro[sș]ie|crucii rosii", "FICR"),
     (r"\bfida\b|fondul international pentru dezvoltare agricola", "FIDA"),

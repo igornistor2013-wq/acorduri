@@ -92,6 +92,7 @@
   .t-finantare{background:var(--gold-bg);color:#8a5c0d}
   .t-contract{background:var(--blue-bg);color:var(--navy)}
   .t-credit{background:var(--purple-bg);color:var(--purple)}
+  .t-tehnica{background:#e8eef7;color:#3d5a80}
   .t-alt{background:#eef0f4;color:var(--ink-dim)}
   .t-simpl{background:var(--green-bg);color:var(--green-ink)}
 
@@ -165,6 +166,25 @@
     .step .cap{max-width:none;text-align:left;font-size:10.5px}
     .step:not(:last-child):after{display:none}
   }
+
+  /* clasificarea legală, pe niveluri */
+  .tax-list{list-style:none;margin:0 0 22px;padding:0}
+  .tax-list li{padding:10px 0;border-bottom:1px solid var(--line)}
+  .tax-list li:last-child{border-bottom:none}
+  .tax-n1{padding-left:20px;border-left:2px solid var(--line-strong);margin-left:4px}
+  .tax-n2{padding-left:40px;border-left:2px solid var(--line);margin-left:4px}
+  .tax-list .d-cap{margin-bottom:5px;gap:10px}
+  .tax-list .d-def{margin:0;max-width:92ch}
+  .sub-h{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);
+    font-weight:700;margin:24px 0 10px}
+  /* traducerea etichetelor */
+  .map-list li{background:#fff}
+  .et-map{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;text-align:left;
+    background:none;border:none;padding:0 0 8px;font-family:inherit;cursor:pointer}
+  .et-map:hover .map-legal{color:var(--navy);text-decoration:underline}
+  .et-map:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .map-sag{color:var(--line-strong);font-weight:700}
+  .map-legal{font-size:12.5px;font-weight:700;color:var(--navy-deep)}
 
   /* filele panoului „Cum se încheie un acord" */
   .fila-intro{font-size:12.5px;color:var(--ink);line-height:1.55;margin:0 0 16px;max-width:86ch}
@@ -399,25 +419,75 @@
      Categoriile din registru sunt deduse din denumirea actului, deci nu se
      suprapun perfect peste noțiunile legale; legătura o facem explicit aici,
      ca cititorul să știe ce înseamnă eticheta de pe rând. */
-  var TIPURI = [
-    {cat:'Grant', def:'Asistență financiară externă nerambursabilă, transmisă de partenerul ' +
-      'extern de dezvoltare beneficiarului sau implementatorului pentru realizarea unor ' +
-      'proiecte ori programe.', ref:'HG 377/2018, anexa nr. 1, pct. 9.13 și 9.3¹'},
-    {cat:'Împrumut', def:'Formă de asistență financiară rambursabilă. Contractele de împrumut ' +
-      'de stat extern se încheie după procedura din Legea nr. 419/2006 privind datoria ' +
-      'sectorului public, nu după cea a contractelor de stat.',
-      ref:'HG 377/2018, anexa nr. 1, pct. 9.2, 14.5 și 35'},
-    {cat:'Credit', def:'Tot asistență financiară rambursabilă, denumită astfel când acordul ' +
-      'îmbracă forma unei facilități sau linii de credit deschise de finanțator.',
-      ref:'HG 377/2018, anexa nr. 1, pct. 9.2'},
-    {cat:'Finanțare', def:'Acord de finanțare — categorie care acoperă și suportul bugetar: ' +
-      'asistență transferată direct într-un buget component al bugetului public național, ' +
-      'pentru susținerea reformelor agreate. Grupul de negociere pentru suport bugetar este ' +
-      'condus de Ministerul Finanțelor.',
-      ref:'HG 377/2018, anexa nr. 1, pct. 9.20¹ și 14.3'},
-    {cat:'Contract de finanțare', def:'Denumirea folosită mai ales de Banca Europeană de ' +
-      'Investiții pentru instrumentul prin care finanțează proiecte de investiții.',
-      ref:'HG 377/2018, anexa nr. 1, pct. 9.20'}
+  /* Clasificarea asistenței externe, exact cum e definită în HG 377/2018,
+     anexa nr. 1, pct. 9. Structura contează: asistența externă se împarte în
+     financiară și tehnică, iar nerambursabilitatea e o însușire transversală,
+     nu o categorie separată — poate fi nerambursabilă și asistența financiară
+     (grantul), și cea tehnică.
+
+     Etichetele de pe rândurile registrului („Credit", „Contract de finanțare")
+     NU sunt categorii legale: sunt denumirile pe care le poartă instrumentele
+     în titlul actelor. Le arătăm separat, ca nimeni să nu creadă că citește o
+     clasificare oficială. */
+  var TAXONOMIE = [
+    {nume:'Asistență externă', nivel:0,
+     def:'Noțiunea-umbrelă: asistență financiară și tehnică acordată Republicii Moldova, ' +
+       'Guvernului sau altor autorități publice de comunitatea partenerilor externi de dezvoltare.',
+     ref:'pct. 9.1'},
+    {nume:'Asistență financiară', nivel:1,
+     def:'Suport financiar acordat sub formă de împrumuturi și/sau granturi, pentru ' +
+       'implementarea proiectelor și programelor.', ref:'pct. 9.2'},
+    {nume:'Împrumut', nivel:2,
+     def:'Formă rambursabilă a asistenței financiare. Contractele de împrumut de stat extern ' +
+       'nu urmează procedura contractelor de stat, ci Legea nr. 419/2006 privind datoria ' +
+       'sectorului public, garanțiile de stat și recreditarea de stat.',
+     ref:'pct. 9.2, 14.5 și 35'},
+    {nume:'Grant', nivel:2,
+     def:'Asistență financiară externă nerambursabilă, transmisă de partenerul extern de ' +
+       'dezvoltare beneficiarului sau implementatorului pentru realizarea unor proiecte ' +
+       'ori programe.', ref:'pct. 9.13'},
+    {nume:'Suport bugetar', nivel:2,
+     def:'Asistență financiară de la Uniunea Europeană, instituțiile financiare ' +
+       'internaționale sau guvernele altor state, transferată direct într-un buget ' +
+       'component al bugetului public național, pentru a susține reformele agreate. ' +
+       'Grupul de negociere este condus de Ministerul Finanțelor.',
+     ref:'pct. 9.20¹ și 14.3'},
+    {nume:'Garanții și alte instrumente de sprijin', nivel:2,
+     def:'Regulamentul le enumeră alături de împrumuturi și granturi, printre formele prin ' +
+       'care un partener extern de dezvoltare acordă sprijin.', ref:'pct. 9.11'},
+    {nume:'Asistență tehnică', nivel:1,
+     def:'Sprijin nerambursabil pentru transfer de cunoștințe, expertiză și tehnologii — ' +
+       'consultanță, instruire, studii, schimb de experiență — inclusiv dotarea cu ' +
+       'echipamente și materiale.', ref:'pct. 9.3'},
+    {nume:'Asistență externă nerambursabilă', nivel:1,
+     def:'Însușire transversală, nu o categorie aparte: asistență financiară SAU tehnică ' +
+       'acordată cu titlu gratuit, la nivel de stat, guvernamental ori interinstituțional.',
+     ref:'pct. 9.3¹'},
+    {nume:'Cofinanțare', nivel:1,
+     def:'Contribuția părții moldovenești — financiară sau nefinanciară, prin servicii și ' +
+       'expertiză tehnică — la realizarea unui proiect împreună cu alți parteneri.',
+     ref:'pct. 9.9'}
+  ];
+
+  /* Traducerea etichetelor din registru în noțiunile de mai sus. */
+  var ETICHETE = [
+    {cat:'Grant', legal:'Grant (pct. 9.13) — asistență financiară nerambursabilă',
+     nota:'Se suprapune exact peste noțiunea legală.'},
+    {cat:'Împrumut', legal:'Împrumut (pct. 9.2) — asistență financiară rambursabilă',
+     nota:'Se suprapune exact peste noțiunea legală.'},
+    {cat:'Credit', legal:'Împrumut (pct. 9.2)',
+     nota:'Nu e o categorie distinctă în regulament. Eticheta apare când acordul se numește ' +
+       'facilitate sau linie de credit — juridic e tot asistență financiară rambursabilă.'},
+    {cat:'Finanțare', legal:'Asistență financiară (pct. 9.2), inclusiv suport bugetar (pct. 9.20¹)',
+     nota:'Acoperă acordurile intitulate „de finanțare", printre care și programele de ' +
+       'suport bugetar cu Uniunea Europeană.'},
+    {cat:'Contract de finanțare', legal:'Asistență financiară (pct. 9.2)',
+     nota:'Nu e o categorie legală, ci denumirea instrumentului folosit mai ales de Banca ' +
+       'Europeană de Investiții pentru proiectele de investiții.'},
+    {cat:'Asistență tehnică', legal:'Asistență tehnică (pct. 9.3)',
+     nota:'Consultanță, instruire, studii, expertiză, transfer de tehnologii. Apare în ' +
+       'Monitor doar prin ordinul autorității care semnează contractul, nu prin hotărâre ' +
+       'de Guvern sau lege.'}
   ];
 
   /* Categoriile de contracte de stat și traseul fiecăreia, din HG 377/2018,
@@ -474,7 +544,8 @@
   ];
 
   var CLS = {'Grant':'t-grant','Împrumut':'t-imprumut','Finanțare':'t-finantare',
-    'Contract de finanțare':'t-contract','Credit':'t-credit'};
+    'Contract de finanțare':'t-contract','Credit':'t-credit',
+    'Asistență tehnică':'t-tehnica'};
 
   var app = document.getElementById('app'), topMeta = document.getElementById('topMeta');
   // „acorduri" = un rând per acord, cu etapele lui. „acte" = lista plată a
@@ -1138,12 +1209,21 @@
              '<span class="inv-ref">' + esc(x[1]) + '</span></li>';
     }).join('');
 
-    var tipuriHtml = TIPURI.map(function(t){
-      var n = catsA[t.cat] || 0, ng = cats[t.cat] || 0;
-      return '<li><div class="d-cap"><span class="tag ' + (CLS[t.cat]||'t-alt') + '">' +
-        esc(t.cat) + '</span><span class="inv-n">' + ng + ' acorduri · ' + n + ' acte</span></div>' +
-        '<p class="d-def">' + esc(t.def) + '</p>' +
-        '<span class="inv-ref">' + esc(t.ref) + '</span></li>';
+    var taxHtml = TAXONOMIE.map(function(t){
+      return '<li class="tax-n' + t.nivel + '">' +
+        '<div class="d-cap"><b>' + esc(t.nume) + '</b>' +
+        '<span class="inv-ref">HG 377/2018, anexa nr. 1, ' + esc(t.ref) + '</span></div>' +
+        '<p class="d-def">' + esc(t.def) + '</p></li>';
+    }).join('');
+
+    var etichHtml = ETICHETE.map(function(e){
+      var ng = cats[e.cat] || 0, na = catsA[e.cat] || 0;
+      return '<li><button class="et-map" data-cat="' + esc(e.cat) + '">' +
+        '<span class="tag ' + (CLS[e.cat]||'t-alt') + '">' + esc(e.cat) + '</span>' +
+        '<span class="map-sag">→</span>' +
+        '<span class="map-legal">' + esc(e.legal) + '</span>' +
+        '<span class="inv-n">' + ng + ' acorduri · ' + na + ' acte</span></button>' +
+        '<p class="d-def">' + esc(e.nota) + '</p></li>';
     }).join('');
 
     var contracteHtml = CONTRACTE.map(function(c){
@@ -1174,10 +1254,27 @@
         '</div>' +
 
         '<div class="panel-body fila" data-fila="tipuri" hidden>' +
-          '<p class="fila-intro">Etichetele de pe rânduri sunt deduse din denumirea actului. ' +
-          'Iată ce înseamnă fiecare în termenii Regulamentului cu privire la cadrul ' +
-          'instituțional și mecanismul de coordonare și management al asistenței externe.</p>' +
-          '<ul class="def-list">' + tipuriHtml + '</ul></div>' +
+          '<p class="fila-intro">Regulamentul nu clasifică finanțările în cinci feluri, cum ' +
+          'ar putea sugera etichetele de pe rânduri. Împarte <b>asistența externă</b> în ' +
+          'financiară și tehnică, iar nerambursabilitatea e o însușire care poate însoți ' +
+          'oricare dintre ele. Iată clasificarea, cu trimiterile exacte.</p>' +
+          '<ul class="tax-list">' + taxHtml + '</ul>' +
+          '<h3 class="sub-h">Ce înseamnă etichetele din registru</h3>' +
+          '<p class="fila-intro">Etichetele sunt deduse din denumirea actului publicat, nu ' +
+          'preluate dintr-o clasificare oficială. Două dintre ele — „Credit" și „Contract de ' +
+          'finanțare" — nu există ca noțiuni în regulament. Apasă o etichetă ca să filtrezi ' +
+          'registrul după ea.</p>' +
+          '<ul class="def-list map-list">' + etichHtml + '</ul>' +
+          '<p class="fila-intro"><b>Asistența tehnică ajunge în Monitor pe altă cale.</b> ' +
+          'Contractele de stat fără impact bugetar care privesc proiecte de asistență ' +
+          'tehnică se semnează direct de conducătorul autorității, fără avizare și fără ' +
+          'hotărâre de Guvern — anexa nr. 1¹, pct. 6. Dar nu rămân nepublicate: toate ' +
+          'contractele de stat se publică în Monitor, iar autoritatea care semnează emite ' +
+          'un ordin cu data intrării în vigoare, publicat în 10 zile împreună cu textul ' +
+          'contractului — pct. 40 și 44. Așa apar acordurile de asistență tehnică încheiate ' +
+          'de ministere cu PAM, GIZ sau Agenția Elvețiană pentru Dezvoltare și Cooperare: ' +
+          'nu ca lege sau hotărâre, ci ca ordin al ministerului semnatar.</p>' +
+        '</div>' +
 
         '<div class="panel-body fila" data-fila="contracte" hidden>' +
           '<p class="fila-intro">O parte din acordurile de aici nu sunt tratate ' +
@@ -1218,6 +1315,19 @@
 
     // Comutarea între file. Indiciul din dreapta antetului e valabil doar la
     // fila cu etape, unde chiar ai ce apăsa.
+    // Etichetele din fila „Tipuri de finanțare" filtrează registrul, ca să poți
+    // trece direct de la definiție la acordurile care intră sub ea.
+    app.querySelectorAll('.et-map').forEach(function(b){
+      b.addEventListener('click', function(){
+        fCat = b.dataset.cat;
+        app.querySelectorAll('#catBtns button').forEach(function(o){
+          o.setAttribute('aria-pressed', String(o.dataset.cat === fCat));
+        });
+        rows(grupuri, acte);
+        document.getElementById('lista').scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    });
+
     app.querySelectorAll('#filaBtns button').forEach(function(b){
       b.addEventListener('click', function(){
         var f = b.dataset.fila;
