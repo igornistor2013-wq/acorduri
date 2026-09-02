@@ -34,6 +34,11 @@ except ImportError:
 
 BASE = "https://monitorul.gov.md"
 HOME = BASE + "/ro"
+
+# Câte ediții sărite recuperăm într-o singură rulare. Fiecare costă o secundă
+# de pauză, deci 25 înseamnă sub un minut în plus; un gol mai mare se închide
+# în rulările următoare, câte 25 pe zi.
+MAX_RECUPERARI = 25
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "date.json")
 
@@ -427,6 +432,25 @@ def culege(db, eid, label):
     return True, noi
 
 
+def goluri(db):
+    """Edițiile lipsă din șirul celor văzute.
+
+    Pagina principală arată doar zece ediții. La ritmul obișnuit de publicare
+    asta înseamnă în jur de trei săptămâni de rezervă — dar dacă automatizarea
+    stă mai mult, sau dacă GitHub sare câteva rulări programate, edițiile ies
+    din listă înainte de a fi citite și nu mai reapar niciodată. Registrul
+    rămâne cu o gaură pe care nimeni n-o observă, fiindcă nimic nu semnalează
+    lipsa.
+
+    ID-urile sunt consecutive, așa că orice număr care lipsește între prima și
+    ultima ediție văzută e o ediție pe care n-am citit-o.
+    """
+    vazute = sorted(int(x) for x in db["editii_vazute"] if str(x).isdigit())
+    if len(vazute) < 2:
+        return []
+    return [i for i in range(vazute[0], vazute[-1] + 1) if i not in vazute]
+
+
 def main():
     db = load()
 
@@ -481,6 +505,29 @@ def main():
         time.sleep(1)
 
     db["editii_vazute"] = sorted(set(db["editii_vazute"]), key=lambda x: int(x) if x.isdigit() else 0)
+
+    # Recuperarea golurilor. Le citim chiar acum, nu doar le raportăm: o ediție
+    # sărită nu se mai întoarce niciodată pe prima pagină, deci dacă n-o luăm
+    # aici, e pierdută definitiv. Limita de 25 pe rulare ține timpul sub un
+    # minut în plus; dacă golul e mai mare, se închide în rulările următoare.
+    # De la cele mai noi spre cele vechi. Golurile recente sunt cele apărute
+    # din cauza unei pauze a automatizării și sunt cele pe care le vrea
+    # utilizatorul; dacă am porni de la capătul vechi, într-un registru cu
+    # multe goluri n-am ajunge niciodată la ediția de săptămâna trecută.
+    lipsa = sorted(goluri(db), reverse=True)
+    if lipsa:
+        print(f"\n{len(lipsa)} ediții lipsă din șir — le recuperez "
+              f"({min(len(lipsa), MAX_RECUPERARI)} acum, de la cele mai noi):")
+        for eid in lipsa[:MAX_RECUPERARI]:
+            print(f" ← ediția {eid}")
+            ok, n = culege(db, str(eid), "")
+            noi += n
+            if ok:
+                db["editii_vazute"].append(str(eid))
+            time.sleep(1)
+        db["editii_vazute"] = sorted(set(db["editii_vazute"]),
+                                     key=lambda x: int(x) if x.isdigit() else 0)
+
     db["ultima_rulare"] = datetime.now().strftime("%d.%m.%Y %H:%M")
     save(db)
 
@@ -491,6 +538,13 @@ def main():
         print(f"\nNimic nou. Total în registru: {total}.")
     if esecuri:
         print("Ediții nedescărcate (se reiau la rularea următoare): " + ", ".join(esecuri))
+    ramase = goluri(db)
+    db["editii_lipsa"] = [str(x) for x in ramase]
+    if ramase:
+        print(f"Încă {len(ramase)} ediții lipsă din șir, cele mai noi: " +
+              ", ".join(str(x) for x in sorted(ramase, reverse=True)[:12]) +
+              ("…" if len(ramase) > 12 else "") +
+              "\n  Se recuperează câte " + str(MAX_RECUPERARI) + " la fiecare rulare.")
     print("Pagina index.html citește date.json direct — nu e nimic de regenerat.")
 
     if PUBLICA and noi:

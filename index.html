@@ -266,6 +266,8 @@
   .det-filtru:hover{background:var(--navy-deep)}
   .det-filtru:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
+  .gol{color:var(--red);cursor:help}
+  .gol b{color:var(--red)}
   .chip{display:inline-flex;align-items:center;gap:8px;background:var(--gold-bg);
     color:#8a5c0d;border:1px solid var(--gold);border-radius:20px;padding:4px 6px 4px 12px;
     font-size:11.5px;font-weight:700}
@@ -1113,9 +1115,19 @@
     var acte = Object.keys(db.acte||{}).map(function(k){ return db.acte[k]; });
     var grupuri = grupeaza(acte);
 
+    /* Golurile din șirul edițiilor se văd și pe pagină, nu doar în jurnalul
+       rulării. O ediție necitită înseamnă acte care lipsesc din registru, iar
+       cifra „N acorduri" ar minți prin omisiune dacă lipsa n-ar fi scrisă
+       nicăieri. Colectorul le recuperează singur, câte 25 pe rulare. */
+    var lipsa = (db.editii_lipsa || []).length;
     topMeta.innerHTML =
       '<span>Ultima verificare: <b>' + esc(db.ultima_rulare||'—') + '</b></span>' +
-      '<span>Ediții parcurse: <b>' + ((db.editii_vazute||[]).length) + '</b></span>';
+      '<span>Ediții parcurse: <b>' + ((db.editii_vazute||[]).length) + '</b></span>' +
+      (lipsa
+        ? '<span class="gol" title="Ediții din interiorul intervalului acoperit care ' +
+          'n-au fost încă citite. Se recuperează automat, câte 25 la fiecare rulare.">' +
+          'Ediții încă necitite: <b>' + lipsa + '</b></span>'
+        : '');
 
     if (!grupuri.length){
       app.innerHTML = '<div class="panel"><div class="empty-state"><strong>Registrul e gol</strong>' +
