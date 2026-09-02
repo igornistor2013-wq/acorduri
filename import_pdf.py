@@ -313,7 +313,7 @@ def main():
         print("\n--dry-run: nu am scris nimic.")
     else:
         mw.save(db)
-        print(f"\nAm scris {DATA}. Urcă-l pe GitHub — index.html îl citește direct.")
+        print(f"\nAm scris {DATA}. Urcă-l pe GitHub — acorduri.html îl citește direct.")
 
     if temp:
         shutil.rmtree(temp, ignore_errors=True)

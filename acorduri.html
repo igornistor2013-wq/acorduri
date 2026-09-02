@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2322406b%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%224.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M37%2014H22a4%204%200%200%200-4%204v28a4%204%200%200%200%204%204h20a4%204%200%200%200%204-4V23z%22%2F%3E%3Cpath%20d%3D%22M37%2014v9h9%22%2F%3E%3Cpath%20d%3D%22M26%2034h12%22%2F%3E%3Cpath%20d%3D%22M26%2041h8%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<title>Acorduri — Asistență Externă, Republica Moldova</title>
+<style>
+  :root{
+    --bg:#ffffff;--panel:#ffffff;--line:#e4e7ef;--line-strong:#c9ceda;
+    --ink:#1c2230;--ink-dim:#6b7284;--navy:#22406b;--navy-deep:#16294a;
+    --blue-bg:#eaf0fb;--gold:#c8871a;--gold-bg:#fdf1dc;--red:#c0402c;--red-bg:#fbe8e3;
+    --green-bg:#e6f4ea;--green-ink:#276c3e;--purple:#6b4a85;--purple-bg:#f1ebf6;
+    --teal-ink:#155a52;--teal-bg:#e0f2f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,'Courier New',monospace;
+    --radius:10px;--shadow:0 1px 2px rgba(20,30,60,.04), 0 4px 14px rgba(20,30,60,.05);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1280px;margin:0 auto;padding:26px 22px 60px}
+
+  .top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+    padding-bottom:22px;margin-bottom:24px;border-bottom:1px solid var(--line-strong)}
+  .title-row{display:flex;align-items:center;gap:13px}
+  .logo-badge{width:38px;height:38px;border-radius:9px;flex:none;
+    background:linear-gradient(135deg,var(--navy),#2f5691);display:flex;align-items:center;justify-content:center}
+  .logo-badge svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.1}
+  h1{font-weight:800;font-size:clamp(26px,3.2vw,38px);line-height:1.12;margin:0;
+    color:var(--navy-deep);letter-spacing:-.015em}
+  .top-sub{margin:9px 0 0;color:var(--ink-dim);font-size:13.5px;max-width:54ch}
+  .top-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);
+    display:flex;flex-direction:column;gap:4px}
+  .top-meta b{color:var(--navy-deep);font-weight:700}
+  .navbtns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .navbtn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;border-radius:var(--radius);
+    padding:11px 20px;font-size:14px;font-weight:800;white-space:nowrap;letter-spacing:.01em;
+    border:1.5px solid transparent}
+  .navbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.3}
+  .navbtn.here{background:linear-gradient(135deg,var(--navy),#2f5691);color:#fff}
+  .navbtn.away{background:#fff;color:var(--navy);border-color:var(--navy)}
+  .navbtn.away:hover{background:var(--blue-bg)}
+  .navbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  @media (max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px 18px}
+  .kpi .lbl{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-dim);
+    font-weight:700;margin-bottom:7px}
+  .kpi .val{font-size:27px;font-weight:800;color:var(--navy-deep);line-height:1;letter-spacing:-.02em}
+  .kpi .sub{font-size:11.5px;color:var(--ink-dim);margin-top:6px;font-family:var(--mono)}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:14px 18px;border-bottom:1px solid var(--line)}
+  h2{font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);margin:0;
+    font-weight:700;display:flex;align-items:center;gap:8px}
+  h2 svg{width:14px;height:14px;stroke:var(--navy);fill:none;stroke-width:2.2}
+  .panel-body{padding:16px 18px}
+
+  .btns{display:flex;flex-wrap:wrap;gap:6px}
+  .btns button{background:var(--panel);border:1px solid var(--line-strong);color:var(--navy);
+    font-family:inherit;font-size:11.5px;font-weight:600;border-radius:6px;padding:6px 11px;
+    cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .btns button:hover{background:var(--blue-bg)}
+  .btns button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+  .btns button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .btns button .n{font-family:var(--mono);opacity:.72;font-size:10.5px}
+  .seek{border:1px solid var(--line-strong);border-radius:6px;padding:7px 12px;font-family:inherit;
+    font-size:12px;color:var(--ink);min-width:200px;flex:1;max-width:320px}
+  .seek:focus{outline:2px solid var(--gold);outline-offset:1px}
+
+  .tbl-scroll{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;min-width:1000px}
+  th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;
+    text-align:left;padding:11px 14px;border-bottom:1px solid var(--line-strong);
+    white-space:nowrap;background:#fbfcfe}
+  td{padding:14px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr.acord{cursor:pointer}
+  tr.acord:hover{background:#fafbfd}
+  tr.acord td{border-bottom:1px solid var(--line)}
+  tr.detalii td{background:#fbfcfe;padding:0 14px 14px}
+  tr.detalii.hid{display:none}
+
+  .tag{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10.5px;
+    font-weight:700;letter-spacing:.02em;white-space:nowrap}
+  .t-grant{background:var(--teal-bg);color:var(--teal-ink)}
+  .t-imprumut{background:var(--red-bg);color:var(--red)}
+  .t-finantare{background:var(--gold-bg);color:#8a5c0d}
+  .t-contract{background:var(--blue-bg);color:var(--navy)}
+  .t-credit{background:var(--purple-bg);color:var(--purple)}
+  .t-tehnica{background:#e8eef7;color:#3d5a80}
+  .t-suport{background:var(--purple-bg);color:var(--purple)}
+  .t-alt{background:#eef0f4;color:var(--ink-dim)}
+  .t-simpl{background:var(--green-bg);color:var(--green-ink)}
+
+  .org{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--navy-deep);white-space:nowrap}
+  .pname{font-size:14px;font-weight:700;color:var(--navy-deep);line-height:1.4;max-width:58ch}
+  .pname-sub{display:block;font-size:11px;font-weight:600;color:var(--ink-dim);
+    font-family:var(--mono);margin-top:3px}
+  .pmeta{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:5px}
+  .semnat{font-family:var(--mono);font-size:11.5px;font-weight:700;background:var(--gold-bg);
+    color:#8a5c0d;padding:3px 8px;border-radius:5px;white-space:nowrap}
+  .nil{color:var(--line-strong)}
+  .caret{display:inline-block;width:14px;color:var(--ink-dim);font-size:10px;transition:transform .15s}
+  tr.acord[aria-expanded="true"] .caret{transform:rotate(90deg)}
+
+  /* etapele acordului */
+  .steps{display:flex;align-items:flex-start;gap:0;min-width:250px}
+  .step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative}
+  .step .bead{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:10.5px;font-weight:800;font-family:var(--mono);
+    border:1.5px solid var(--line-strong);background:#fff;color:var(--line-strong);z-index:1}
+  .step.on .bead{background:var(--navy);border-color:var(--navy);color:#fff}
+  /* etapă parcursă sigur, dar fără act în registru */
+  .step.necunoscut .bead{background:#fff;border-color:var(--gold);color:var(--gold);
+    border-style:dashed;cursor:help}
+  .step.necunoscut .cap{color:var(--ink-dim)}
+  /* etapă care nu se aplică pe traseul guvernamental */
+  .step.nu .bead{background:#f2f4f8;border-color:var(--line);color:var(--line-strong);cursor:help}
+  .step.nu .cap{color:var(--line-strong)}
+  .step.last .bead{background:var(--gold);border-color:var(--gold);color:#fff;
+    box-shadow:0 0 0 3px rgba(200,135,26,.2)}
+  .step .cap{font-size:9.5px;line-height:1.25;text-align:center;color:var(--ink-dim);max-width:64px}
+  .step.on .cap{color:var(--navy-deep);font-weight:700}
+  .step:not(:last-child):after{content:'';position:absolute;top:10.5px;left:50%;width:100%;
+    height:1.5px;background:var(--line-strong)}
+  .step.on:not(:last-child):after{background:var(--navy)}
+  .vig-note{margin-top:7px;font-size:10.5px;font-weight:700;color:var(--green-ink);
+    background:var(--green-bg);display:inline-block;padding:3px 8px;border-radius:5px;
+    font-family:var(--mono);cursor:help}
+  .vig-note span{font-weight:400;opacity:.75}
+
+  /* 7. denumirile lungi: două rânduri în listă, textul întreg la deschidere */
+  .pname{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  tr.acord[aria-expanded="true"] .pname{-webkit-line-clamp:unset;overflow:visible}
+  .det-nume{font-size:13.5px;font-weight:700;color:var(--navy-deep);line-height:1.45;
+    margin-bottom:10px;max-width:90ch}
+  /* 3. puntea către pagina cu sume */
+  .spre-sume{display:inline-block;margin-top:10px;font-size:12px;font-weight:700;
+    color:var(--navy);text-decoration:none;border-bottom:1.5px solid var(--line-strong);
+    padding-bottom:2px}
+  .spre-sume:hover{color:var(--gold);border-color:var(--gold)}
+  /* 5. rândul primește focus vizibil */
+  tr.acord:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+
+  /* 6. pe ecran îngust tabelul devine listă de carduri */
+  .et-mic{display:inline-block;font-size:10px;font-weight:700;color:var(--navy);
+    background:var(--blue-bg);border-radius:4px;padding:2px 7px;margin:0 4px 3px 0;
+    white-space:nowrap}
+  .et-mic.vig{background:var(--green-bg);color:var(--green-ink)}
+
+  @media (max-width:700px){
+    .tbl-scroll{overflow-x:visible}
+    #tabel{min-width:0;display:block}
+    #tabel thead{display:none}
+    #tabel tbody{display:block}
+    tr.acord, tr.act-rand{display:block;border:1px solid var(--line-strong);border-radius:10px;
+      padding:12px 14px;margin-bottom:10px;background:var(--panel)}
+    tr.acord td, tr.act-rand td{display:block;border:none;padding:5px 0}
+    tr.acord td[data-l]:before, tr.act-rand td[data-l]:before{content:attr(data-l);display:block;font-size:9.5px;
+      letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);
+      font-weight:700;margin-bottom:3px}
+    .pname{-webkit-line-clamp:3;max-width:none}
+    tr.detalii{display:block}
+    tr.detalii td{display:block;padding:0 0 12px}
+    .steps{flex-wrap:wrap;gap:10px}
+    .step{flex:0 0 auto;flex-direction:row;gap:6px}
+    .step .cap{max-width:none;text-align:left;font-size:10.5px}
+    .step:not(:last-child):after{display:none}
+  }
+
+  /* clasificarea legală, pe niveluri */
+  .tax-list{list-style:none;margin:0 0 22px;padding:0}
+  .tax-list li{padding:10px 0;border-bottom:1px solid var(--line)}
+  .tax-list li:last-child{border-bottom:none}
+  .tax-n1{padding-left:20px;border-left:2px solid var(--line-strong);margin-left:4px}
+  .tax-n2{padding-left:40px;border-left:2px solid var(--line);margin-left:4px}
+  .tax-list .d-cap{margin-bottom:5px;gap:10px}
+  .tax-list .d-def{margin:0;max-width:92ch}
+  .sub-h{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--navy);
+    font-weight:700;margin:24px 0 10px}
+  /* traducerea etichetelor */
+  .map-list li{background:#fff}
+  .et-map{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;text-align:left;
+    background:none;border:none;padding:0 0 8px;font-family:inherit;cursor:pointer}
+  .et-map:hover .map-legal{color:var(--navy);text-decoration:underline}
+  .et-map:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .map-sag{color:var(--line-strong);font-weight:700}
+  .map-legal{font-size:12.5px;font-weight:700;color:var(--navy-deep)}
+
+  /* filele panoului „Cum se încheie un acord" */
+  .fila-intro{font-size:12.5px;color:var(--ink);line-height:1.55;margin:0 0 16px;max-width:86ch}
+  .fila-intro b{color:var(--navy-deep)}
+  .def-list{list-style:none;margin:0;padding:0;display:grid;
+    grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:860px){.def-list{grid-template-columns:1fr}}
+  .def-list li{border:1px solid var(--line);border-radius:9px;padding:13px 15px;background:#fbfcfe}
+  .d-cap{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
+  .d-cap b{font-size:13px;color:var(--navy-deep)}
+  .d-def{font-size:12.5px;color:var(--ink);line-height:1.5;margin:0 0 8px}
+  .d-traseu{font-size:12px;color:var(--ink);line-height:1.5;margin:0 0 8px;
+    padding-left:11px;border-left:2px solid var(--line-strong)}
+
+  /* butonul de export și rândurile de filtre etichetate */
+  .xls{display:inline-flex;align-items:center;gap:7px;background:var(--green-bg);
+    color:var(--green-ink);border:1px solid var(--green-ink);border-radius:6px;
+    padding:7px 14px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+  .xls:hover{background:var(--green-ink);color:#fff}
+  .xls:hover svg{stroke:#fff}
+  .xls svg{width:14px;height:14px;stroke:var(--green-ink);fill:none;stroke-width:2.2}
+  .xls:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .filtru-rand{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+  .filtru-rand:last-child{margin-bottom:0}
+  .f-lbl{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);
+    font-weight:700;padding-top:7px;min-width:104px;flex:none}
+  @media (max-width:640px){.filtru-rand{flex-direction:column;gap:6px}.f-lbl{padding-top:0}}
+
+  /* fluxul interactiv al etapelor */
+  .flux{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  @media (max-width:980px){.flux{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:560px){.flux{grid-template-columns:repeat(2,1fr)}}
+  .et-card{position:relative;text-align:left;background:var(--panel);cursor:pointer;
+    border:1.5px solid var(--line-strong);border-radius:9px;padding:11px 12px;
+    font-family:inherit;display:flex;flex-direction:column;gap:6px}
+  .et-card:hover{border-color:var(--navy);background:var(--blue-bg)}
+  .et-card[aria-expanded="true"]{border-color:var(--navy);background:var(--blue-bg);
+    box-shadow:0 2px 10px rgba(34,64,107,.12)}
+  .et-card.activ{border-color:var(--gold);background:var(--gold-bg)}
+  .et-card.aparte{border-style:dashed}
+  .et-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .et-top{display:flex;justify-content:space-between;align-items:center}
+  .et-n{width:20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;
+    font-family:var(--mono);font-size:11px;font-weight:700;display:flex;
+    align-items:center;justify-content:center;flex:none}
+  .et-card.aparte .et-n{background:var(--green-ink)}
+  .et-drop{font-family:var(--mono);font-size:10px;color:var(--red);font-weight:700}
+  .et-cap{font-size:11.5px;font-weight:700;color:var(--navy-deep);line-height:1.3;min-height:29px}
+  .et-val{font-size:21px;font-weight:800;color:var(--navy-deep);line-height:1;letter-spacing:-.02em}
+  .et-bar{display:block;height:4px;background:#eef0f4;border-radius:2px;overflow:hidden}
+  .et-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--navy),#3d6ba8)}
+  .et-card.aparte .et-bar i{background:var(--green-ink)}
+  .et-em{font-size:10px;color:var(--ink-dim);font-family:var(--mono)}
+
+  .et-detail{margin-top:14px;padding:15px 17px;border:1px solid var(--line-strong);
+    border-radius:9px;background:#fbfcfe}
+  .det-cap{font-size:14px;font-weight:800;color:var(--navy-deep);margin-bottom:12px}
+  .det-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:14px}
+  @media (max-width:760px){.det-grid{grid-template-columns:1fr;gap:10px}}
+  .det-grid > div{font-size:12.5px;color:var(--ink);line-height:1.45}
+  .det-lbl{display:block;font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--ink-dim);font-weight:700;margin-bottom:4px}
+  .det-ref{font-family:var(--mono);font-size:11px;color:var(--navy)}
+  .det-ex{list-style:none;margin:6px 0 14px;padding:0}
+  .det-ex li{font-size:12px;color:var(--ink);padding:5px 0;border-bottom:1px solid var(--line);
+    line-height:1.45}
+  .det-ex li:last-child{border-bottom:none}
+  .det-ex a{font-family:var(--mono);font-size:11px;color:var(--navy);font-weight:700;
+    text-decoration:none;margin-right:8px}
+  .det-ex a:hover{text-decoration:underline;color:var(--gold)}
+  .det-filtru{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:8px 15px;
+    font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+  .det-filtru:hover{background:var(--navy-deep)}
+  .det-filtru:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .gol{color:var(--red);cursor:help}
+  .gol b{color:var(--red)}
+  .chip{display:inline-flex;align-items:center;gap:8px;background:var(--gold-bg);
+    color:#8a5c0d;border:1px solid var(--gold);border-radius:20px;padding:4px 6px 4px 12px;
+    font-size:11.5px;font-weight:700}
+  .chip b{cursor:pointer;font-size:14px;line-height:1;padding:0 6px;border-radius:50%;
+    color:#8a5c0d}
+  .chip b:hover{background:var(--gold);color:#fff}
+
+  .inv-wrap{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+  .inv-wrap summary{cursor:pointer;font-size:12px;color:var(--ink-dim);font-weight:600;
+    list-style:none;display:flex;align-items:center;gap:7px}
+  .inv-wrap summary::-webkit-details-marker{display:none}
+  .inv-wrap summary::before{content:"▸";color:var(--line-strong);font-size:13px}
+  .inv-wrap[open] summary::before{content:"▾"}
+  .inv-wrap summary:hover{color:var(--navy)}
+  .inv-wrap b{color:var(--navy)}
+  .inv-wrap .inv-list{margin-top:10px}
+
+  /* panoul „Cum se încheie un acord" */
+  .inv-list{list-style:none;margin:0;padding:0}
+  .inv-list li{padding:8px 0;border-bottom:1px solid var(--line)}
+  .inv-list li:last-child{border-bottom:none}
+  .inv-lbl{display:block;font-size:12.5px;color:var(--ink);line-height:1.45}
+  .inv-lbl b{color:var(--navy)}
+  .inv-n{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim)}
+  .inv-ref{display:block;font-size:10.5px;color:var(--ink-dim);margin-top:2px;font-family:var(--mono)}
+
+  .simpl-note{font-size:11px;color:var(--green-ink);font-weight:700;
+    background:var(--green-bg);padding:6px 10px;border-radius:6px;display:inline-block}
+
+  .acte-list{margin:0;padding:0;list-style:none;border-left:2px solid var(--line-strong);margin-left:6px}
+  .acte-list li{padding:9px 0 9px 15px;position:relative}
+  .acte-list li:before{content:'';position:absolute;left:-5px;top:15px;width:8px;height:8px;
+    border-radius:50%;background:var(--navy)}
+  .acte-list .a-nr{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy)}
+
+  /* comutatorul de vedere: acorduri / acte */
+  .seg{border:1px solid var(--line-strong);border-radius:7px;padding:2px;gap:2px}
+  .seg button{border:none;border-radius:5px;padding:6px 13px}
+  .seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+
+  /* banda de filtre pe categorii, sub antetul panoului */
+  .panel-sub{padding:12px 18px;border-bottom:1px solid var(--line);background:#fbfcfe}
+
+  /* rândurile din vederea „acte" refolosesc stilurile listei de acte */
+  td.a-nr{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy);white-space:nowrap}
+  td.a-src{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);white-space:nowrap}
+  td.a-src a{color:var(--navy);text-decoration:none;font-weight:700}
+  td.a-src a:hover{text-decoration:underline;color:var(--gold)}
+  .a-tit{font-size:12.5px;line-height:1.5;color:var(--ink);max-width:70ch}
+  .acte-list .a-tit{font-size:12.5px;line-height:1.5;color:var(--ink);margin-top:3px;max-width:88ch}
+  .acte-list .a-src{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-top:3px}
+  .acte-list .a-src a{color:var(--navy);text-decoration:none}
+  .acte-list .a-src a:hover{text-decoration:underline;color:var(--gold)}
+
+
+  .empty-state{padding:34px 18px;text-align:center;color:var(--ink-dim);font-size:13px}
+  .empty-state strong{display:block;color:var(--navy-deep);font-size:15px;font-weight:700;margin-bottom:6px}
+  .empty-state code{font-family:var(--mono);background:#f2f4f8;padding:2px 6px;border-radius:4px}
+  .footer-source{border-top:1px solid var(--line);padding-top:16px;margin-top:8px;
+    font-size:12px;color:var(--ink-dim);max-width:80ch}
+  @media (prefers-reduced-motion:no-preference){.et-bar i{transition:width .5s cubic-bezier(.2,.7,.3,1)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <div class="title-row">
+        <div class="logo-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+        </div>
+        <h1>Acorduri de asistență externă</h1>
+      </div>
+      <p class="top-sub">Un acord, un rând. Actele publicate în Monitorul Oficial sunt grupate pe acordul din care fac parte, cu etapa la care a ajuns fiecare.</p>
+    </div>
+    <div class="top-meta" id="topMeta"></div>
+    <div class="navbtns">
+      <span class="navbtn here">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Acorduri
+      </span>
+      <a class="navbtn away" href="index.html">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg>
+        Donatori și proiecte →
+      </a>
+    </div>
+  </header>
+
+  <div id="app">
+    <div class="panel"><div class="empty-state"><strong>Se încarcă</strong>Preiau registrul.</div></div>
+  </div>
+
+  <div class="footer-source">
+    Un acord parcurge cinci etape care pot fi urmărite act cu act în Monitorul Oficial: hotărârea sau decretul de inițiere a negocierilor, aprobarea semnării, hotărârea de aprobare a proiectului de lege, legea de ratificare (ori hotărârea de aprobare, pentru acordurile de competența Guvernului) și decretul de promulgare. Intrarea în vigoare nu e o a șasea etapă. Data afișată sub etape este cea la care a intrat în vigoare legea de ratificare — articolul ei final prevede că legea intră în vigoare la data publicării în Monitor, iar aceea e chiar data ediției. Acordul propriu-zis intră în vigoare mai târziu, după schimbul instrumentelor de ratificare; acea dată nu se poate deduce din cuprins, fiindcă ordinul ministrului afacerilor externe care o anunță este colectiv și nu numește acordul. Alte etape obligatorii — avizarea, parafarea, deplinele puteri, semnarea propriu-zisă — nu produc niciun act publicat. O parte din acordurile de aici nu sunt tratate internaționale, ci contracte de stat, care urmează un traseu propriu: categoria contractului — cu impact asupra bugetului de stat, asupra bugetului autorității, fără impact bugetar sau de colaborare interinstituțională — decide cine îl aprobă și când intră în vigoare. Tipurile de finanțare afișate pe rânduri (grant, împrumut, credit, finanțare) sunt deduse din denumirea actului; definițiile lor legale sunt în panoul „Cum se încheie un acord". Temeiul: HG 442/2015, HG 377/2018 cu anexele nr. 1 și nr. 1¹, și Legea nr. 419/2006 pentru împrumuturile de stat. Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var DATA_URL = "date.json";
+
+  /* Etapele prin care trece un acord, în ordinea din regulamente, păstrând
+     doar pe cele care produc un act publicat în Monitorul Oficial.
+
+     Sursele sunt HG 442/2015 (Regulamentul privind mecanismul de încheiere,
+     aplicare și încetare a tratatelor internaționale) și HG 377/2018, anexa
+     nr. 1¹ (Regulamentul privind mecanismul de încheiere și intrare în vigoare
+     a contractelor de stat). Multe etape obligatorii — consultările prealabile,
+     avizarea interministerială, parafarea, deplinele puteri, semnarea propriu-
+     zisă, instrumentul de ratificare — nu generează niciun act publicat, deci
+     nu pot fi urmărite din Monitor. Sunt enumerate în panoul „Cum se încheie
+     un acord", ca cititorul să știe ce lipsește din tablou. */
+  var STEPS = [
+    {k:'neg', n:'1', cap:'Inițiere negocieri',       emitent:'Guvern sau Președinte',
+     act:'Hotărâre de Guvern, ori decret prezidențial la tratatele interstatale',
+     ref:'HG 442/2015, pct. 43'},
+    {k:'sem', n:'2', cap:'Aprobare semnare',         emitent:'Guvern sau Președinte',
+     act:'Hotărâre sau decret; pct. 83 permite un singur act pentru etapele 1 și 2',
+     ref:'HG 442/2015, pct. 79; HG 377/2018, anexa 1¹, pct. 21'},
+    {k:'plg', n:'3', cap:'Aprobare proiect de lege', emitent:'Guvern',
+     act:'Hotărâre prin care Guvernul trimite Parlamentului proiectul legii de ratificare',
+     ref:'HG 442/2015, pct. 165 lit. e)'},
+    {k:'rat', n:'4', cap:'Ratificare sau aprobare',  emitent:'Parlament sau Guvern',
+     act:'Lege de ratificare; la acordurile de competența Guvernului, hotărâre de aprobare. ' +
+         'Articolul final prevede că legea intră în vigoare la data publicării în Monitor — ' +
+         'acordul propriu-zis intră în vigoare separat, după schimbul instrumentelor',
+     ref:'HG 442/2015, pct. 165 și 169; HG 377/2018, anexa 1¹, pct. 25–26'},
+    {k:'prm', n:'5', cap:'Decret de promulgare',     emitent:'Președinte',
+     act:'Decret de promulgare a legii de ratificare',
+     ref:'Constituția, art. 93'}
+  ];
+
+  /* Intrarea în vigoare NU e o etapă a lanțului și nu apare ca al șaselea card.
+     Sunt trei date diferite, ușor de confundat:
+
+     1. Legea de ratificare intră în vigoare la data publicării în Monitor —
+        articolul final al oricărei legi de ratificare o spune explicit. Data
+        aceasta o știm: e chiar data ediției în care apare legea, deci o
+        derivăm din registru, fără să mai fie nevoie de vreun act separat.
+     2. Acordul propriu-zis intră în vigoare mai târziu, după schimbul
+        instrumentelor de ratificare sau conform propriilor clauze. Ordinul
+        ministrului afacerilor externe cerut de pct. 180 din HG 442/2015 anunță
+        data asta, dar e un ordin colectiv — „cu privire la intrarea în vigoare
+        și stingerea unor tratate internaționale" — care nu numește acordul,
+        deci din cuprins nu poate fi legat de un acord anume.
+     3. La acordurile interinstituționale, încheiate ca contracte de stat,
+        autoritatea responsabilă publică un ordin care CHIAR numește acordul
+        (HG 377/2018, anexa 1¹, pct. 44). Pe acela îl arătăm ca informație
+        derivată, nu ca etapă. */
+  var VIGOARE = {k:'vig', cap:'Ordin de punere în aplicare',
+                 ref:'HG 377/2018, anexa 1¹, pct. 44'};
+
+  // Etapele care nu lasă urmă în Monitorul Oficial.
+  /* Definițiile tipurilor de finanțare, din HG 377/2018, anexa nr. 1, pct. 9.
+     Categoriile din registru sunt deduse din denumirea actului, deci nu se
+     suprapun perfect peste noțiunile legale; legătura o facem explicit aici,
+     ca cititorul să știe ce înseamnă eticheta de pe rând. */
+  /* Clasificarea asistenței externe, exact cum e definită în HG 377/2018,
+     anexa nr. 1, pct. 9. Structura contează: asistența externă se împarte în
+     financiară și tehnică, iar nerambursabilitatea e o însușire transversală,
+     nu o categorie separată — poate fi nerambursabilă și asistența financiară
+     (grantul), și cea tehnică.
+
+     Etichetele de pe rândurile registrului („Credit", „Contract de finanțare")
+     NU sunt categorii legale: sunt denumirile pe care le poartă instrumentele
+     în titlul actelor. Le arătăm separat, ca nimeni să nu creadă că citește o
+     clasificare oficială. */
+  var TAXONOMIE = [
+    {nume:'Asistență externă', nivel:0,
+     def:'Noțiunea-umbrelă: asistență financiară și tehnică acordată Republicii Moldova, ' +
+       'Guvernului sau altor autorități publice de comunitatea partenerilor externi de dezvoltare.',
+     ref:'pct. 9.1'},
+    {nume:'Asistență financiară', nivel:1,
+     def:'Suport financiar acordat sub formă de împrumuturi și/sau granturi, pentru ' +
+       'implementarea proiectelor și programelor.', ref:'pct. 9.2'},
+    {nume:'Împrumut', nivel:2,
+     def:'Formă rambursabilă a asistenței financiare. Contractele de împrumut de stat extern ' +
+       'nu urmează procedura contractelor de stat, ci Legea nr. 419/2006 privind datoria ' +
+       'sectorului public, garanțiile de stat și recreditarea de stat.',
+     ref:'pct. 9.2, 14.5 și 35'},
+    {nume:'Grant', nivel:2,
+     def:'Asistență financiară externă nerambursabilă, transmisă de partenerul extern de ' +
+       'dezvoltare beneficiarului sau implementatorului pentru realizarea unor proiecte ' +
+       'ori programe.', ref:'pct. 9.13'},
+    {nume:'Suport bugetar', nivel:2,
+     def:'Asistență financiară de la Uniunea Europeană, instituțiile financiare ' +
+       'internaționale sau guvernele altor state, transferată direct într-un buget ' +
+       'component al bugetului public național, pentru a susține reformele agreate. ' +
+       'Grupul de negociere este condus de Ministerul Finanțelor.',
+     ref:'pct. 9.20¹ și 14.3'},
+    {nume:'Garanții și alte instrumente de sprijin', nivel:2,
+     def:'Regulamentul le enumeră alături de împrumuturi și granturi, printre formele prin ' +
+       'care un partener extern de dezvoltare acordă sprijin.', ref:'pct. 9.11'},
+    {nume:'Asistență tehnică', nivel:1,
+     def:'Sprijin nerambursabil pentru transfer de cunoștințe, expertiză și tehnologii — ' +
+       'consultanță, instruire, studii, schimb de experiență — inclusiv dotarea cu ' +
+       'echipamente și materiale.', ref:'pct. 9.3'},
+    {nume:'Asistență externă nerambursabilă', nivel:1,
+     def:'Însușire transversală, nu o categorie aparte: asistență financiară SAU tehnică ' +
+       'acordată cu titlu gratuit, la nivel de stat, guvernamental ori interinstituțional.',
+     ref:'pct. 9.3¹'},
+    {nume:'Cofinanțare', nivel:1,
+     def:'Contribuția părții moldovenești — financiară sau nefinanciară, prin servicii și ' +
+       'expertiză tehnică — la realizarea unui proiect împreună cu alți parteneri.',
+     ref:'pct. 9.9'}
+  ];
+
+  /* Cum e dedusă categoria din titlul actului. Categoriile sunt chiar cele din
+     regulament; ce explicăm aici e regula prin care un titlu ajunge la una
+     dintre ele, fiindcă titlurile nu folosesc mereu cuvintele din lege. */
+  var ETICHETE = [
+    {cat:'Împrumut', legal:'Asistență financiară rambursabilă (pct. 9.2)',
+     nota:'Prinde „acord de împrumut", dar și denumirile comerciale ale aceluiași lucru: ' +
+       'facilitate sau linie de credit, ori contractul de finanțare al Băncii Europene de ' +
+       'Investiții. Niciuna nu e o categorie legală separată.'},
+    {cat:'Grant', legal:'Asistență financiară nerambursabilă (pct. 9.13)',
+     nota:'„Acord de grant", grant investițional, asistență financiară nerambursabilă. ' +
+       'Un grant care plătește servicii de consultanță rămâne grant: contează instrumentul.'},
+    {cat:'Suport bugetar', legal:'Transferat direct în bugetul public (pct. 9.20¹)',
+     nota:'Contractul de performanță pentru reforma sectorială al Uniunii Europene, ' +
+       'asistența macrofinanciară, Facilitatea de reformă și creștere. Când actul spune ' +
+       'totuși „acord de împrumut", câștigă împrumutul — suportul bugetar descrie cum ajung ' +
+       'banii, nu dacă se întorc.'},
+    {cat:'Asistență tehnică', legal:'Consultanță, instruire, expertiză (pct. 9.3)',
+     nota:'Acord sau contract de asistență ori cooperare tehnică, memorandum privind ' +
+       'consultanța sau instruirea. Ajunge în Monitor prin ordinul autorității semnatare.'},
+    {cat:'Asistență financiară', legal:'Categoria-părinte (pct. 9.2)',
+     nota:'Folosită doar când titlul spune „acord de finanțare" fără să arate dacă banii ' +
+       'sunt rambursabili — cazul acordurilor cu AID sau al celor de cooperare și finanțare ' +
+       'cu FICR. Nu ghicim: lăsăm noțiunea din care ambele forme fac parte.'}
+  ];
+
+  /* Categoriile de contracte de stat și traseul fiecăreia, din HG 377/2018,
+     anexa nr. 1¹. Contractele de stat NU sunt tratate internaționale: sunt
+     acordurile care nu se supun dreptului internațional public sau care spun
+     chiar în text că nu constituie tratat. De aceea o parte din acordurile din
+     registru nu ajung niciodată în Parlament. */
+  var CONTRACTE = [
+    {tip:'Cu impact financiar asupra bugetului de stat',
+     def:'Implică angajamente care cer alocări suplimentare din bugetul de stat.',
+     traseu:'Hotărâre de Guvern pentru aprobarea semnării, apoi lege de ratificare a ' +
+       'Parlamentului. Intră în vigoare la data ultimei notificări dintre părți.',
+     ref:'anexa 1¹, pct. 3.1, 26 și 28'},
+    {tip:'Cu impact asupra bugetului autorității',
+     def:'Angajamentele se acoperă din mijloacele deja aprobate în bugetul autorității.',
+     traseu:'Hotărâre de Guvern pentru aprobarea semnării, apoi hotărâre de Guvern de ' +
+       'aprobare a contractului. Intră în vigoare după aprobarea Guvernului.',
+     ref:'anexa 1¹, pct. 3.2 și 25'},
+    {tip:'Fără impact bugetar',
+     def:'Nu cere alocarea de resurse din bugetul de stat.',
+     traseu:'Se semnează direct de conducătorul autorității, fără avizare și fără hotărâre ' +
+       'de Guvern. Intră în vigoare la semnare. În Monitor apare doar ordinul care anunță ' +
+       'data intrării în vigoare, publicat în 10 zile împreună cu textul contractului.',
+     ref:'anexa 1¹, pct. 3.3, 6, 24 și 44'},
+    {tip:'De colaborare interinstituțională',
+     def:'Nu conține prevederi despre asistență externă și nu implică angajamente ' +
+       'financiare suplimentare.',
+     traseu:'Semnat direct de conducătorul autorității, fără procedura de avizare.',
+     ref:'anexa 1¹, pct. 3.4 și 6'}
+  ];
+
+  var INVIZIBILE = [
+    ['Consultări prealabile și examinarea oportunității', 'HG 442/2015, cap. II'],
+    ['Avizarea de către ministere și avizul Comisiei politică externă', 'HG 442/2015, pct. 33–41; HG 377/2018, anexa 1¹, pct. 14 și 19'],
+    ['Rundele de negociere și rapoartele acestora', 'HG 442/2015, cap. V'],
+    ['Parafarea textului', 'HG 442/2015, pct. 74–77'],
+    ['Eliberarea deplinelor puteri', 'HG 442/2015, cap. IX'],
+    ['Semnarea propriu-zisă', 'HG 442/2015, cap. X'],
+    ['Instrumentul de ratificare și schimbul instrumentelor', 'HG 442/2015, pct. 173–177'],
+    ['Intrarea în vigoare a acordului însuși — se produce la schimbul instrumentelor, iar ordinul MAE care o anunță e colectiv și nu numește acordul', 'HG 442/2015, pct. 173–177 și 180'],
+    ['Contractele de stat fără impact bugetar, semnate direct', 'HG 377/2018, anexa 1¹, pct. 6 și 24']
+  ];
+
+  // Acronime și formulări diferite pentru același proiect.
+  // Adaugă aici perechi noi dacă vezi un acord împărțit greșit în două rânduri.
+  var ALIAS = [
+    {nume:'Competitivitatea întreprinderilor micro, mici și mijlocii (ÎMMM)',
+     m:['immm','competitivitate a intreprinderilor micro','intreprinderilor micro, mici si mijlocii']},
+    {nume:'Programul de dezvoltare integrată a agriculturii și irigațiilor (iDRIP)',
+     m:['idrip','dezvoltare integrata a agriculturii']},
+    {nume:'RLF — Răspuns de urgență, Căile Ferate din Moldova', m:['caile ferate']},
+    {nume:'Reabilitarea drumurilor din Moldova — Proiectul V', m:['proiectului v de reabilitare','proiectul v de reabilitare']},
+    {nume:'Reabilitarea drumurilor din Moldova — Proiectul VI', m:['proiectului vi de reabilitare','proiectul vi de reabilitare']}
+  ];
+
+  /* Categoriile sunt cele din HG 377/2018, anexa nr. 1, pct. 9. */
+  var CLS = {'Grant':'t-grant', 'Împrumut':'t-imprumut',
+    'Suport bugetar':'t-suport', 'Asistență tehnică':'t-tehnica',
+    'Asistență financiară':'t-finantare'};
+
+  var app = document.getElementById('app'), topMeta = document.getElementById('topMeta');
+  // „acorduri" = un rând per acord, cu etapele lui. „acte" = lista plată a
+  // actelor publicate, în ordinea apariției în Monitor. Aceleași date, aceleași
+  // filtre — doar felul de a le citi diferă.
+  var db = null, fCat = 'all', fOrg = 'all', fAn = 'all', fEt = 'all',
+      seek = '', vedere = 'acorduri';
+
+  var q = new URLSearchParams(location.search).get('src');
+  if (q) DATA_URL = q;
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function fold(s){
+    return String(s||'').toLowerCase()
+      .replace(/[ăâ]/g,'a').replace(/î/g,'i').replace(/[șş]/g,'s').replace(/[țţ]/g,'t');
+  }
+
+  // Cuvintele care deschid denumirea unui acord, în orice formă gramaticală.
+  var TIP  = /(acord|contract|conven[țţ]i|memorandum|amendament|protocol)/i;
+  // Dacă textul de după „Proiectul…" începe cu unul dintre astea, nu e un nume
+  // de proiect: „proiectul de lege", „proiectul Acordului de împrumut".
+  var NOTP = /^(acord|contract|conven[țţ]i|memorandum|amendament|protocol|lege|hot[aă]r[aâ]re)/i;
+  // Aducem primul cuvânt la nominativ, ca titlul rândului să se citească normal:
+  // „Acordul de împrumut…", nu „Acordului de împrumut…".
+  var NOM = {
+    'acordului':'Acordul', 'acordul':'Acordul',
+    'contractului':'Contractul', 'contractul':'Contractul',
+    'convenției':'Convenția', 'convenţiei':'Convenția', 'convenția':'Convenția',
+    'memorandumului':'Memorandumul', 'memorandumul':'Memorandumul',
+    'amendamentului':'Amendamentul', 'amendamentul':'Amendamentul',
+    'protocolului':'Protocolul', 'protocolul':'Protocolul'
+  };
+
+  /* Denumirea rândului, în ordinea preferinței:
+       1. alias cunoscut         2. textul dintre ghilimele
+       3. sintagma „Proiectul …" 4. denumirea acordului, INTEGRAL
+
+     Punctul 4 înlocuiește vechea tăiere la 70 de caractere. Aceea producea
+     etichete ca „Decret privind promulgarea Legii pentru ratificarea Acordului
+     de împru" — rupte la mijloc de cuvânt și, mai rău, arătând tipul actului în
+     loc de acord. Fiind și cheie de grupare, unea acorduri fără legătură care
+     se nimereau să înceapă la fel: un împrumut BIRD ajunsese în același rând cu
+     unul al Băncii Naționale. */
+  /* Ghilimelele conțin de obicei numele proiectului, dar nu întotdeauna: în
+     „Acordul de grant dintre Ministerul Energiei, Banca Germană «Kreditanstalt
+     für Wiederaufbau (KfW)» și …" ghilimelele încadrează numele băncii. Luat
+     ca denumire, rândul ajungea să se numească „Kreditanstalt für Wiederaufbau
+     (KfW)", ceea ce nu spune nimic despre ce se finanțează. */
+  var INSTITUTIE = /\b(bank|banca|banka|kreditanstalt|gmbh|\bAB\b|\bAG\b|\bSA\b|corporation|holding|agentur)\b/i;
+
+  function denumire(t){
+    var f = fold(t), i;
+    for (i = 0; i < ALIAS.length; i++)
+      if (ALIAS[i].m.some(function(x){ return f.indexOf(x) > -1; })) return ALIAS[i].nume;
+
+    var quotes = t.match(/[„"]([^"”„]{6,200})[”"]/g);
+    if (quotes && quotes.length){
+      var best = quotes.map(function(s){ return s.replace(/^[„"]|[”"]$/g,'').trim(); })
+        .filter(function(s){ return !INSTITUTIE.test(s); })
+        .sort(function(a,b){ return b.length - a.length; })[0];
+      if (best) return best;
+    }
+
+    /* Păstrăm și cuvântul „Proiectul", altfel eticheta iese ciuntită și cu
+       literă mică: „dezvoltare a sistemului electroenergetic" în loc de
+       „Proiectul de dezvoltare a sistemului electroenergetic". */
+    var p = t.match(/[Pp]roiectul(?:ui)?\s+(?:de\s+)?([^,\.;]{10,})/);
+    if (p && !NOTP.test(p[1].trim()))
+      return coada(t.slice(p.index).split(/[,\.;]/)[0].trim()
+                    .replace(/^Proiectului\b/, 'Proiectul'));
+
+    var m = TIP.exec(t);
+    if (m){
+      var s = t.slice(m.index).trim().replace(/[\s,;\.]+$/, '');
+      var w = s.split(/\s/)[0], n = NOM[w.toLowerCase()];
+      if (n) s = n + s.slice(w.length);
+      return coada(s);
+    }
+    return coada(t.trim());
+  }
+
+  /* Taie coada procedurală din denumire. „…și împuternicirea delegației
+     oficiale pentru negocieri" descrie ce face Guvernul, nu acordul.
+
+     Atenție la „semnat la": uneori e la final și se taie, dar alteori e o
+     paranteză în mijlocul frazei — „Acordul de modificare nr. 4, semnat la
+     Chișinău la 26 iunie 2025, la Acordul de împrumut dintre…". Acolo tăierea
+     ștergea tot ce urma și rândul rămânea „Acordul de modificare nr. 4", fără
+     să spună la ce acord se referă. Când mai vine text după, scoatem doar
+     inserția și lipim restul. */
+  function coada(s){
+    s = s.replace(/,\s*semnat[ăa]?\s+la\s+[^,]{3,60},\s*(?=\S)/i, ', ')
+         .replace(/,\s+la\s+(?=Acord|Contract|Conven|Memorand)/i, ' la ');
+    return s.replace(/[\s,]+(?:și|si)\s+(?:acordarea|împuternicirea|imputernicirea|împuternicirilor|imputernicirilor|desemnarea)\b[\s\S]*$/i, '')
+            .replace(/[\s,]+semnat[ăa]?\s+la\s+[\s\S]*$/i, '')
+            .replace(/[\s,;\.]+$/, '');
+  }
+
+  /* Cheia de grupare. Aceeași denumire scrisă puțin altfel de la o etapă la
+     alta trebuie să cadă pe același rând, așa că normalizăm: declinările devin
+     formă unică, amendamentul se atașează acordului pe care îl modifică, iar
+     cozile procedurale se taie. Fără ultima, „…semnat la 5 iunie 2026" și „…și
+     acordarea împuternicirilor" rupeau un singur acord în trei rânduri. */
+  /* Sursa fondului. Două acorduri pot avea aceeași denumire de proiect,
+     același finanțator și același instrument, și totuși să fie acorduri
+     diferite: proiectul Termoelectrica are un grant BERD din Fondul Regional
+     E5P și altul din Platforma de Investiții pentru Vecinătate a Comisiei
+     Europene. Singurul lucru care le deosebește în titlu e fondul din care
+     vin banii, așa că îl scoatem și îl punem în cheie. Se declanșează rar —
+     pe câteva acte din tot registrul — deci nu riscă să spargă altceva. */
+  function sursa(t){
+    var m = t.match(/\bdin\s+(?:cadrul\s+|partea\s+)?((?:Fondul|Fondului|Platform\w+|Facilitat\w+|Mecanism\w+|Instrument\w+|Programul|Programului|Inițiativ\w+)[^,\.]{5,90})/i);
+    if (!m) return '';
+    return fold(m[1]).replace(/\b(in vederea|pentru realizarea|privind)\b[\s\S]*$/, '')
+      .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+  }
+
+  function cheie(nume){
+    var k = fold(nume);
+    k = k.replace(/^amendament\S*[\s\S]*?\bla\s+(?=acord|contract|conventi|memorandum)/, '');
+    k = k.replace(/\b(acordului|acordul)\b/g, 'acord')
+         .replace(/\b(contractului|contractul)\b/g, 'contract')
+         .replace(/\b(conventiei|conventia)\b/g, 'conventie')
+         .replace(/\b(memorandumului|memorandumul)\b/g, 'memorandum')
+         // „între Republica Moldova" și „dintre Republica Moldova" sunt
+         // folosite alternativ în același acord, de la o etapă la alta.
+         .replace(/\bdintre\b/g, 'intre');
+    k = k.split(/\s(?:si\s+(?:acordarea|imputernicirea|imputernicirilor|desemnarea)|semnat[aă]?\s+la\s|incheiat[aă]?\s+la\s|intocmit\s+la\s)/)[0];
+    // Aceleași cuvinte scrise altfel de la o etapă la alta.
+    k = k.replace(/\bmunicipiul\b/g, 'mun').replace(/\brepublicii moldova\b/g, 'republica moldova');
+    return k.replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  /* Ce etapă reprezintă actul. Clasificarea se face după FUNCȚIA actului, nu
+     după tipul lui. Versiunea veche trimitea orice decret la „Decret
+     prezidențial", dar decretul apare la trei etape diferite: pentru tratatele
+     interstatale Președintele decide inițierea negocierilor și aprobarea
+     semnării (HG 442/2015, pct. 43 și 79), iar la final promulgă legea de
+     ratificare. Un „Decret privind inițierea negocierilor" bifat drept
+     promulgare arăta acordul mai avansat decât era.
+
+     Întoarce o listă, fiindcă un singur act poate acoperi două etape: pct. 83
+     din HG 442/2015 permite explicit un singur decret sau o singură hotărâre
+     „privind inițierea negocierilor și aprobarea semnării". */
+  function etapa(a){
+    var t = fold(a.titlu), out = [];
+
+    // Ordinul prin care se aduce la cunoștință publică data intrării în vigoare
+    if (/^ordin/.test(t)) return ['vig'];
+    if (/promulgarea legii/.test(t)) return ['prm'];
+    if (/^lege/.test(t)) return ['rat'];
+    if (/aprobarea proiectului de lege/.test(t)) return ['plg'];
+
+    if (/initierea negocierilor|negocierilor asupra/.test(t)) out.push('neg');
+    if (/aprobarea semnarii|semnarii acordului|semnarii contractului/.test(t)) out.push('sem');
+    if (out.length) return out;
+
+    // Hotărâre de aprobare a acordului: la tratatele de competența Guvernului
+    // ține locul legii de ratificare (HG 442/2015, pct. 169–170).
+    if (/aprobarea (acordului|contractului|conventiei|memorandumului|amendamentului|protocolului)/.test(t))
+      return ['rat'];
+    return ['sem'];
+  }
+
+  /* ---------------------------------------------------------------- export
+
+     Scriem fișierul .xlsx direct în browser, fără nicio bibliotecă externă.
+     Un xlsx e o arhivă ZIP cu câteva fișiere XML, iar ZIP-ul îl construim cu
+     metoda „stocat" (fără compresie), pe care Excel o acceptă. Alternativa —
+     a încărca o bibliotecă de pe un CDN — ar însemna că pagina nu mai
+     funcționează când CDN-ul e blocat sau dispare, iar registrul ăsta trebuie
+     să meargă și peste cinci ani.
+
+     Un CSV ar fi fost mai simplu, dar Excel îl deschide prost: pe setările
+     românești separatorul e altul, diacriticele se strică fără BOM, iar
+     numerele de act de forma „nr. 1-2" sunt convertite în date calendaristice. */
+
+  var CRC = (function(){
+    var t = new Uint32Array(256), c, i, k;
+    for (i = 0; i < 256; i++){
+      c = i;
+      for (k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[i] = c >>> 0;
+    }
+    return t;
+  })();
+
+  function crc32(u8){
+    var c = 0xFFFFFFFF;
+    for (var i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  function zip(fisiere){
+    var enc = new TextEncoder(), parti = [], central = [], offset = 0;
+
+    function u16(n){ return [n & 255, (n >>> 8) & 255]; }
+    function u32(n){ return [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255]; }
+
+    fisiere.forEach(function(f){
+      var nume = enc.encode(f.name), date = enc.encode(f.data), c = crc32(date);
+      var local = [].concat([0x50,0x4B,0x03,0x04], u16(20), u16(0), u16(0), u16(0), u16(0),
+        u32(c), u32(date.length), u32(date.length), u16(nume.length), u16(0));
+      parti.push(new Uint8Array(local), nume, date);
+      central.push({ nume: nume, crc: c, len: date.length, off: offset });
+      offset += local.length + nume.length + date.length;
+    });
+
+    var cd = [], cdLen = 0;
+    central.forEach(function(e){
+      var h = [].concat([0x50,0x4B,0x01,0x02], u16(20), u16(20), u16(0), u16(0), u16(0), u16(0),
+        u32(e.crc), u32(e.len), u32(e.len), u16(e.nume.length),
+        u16(0), u16(0), u16(0), u16(0), u32(0), u32(e.off));
+      cd.push(new Uint8Array(h), e.nume);
+      cdLen += h.length + e.nume.length;
+    });
+
+    var eocd = new Uint8Array([].concat([0x50,0x4B,0x05,0x06], u16(0), u16(0),
+      u16(central.length), u16(central.length), u32(cdLen), u32(offset), u16(0)));
+
+    var total = parti.concat(cd, [eocd]).reduce(function(s, p){ return s + p.length; }, 0);
+    var out = new Uint8Array(total), poz = 0;
+    parti.concat(cd, [eocd]).forEach(function(p){ out.set(p, poz); poz += p.length; });
+    return out;
+  }
+
+  function xmlEsc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/\x00-\x08\x0B\x0C\x0E-\x1F/g,'');
+  }
+
+  function coloana(i){                       // 0 -> A, 26 -> AA
+    var s = '';
+    i++;
+    while (i > 0){ var r = (i - 1) % 26; s = String.fromCharCode(65 + r) + s; i = (i - r - 1) / 26; }
+    return s;
+  }
+
+  function xlsx(nume_foaie, randuri){
+    var sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+      '<sheetData>' +
+      randuri.map(function(r, ri){
+        return '<row r="' + (ri + 1) + '">' + r.map(function(v, ci){
+          return '<c r="' + coloana(ci) + (ri + 1) + '" t="inlineStr"><is><t xml:space="preserve">' +
+            xmlEsc(v) + '</t></is></c>';
+        }).join('') + '</row>';
+      }).join('') +
+      '</sheetData></worksheet>';
+
+    return zip([
+      { name: '[Content_Types].xml', data:
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+        '<Default Extension="xml" ContentType="application/xml"/>' +
+        '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+        '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+        '</Types>' },
+      { name: '_rels/.rels', data:
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+        '</Relationships>' },
+      { name: 'xl/workbook.xml', data:
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" ' +
+        'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+        '<sheets><sheet name="' + xmlEsc(nume_foaie) + '" sheetId="1" r:id="rId1"/></sheets></workbook>' },
+      { name: 'xl/_rels/workbook.xml.rels', data:
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>' +
+        '</Relationships>' },
+      { name: 'xl/worksheets/sheet1.xml', data: sheet }
+    ]);
+  }
+
+  function ord(a){
+    var m = /(\d{2})\.(\d{2})\.(\d{4})/.exec(a.data_editie||'');
+    return m ? m[3]+m[2]+m[1] : '0';
+  }
+
+  function an(a){ return (a.data_editie || '').slice(6, 10); }
+
+  // Un acord se întinde de obicei pe mai mulți ani: negocierile într-un an,
+  // ratificarea în altul. Îl considerăm din anul X dacă are măcar un act
+  // publicat în anul X, altfel filtrul pe an ar ascunde acorduri în derulare.
+  function aniGrup(g){
+    var s = {};
+    g.acte.forEach(function(a){ var y = an(a); if (y) s[y] = true; });
+    return Object.keys(s).sort().reverse();
+  }
+
+  function contopeste(map){
+    var chei = Object.keys(map);
+    function cuvinte(k){
+      var o = {}, l = k.split('\u0001')[0].split(' ');
+      l.forEach(function(w){ if (w.length > 2) o[w] = true; });
+      return o;
+    }
+    function inclus(a, b){
+      return Object.keys(a).every(function(w){ return b[w]; });
+    }
+    var alias = {};
+    chei.forEach(function(x){
+      chei.forEach(function(y){
+        if (x === y) return;
+        var A = x.split('\u0001'), B = y.split('\u0001');
+        if (A[1] !== B[1] || A[2] !== B[2] || A[3] !== B[3]) return;   // alt finanțator, instrument sau fond
+        var ca = cuvinte(x), cb = cuvinte(y);
+        if (Object.keys(ca).length < Object.keys(cb).length && inclus(ca, cb)) alias[x] = y;
+      });
+    });
+    var out = {};
+    chei.forEach(function(k){
+      var t = k, n = 0;
+      while (alias[t] && n++ < 5) t = alias[t];        // lanț scurt, fără bucle
+      if (!out[t]) out[t] = map[t];
+      if (t !== k){
+        out[t].acte = out[t].acte.concat(map[k].acte);
+        Object.keys(map[k].et).forEach(function(e){ out[t].et[e] = true; });
+        Object.keys(map[k].orgs).forEach(function(o){ out[t].orgs[o] = true; });
+        Object.keys(map[k].cats).forEach(function(c){ out[t].cats[c] = true; });
+        if (!out[t].semnat) out[t].semnat = map[k].semnat;
+      }
+    });
+    return out;
+  }
+
+  function grupeaza(acte){
+    var map = {};
+    acte.forEach(function(a){
+      var nume = denumire(a.titlu);
+      /* Cheia include instrumentul și finanțatorul principal, nu doar
+         denumirea. Un proiect mare e finanțat de mai mulți creditori prin
+         instrumente diferite: „Eficiența energetică" are un grant BEI și un
+         contract de finanțare tot de la BEI, iar „Învățământul superior" un
+         împrumut BIRD și o finanțare AID. Grupate doar după denumire, cele
+         patru-cinci acorduri ajungeau pe un singur rând, iar bifele de etape
+         se amestecau: rândul arăta toate cele șase etape parcurse, deși niciun
+         acord în parte nu ajunsese acolo. */
+      var k = cheie(nume) + '\u0001' + (a.partener || '').split(' / ')[0].trim() +
+              '\u0001' + (a.categorie || '') + '\u0001' + sursa(a.titlu);
+      if (!map[k]) map[k] = {nume:nume, acte:[], et:{}, orgs:{}, cats:{}, semnat:''};
+      var g = map[k];
+      g.acte.push(a);
+      etapa(a).forEach(function(e){ g.et[e] = true; });
+      if (a.semnat && !g.semnat) g.semnat = a.semnat;
+      if (a.categorie) g.cats[a.categorie] = true;
+      (a.partener||'').split(' / ').forEach(function(o){ o = o.trim(); if (o) g.orgs[o] = true; });
+    });
+    /* Ultima trecere: contopim cheile care descriu evident același acord.
+       Titlul oficial variază de la o etapă la alta — o hotărâre scrie
+       „Optimizarea sistemului de alimentare cu energie termică", legea scrie
+       „…de alimentare CENTRALIZATĂ cu energie termică". Nu e o greșeală de-a
+       noastră, e chiar textul publicat. Când toate cuvintele unei denumiri se
+       regăsesc în cealaltă, iar finanțatorul, instrumentul și fondul coincid,
+       e același acord. */
+    map = contopeste(map);
+
+    return Object.keys(map).map(function(k){
+      var g = map[k];
+      g.acte.sort(function(x,y){ return ord(y).localeCompare(ord(x)); });
+      g.ultim = g.acte[0];
+      g.parteneri = Object.keys(g.orgs).join(' / ');
+      g.categorie = Object.keys(g.cats)[0] || '—';
+      return g;
+    }).sort(function(x,y){ return ord(y.ultim).localeCompare(ord(x.ultim)); });
+  }
+
+  /* „În vigoare din" — data pe care o putem afirma cu temei.
+
+     Legea de ratificare intră în vigoare la data publicării în Monitor, așa
+     cum prevede articolul ei final, iar acea dată e chiar data ediției în care
+     apare legea. O luăm de acolo, nu dintr-un act separat.
+
+     Acordul propriu-zis intră în vigoare mai târziu, după schimbul
+     instrumentelor. Data aia nu e deductibilă din cuprinsul Monitorului, deci
+     nu o inventăm — scriem explicit la ce se referă data afișată. */
+  function inVigoareDin(g){
+    var lege = null, ordin = null;
+    g.acte.forEach(function(a){
+      var e = etapa(a);
+      if (e.indexOf('rat') > -1 && (!lege || ord(a) < ord(lege))) lege = a;
+      if (e.indexOf('vig') > -1 && (!ordin || ord(a) < ord(ordin))) ordin = a;
+    });
+    if (lege)  return { data: lege.data_editie,  ce: 'legea de ratificare',
+      titlu: 'Legea de ratificare a intrat în vigoare la publicarea în Monitor. ' +
+             'Acordul intră în vigoare separat, după schimbul instrumentelor.' };
+    if (ordin) return { data: ordin.data_editie, ce: 'ordin de punere în aplicare',
+      titlu: 'Acord interinstituțional: autoritatea responsabilă a publicat ordinul ' +
+             'care anunță data intrării în vigoare (HG 377/2018, anexa 1¹, pct. 44).' };
+    return null;
+  }
+
+  /* Traseul acordului decide ce etape i se aplică. Cele ratificate prin lege
+     trec prin Parlament, deci au și hotărârea de aprobare a proiectului de
+     lege (etapa 3) și decretul de promulgare (etapa 5). Cele aprobate prin
+     hotărâre de Guvern nu au niciuna din ele — pct. 169 din HG 442/2015. */
+  function traseu(g){
+    var prinLege = g.acte.some(function(a){
+      return etapa(a).indexOf('rat') > -1 && /^lege/.test(fold(a.titlu));
+    });
+    var prinGuvern = g.acte.some(function(a){
+      return etapa(a).indexOf('rat') > -1 && /^hotarare/.test(fold(a.titlu));
+    });
+    if (prinLege) return 'parlament';
+    if (prinGuvern) return 'guvern';
+    return '';                       // încă nu se știe
+  }
+
+  function steps(g){
+    var last = -1;
+    STEPS.forEach(function(s, i){ if (g.et[s.k]) last = i; });
+    var v = inVigoareDin(g);
+    var nota = v ? '<div class="vig-note" title="' + esc(v.titlu) + '">În vigoare din ' +
+      esc(v.data) + ' <span>· ' + esc(v.ce) + '</span></div>' : '';
+    if (last < 0)
+      return nota || '<span class="simpl-note">etapă neidentificată</span>';
+
+    var rut = traseu(g);
+    return '<div class="steps">' + STEPS.map(function(s, i){
+      var on = g.et[s.k];
+      // Etapă neaplicabilă pe traseul guvernamental.
+      var nuSeAplica = (rut === 'guvern' && (s.k === 'plg' || s.k === 'prm'));
+      /* Etapă anterioară uneia atinse, dar fără act în registru. Nu înseamnă
+         că nu s-a întâmplat: un acord nu poate fi ratificat fără să fi fost
+         semnat. Fie actul e dinainte de perioada acoperită (registrul începe
+         în ianuarie 2025), fie n-a fost prins de filtru. Bifa goală ar minți;
+         semnul întrebării spune adevărul. */
+      var necunoscut = !on && !nuSeAplica && i < last;
+      var cls = 'step' + (on ? ' on' : necunoscut ? ' necunoscut' : nuSeAplica ? ' nu' : '') +
+        (i === last ? ' last' : '');
+      var titlu = nuSeAplica
+        ? 'Nu se aplică: acordul a fost aprobat prin hotărâre de Guvern (HG 442/2015, pct. 169)'
+        : necunoscut
+          ? 'Etapă parcursă obligatoriu, dar fără act în registru — probabil publicată înainte de perioada acoperită'
+          : s.ref;
+      return '<div class="' + cls + '" title="' + esc(titlu) + '"><span class="bead">' +
+        (on ? '✓' : nuSeAplica ? '–' : necunoscut ? '?' : s.n) + '</span>' +
+        '<span class="cap">' + s.cap + '</span></div>';
+    }).join('') + '</div>' + nota;
+  }
+
+  /* Exportă exact ce e pe ecran: aceleași filtre, aceeași ordine, aceeași
+     vedere. Prima linie a foii spune ce filtre erau active, ca fișierul să
+     rămână interpretabil peste șase luni, când nimeni nu mai ține minte ce
+     era bifat în momentul descărcării. */
+  function exporta(grupuri, acte){
+    var filtre = [];
+    if (fAn  !== 'all') filtre.push('anul ' + fAn);
+    if (fOrg !== 'all') filtre.push('partener: ' + fOrg);
+    if (fCat !== 'all') filtre.push('tip: ' + fCat);
+    if (seek)           filtre.push('căutare: ' + seek);
+    var antet = 'Acorduri de asistență externă — Monitorul Oficial al Republicii Moldova. ' +
+      'Extras la ' + new Date().toLocaleDateString('ro-RO') + '. ' +
+      (filtre.length ? 'Filtre: ' + filtre.join('; ') : 'Fără filtre — toate înregistrările') + '.';
+
+    var randuri = [[antet]], nume;
+
+    if (vedere === 'acte'){
+      nume = 'Acte';
+      randuri.push(['Data ediției','Ediția','Act','Tip de finanțare','Partener',
+                    'Etapa','Denumirea acordului','Titlul complet al actului','Semnat','Link']);
+      acte.filter(function(a){
+        if (!trece_act(a)) return false;
+        if (seek){
+          var hay = fold([a.titlu, a.act, a.partener, a.editie].join(' '));
+          if (hay.indexOf(seek) === -1) return false;
+        }
+        return true;
+      }).sort(function(x, y){ return ord(y).localeCompare(ord(x)); })
+        .forEach(function(a){
+          var caps = etapa(a).map(function(k){
+            var s = STEPS.filter(function(x){ return x.k === k; })[0];
+            return s ? s.n + '. ' + s.cap : k;
+          }).join(' + ');
+          randuri.push([a.data_editie, 'MO ' + a.editie, a.act, a.categorie,
+            a.partener || '', caps, denumire(a.titlu), a.titlu, a.semnat || '', a.url]);
+        });
+    } else {
+      nume = 'Acorduri';
+      randuri.push(['Acordul','Partener','Tip de finanțare','Ani','Nr. acte',
+                    'Prima publicare','Ultima publicare','Etape parcurse',
+                    'Etapa atinsă','Semnat'].concat(STEPS.map(function(s){
+                      return s.n + '. ' + s.cap; }))
+                      .concat(['În vigoare din', 'Temeiul datei']));
+      grupuri.filter(function(g){
+        if (!trece_grup(g)) return false;
+        if (seek){
+          var hay = fold(g.nume + ' ' + g.parteneri + ' ' +
+            g.acte.map(function(a){ return a.titlu + ' ' + a.act; }).join(' '));
+          if (hay.indexOf(seek) === -1) return false;
+        }
+        return true;
+      }).forEach(function(g){
+        var atinse = STEPS.filter(function(s){ return g.et[s.k]; });
+        var v = inVigoareDin(g);
+        var ultima = atinse.length ? atinse[atinse.length - 1] : null;
+        var dt = g.acte.map(ord).sort();
+        function frumos(v){ return v && v !== '0' ? v.slice(6,8)+'.'+v.slice(4,6)+'.'+v.slice(0,4) : ''; }
+        randuri.push([g.nume, g.parteneri || '', g.categorie, aniGrup(g).join(', '),
+          String(g.acte.length), frumos(dt[0]), frumos(dt[dt.length-1]),
+          atinse.length + ' din ' + STEPS.length,
+          ultima ? ultima.n + '. ' + ultima.cap : '', g.semnat || ''
+        ].concat(STEPS.map(function(s){ return g.et[s.k] ? 'da' : ''; }))
+         .concat([v ? v.data : '', v ? v.ce : '']));
+      });
+    }
+
+    var octeti = xlsx(nume, randuri);
+    var url = URL.createObjectURL(new Blob([octeti],
+      { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    var a = document.createElement('a');
+    a.href = url;
+    function bucata(v){ return '-' + fold(v).replace(/[^a-z0-9]+/g, ''); }
+    a.download = 'registru-' + nume.toLowerCase() +
+      (fAn  !== 'all' ? '-' + fAn : '') +
+      (fOrg !== 'all' ? bucata(fOrg) : '') +
+      (fCat !== 'all' ? bucata(fCat) : '') +
+      '-' + new Date().toISOString().slice(0,10) + '.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }
+
+  /* Cele două pagini numesc aceiași finanțatori altfel: registrul folosește
+     acronime scoase din titlul actului („BERD"), pagina de donatori folosește
+     denumirile complete din AMP („Banca Europeană pentru Reconstrucție și
+     Dezvoltare"). Fără traducerea asta, linkul ar duce la o pagină nefiltrată,
+     ceea ce e mai rău decât niciun link: promite ceva și nu livrează.
+     Acronimele fără corespondent în AMP nu primesc link. */
+  var SPRE_DONATORI = {
+    'BIRD':  'Banca Internațională pentru Reconstrucție și Dezvoltare',
+    'BERD':  'Banca Europeană pentru Reconstrucție și Dezvoltare',
+    'BEI':   'Banca Europeană de Investiții',
+    'UE':    'Uniunea Europeană',
+    'KfW':   'Banca de Dezvoltare a Germaniei KfW',
+    'GIZ':   'Agenția de Cooperare Internațională a Germaniei',
+    'PNUD':  'Programul Națiunilor Unite pentru Dezvoltare',
+    'JICA':  'Agenția Japoneză pentru Cooperare Internațională',
+    'CEB':   'Banca de Dezvoltare a Consiliului Europei',
+    'Suedia':'Regatul Suediei'
+  };
+
+  function paint(){
+    citesteURL();          // filtrele din link, înainte de a desena butoanele
+    var acte = Object.keys(db.acte||{}).map(function(k){ return db.acte[k]; });
+    var grupuri = grupeaza(acte);
+
+    /* Golurile din șirul edițiilor se văd și pe pagină, nu doar în jurnalul
+       rulării. O ediție necitită înseamnă acte care lipsesc din registru, iar
+       cifra „N acorduri" ar minți prin omisiune dacă lipsa n-ar fi scrisă
+       nicăieri. Colectorul le recuperează singur, câte 25 pe rulare. */
+    var lipsa = (db.editii_lipsa || []).length;
+    topMeta.innerHTML =
+      '<span>Ultima verificare: <b>' + esc(db.ultima_rulare||'—') + '</b></span>' +
+      '<span>Ediții parcurse: <b>' + ((db.editii_vazute||[]).length) + '</b></span>' +
+      (lipsa
+        ? '<span class="gol" title="Ediții din interiorul intervalului acoperit care ' +
+          'n-au fost încă citite. Se recuperează automat, câte 25 la fiecare rulare.">' +
+          'Ediții încă necitite: <b>' + lipsa + '</b></span>'
+        : '');
+
+    if (!grupuri.length){
+      app.innerHTML = '<div class="panel"><div class="empty-state"><strong>Registrul e gol</strong>' +
+        'Fișierul a fost citit, dar nu conține acte.</div></div>';
+      return;
+    }
+
+    var cats = {}, orgs = {}, cuVigoare = 0, cuSemnat = 0, dist = {};
+    var catsA = {}, orgsA = {};      // aceleași chei, dar numărate în acte
+    grupuri.forEach(function(g){
+      cats[g.categorie] = (cats[g.categorie]||0)+1;
+      Object.keys(g.orgs).forEach(function(o){ orgs[o] = (orgs[o]||0)+1; });
+      if (inVigoareDin(g)) cuVigoare++;
+      if (g.semnat) cuSemnat++;
+      STEPS.forEach(function(s){ if (g.et[s.k]) dist[s.cap] = (dist[s.cap]||0)+1; });
+    });
+    acte.forEach(function(a){
+      catsA[a.categorie] = (catsA[a.categorie]||0)+1;
+      (a.partener||'').split(' / ').forEach(function(o){
+        o = o.trim(); if (o) orgsA[o] = (orgsA[o]||0)+1;
+      });
+    });
+
+    var kpis =
+      kpi('Acorduri', grupuri.length, 'din ' + acte.length + ' acte publicate') +
+      kpi('Creditori', Object.keys(orgs).length,
+        Object.keys(orgs).sort(function(a,b){return orgs[b]-orgs[a];}).slice(0,3).join(' · ')) +
+      kpi('Ratificate sau aprobate', dist['Ratificare sau aprobare'] || 0,
+        'au trecut de etapa 4 din 5') +
+      kpi('Cu dată de intrare în vigoare', cuVigoare,
+        'derivată din legea de ratificare');
+
+    var orgBtns = ['<button data-org="all" data-a="' + grupuri.length + '" data-b="' +
+      acte.length + '" aria-pressed="' + (fOrg === 'all') + '">Toți <span class="n">' +
+      grupuri.length + '</span></button>'].concat(
+      Object.keys(orgs).sort(function(a,b){ return orgs[b]-orgs[a]; }).map(function(o){
+        return '<button data-org="' + esc(o) + '" data-a="' + orgs[o] + '" data-b="' +
+          (orgsA[o]||0) + '" aria-pressed="' + (fOrg === o) + '">' + esc(o) +
+          ' <span class="n">' + orgs[o] + '</span></button>';
+      })).join('');
+
+    var catBtns = ['<button data-cat="all" data-a="' + grupuri.length + '" data-b="' +
+      acte.length + '" aria-pressed="' + (fCat === 'all') + '">Toate <span class="n">' +
+      grupuri.length + '</span></button>'].concat(
+      Object.keys(cats).sort().map(function(c){
+        return '<button data-cat="' + esc(c) + '" data-a="' + cats[c] + '" data-b="' +
+          (catsA[c]||0) + '" aria-pressed="' + (fCat === c) + '">' + esc(c) +
+          ' <span class="n">' + cats[c] + '</span></button>';
+      })).join('');
+
+    var ani = {}, aniA = {};
+    grupuri.forEach(function(g){ aniGrup(g).forEach(function(y){ ani[y] = (ani[y]||0)+1; }); });
+    acte.forEach(function(a){ var y = an(a); if (y) aniA[y] = (aniA[y]||0)+1; });
+    var anBtns = ['<button data-an="all" data-a="' + grupuri.length + '" data-b="' +
+      acte.length + '" aria-pressed="' + (fAn === 'all') + '">Toți anii <span class="n">' +
+      grupuri.length + '</span></button>'].concat(
+      Object.keys(ani).sort().reverse().map(function(y){
+        return '<button data-an="' + y + '" data-a="' + ani[y] + '" data-b="' +
+          (aniA[y]||0) + '" aria-pressed="' + (fAn === y) + '">' + y +
+          ' <span class="n">' + ani[y] + '</span></button>';
+      })).join('');
+
+    var vedBtns =
+      '<button data-ved="acorduri" aria-pressed="' + (vedere === 'acorduri') +
+        '">Acorduri <span class="n">' + grupuri.length + '</span></button>' +
+      '<button data-ved="acte" aria-pressed="' + (vedere === 'acte') + '">Acte <span class="n">' +
+        acte.length + '</span></button>';
+
+    /* Fluxul etapelor. Fiecare card se deschide și arată cine emite actul, cum
+       arată actul și exemple reale din registru; de acolo poți filtra tabelul
+       la acordurile care au ajuns în acea etapă. Lista etapelor fără act
+       publicat stă pliată dedesubt — e importantă, dar nu trebuie să ocupe
+       jumătate de ecran la fiecare deschidere a paginii. */
+    var acteEt = {};
+    acte.forEach(function(a){
+      etapa(a).forEach(function(k){ (acteEt[k] = acteEt[k] || []).push(a); });
+    });
+
+    var toate = STEPS;
+    var maxE = Math.max.apply(null, STEPS.map(function(s){ return dist[s.cap] || 0; }));
+
+    var flux = STEPS.map(function(s, i){
+      var n = dist[s.cap] || 0;
+      var pierdut = '';
+      if (i > 0){
+        var ant = dist[STEPS[i-1].cap] || 0;
+        if (ant > n) pierdut = '<span class="et-drop" title="cu ' + (ant - n) +
+          ' mai puține decât la etapa anterioară — fie n-au ajuns încă aici, ' +
+          'fie au urmat alt traseu">−' + (ant - n) + '</span>';
+      }
+      return '<button class="et-card' + (fEt === s.k ? ' activ' : '') +
+        '" data-et="' + s.k + '" aria-expanded="false">' +
+        '<span class="et-top"><span class="et-n">' + s.n + '</span>' + pierdut + '</span>' +
+        '<span class="et-cap">' + esc(s.cap) + '</span>' +
+        '<span class="et-val">' + n + '</span>' +
+        '<span class="et-bar"><i style="width:' + (maxE ? 100*n/maxE : 0) + '%"></i></span>' +
+        '<span class="et-em">' + esc(s.emitent) + '</span></button>';
+    }).join('');
+
+    var invizibile = INVIZIBILE.map(function(x){
+      return '<li><span class="inv-lbl">' + esc(x[0]) + '</span>' +
+             '<span class="inv-ref">' + esc(x[1]) + '</span></li>';
+    }).join('');
+
+    var taxHtml = TAXONOMIE.map(function(t){
+      return '<li class="tax-n' + t.nivel + '">' +
+        '<div class="d-cap"><b>' + esc(t.nume) + '</b>' +
+        '<span class="inv-ref">HG 377/2018, anexa nr. 1, ' + esc(t.ref) + '</span></div>' +
+        '<p class="d-def">' + esc(t.def) + '</p></li>';
+    }).join('');
+
+    var etichHtml = ETICHETE.map(function(e){
+      var ng = cats[e.cat] || 0, na = catsA[e.cat] || 0;
+      return '<li><button class="et-map" data-cat="' + esc(e.cat) + '">' +
+        '<span class="tag ' + (CLS[e.cat]||'t-alt') + '">' + esc(e.cat) + '</span>' +
+        '<span class="map-sag">→</span>' +
+        '<span class="map-legal">' + esc(e.legal) + '</span>' +
+        '<span class="inv-n">' + ng + ' acorduri · ' + na + ' acte</span></button>' +
+        '<p class="d-def">' + esc(e.nota) + '</p></li>';
+    }).join('');
+
+    var contracteHtml = CONTRACTE.map(function(c){
+      return '<li><div class="d-cap"><b>' + esc(c.tip) + '</b></div>' +
+        '<p class="d-def">' + esc(c.def) + '</p>' +
+        '<p class="d-traseu"><span class="det-lbl">Traseul până la intrarea în vigoare</span>' +
+        esc(c.traseu) + '</p>' +
+        '<span class="inv-ref">HG 377/2018, ' + esc(c.ref) + '</span></li>';
+    }).join('');
+
+    app.innerHTML =
+      '<div class="kpis">' + kpis + '</div>' +
+      '<div class="panel"><div class="panel-head"><h2>' + ico('file') +
+        'Cum se încheie un acord</h2>' +
+        '<div class="btns seg" id="filaBtns">' +
+          '<button data-fila="etape" aria-pressed="true">Etapele</button>' +
+          '<button data-fila="tipuri" aria-pressed="false">Tipuri de finanțare</button>' +
+          '<button data-fila="contracte" aria-pressed="false">Contracte de stat</button>' +
+        '</div>' +
+        '<span class="count" id="etHint">Apasă o etapă pentru detalii</span></div>' +
+
+        '<div class="panel-body fila" data-fila="etape">' +
+          '<div class="flux" id="flux">' + flux + '</div>' +
+          '<div class="et-detail" id="etDetail" hidden></div>' +
+          '<details class="inv-wrap"><summary>Etape obligatorii care nu produc ' +
+            'niciun act publicat în Monitor <b>(' + INVIZIBILE.length + ')</b></summary>' +
+            '<ul class="inv-list">' + invizibile + '</ul></details>' +
+        '</div>' +
+
+        '<div class="panel-body fila" data-fila="tipuri" hidden>' +
+          '<p class="fila-intro">Regulamentul nu clasifică finanțările în cinci feluri, cum ' +
+          'ar putea sugera etichetele de pe rânduri. Împarte <b>asistența externă</b> în ' +
+          'financiară și tehnică, iar nerambursabilitatea e o însușire care poate însoți ' +
+          'oricare dintre ele. Iată clasificarea, cu trimiterile exacte.</p>' +
+          '<ul class="tax-list">' + taxHtml + '</ul>' +
+          '<h3 class="sub-h">Cum ajunge un act într-o categorie</h3>' +
+          '<p class="fila-intro">Categoriile de pe rânduri sunt chiar cele de mai sus. ' +
+          'Titlurile actelor nu folosesc însă mereu cuvintele din lege, așa că iată regula ' +
+          'după care fiecare titlu ajunge la o categorie. Apasă una ca să filtrezi registrul.</p>' +
+          '<ul class="def-list map-list">' + etichHtml + '</ul>' +
+          '<p class="fila-intro"><b>Asistența tehnică ajunge în Monitor pe altă cale.</b> ' +
+          'Contractele de stat fără impact bugetar care privesc proiecte de asistență ' +
+          'tehnică se semnează direct de conducătorul autorității, fără avizare și fără ' +
+          'hotărâre de Guvern — anexa nr. 1¹, pct. 6. Dar nu rămân nepublicate: toate ' +
+          'contractele de stat se publică în Monitor, iar autoritatea care semnează emite ' +
+          'un ordin cu data intrării în vigoare, publicat în 10 zile împreună cu textul ' +
+          'contractului — pct. 40 și 44. Așa apar acordurile de asistență tehnică încheiate ' +
+          'de ministere cu PAM, GIZ sau Agenția Elvețiană pentru Dezvoltare și Cooperare: ' +
+          'nu ca lege sau hotărâre, ci ca ordin al ministerului semnatar.</p>' +
+        '</div>' +
+
+        '<div class="panel-body fila" data-fila="contracte" hidden>' +
+          '<p class="fila-intro">O parte din acordurile de aici nu sunt tratate ' +
+          'internaționale, ci <b>contracte de stat</b>: acorduri care nu se supun dreptului ' +
+          'internațional public sau care prevăd chiar în text că nu constituie tratat. ' +
+          'Ele urmează un traseu propriu, stabilit de anexa nr. 1¹ la HG 377/2018, iar ' +
+          'categoria contractului decide cine îl aprobă și când intră în vigoare. ' +
+          'Banca Națională a Moldovei aplică proceduri proprii, iar contractele fără impact ' +
+          'financiar pot fi încheiate prin schimb de scrisori.</p>' +
+          '<ul class="def-list">' + contracteHtml + '</ul>' +
+          '<span class="inv-ref">Excepțiile: anexa 1¹, pct. 7 și 30</span></div>' +
+      '</div>' +
+      '<div class="panel"><div class="panel-head"><h2>' + ico('layers') +
+        'Creditori și parteneri</h2></div>' +
+        '<div class="panel-body"><div class="btns" id="orgBtns">' + orgBtns + '</div></div></div>' +
+      '<div class="panel" id="lista"><div class="panel-head"><h2>' + ico('file') +
+        '<span id="titluLista">Acorduri</span></h2>' +
+        '<span class="chip" id="etChip" hidden></span>' +
+        '<div class="btns seg" id="vedBtns">' + vedBtns + '</div>' +
+        '<input class="seek" type="search" id="seek" placeholder="Caută…" aria-label="Caută" value="' +
+          esc(seek) + '">' +
+        '<button class="xls" id="export" title="Descarcă exact rândurile filtrate">' +
+          ico('down') + 'Excel</button>' +
+      '</div>' +
+      '<div class="panel-sub"><div class="filtru-rand"><span class="f-lbl">An</span>' +
+        '<div class="btns" id="anBtns">' + anBtns + '</div></div>' +
+        '<div class="filtru-rand"><span class="f-lbl">Tip de finanțare</span>' +
+        '<div class="btns" id="catBtns">' + catBtns + '</div></div></div>' +
+      '<div class="tbl-scroll"><table id="tabel"><thead id="cap"></thead>' +
+        '<tbody id="rows"></tbody></table></div><div id="none"></div></div>';
+
+    bind('#orgBtns button', 'org', function(v){ fOrg = v; });
+    bind('#catBtns button', 'cat', function(v){ fCat = v; });
+    bind('#anBtns button',  'an',  function(v){ fAn  = v; });
+    bind('#vedBtns button', 'ved', function(v){ vedere = v; numere(); });
+
+    var detaliu = document.getElementById('etDetail'), deschis = null;
+
+    // Comutarea între file. Indiciul din dreapta antetului e valabil doar la
+    // fila cu etape, unde chiar ai ce apăsa.
+    // Etichetele din fila „Tipuri de finanțare" filtrează registrul, ca să poți
+    // trece direct de la definiție la acordurile care intră sub ea.
+    app.querySelectorAll('.et-map').forEach(function(b){
+      b.addEventListener('click', function(){
+        fCat = b.dataset.cat;
+        app.querySelectorAll('#catBtns button').forEach(function(o){
+          o.setAttribute('aria-pressed', String(o.dataset.cat === fCat));
+        });
+        rows(grupuri, acte);
+        document.getElementById('lista').scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    });
+
+    app.querySelectorAll('#filaBtns button').forEach(function(b){
+      b.addEventListener('click', function(){
+        var f = b.dataset.fila;
+        app.querySelectorAll('#filaBtns button').forEach(function(o){
+          o.setAttribute('aria-pressed', String(o === b));
+        });
+        app.querySelectorAll('.fila').forEach(function(p){
+          p.hidden = (p.dataset.fila !== f);
+        });
+        document.getElementById('etHint').textContent =
+          f === 'etape' ? 'Apasă o etapă pentru detalii' : '';
+      });
+    });
+    app.querySelectorAll('#flux .et-card').forEach(function(b){
+      b.addEventListener('click', function(){
+        var k = b.dataset.et;
+        if (deschis === k){ inchideDetaliu(); return; }
+        deschis = k;
+        var s = STEPS.filter(function(x){ return x.k === k; })[0];
+        var n = dist[s.cap] || 0;
+        var ex = (acteEt[k] || []).slice()
+          .sort(function(x, y){ return ord(y).localeCompare(ord(x)); }).slice(0, 3);
+
+        detaliu.innerHTML =
+          '<div class="det-cap">' + esc(s.n + '. ' + s.cap) + '</div>' +
+          '<div class="det-grid">' +
+            '<div><span class="det-lbl">Cine emite actul</span>' + esc(s.emitent) + '</div>' +
+            '<div><span class="det-lbl">Ce act apare în Monitor</span>' + esc(s.act) + '</div>' +
+            '<div><span class="det-lbl">Temei</span><span class="det-ref">' + esc(s.ref) + '</span></div>' +
+          '</div>' +
+          (ex.length ? '<div class="det-lbl">Ultimele acte din această etapă</div><ul class="det-ex">' +
+            ex.map(function(a){
+              return '<li><a href="' + esc(a.url) + '" target="_blank" rel="noopener">' +
+                esc(a.data_editie) + '</a> ' + esc(a.titlu.slice(0, 130)) +
+                (a.titlu.length > 130 ? '…' : '') + '</li>';
+            }).join('') + '</ul>' : '') +
+          '<button class="det-filtru" id="detFiltru">' +
+            (fEt === k ? 'Șterge filtrul pe etapă'
+                       : 'Arată cele ' + numeral(n, 'acorduri') + ' care au ajuns aici') +
+          '</button>';
+        detaliu.hidden = false;
+        app.querySelectorAll('#flux .et-card').forEach(function(o){
+          o.setAttribute('aria-expanded', String(o === b));
+        });
+        document.getElementById('etHint').textContent = 'Apasă din nou ca să închizi';
+
+        document.getElementById('detFiltru').addEventListener('click', function(ev){
+          ev.stopPropagation();
+          fEt = (fEt === k) ? 'all' : k;
+          app.querySelectorAll('#flux .et-card').forEach(function(o){
+            o.classList.toggle('activ', o.dataset.et === fEt);
+          });
+          this.textContent = (fEt === k)
+            ? 'Șterge filtrul pe etapă'
+            : 'Arată cele ' + numeral(n, 'acorduri') + ' care au ajuns aici';
+          rows(grupuri, acte);
+          document.getElementById('lista').scrollIntoView({ behavior:'smooth', block:'start' });
+        });
+      });
+    });
+
+    /* În română, numeralele de la 20 în sus cer „de": 3 acorduri, dar 38 DE
+     acorduri. Regula se aplică după ultimele două cifre. */
+  function numeral(n, cuvant){
+    var u = n % 100;                       // decid ultimele două cifre
+    return n + (u === 0 || u >= 20 ? ' de ' : ' ') + cuvant;
+  }
+
+  function inchideDetaliu(){
+      deschis = null;
+      detaliu.hidden = true;
+      app.querySelectorAll('#flux .et-card').forEach(function(o){
+        o.setAttribute('aria-expanded', 'false');
+      });
+      document.getElementById('etHint').textContent = 'Apasă o etapă pentru detalii';
+    }
+    document.getElementById('seek').addEventListener('input', function(){
+      seek = fold(this.value); rows(grupuri, acte);
+    });
+    document.getElementById('export').addEventListener('click', function(){
+      exporta(grupuri, acte);
+    });
+    numere();
+    rows(grupuri, acte);
+
+    // Butoanele de filtrare arată câte acorduri sau câte acte le corespund,
+    // după vederea aleasă. Altfel „BERD 12" ar rămâne pe ecran lângă o listă
+    // de 39 de acte BERD și cifra ar părea greșită.
+    function numere(){
+      var cheie = vedere === 'acte' ? 'b' : 'a';
+      app.querySelectorAll('#catBtns button, #orgBtns button, #anBtns button, #vedBtns button')
+        .forEach(function(b){
+          if (b.dataset.ved) return;
+          var n = b.dataset[cheie];
+          if (n !== undefined) b.querySelector('.n').textContent = n;
+        });
+      document.getElementById('titluLista').textContent =
+        vedere === 'acte' ? 'Acte publicate' : 'Acorduri';
+    }
+
+    function bind(sel, key, set){
+      var list = app.querySelectorAll(sel);
+      list.forEach(function(b){
+        b.addEventListener('click', function(){
+          set(b.dataset[key]);
+          list.forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
+          rows(grupuri, acte);
+        });
+      });
+    }
+  }
+
+  function ico(t){
+    var p = {
+      bar:'<path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="13" y="6" width="3" height="11"/>',
+      layers:'<path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
+      file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+      down:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>'
+    }[t];
+    return '<svg viewBox="0 0 24 24">' + p + '</svg>';
+  }
+
+  function kpi(lbl, val, sub){
+    return '<div class="kpi"><div class="lbl">' + esc(lbl) + '</div><div class="val">' + val +
+      '</div><div class="sub">' + esc(sub) + '</div></div>';
+  }
+
+  /* Starea filtrelor trăiește în adresa paginii, ca un link să poată fi
+     trimis mai departe: „acordurile BERD din 2025 ajunse la ratificare" e o
+     întrebare pe care cineva vrea s-o partajeze, nu s-o reconstruiască prin
+     clicuri. Folosim hash, nu query, ca să nu forțăm reîncărcarea paginii. */
+  var CAMPURI = {an:'fAn', org:'fOrg', cat:'fCat', et:'fEt', v:'vedere', q:'seek'};
+
+  function scrieURL(){
+    var p = [];
+    if (fAn  !== 'all') p.push('an=' + encodeURIComponent(fAn));
+    if (fOrg !== 'all') p.push('org=' + encodeURIComponent(fOrg));
+    if (fCat !== 'all') p.push('cat=' + encodeURIComponent(fCat));
+    if (fEt  !== 'all') p.push('et=' + encodeURIComponent(fEt));
+    if (vedere !== 'acorduri') p.push('v=' + vedere);
+    if (seek) p.push('q=' + encodeURIComponent(seek));
+    var nou = p.length ? '#' + p.join('&') : ' ';
+    if (('#' + location.hash.replace(/^#/, '')) !== ('#' + p.join('&')))
+      history.replaceState(null, '', location.pathname + location.search + nou);
+  }
+
+  function citesteURL(){
+    var h = location.hash.replace(/^#/, '');
+    if (!h) return;
+    h.split('&').forEach(function(bucata){
+      var x = bucata.split('='), k = x[0], v = decodeURIComponent(x.slice(1).join('=') || '');
+      if (!v) return;
+      if (k === 'an') fAn = v;
+      else if (k === 'org') fOrg = v;
+      else if (k === 'cat') fCat = v;
+      else if (k === 'et')  fEt = v;
+      else if (k === 'v' && (v === 'acte' || v === 'acorduri')) vedere = v;
+      else if (k === 'q')   seek = fold(v);
+    });
+  }
+
+  function rows(grupuri, acte){
+    scrieURL();
+    /* Filtrul pe etapă se aplică dintr-un alt panou, aflat mai sus pe pagină.
+       Fără un indicator lângă listă, cine derulează direct la tabel vede 38 de
+       rânduri în loc de 73 și n-are cum să înțeleagă de ce. */
+    var chip = document.getElementById('etChip');
+    if (chip){
+      if (fEt === 'all'){ chip.hidden = true; }
+      else {
+        var s = STEPS.concat([VIGOARE]).filter(function(x){ return x.k === fEt; })[0];
+        chip.hidden = false;
+        chip.innerHTML = 'etapa: ' + esc(s.cap) + '<b title="Șterge filtrul">×</b>';
+        chip.querySelector('b').onclick = function(){
+          fEt = 'all';
+          document.querySelectorAll('#flux .et-card').forEach(function(o){
+            o.classList.remove('activ');
+            o.setAttribute('aria-expanded', 'false');
+          });
+          // Închidem și panoul de detaliu: altfel butonul din el ar rămâne pe
+          // „Șterge filtrul", deși filtrul tocmai a fost șters de aici.
+          var det = document.getElementById('etDetail');
+          if (det){ det.hidden = true; det.innerHTML = ''; }
+          var h = document.getElementById('etHint');
+          if (h) h.textContent = 'Apasă o etapă pentru detalii';
+          rows(grupuri, acte);
+        };
+      }
+    }
+    if (vedere === 'acte') return randActe(acte);
+    return randAcorduri(grupuri);
+  }
+
+  // Lista plată: un act, un rând, în ordinea publicării în Monitor.
+  // Filtrele sunt comune celor două vederi și exportului, ca ce descarci să
+  // fie exact ce vezi pe ecran.
+  function trece_act(a){
+    if (fCat !== 'all' && a.categorie !== fCat) return false;
+    if (fOrg !== 'all' && (a.partener||'').split(' / ').indexOf(fOrg) === -1) return false;
+    if (fAn !== 'all' && an(a) !== fAn) return false;
+    if (fEt !== 'all' && etapa(a).indexOf(fEt) === -1) return false;
+    return true;
+  }
+
+  function trece_grup(g){
+    if (fCat !== 'all' && g.categorie !== fCat) return false;
+    if (fOrg !== 'all' && !g.orgs[fOrg]) return false;
+    if (fAn !== 'all' && aniGrup(g).indexOf(fAn) === -1) return false;
+    if (fEt !== 'all' && !g.et[fEt]) return false;
+    return true;
+  }
+
+  function randActe(acte){
+    var out = acte.filter(function(a){
+      if (!trece_act(a)) return false;
+      if (seek){
+        var hay = fold([a.titlu, a.act, a.partener, a.editie].join(' '));
+        if (hay.indexOf(seek) === -1) return false;
+      }
+      return true;
+    }).sort(function(x, y){ return ord(y).localeCompare(ord(x)); });
+
+    /* Coloana „Etapa" lipsea, deși exportul acestei vederi o avea. Ce vezi pe
+       ecran și ce descarci trebuie să fie același lucru. */
+    document.getElementById('cap').innerHTML = '<tr>' +
+      '<th>Act</th><th>Categorie</th><th>Partener</th><th>Etapa</th>' +
+      '<th>Denumire</th><th>Semnat</th><th>Ediția</th></tr>';
+
+    document.getElementById('rows').innerHTML = out.map(function(a){
+      var caps = etapa(a).map(function(k){
+        var s = STEPS.filter(function(x){ return x.k === k; })[0];
+        return s ? '<span class="et-mic">' + s.n + '. ' + esc(s.cap) + '</span>'
+                 : '<span class="et-mic vig">' + esc(VIGOARE.cap) + '</span>';
+      }).join('');
+      return '<tr class="act-rand">' +
+        '<td class="a-nr" data-l="Act">' + esc(a.act) + '</td>' +
+        '<td data-l="Categorie"><span class="tag ' + (CLS[a.categorie]||'t-alt') + '">' +
+          esc(a.categorie) + '</span></td>' +
+        '<td class="org" data-l="Partener">' + esc(a.partener || '—') + '</td>' +
+        '<td data-l="Etapa">' + caps + '</td>' +
+        '<td data-l="Denumire"><div class="a-tit">' + esc(a.titlu) + '</div></td>' +
+        '<td data-l="Semnat">' + (a.semnat ? '<span class="semnat">' + esc(a.semnat) + '</span>'
+          : '<span class="nil">—</span>') + '</td>' +
+        '<td class="a-src" data-l="Ediția"><a href="' + esc(a.url) + '" target="_blank" ' +
+          'rel="noopener">MO ' + esc(a.editie) + '</a><br>' + esc(a.data_editie) + '</td></tr>';
+    }).join('');
+
+    document.getElementById('none').innerHTML = out.length ? '' :
+      '<div class="empty-state"><strong>Niciun act</strong>Nimic nu corespunde filtrelor.</div>';
+  }
+
+  function randAcorduri(grupuri){
+    /* Un proiect mare are mai multe acorduri — „Eficiența energetică" are un
+       grant BEI și un contract de finanțare tot de la BEI. Sunt rânduri
+       diferite, corect separate, dar cu aceeași denumire arată a dublură.
+       Unde numele se repetă, adăugăm dedesubt instrumentul și finanțatorul. */
+    var deCateOri = {};
+    grupuri.forEach(function(g){ deCateOri[g.nume] = (deCateOri[g.nume] || 0) + 1; });
+
+    document.getElementById('cap').innerHTML = '<tr>' +
+      '<th>Partener</th><th>Acordul</th><th>Categorie</th>' +
+      '<th>Etape parcurse</th><th>Semnat</th></tr>';
+
+    var out = grupuri.filter(function(g){
+      if (!trece_grup(g)) return false;
+      if (seek){
+        var hay = fold(g.nume + ' ' + g.parteneri + ' ' +
+          g.acte.map(function(a){ return a.titlu + ' ' + a.act; }).join(' '));
+        if (hay.indexOf(seek) === -1) return false;
+      }
+      return true;
+    });
+
+    document.getElementById('rows').innerHTML = out.map(function(g, i){
+      var lista = g.acte.map(function(a){
+        return '<li><div class="a-nr">' + esc(a.act) + '</div>' +
+          '<div class="a-tit">' + esc(a.titlu) + '</div>' +
+          '<div class="a-src"><a href="' + esc(a.url) + '" target="_blank" rel="noopener">MO ' +
+            esc(a.editie) + '</a> · ' + esc(a.data_editie) + '</div></li>';
+      }).join('');
+
+      /* Legătura cu pagina de donatori: acolo sunt sumele, aici sunt actele.
+         Fără ea, cele două jumătăți ale registrului nu comunică deloc. */
+      var principal = (g.parteneri || '').split(' / ')[0].trim();
+      var numeAmp = SPRE_DONATORI[principal];
+      var spreSume = numeAmp
+        ? '<a class="spre-sume" href="index.html?donator=' +
+          encodeURIComponent(numeAmp) + '" target="_blank" rel="noopener">' +
+          'Vezi proiectele și sumele ' + esc(principal) + ' →</a>'
+        : '';
+
+      return '<tr class="acord" data-i="' + i + '" aria-expanded="false">' +
+        '<td class="org" data-l="Partener">' + esc(g.parteneri || '—') + '</td>' +
+        '<td data-l="Acordul"><div class="pname" title="' + esc(g.nume) + '">' +
+          '<span class="caret">▶</span>' + esc(g.nume) +
+          (deCateOri[g.nume] > 1
+            ? '<span class="pname-sub">' + esc(g.categorie) +
+              (g.parteneri ? ' · ' + esc(g.parteneri) : '') + '</span>'
+            : '') + '</div>' +
+          '<div class="pmeta">' + g.acte.length + (g.acte.length === 1 ? ' act' : ' acte') +
+          ' · ultimul: ' + esc(g.ultim.data_editie) + '</div></td>' +
+        '<td data-l="Categorie"><span class="tag ' + (CLS[g.categorie]||'t-alt') + '">' +
+          esc(g.categorie) + '</span></td>' +
+        '<td data-l="Etape parcurse">' + steps(g) + '</td>' +
+        '<td data-l="Semnat">' + (g.semnat ? '<span class="semnat">' + esc(g.semnat) + '</span>'
+          : '<span class="nil">—</span>') + '</td></tr>' +
+        '<tr class="detalii hid" data-d="' + i + '"><td colspan="5">' +
+          '<div class="det-nume">' + esc(g.nume) + '</div>' +
+          '<ul class="acte-list">' + lista + '</ul>' + spreSume + '</td></tr>';
+    }).join('');
+
+    document.querySelectorAll('tr.acord').forEach(function(tr){
+      /* Rândul e un buton, nu doar o zonă pe care se poate da clic: primește
+         focus, se anunță ca atare cititoarelor de ecran și se deschide cu
+         Enter sau Space. Fără asta, cine navighează din tastatură nu poate
+         vedea deloc actele unui acord. */
+      tr.setAttribute('tabindex', '0');
+      tr.setAttribute('role', 'button');
+      function comuta(){
+        var d = document.querySelector('tr.detalii[data-d="' + tr.dataset.i + '"]');
+        var open = d.classList.toggle('hid');
+        tr.setAttribute('aria-expanded', String(!open));
+      }
+      tr.addEventListener('click', comuta);
+      tr.addEventListener('keydown', function(ev){
+        if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); comuta(); }
+      });
+    });
+
+    document.getElementById('none').innerHTML = out.length ? '' :
+      '<div class="empty-state"><strong>Niciun acord</strong>Nimic nu corespunde filtrelor.</div>';
+  }
+
+  fetch(DATA_URL + (DATA_URL.indexOf('?')>-1?'&':'?') + '_=' + Date.now(), {cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw new Error('serverul a răspuns ' + r.status); return r.json(); })
+    .then(function(j){ if(!j||!j.acte) throw new Error('structură neașteptată'); db = j; paint(); })
+    .catch(function(e){
+      app.innerHTML = '<div class="panel"><div class="empty-state">' +
+        '<strong>Registrul nu a putut fi citit</strong>Am cerut <code>' + esc(DATA_URL) +
+        '</code> și am primit: ' + esc(e.message) + '.<br><br>' +
+        'Dacă ai deschis pagina prin dublu-click, browserul blochează citirea fișierelor locale. ' +
+        'Deschide-o de pe site.</div></div>';
+    });
+})();
+</script>
+</body>
+</html>

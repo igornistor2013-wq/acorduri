@@ -14,7 +14,7 @@ Ce face:
   2. Recitește TOATE edițiile din listă la fiecare rulare (nu doar cele noi)
   3. Extrage actele care conțin termeni de finanțare externă
   4. Salvează în date.json (cumulativ, fără duplicate)
-  5. Pagina index.html citește date.json direct — nu se generează nimic
+  5. Pagina acorduri.html citește date.json direct — nu se generează nimic
 
 Fișierele apar lângă script.
 """
@@ -548,7 +548,7 @@ def main():
               ", ".join(str(x) for x in sorted(ramase, reverse=True)[:12]) +
               ("…" if len(ramase) > 12 else "") +
               "\n  Se recuperează câte " + str(MAX_RECUPERARI) + " la fiecare rulare.")
-    print("Pagina index.html citește date.json direct — nu e nimic de regenerat.")
+    print("Pagina acorduri.html citește date.json direct — nu e nimic de regenerat.")
 
     if PUBLICA and noi:
         publica()
