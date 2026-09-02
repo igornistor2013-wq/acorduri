@@ -4897,6 +4897,53 @@ window.__initAdvancedView = function(){ ongoingProjectsIndex = null; regionFilte
 window.findSvgRegionExport = findSvgRegion;
 })();
 let __advInitialized = false;
+
+/* ------------------------------------------------------------------
+   Vederile și butonul „înapoi" al browserului
+
+   Paginile astea sunt cinci vederi care se ascund una pe alta prin
+   style.display, fără nicio urmă în adresă. Consecințele se simțeau zilnic:
+   apăsai „înapoi" din Analize avansate și ieșeai complet de pe site în loc să
+   te întorci la dashboard — pe telefon, unde „înapoi" e gestul principal de
+   navigare, asta e cea mai frecventă cale de ieșire accidentală. Reîncărcarea
+   paginii te arunca înapoi la dashboard. Iar o vedere nu putea fi trimisă
+   nimănui, fiindcă adresa rămânea aceeași indiferent ce era pe ecran.
+
+   Legăm fiecare vedere de un fragment în adresă și ascultăm popstate. Butoanele
+   „Înapoi la pagina principală" rămân unde erau; acum doar li se alătură gestul
+   nativ al browserului. Folosim pushState la deschidere și replaceState la
+   întoarcerea în dashboard, ca să nu se umple istoricul cu perechi dus-întors.
+   ------------------------------------------------------------------ */
+const VEDERI = {
+  '':          'showMainView',
+  'analize':   'showAdvancedView',
+  'export':    'showExportView',
+  'iati':      'showIatiView',
+  'dportal':   'showDportalView'
+};
+const FRAGMENT = { showMainView:'', showAdvancedView:'analize', showExportView:'export',
+                   showIatiView:'iati', showDportalView:'dportal' };
+let __schimbDinIstoric = false;   // nu rescriem adresa când chiar browserul ne-a adus aici
+
+function __marcheazaVederea(numeFunctie){
+  if(__schimbDinIstoric) return;
+  const frag = FRAGMENT[numeFunctie] || '';
+  const nou = location.pathname + location.search + (frag ? '#' + frag : '');
+  if(nou === location.href.replace(location.origin, '')) return;
+  try{
+    if(frag) history.pushState({v:frag}, '', nou);
+    else     history.replaceState({v:''}, '', nou);
+  }catch(e){ /* fișier local, fără istoric — nu e motiv să cadă pagina */ }
+}
+
+window.addEventListener('popstate', function(){
+  const frag = (location.hash || '').replace(/^#/, '');
+  const fn = VEDERI[frag] || 'showMainView';
+  __schimbDinIstoric = true;
+  try{ if(typeof window[fn] === 'function') window[fn](); }
+  finally{ __schimbDinIstoric = false; }
+});
+
 function showAdvancedView(){
   document.getElementById('mainView').style.display = 'none';
   document.getElementById('updateView').style.display = 'none';
@@ -4904,6 +4951,7 @@ function showAdvancedView(){
   document.getElementById('advancedView').style.display = '';
   if(!__advInitialized){ __advInitialized = true; window.__initAdvancedView(); }
   document.getElementById('dportalView').style.display = 'none';
+  __marcheazaVederea('showAdvancedView');
   window.scrollTo(0,0);
 }
 function showMainView(){
@@ -4912,6 +4960,7 @@ function showMainView(){
   document.getElementById('iatiView').style.display = 'none';
   document.getElementById('mainView').style.display = '';
   document.getElementById('dportalView').style.display = 'none';
+  __marcheazaVederea('showMainView');
   window.scrollTo(0,0);
 }
 function showExportView(){
@@ -4920,8 +4969,16 @@ function showExportView(){
   document.getElementById('iatiView').style.display = 'none';
   document.getElementById('updateView').style.display = '';
   document.getElementById('dportalView').style.display = 'none';
+  __marcheazaVederea('showExportView');
   window.scrollTo(0,0);
 }
+/* popstate apelează funcțiile prin nume, deci trebuie să existe pe window.
+   Sunt declarate cu „function" la nivel de script, ceea ce le pune deja acolo
+   în majoritatea cazurilor, dar o legăm explicit ca să nu depindem de asta. */
+window.showMainView = showMainView;
+window.showAdvancedView = showAdvancedView;
+window.showExportView = showExportView;
+
 document.getElementById('advancedAnalysisNavBtn').addEventListener('click', showAdvancedView);
 document.getElementById('backToMainBtn').addEventListener('click', showMainView);
 document.getElementById('updateNavBtn').addEventListener('click', showExportView);
@@ -5422,6 +5479,7 @@ function showIatiView(){
   iatiRenderList();
   iatiUpdateKpis();
   document.getElementById('dportalView').style.display = 'none';
+  __marcheazaVederea('showIatiView');
   window.scrollTo(0,0);
 }
 document.getElementById('iatiSelectorOptCheck').addEventListener('click', () => {
@@ -6166,6 +6224,7 @@ function showDportalView(){
   document.getElementById('iatiView').style.display = 'none';
   document.getElementById('dportalView').style.display = '';
   dpRender();
+  __marcheazaVederea('showDportalView');
   window.scrollTo(0,0);
 }
 document.getElementById('iatiSelectorOptDash').addEventListener('click', () => {
@@ -7078,6 +7137,20 @@ function canonicalToa(t){var f=__toaFold(t);if(__TOA_CANON[f])return __TOA_CANON
 
 /* ---------- Pornire: mai întâi arhiva, apoi datele live ---------- */
 rebuildAll(archiveRecords());
+
+/* Adresa poate cere o vedere anume: cineva a trimis linkul, sau utilizatorul a
+   dat F5 fiind în „Analize avansate". Fără asta, ajungea de fiecare dată la
+   dashboard și trebuia să navigheze din nou. */
+(function(){
+  try{
+    const frag = (location.hash || '').replace(/^#/, '');
+    const fn = VEDERI[frag];
+    if(fn && fn !== 'showMainView' && typeof window[fn] === 'function'){
+      __schimbDinIstoric = true;
+      try{ window[fn](); } finally{ __schimbDinIstoric = false; }
+    }
+  }catch(e){ console.warn('vedere din adresă', e); }
+})();
 
 /* Dacă pagina e deschisă cu ?donator=… — de pildă dintr-un rând al registrului
    de acorduri — pornim cu acel finanțator selectat, în loc să-l caute

@@ -327,6 +327,12 @@
   .empty-state{padding:34px 18px;text-align:center;color:var(--ink-dim);font-size:13px}
   .empty-state strong{display:block;color:var(--navy-deep);font-size:15px;font-weight:700;margin-bottom:6px}
   .empty-state code{font-family:var(--mono);background:#f2f4f8;padding:2px 6px;border-radius:4px}
+  .footer-nav{display:flex;gap:22px;flex-wrap:wrap;margin-top:14px;
+    padding-top:14px;border-top:1px solid var(--line)}
+  .footer-nav a{font-size:12.5px;font-weight:700;color:var(--navy);text-decoration:none}
+  .footer-nav a:hover{color:var(--gold);text-decoration:underline}
+  .footer-nav a:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:3px}
+
   .footer-source{border-top:1px solid var(--line);padding-top:16px;margin-top:8px;
     font-size:12px;color:var(--ink-dim);max-width:80ch}
   @media (prefers-reduced-motion:no-preference){.et-bar i{transition:width .5s cubic-bezier(.2,.7,.3,1)}}
@@ -365,6 +371,15 @@
   <div class="footer-source">
     Un acord parcurge cinci etape care pot fi urmărite act cu act în Monitorul Oficial: hotărârea sau decretul de inițiere a negocierilor, aprobarea semnării, hotărârea de aprobare a proiectului de lege, legea de ratificare (ori hotărârea de aprobare, pentru acordurile de competența Guvernului) și decretul de promulgare. Intrarea în vigoare nu e o a șasea etapă. Data afișată sub etape este cea la care a intrat în vigoare legea de ratificare — articolul ei final prevede că legea intră în vigoare la data publicării în Monitor, iar aceea e chiar data ediției. Acordul propriu-zis intră în vigoare mai târziu, după schimbul instrumentelor de ratificare; acea dată nu se poate deduce din cuprins, fiindcă ordinul ministrului afacerilor externe care o anunță este colectiv și nu numește acordul. Alte etape obligatorii — avizarea, parafarea, deplinele puteri, semnarea propriu-zisă — nu produc niciun act publicat. O parte din acordurile de aici nu sunt tratate internaționale, ci contracte de stat, care urmează un traseu propriu: categoria contractului — cu impact asupra bugetului de stat, asupra bugetului autorității, fără impact bugetar sau de colaborare interinstituțională — decide cine îl aprobă și când intră în vigoare. Tipurile de finanțare afișate pe rânduri (grant, împrumut, credit, finanțare) sunt deduse din denumirea actului; definițiile lor legale sunt în panoul „Cum se încheie un acord". Temeiul: HG 442/2015, HG 377/2018 cu anexele nr. 1 și nr. 1¹, și Legea nr. 419/2006 pentru împrumuturile de stat. Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova.
   </div>
+
+  <!-- Singura cale de întoarcere era butonul din antet. După zeci de rânduri
+       de registru, el rămâne undeva sus, iar cititorul ajuns la capătul listei
+       trebuie să deruleze tot înapoi ca să iasă. Două legături în subsol
+       rezolvă asta fără să adauge nimic plutitor pe ecran. -->
+  <nav class="footer-nav">
+    <a href="index.html">← Donatori și proiecte</a>
+    <a href="#" id="susBtn">↑ Începutul paginii</a>
+  </nav>
 
 </div>
 
@@ -1123,6 +1138,15 @@
     'CEB':   'Banca de Dezvoltare a Consiliului Europei',
     'Suedia':'Regatul Suediei'
   };
+
+  /* „#" în href ar rămâne în adresă și ar strica hash-ul cu filtrele, care e
+     folosit pentru linkuri partajabile. Interceptăm și derulăm noi. */
+  document.addEventListener('click', function(ev){
+    var b = ev.target.closest && ev.target.closest('#susBtn');
+    if(!b) return;
+    ev.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   function paint(){
     citesteURL();          // filtrele din link, înainte de a desena butoanele
