@@ -172,7 +172,10 @@ PARTNERS = [
     (r"\bbei\b|banca europeana de investitii", "BEI"),
     (r"\baid\b|asociatia internationala pentru dezvoltare", "AID"),
     (r"banca mondiala|grupul bancii mondiale", "Banca Mondială"),
-    (r"\bbdce\b|banca de dezvoltare a consiliului europei", "BDCE"),
+    # În Republica Moldova banca e citată drept CEB (Council of Europe
+    # Development Bank), nu BDCE — așa apare în actele Ministerului Finanțelor
+    # și în comunicatele OGPAE. BDCE e forma folosită mai ales în România.
+    (r"\bceb\b|\bbdce\b|banca de dezvoltare a consiliului europei", "CEB"),
     (r"\bafd\b|agentia franceza", "AFD"),
     (r"\bkfw\b", "KfW"),
     (r"\bjica\b|agentia japoneza", "JICA"),
@@ -266,8 +269,8 @@ def classify(title):
 
 # Când o instituție specifică e recunoscută, denumirea mai generală care apare
 # în propriul ei nume devine zgomot: „Banca de Dezvoltare a Consiliului Europei"
-# e BDCE, nu „BDCE / Consiliul Europei".
-REDUNDANT = {"BDCE": "Consiliul Europei"}
+# e CEB, nu „CEB / Consiliul Europei".
+REDUNDANT = {"CEB": "Consiliul Europei"}
 
 
 def partner(title):
