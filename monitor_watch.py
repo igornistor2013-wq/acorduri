@@ -263,8 +263,37 @@ def classify(title):
     for pref in ("Împrumut", "Grant", "Suport bugetar", "Asistență tehnică",
                  "Asistență financiară"):
         if pref in hits:
+            if pref == "Asistență financiară":
+                return dupa_finantator(title)
             return pref
     return hits[0]
+
+
+# Cine dă banii spune, în practică, dacă se întorc.
+#
+# „Acord de finanțare" nu arată în titlu dacă e rambursabil, dar finanțatorul
+# arată: băncile de dezvoltare împrumută, agențiile de cooperare donează.
+# Acordul de finanțare cu AID e un împrumut — Ministerul Economiei îl numește
+# explicit așa: „29,8 mil. Euro împrumutul AID". Acordurile de finanțare cu
+# Comisia Europeană pentru URBACT, Interreg sau Planul de acțiuni multianual
+# sunt granturi, la fel acordurile de cooperare și finanțare cu Federația
+# Internațională de Cruce Roșie.
+#
+# Pentru un finanțator necunoscut rămânem la categoria-părinte: mai bine
+# neclasificat decât clasificat greșit.
+CREDITORI = {"AID", "BIRD", "BERD", "BEI", "CEB", "AFD", "KfW", "FMI", "Belgia"}
+DONATORI  = {"UE", "FICR", "PNUD", "UNICEF", "UNHCR", "GIZ", "Suedia", "Elveția",
+             "SUA", "PAM", "UNOPS", "Consiliul Europei", "România", "Polonia",
+             "Turcia", "Japonia", "Germania"}
+
+
+def dupa_finantator(title):
+    parti = [p.strip() for p in (partner(title) or "").split(" / ") if p.strip()]
+    if parti and all(p in CREDITORI for p in parti):
+        return "Împrumut"
+    if parti and all(p in DONATORI for p in parti):
+        return "Grant"
+    return "Asistență financiară"
 
 
 # Când o instituție specifică e recunoscută, denumirea mai generală care apare
