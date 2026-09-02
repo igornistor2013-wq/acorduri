@@ -66,6 +66,40 @@
   }
   .lang-switch button.active{background:var(--navy);color:#fff;}
   .lang-switch button:hover:not(.active){color:var(--navy);}
+  /* Butonul „Acorduri" avea aceeași formă ca vecinii lui, dar nicio regulă de
+     interacțiune: nu se ridica la hover, n-avea strălucire, nu răspundea la
+     apăsare, iar săgeata stătea pe loc. Arăta ca o etichetă, nu ca un buton —
+     iar diferența față de celelalte două îl făcea să pară stricat. Primește
+     același tratament, adaptat conturului lui alb cu navy: la hover se umple
+     cu albastru și inversează culorile. */
+  #acorduriNavBtn{
+    transition:transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease,
+               background .25s ease, color .25s ease, border-color .25s ease;
+    position:relative; overflow:hidden;
+  }
+  #acorduriNavBtn::before{
+    content:''; position:absolute; inset:0; border-radius:inherit;
+    background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.3), transparent 70%);
+    opacity:0; transition:opacity .3s ease; pointer-events:none;
+  }
+  #acorduriNavBtn:hover{
+    transform:translateY(-3px) scale(1.035);
+    background:linear-gradient(135deg,var(--navy),#2f5691);
+    color:#fff; border-color:var(--navy);
+    box-shadow:0 10px 26px rgba(34,64,107,.35),0 3px 8px rgba(34,64,107,.25),
+               0 0 0 1px rgba(34,64,107,.3);
+  }
+  #acorduriNavBtn:hover::before{ opacity:1; }
+  #acorduriNavBtn:active{
+    transform:translateY(-1px) scale(.97);
+    transition:transform .12s ease;
+  }
+  #acorduriNavBtn svg{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
+  #acorduriNavBtn:hover svg{ transform:translateX(3px); }
+  /* Focusul din tastatură era invizibil pe toate trei. */
+  #acorduriNavBtn:focus-visible, #advancedAnalysisNavBtn:focus-visible,
+  #updateNavBtn:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+
   #advancedAnalysisNavBtn, #updateNavBtn{
     transition:transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, background .25s ease;
     position:relative; overflow:hidden;
@@ -2109,9 +2143,9 @@ function renderDonorList(){
 
         itemDiv.addEventListener('click', (e) => {
           if(e.target.tagName === 'INPUT') return;
-          toggleDonor(name);
+          toggleDonor(name, itemDiv);
         });
-        itemDiv.querySelector('input').addEventListener('change', () => toggleDonor(name));
+        itemDiv.querySelector('input').addEventListener('change', () => toggleDonor(name, itemDiv));
         itemsDiv.appendChild(itemDiv);
       });
 
@@ -2140,9 +2174,38 @@ window.__auditDonors = function(){
   return { reali: DONORS.length, orfane: orfane.length, neacoperiti: neacoperiti.length };
 };
 
-function toggleDonor(name){
+function toggleDonor(name, itemDiv){
   if(state.selectedDonors.has(name)) state.selectedDonors.delete(name);
   else state.selectedDonors.add(name);
+
+  /* Bifa trebuie actualizată explicit. render() recalculează cifrele și
+     tabelul, dar nu atinge lista de finanțatori — așa că, la un clic pe numele
+     donatorului, sumele se schimbau iar căsuța rămânea bifată. Părea că
+     apăsarea n-a avut efect, deși avusese.
+
+     Actualizăm doar elementul atins, nu toată lista: renderDonorList() ar
+     reconstrui cele 153 de rânduri și ar arunca poziția derulării la fiecare
+     clic. Antetul grupului se recalculează din stare, nu din DOM, ca să fie
+     corect și când o căutare ascunde o parte din donatorii grupului. */
+  if(itemDiv){
+    const bifat = state.selectedDonors.has(name);
+    itemDiv.classList.toggle('checked', bifat);
+    const caseta = itemDiv.querySelector('input');
+    if(caseta) caseta.checked = bifat;
+
+    const grup = itemDiv.closest('.donor-group');
+    const antet = grup && grup.querySelector('.donor-group-header');
+    if(antet){
+      const aiGrupului = donorsByGroup().get(groupOfDonor(name)) || [];
+      const toate = aiGrupului.length > 0 &&
+                    aiGrupului.every(d => state.selectedDonors.has(d));
+      antet.classList.toggle('all-checked', toate);
+      const casetaAntet = antet.querySelector('input');
+      if(casetaAntet) casetaAntet.checked = toate;
+    }
+  } else {
+    renderDonorList();
+  }
   render();
 }
 document.getElementById('donorSearch').addEventListener('input',(e)=>{
