@@ -41,7 +41,20 @@ UA = {"User-Agent": "Mozilla/5.0 (compatible; monitor-watch/1.0)"}
 
 # ---------------------------------------------------------------- clasificare
 
-# Termeni care indică un act de finanțare externă.
+# Termeni care indică un act de finanțare externă, grupați pe categoriile de
+# asistență externă din HG 377/2018, anexa nr. 1, pct. 9:
+#
+#   Grant                (pct. 9.13)  asistență financiară nerambursabilă
+#   Împrumut             (pct. 9.2)   asistență financiară rambursabilă
+#   Suport bugetar       (pct. 9.20¹) transferat direct în bugetul public
+#   Asistență tehnică    (pct. 9.3)   consultanță, instruire, expertiză
+#   Asistență financiară (pct. 9.2)   categoria-părinte, folosită doar când
+#                                     titlul nu spune dacă e rambursabilă
+#
+# „Credit" și „Contract de finanțare" nu mai sunt categorii separate, fiindcă
+# nu există ca noțiuni în regulament: facilitatea de credit e tot împrumut, iar
+# contractul de finanțare e denumirea pe care Banca Europeană de Investiții o
+# dă instrumentului ei de creditare a proiectelor de investiții.
 #
 # Tiparele se aplică pe text NORMALIZAT (litere mici, fără diacritice), de aceea
 # sunt scrise aici direct fără diacritice — vezi norm() mai jos.
@@ -59,26 +72,33 @@ INCLUDE = [
     (r"grant(?:ul|ului|uri|urile|urilor)?\s+investi", "Grant"),
     (r"din\s+contul\s+grantului", "Grant"),
     (r"asistent[aă]\s+financiara\s+nerambursabila", "Grant"),
-    (ACORD + r"\s+de\s+colaborare\s+dintre", "Grant"),
     # împrumuturi
     (ACORD + r"\s+de\s+imprumut", "Împrumut"),
     (CONTRACT + r"\s+de\s+imprumut", "Împrumut"),
     # finanțare
-    (ACORD + r"\s+de\s+finan", "Finanțare"),
-    (r"conventi(?:a|e|ei|i|ile|ilor)?\s+de\s+finan", "Finanțare"),
-    (r"cooperare\s+si\s+finantare", "Finanțare"),
-    (ACORD + r"\s+de\s+cooperare\s+financiara", "Finanțare"),
-    (ACORD + r"\s+de\s+(?:asistenta|sprijin)\s+financiar", "Finanțare"),
-    (r"asistenta\s+(?:financiara\s+)?(?:externa|macrofinanciara)", "Finanțare"),
-    (r"memorandum[^.]{0,80}?(?:finantare|imprumut|macrofinanciar)", "Finanțare"),
-    (r"suport\s+bugetar", "Finanțare"),
+    (ACORD + r"\s+de\s+finan", "Asistență financiară"),
+    (r"conventi(?:a|e|ei|i|ile|ilor)?\s+de\s+finan", "Asistență financiară"),
+    (r"cooperare\s+si\s+finantare", "Asistență financiară"),
+    (ACORD + r"\s+de\s+cooperare\s+financiara", "Asistență financiară"),
+    (ACORD + r"\s+de\s+(?:asistenta|sprijin)\s+financiar", "Asistență financiară"),
+    (r"asistenta\s+(?:financiara\s+)?(?:externa|macrofinanciara)", "Asistență financiară"),
+    (r"memorandum[^.]{0,80}?(?:finantare|imprumut|macrofinanciar)", "Asistență financiară"),
+    # suport bugetar — pct. 9.20¹: asistență transferată direct în bugetul
+    # public național, pentru susținerea reformelor agreate. Instrumentele prin
+    # care vine sunt denumite variat, dar toate înseamnă același lucru:
+    # contractul de performanță pentru reforma sectorială al Uniunii Europene,
+    # asistența macrofinanciară, Facilitatea de reformă și creștere.
+    (r"suport\s+bugetar", "Suport bugetar"),
+    (r"contract(?:ul|ului)?\s+de\s+performanta\s+pentru\s+reforma", "Suport bugetar"),
+    (r"asistenta\s+macrofinanciara", "Suport bugetar"),
+    (r"facilitat\w*\s+de\s+reforma\s+si\s+crestere", "Suport bugetar"),
     # contract de finanțare (mai specific decât „finanțare")
-    (CONTRACT + r"\s+de\s+finan", "Contract de finanțare"),
+    (CONTRACT + r"\s+de\s+finan", "Împrumut"),
     # credite
-    (r"facilitate\s+de\s+credit", "Credit"),
-    (r"linie\s+de\s+credit", "Credit"),
-    (ACORD + r"\s+de\s+credit", "Credit"),
-    (CONTRACT + r"\s+de\s+credit", "Credit"),
+    (r"facilitate\s+de\s+credit", "Împrumut"),
+    (r"linie\s+de\s+credit", "Împrumut"),
+    (ACORD + r"\s+de\s+credit", "Împrumut"),
+    (CONTRACT + r"\s+de\s+credit", "Împrumut"),
     # asistență tehnică — pct. 9.3 din anexa nr. 1 la HG 377/2018
     #
     # Lipsea complet din filtru. Contractele de stat de asistență tehnică fără
@@ -90,23 +110,30 @@ INCLUDE = [
     (ACORD + r"\s+de\s+asistenta\s+tehnica", "Asistență tehnică"),
     (CONTRACT + r"\s+de\s+asistenta\s+tehnica", "Asistență tehnică"),
     (ACORD + r"\s+de\s+cooperare\s+tehnica", "Asistență tehnică"),
+    (r"facilitat\w*\s+de\s+cooperare\s+tehnica", "Asistență tehnică"),
     (r"memorandum[^.]{0,60}?asistenta\s+tehnica", "Asistență tehnică"),
     (r"proiect(?:ul|ului)?\s+de\s+asistenta\s+tehnica", "Asistență tehnică"),
-    # Instrumentele „moi" prin care se acordă tot asistență tehnică. Nu putem
-    # cere ca termenul să stea lângă cuvântul „acord": în titlurile reale, între
-    # ele încap denumirile complete ale ambelor părți — „Acordului de înțelegere
-    # între Ministerul Dezvoltării Economice și Digitalizării și Agenția
-    # Elvețiană pentru Dezvoltare și Cooperare (SDC) privind consultanța…" are
-    # 140 de caractere între cele două. Cerem ambele, oriunde în titlu.
-    # Consultanța, instruirea și expertiza sunt chiar conținutul definiției
-    # asistenței tehnice din pct. 9.3.
+]
+
+# Termeni care înseamnă că actul NU e despre finanțare externă,
+# chiar dacă a trecut de filtrul de mai sus.
+# Tipare care intră în registru DOAR dacă în titlu apare un partener extern
+# recunoscut. „Acord de colaborare dintre…" și memorandumurile despre instruire
+# sau consultanță sunt formulări folosite la fel de des pentru înțelegeri interne
+# între instituții moldovenești — colaborarea dintre un minister și o academie
+# militară, instruirea studenților cu o universitate din România. Fără condiția
+# asta, oricare dintre ele intra în registru ca „Grant" sau „Asistență tehnică".
+#
+# Nu putem cere ca termenul-cheie să stea lângă cuvântul „acord": în titlurile
+# reale, între ele încap denumirile complete ale ambelor părți — 140 de caractere
+# în cazul acordului cu Agenția Elvețiană pentru Dezvoltare și Cooperare.
+INCLUDE_PARTENER = [
+    (ACORD + r"\s+de\s+colaborare\s+dintre", "Grant"),
     (r"(?=.*\b(?:acord|acordul|acordului|memorandum|memorandumul|memorandumului)\b)"
      r".*\b(?:consultanta|instruire|expertiza|transfer\s+de\s+cunostinte)",
      "Asistență tehnică"),
 ]
 
-# Termeni care înseamnă că actul NU e despre finanțare externă,
-# chiar dacă a trecut de filtrul de mai sus.
 EXCLUDE = [
     r"imprumut\s+interbibliotecar",
     r"asociati(?:i|ile|ilor)\s+de\s+economii\s+si\s+imprumut",
@@ -205,9 +232,28 @@ def classify(title):
     for pat, cat in INCLUDE:
         if re.search(norm(pat), n):
             hits.append(cat)
+    if partner(title):
+        for pat, cat in INCLUDE_PARTENER:
+            if re.search(norm(pat), n):
+                hits.append(cat)
     if not hits:
         return None
-    for pref in ("Contract de finanțare", "Credit", "Împrumut", "Grant", "Finanțare"):
+    # Ordinea de preferință: instrumentul bate canalul de livrare.
+    #
+    # Suportul bugetar (pct. 9.20¹) descrie CUM ajung banii — direct în buget —
+    # nu dacă se întorc. „Acordul de împrumut privind Facilitatea de reformă și
+    # creștere" e suport bugetar livrat ca împrumut; îl trecem la Împrumut,
+    # fiindcă asta spune ce datorează statul. Rămâne Suport bugetar doar când
+    # titlul nu numește niciun instrument.
+    #
+    # La fel, un grant care plătește servicii de consultanță rămâne grant:
+    # asistența tehnică se aplică atunci când actul nu numește un instrument
+    # financiar, ci descrie chiar transferul de expertiză.
+    #
+    # „Asistență financiară" e ultima, fiind categoria-părinte din pct. 9.2: o
+    # folosim doar când titlul nu spune dacă banii sunt rambursabili sau nu.
+    for pref in ("Împrumut", "Grant", "Suport bugetar", "Asistență tehnică",
+                 "Asistență financiară"):
         if pref in hits:
             return pref
     return hits[0]

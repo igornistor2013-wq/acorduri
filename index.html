@@ -148,15 +148,20 @@
   tr.acord:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 
   /* 6. pe ecran îngust tabelul devine listă de carduri */
+  .et-mic{display:inline-block;font-size:10px;font-weight:700;color:var(--navy);
+    background:var(--blue-bg);border-radius:4px;padding:2px 7px;margin:0 4px 3px 0;
+    white-space:nowrap}
+  .et-mic.vig{background:var(--green-bg);color:var(--green-ink)}
+
   @media (max-width:700px){
     .tbl-scroll{overflow-x:visible}
     #tabel{min-width:0;display:block}
     #tabel thead{display:none}
     #tabel tbody{display:block}
-    tr.acord{display:block;border:1px solid var(--line-strong);border-radius:10px;
+    tr.acord, tr.act-rand{display:block;border:1px solid var(--line-strong);border-radius:10px;
       padding:12px 14px;margin-bottom:10px;background:var(--panel)}
-    tr.acord td{display:block;border:none;padding:5px 0}
-    tr.acord td[data-l]:before{content:attr(data-l);display:block;font-size:9.5px;
+    tr.acord td, tr.act-rand td{display:block;border:none;padding:5px 0}
+    tr.acord td[data-l]:before, tr.act-rand td[data-l]:before{content:attr(data-l);display:block;font-size:9.5px;
       letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);
       font-weight:700;margin-bottom:3px}
     .pname{-webkit-line-clamp:3;max-width:none}
@@ -1555,20 +1560,29 @@
       return true;
     }).sort(function(x, y){ return ord(y).localeCompare(ord(x)); });
 
+    /* Coloana „Etapa" lipsea, deși exportul acestei vederi o avea. Ce vezi pe
+       ecran și ce descarci trebuie să fie același lucru. */
     document.getElementById('cap').innerHTML = '<tr>' +
-      '<th>Act</th><th>Categorie</th><th>Partener</th>' +
+      '<th>Act</th><th>Categorie</th><th>Partener</th><th>Etapa</th>' +
       '<th>Denumire</th><th>Semnat</th><th>Ediția</th></tr>';
 
     document.getElementById('rows').innerHTML = out.map(function(a){
-      return '<tr>' +
-        '<td class="a-nr">' + esc(a.act) + '</td>' +
-        '<td><span class="tag ' + (CLS[a.categorie]||'t-alt') + '">' + esc(a.categorie) + '</span></td>' +
-        '<td class="org">' + esc(a.partener || '—') + '</td>' +
-        '<td><div class="a-tit">' + esc(a.titlu) + '</div></td>' +
-        '<td>' + (a.semnat ? '<span class="semnat">' + esc(a.semnat) + '</span>'
+      var caps = etapa(a).map(function(k){
+        var s = STEPS.filter(function(x){ return x.k === k; })[0];
+        return s ? '<span class="et-mic">' + s.n + '. ' + esc(s.cap) + '</span>'
+                 : '<span class="et-mic vig">' + esc(VIGOARE.cap) + '</span>';
+      }).join('');
+      return '<tr class="act-rand">' +
+        '<td class="a-nr" data-l="Act">' + esc(a.act) + '</td>' +
+        '<td data-l="Categorie"><span class="tag ' + (CLS[a.categorie]||'t-alt') + '">' +
+          esc(a.categorie) + '</span></td>' +
+        '<td class="org" data-l="Partener">' + esc(a.partener || '—') + '</td>' +
+        '<td data-l="Etapa">' + caps + '</td>' +
+        '<td data-l="Denumire"><div class="a-tit">' + esc(a.titlu) + '</div></td>' +
+        '<td data-l="Semnat">' + (a.semnat ? '<span class="semnat">' + esc(a.semnat) + '</span>'
           : '<span class="nil">—</span>') + '</td>' +
-        '<td class="a-src"><a href="' + esc(a.url) + '" target="_blank" rel="noopener">MO ' +
-          esc(a.editie) + '</a><br>' + esc(a.data_editie) + '</td></tr>';
+        '<td class="a-src" data-l="Ediția"><a href="' + esc(a.url) + '" target="_blank" ' +
+          'rel="noopener">MO ' + esc(a.editie) + '</a><br>' + esc(a.data_editie) + '</td></tr>';
     }).join('');
 
     document.getElementById('none').innerHTML = out.length ? '' :
