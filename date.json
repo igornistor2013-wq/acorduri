@@ -2306,6 +2306,17 @@
       "editie_id": "pdf-350-352",
       "url": "https://monitorul.gov.md/ro/search",
       "sursa": "PDF"
+    },
+    "nr. 147, 24 august 2026|3327": {
+      "act": "nr. 147, 24 august 2026",
+      "titlu": "Ordin cu privire la aducerea la cunoştinţa publică a datei intrării în vigoare a Acordului de colaborare dintre Instituţia Publică Organizaţia pentru Dezvoltarea Antreprenoriatului şi Programul Naţiunilor Unite pentru Dezvoltare pentru implementarea proiectului „Comunităţi reziliente prin abilitarea femeilor”",
+      "categorie": "Grant",
+      "partener": "PNUD",
+      "semnat": "",
+      "editie": "407-409",
+      "data_editie": "02.09.2026",
+      "editie_id": "3327",
+      "url": "https://monitorul.gov.md/ro/monitor/3327"
     }
   },
   "editii_vazute": [
@@ -2320,7 +2331,12 @@
     "3320",
     "3321",
     "3322",
-    "3323"
+    "3323",
+    "3324",
+    "3325",
+    "3326",
+    "3327",
+    "3328"
   ],
-  "ultima_rulare": "27.08.2026 06:55"
+  "ultima_rulare": "02.09.2026 06:21"
 }
