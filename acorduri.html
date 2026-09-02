@@ -105,6 +105,7 @@
   .semnat{font-family:var(--mono);font-size:11.5px;font-weight:700;background:var(--gold-bg);
     color:#8a5c0d;padding:3px 8px;border-radius:5px;white-space:nowrap}
   .nil{color:var(--line-strong)}
+  .nil-link{color:var(--ink-dim)}
   .caret{display:inline-block;width:14px;color:var(--ink-dim);font-size:10px;transition:transform .15s}
   tr.acord[aria-expanded="true"] .caret{transform:rotate(90deg)}
 
@@ -570,6 +571,14 @@
   var q = new URLSearchParams(location.search).get('src');
   if (q) DATA_URL = q;
 
+  /* Un link vine din registru, iar registrul poate fi editat manual sau
+     alimentat din PDF-uri. Dacă acolo ajunge „javascript:…", browserul îl
+     execută la clic. Lăsăm să treacă doar adresele http(s); restul devin text
+     simplu, fără link. */
+  function linkSigur(u){
+    return /^https?:\/\//i.test(String(u || '')) ? String(u) : '';
+  }
+
   function esc(s){
     return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -789,9 +798,14 @@
   }
 
   function xmlEsc(s){
+    /* Parantezele drepte lipseau: fără ele expresia caută secvența literală
+       „\x00-\x08…", nu clasa de caractere, deci nu ștergea nimic. Un caracter
+       de control ajuns din titlul unui act în foaia XML face fișierul invalid,
+       iar Excel refuză să-l deschidă cu un mesaj de fișier corupt. */
     return String(s == null ? '' : s)
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;').replace(/\x00-\x08\x0B\x0C\x0E-\x1F/g,'');
+      .replace(/"/g,'&quot;');
   }
 
   function coloana(i){                       // 0 -> A, 26 -> AA
@@ -1382,8 +1396,12 @@
           '</div>' +
           (ex.length ? '<div class="det-lbl">Ultimele acte din această etapă</div><ul class="det-ex">' +
             ex.map(function(a){
-              return '<li><a href="' + esc(a.url) + '" target="_blank" rel="noopener">' +
-                esc(a.data_editie) + '</a> ' + esc(a.titlu.slice(0, 130)) +
+              var u = linkSigur(a.url);
+              return '<li>' +
+                (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">'
+                   : '<span class="nil-link">') +
+                esc(a.data_editie) +
+                (u ? '</a>' : '</span>') + ' ' + esc(a.titlu.slice(0, 130)) +
                 (a.titlu.length > 130 ? '…' : '') + '</li>';
             }).join('') + '</ul>' : '') +
           '<button class="det-filtru" id="detFiltru">' +
@@ -1593,8 +1611,12 @@
         '<td data-l="Denumire"><div class="a-tit">' + esc(a.titlu) + '</div></td>' +
         '<td data-l="Semnat">' + (a.semnat ? '<span class="semnat">' + esc(a.semnat) + '</span>'
           : '<span class="nil">—</span>') + '</td>' +
-        '<td class="a-src" data-l="Ediția"><a href="' + esc(a.url) + '" target="_blank" ' +
-          'rel="noopener">MO ' + esc(a.editie) + '</a><br>' + esc(a.data_editie) + '</td></tr>';
+        '<td class="a-src" data-l="Ediția">' +
+          (linkSigur(a.url)
+            ? '<a href="' + esc(linkSigur(a.url)) + '" target="_blank" rel="noopener noreferrer">MO ' +
+              esc(a.editie) + '</a>'
+            : 'MO ' + esc(a.editie)) +
+          '<br>' + esc(a.data_editie) + '</td></tr>';
     }).join('');
 
     document.getElementById('none').innerHTML = out.length ? '' :
@@ -1625,10 +1647,14 @@
 
     document.getElementById('rows').innerHTML = out.map(function(g, i){
       var lista = g.acte.map(function(a){
+        var u = linkSigur(a.url);
         return '<li><div class="a-nr">' + esc(a.act) + '</div>' +
           '<div class="a-tit">' + esc(a.titlu) + '</div>' +
-          '<div class="a-src"><a href="' + esc(a.url) + '" target="_blank" rel="noopener">MO ' +
-            esc(a.editie) + '</a> · ' + esc(a.data_editie) + '</div></li>';
+          '<div class="a-src">' +
+            (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">MO '
+               : '<span class="nil-link">MO ') +
+            esc(a.editie) + (u ? '</a>' : '</span>') +
+            ' · ' + esc(a.data_editie) + '</div></li>';
       }).join('');
 
       /* Legătura cu pagina de donatori: acolo sunt sumele, aici sunt actele.
