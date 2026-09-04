@@ -2317,6 +2317,17 @@
       "data_editie": "02.09.2026",
       "editie_id": "3327",
       "url": "https://monitorul.gov.md/ro/monitor/3327"
+    },
+    "nr. 273, 18 august 2026|3331": {
+      "act": "nr. 273, 18 august 2026",
+      "titlu": "Ordin cu privire la semnarea și intrarea în vigoare a Amendamentului nr. 1, semnat la Chișinău la 29 iulie 2026, la Acordul pentru proiectul de cooperare și finanțare dintre Federația Internațională a Societăților de Cruce Roșie și Semilună Roșie (FICR) și Ministerul Muncii și Protecției Sociale al Republicii Moldova privind Proiectul „Sprijin pentru funcționarea centrelor de plasament temporar pentru refugiați și acordarea asistenței în sezonul rece în Republica Moldova”, semnat la Chișinău la 2 martie 2026",
+      "categorie": "Grant",
+      "partener": "FICR",
+      "semnat": "29.07.2026",
+      "editie": "420-423",
+      "data_editie": "04.09.2026",
+      "editie_id": "3331",
+      "url": "https://monitorul.gov.md/ro/monitor/3331"
     }
   },
   "editii_vazute": [
@@ -2338,7 +2349,8 @@
     "3327",
     "3328",
     "3329",
-    "3330"
+    "3330",
+    "3331"
   ],
-  "ultima_rulare": "03.09.2026 06:18"
+  "ultima_rulare": "04.09.2026 06:16"
 }
