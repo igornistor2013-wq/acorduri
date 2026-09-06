@@ -93,10 +93,13 @@ INCLUDE = [
     # care vine sunt denumite variat, dar toate înseamnă același lucru:
     # contractul de performanță pentru reforma sectorială al Uniunii Europene,
     # asistența macrofinanciară, Facilitatea de reformă și creștere.
-    (r"suport\s+bugetar", "Suport bugetar"),
-    (r"contract(?:ul|ului)?\s+de\s+performanta\s+pentru\s+reforma", "Suport bugetar"),
-    (r"asistenta\s+macrofinanciara", "Suport bugetar"),
-    (r"facilitat\w*\s+de\s+reforma\s+si\s+crestere", "Suport bugetar"),
+    # Suportul bugetar nu mai e o categorie aici — vezi SUPORT_BUGETAR mai jos.
+    # Tiparele rămân în listă doar ca actul să intre în registru chiar dacă
+    # titlul nu numește niciun instrument.
+    (r"suport\s+bugetar", "Asistență financiară"),
+    (r"contract(?:ul|ului)?\s+de\s+performanta\s+pentru\s+reforma", "Asistență financiară"),
+    (r"asistenta\s+macrofinanciara", "Asistență financiară"),
+    (r"facilitat\w*\s+de\s+reforma\s+si\s+crestere", "Asistență financiară"),
     # contract de finanțare (mai specific decât „finanțare")
     (CONTRACT + r"\s+de\s+finan", "Împrumut"),
     # credite
@@ -265,13 +268,37 @@ def classify(title):
     #
     # „Asistență financiară" e ultima, fiind categoria-părinte din pct. 9.2: o
     # folosim doar când titlul nu spune dacă banii sunt rambursabili sau nu.
-    for pref in ("Împrumut", "Grant", "Suport bugetar", "Asistență tehnică",
-                 "Asistență financiară"):
+    for pref in ("Împrumut", "Grant", "Asistență tehnică", "Asistență financiară"):
         if pref in hits:
             if pref == "Asistență financiară":
                 return dupa_finantator(title)
             return pref
     return hits[0]
+
+
+# Suportul bugetar e un mod de livrare, nu un instrument.
+#
+# Pct. 9.20¹ îl definește ca asistență financiară transferată direct într-un
+# buget component al bugetului public național. Poate fi grant — Contractul de
+# performanță pentru reforma sectorială al Uniunii Europene — sau împrumut, cum
+# e Facilitatea de reformă și creștere. Ca și categorie separată, el ascundea
+# tocmai informația care contează: dacă statul are sau nu de rambursat.
+#
+# Așa că nu mai e categorie, ci un semn care însoțește categoria. Cele patru
+# acte despre Facilitatea de reformă și creștere rămân la „Împrumut", dar poartă
+# și marcajul; cele două despre Contractul de performanță sunt granturi cu
+# marcaj. Categoria spune ce datorează statul, marcajul spune unde ajung banii.
+SUPORT_BUGETAR = [
+    r"suport\s+bugetar",
+    r"contract(?:ul|ului)?\s+de\s+performanta\s+pentru\s+reforma",
+    r"asistenta\s+macrofinanciara",
+    r"facilitat\w*\s+de\s+reforma\s+si\s+crestere",
+]
+
+
+def e_suport_bugetar(title):
+    n = norm(title)
+    return any(re.search(norm(p), n) for p in SUPORT_BUGETAR)
 
 
 # Cine dă banii spune, în practică, dacă se întorc.
@@ -415,6 +442,7 @@ def parse_edition(eid, label):
             "editie": ed_nr,
             "data_editie": ed_date,
             "editie_id": eid,
+            "suport": e_suport_bugetar(titlu),
             "url": f"{BASE}/ro/monitor/{eid}",
         })
     return True, found

@@ -93,7 +93,7 @@
   .t-contract{background:var(--blue-bg);color:var(--navy)}
   .t-credit{background:var(--purple-bg);color:var(--purple)}
   .t-tehnica{background:#e8eef7;color:#3d5a80}
-  .t-suport{background:var(--purple-bg);color:var(--purple)}
+  .t-suport{background:var(--purple-bg);color:var(--purple);margin-left:5px;cursor:help}
   .t-alt{background:#eef0f4;color:var(--ink-dim)}
   .t-simpl{background:var(--green-bg);color:var(--green-ink)}
 
@@ -504,11 +504,12 @@
     {cat:'Grant', legal:'Asistență financiară nerambursabilă (pct. 9.13)',
      nota:'„Acord de grant", grant investițional, asistență financiară nerambursabilă. ' +
        'Un grant care plătește servicii de consultanță rămâne grant: contează instrumentul.'},
-    {cat:'Suport bugetar', legal:'Transferat direct în bugetul public (pct. 9.20¹)',
-     nota:'Contractul de performanță pentru reforma sectorială al Uniunii Europene, ' +
-       'asistența macrofinanciară, Facilitatea de reformă și creștere. Când actul spune ' +
-       'totuși „acord de împrumut", câștigă împrumutul — suportul bugetar descrie cum ajung ' +
-       'banii, nu dacă se întorc.'},
+    {cat:'suport bugetar', legal:'Marcaj, nu categorie (pct. 9.20¹)',
+     nota:'Însoțește categoria, nu o înlocuiește. Suportul bugetar descrie unde ajung banii ' +
+       '— direct într-un buget component al bugetului public național — nu dacă se întorc. ' +
+       'Contractul de performanță pentru reforma sectorială al Uniunii Europene e un grant ' +
+       'cu acest marcaj; Facilitatea de reformă și creștere e un împrumut cu același marcaj. ' +
+       'Ca și categorie separată, ascundea tocmai ce contează: dacă statul are de rambursat.'},
     {cat:'Asistență tehnică', legal:'Consultanță, instruire, expertiză (pct. 9.3)',
      nota:'Acord sau contract de asistență ori cooperare tehnică, memorandum privind ' +
        'consultanța sau instruirea. Ajunge în Monitor prin ordinul autorității semnatare.'},
@@ -941,6 +942,7 @@
       var g = map[k];
       g.acte.push(a);
       etapa(a).forEach(function(e){ g.et[e] = true; });
+      if (a.suport) g.suport = true;   // suport bugetar: vezi eticheta de pe rând
       if (a.semnat && !g.semnat) g.semnat = a.semnat;
       if (a.categorie) g.cats[a.categorie] = true;
       (a.partener||'').split(' / ').forEach(function(o){ o = o.trim(); if (o) g.orgs[o] = true; });
@@ -1063,7 +1065,7 @@
 
     if (vedere === 'acte'){
       nume = 'Acte';
-      randuri.push(['Data ediției','Ediția','Act','Tip de finanțare','Partener',
+      randuri.push(['Data ediției','Ediția','Act','Tip de finanțare','Suport bugetar','Partener',
                     'Etapa','Denumirea acordului','Titlul complet al actului','Semnat','Link']);
       acte.filter(function(a){
         if (!trece_act(a)) return false;
@@ -1079,11 +1081,12 @@
             return s ? s.n + '. ' + s.cap : k;
           }).join(' + ');
           randuri.push([a.data_editie, 'MO ' + a.editie, a.act, a.categorie,
-            a.partener || '', caps, denumire(a.titlu), a.titlu, a.semnat || '', a.url]);
+            a.suport ? 'da' : '', a.partener || '', caps, denumire(a.titlu), a.titlu,
+            a.semnat || '', a.url]);
         });
     } else {
       nume = 'Acorduri';
-      randuri.push(['Acordul','Partener','Tip de finanțare','Ani','Nr. acte',
+      randuri.push(['Acordul','Partener','Tip de finanțare','Suport bugetar','Ani','Nr. acte',
                     'Prima publicare','Ultima publicare','Etape parcurse',
                     'Etapa atinsă','Semnat'].concat(STEPS.map(function(s){
                       return s.n + '. ' + s.cap; }))
@@ -1102,7 +1105,8 @@
         var ultima = atinse.length ? atinse[atinse.length - 1] : null;
         var dt = g.acte.map(ord).sort();
         function frumos(v){ return v && v !== '0' ? v.slice(6,8)+'.'+v.slice(4,6)+'.'+v.slice(0,4) : ''; }
-        randuri.push([g.nume, g.parteneri || '', g.categorie, aniGrup(g).join(', '),
+        randuri.push([g.nume, g.parteneri || '', g.categorie, g.suport ? 'da' : '',
+          aniGrup(g).join(', '),
           String(g.acte.length), frumos(dt[0]), frumos(dt[dt.length-1]),
           atinse.length + ' din ' + STEPS.length,
           ultima ? ultima.n + '. ' + ultima.cap : '', g.semnat || ''
@@ -1640,7 +1644,8 @@
       return '<tr class="act-rand">' +
         '<td class="a-nr" data-l="Act">' + esc(a.act) + '</td>' +
         '<td data-l="Categorie"><span class="tag ' + (CLS[a.categorie]||'t-alt') + '">' +
-          esc(a.categorie) + '</span></td>' +
+          esc(a.categorie) + '</span>' +
+          (a.suport ? '<span class="tag t-suport">suport bugetar</span>' : '') + '</td>' +
         '<td class="org" data-l="Partener">' + esc(a.partener || '—') + '</td>' +
         '<td data-l="Etapa">' + caps + '</td>' +
         '<td data-l="Denumire"><div class="a-tit">' + esc(a.titlu) + '</div></td>' +
@@ -1713,7 +1718,13 @@
           '<div class="pmeta">' + g.acte.length + (g.acte.length === 1 ? ' act' : ' acte') +
           ' · ultimul: ' + esc(g.ultim.data_editie) + '</div></td>' +
         '<td data-l="Categorie"><span class="tag ' + (CLS[g.categorie]||'t-alt') + '">' +
-          esc(g.categorie) + '</span></td>' +
+          esc(g.categorie) + '</span>' +
+          (g.suport ? '<span class="tag t-suport" title="Asistență transferată direct ' +
+            'într-un buget component al bugetului public național, pentru susținerea ' +
+            'reformelor agreate — HG 377/2018, anexa nr. 1, pct. 9.20¹. Nu e un instrument ' +
+            'aparte: poate fi grant, ca la Contractul de performanță pentru reforma ' +
+            'sectorială, sau împrumut, ca la Facilitatea de reformă și creștere.">' +
+            'suport bugetar</span>' : '') + '</td>' +
         '<td data-l="Etape parcurse">' + steps(g) + '</td>' +
         '<td data-l="Semnat">' + (g.semnat ? '<span class="semnat">' + esc(g.semnat) + '</span>'
           : '<span class="nil">—</span>') + '</td></tr>' +
@@ -1749,10 +1760,25 @@
     .then(function(j){ if(!j||!j.acte) throw new Error('structură neașteptată'); db = j; paint(); })
     .catch(function(e){
       app.innerHTML = '<div class="panel"><div class="empty-state">' +
-        '<strong>Registrul nu a putut fi citit</strong>Am cerut <code>' + esc(DATA_URL) +
-        '</code> și am primit: ' + esc(e.message) + '.<br><br>' +
-        'Dacă ai deschis pagina prin dublu-click, browserul blochează citirea fișierelor locale. ' +
-        'Deschide-o de pe site.</div></div>';
+        '<strong>Registrul nu a putut fi citit</strong>' +
+        (location.protocol === 'file:'
+          /* Cazul e sigur, nu probabil: adresa începe cu file:. Nu-l punem pe
+             cititor să ghicească dintr-o listă de cauze posibile — îi spunem
+             exact ce s-a întâmplat și ce are de făcut. */
+          ? 'Pagina e deschisă direct de pe disc, prin dublu-click. Browserele ' +
+            'refuză din principiu ca o pagină locală să citească alte fișiere de ' +
+            'pe disc, iar registrul stă într-un fișier separat, <code>date.json</code>.' +
+            '<br><br>Deschide pagina de pe site: ' +
+            '<a href="https://nistor.vivi.md/acorduri.html">nistor.vivi.md/acorduri.html</a>.' +
+            '<br><br>Dacă vrei totuși s-o vezi local, pornește un server în folderul ' +
+            'unde stau fișierele — <code>python3 -m http.server 8000</code> — și intră pe ' +
+            '<code>http://localhost:8000/acorduri.html</code>.'
+          : 'Am cerut <code>' + esc(DATA_URL) + '</code> și am primit: ' +
+            esc(e.message) + '.<br><br>' +
+            'Verifică dacă <code>date.json</code> se află lângă această pagină pe server. ' +
+            'Dacă mesajul de mai sus spune „Failed to fetch", cererea n-a ajuns nicăieri: ' +
+            'fie ești fără conexiune, fie ceva o blochează.') +
+        '</div></div>';
     });
 })();
 </script>

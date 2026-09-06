@@ -2,54 +2,56 @@
 
 Repository: `igornistor2013-wq/acorduri` · Site: `nistor.vivi.md`
 
-## Ce s-a schimbat
+## De urcat — trei fișiere
 
-Registrul acoperă acum **12.01.2024 – 04.09.2026**, doi ani și opt luni fără
-întrerupere: 326 de acte grupate în 92 de acorduri, de la 16 finanțatori.
-
-| Fișier | De ce se schimbă |
+| Fișier | Ce s-a schimbat |
 |---|---|
-| `date.json` | 326 de acte, cu tot 2024 integrat |
-| `monitor_watch.py` | Bank Gospodarstwa Krajowego recunoscut ca Polonia; avizele Guvernului la proiecte de lege excluse; toleranță la „Reconstrucții" scris greșit în titlurile oficiale |
-| `import_pdf.py` | data ediției luată din numele fișierului, cu coperta ca autoritate finală; ediții în mai multe volume (150a-176); ediții speciale fără număr; titluri care încep cu localitatea, respinse ca potriviri greșite |
-| `acorduri.html` | data de început a acoperirii se calculează din date, nu mai e scrisă de mână |
-| `index.html` | descărcarea IATI cere patru pagini deodată și arată progresul |
+| `date.json` | 326 de acte, 12.01.2024 – 04.09.2026. Suportul bugetar a devenit un câmp separat, nu o categorie |
+| `acorduri.html` | eticheta „suport bugetar" pe rânduri și în export; mesaj de eroare care recunoaște deschiderea prin dublu-click |
+| `monitor_watch.py` | suportul bugetar detectat ca marcaj; categoria rămâne instrumentul |
 
-Nu se schimbă și pot fi sărite: `donatori.html` și
-`.github/workflows/monitor.yml`.
+Identice cu ce e deja pe GitHub, pot fi sărite: `index.html`, `donatori.html`,
+`import_pdf.py`, `.github/workflows/monitor.yml`.
 
 ## Pașii
 
-**1. Dezarhivează.** GitHub nu despachetează arhive.
+1. **Dezarhivează.** GitHub nu despachetează arhive.
+2. Urcă cele trei fișiere: `Add file` → `Upload files`, `Commit changes`.
+3. Verifică pe `https://nistor.vivi.md/acorduri.html` cu Ctrl+F5.
 
-**2. Urcă cele cinci fișiere din rădăcină** — `date.json`, `acorduri.html`,
-`index.html`, `monitor_watch.py`, `import_pdf.py`. `Add file` →
-`Upload files`, le tragi pe toate odată, `Commit changes`.
+## Ce ar trebui să vezi
 
-**3. Verifică** pe `https://nistor.vivi.md/acorduri.html`, cu Ctrl+F5.
+92 de acorduri. Filtrul pe tip are trei valori: Împrumut 46, Grant 45,
+Asistență tehnică 1. Două rânduri poartă în plus eticheta mov
+`suport bugetar` — unul e împrumut, celălalt grant.
 
-Ar trebui să vezi 92 de acorduri, iar filtrul pe an să ofere 2024, 2025 și
-2026.
+## De ce suportul bugetar nu mai e categorie
+
+Pct. 9.20¹ din anexa nr. 1 la HG 377/2018 îl definește ca asistență
+transferată direct într-un buget component al bugetului public național. Asta
+descrie unde ajung banii, nu dacă se întorc — deci poate fi grant sau
+împrumut.
+
+Ca și categorie separată, ascundea tocmai ce contează. Facilitatea de reformă
+și creștere e suport bugetar dat ca împrumut: aveam de ales între a arăta că
+statul are de rambursat și a arăta că banii intră direct în buget. Ca marcaj,
+se arată amândouă.
+
+Contractul de performanță pentru reforma sectorială cu Comisia Europeană e
+grant cu marcaj; Facilitatea de reformă și creștere e împrumut cu marcaj.
 
 ## Despre `date.json`
 
-Conține și actul colectat de automatizare pe 4 septembrie — un ordin privind
-amendamentul la acordul cu FICR. L-am preluat de pe GitHub și l-am unit cu
-importul din arhivele 2024, ca să nu se piardă la suprascriere. Am păstrat de
-la workflow și lista edițiilor văzute, și ora ultimei rulări.
+E construit pornind de la fișierul de pe GitHub, ca să păstreze actul colectat
+de automatizare pe 4 septembrie. Am recalculat categoriile, partenerii și
+marcajul cu regulile curente. Niciun act fără partener, niciun gol în șirul
+edițiilor.
 
-În șirul edițiilor nu există goluri.
+## Ce a rămas
 
-## Ce a rămas de făcut
+Semnele de întrebare din coloana etapelor sunt acordurile începute înainte de
+12 ianuarie 2024. Se închid cu arhivele din 2023.
 
-Semnele de întrebare din coloana etapelor au scăzut de la 50 la 38 — sunt
-acordurile începute înainte de 12 ianuarie 2024. Se închid doar cu arhivele
-din 2023.
-
-Linkurile din registru duc în majoritate la căutarea generală a Monitorului,
-nu la ediția exactă, fiindcă actele au venit din PDF-uri. Se repară rulând
-local:
-
-    python3 monitor_watch.py --backfill 3000 3311
-
-apoi urcând `date.json` rezultat.
+Linkurile duc în majoritate la căutarea generală a Monitorului, nu la ediția
+exactă, fiindcă actele au venit din PDF-uri. Se repară rulând local
+`python3 monitor_watch.py --backfill 3000 3311` și urcând `date.json`.
