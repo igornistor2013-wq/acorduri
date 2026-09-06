@@ -1,65 +1,55 @@
 # Ce se urcă pe GitHub
 
-Repository: `igornistor2013-wq/acorduri`
+Repository: `igornistor2013-wq/acorduri` · Site: `nistor.vivi.md`
 
 ## Ce s-a schimbat
 
-Paginile și-au schimbat rolurile:
+Registrul acoperă acum **12.01.2024 – 04.09.2026**, doi ani și opt luni fără
+întrerupere: 326 de acte grupate în 92 de acorduri, de la 16 finanțatori.
 
-| Fișier | Ce e acum | Înainte |
-|---|---|---|
-| `index.html` | pagina de donatori și proiecte — **pagina principală** | era registrul de acorduri |
-| `acorduri.html` | registrul de acorduri | se numea `index.html` |
-| `donatori.html` | doar o redirecționare către `index.html` | era pagina de donatori |
-
-Adresa scurtă `igornistor2013-wq.github.io/acorduri/` deschide de acum
-pagina de donatori.
-
-## Fișierele din arhivă
-
-| Fișier | Unde |
+| Fișier | De ce se schimbă |
 |---|---|
-| `index.html` | rădăcină — 3,6 MB, e fosta pagină de donatori |
-| `acorduri.html` | rădăcină — registrul, cu legăturile rescrise |
-| `donatori.html` | rădăcină — redirecționare, ca linkurile vechi să nu moară |
-| `date.json` | rădăcină — 194 de acte, preluat de pe GitHub, cu actul colectat pe 2 septembrie |
-| `monitor_watch.py` | rădăcină |
-| `import_pdf.py` | rădăcină |
-| `.github/workflows/monitor.yml` | `.github/workflows/` — neschimbat, îl poți sări |
+| `date.json` | 326 de acte, cu tot 2024 integrat |
+| `monitor_watch.py` | Bank Gospodarstwa Krajowego recunoscut ca Polonia; avizele Guvernului la proiecte de lege excluse; toleranță la „Reconstrucții" scris greșit în titlurile oficiale |
+| `import_pdf.py` | data ediției luată din numele fișierului, cu coperta ca autoritate finală; ediții în mai multe volume (150a-176); ediții speciale fără număr; titluri care încep cu localitatea, respinse ca potriviri greșite |
+| `acorduri.html` | data de început a acoperirii se calculează din date, nu mai e scrisă de mână |
+| `index.html` | descărcarea IATI cere patru pagini deodată și arată progresul |
+
+Nu se schimbă și pot fi sărite: `donatori.html` și
+`.github/workflows/monitor.yml`.
 
 ## Pașii
 
-**1. Dezarhivează.** GitHub nu despachetează arhive; dacă urci `.zip`-ul ca
-atare, rămâne un fișier inutil în repo.
+**1. Dezarhivează.** GitHub nu despachetează arhive.
 
-**2. Urcă cele șase fișiere din rădăcină.** `Add file` → `Upload files`, le
-tragi pe toate odată, `Commit changes`. Suprascrierea celor existente e normală
-și așteptată — `index.html` și `donatori.html` se înlocuiesc complet.
+**2. Urcă cele cinci fișiere din rădăcină** — `date.json`, `acorduri.html`,
+`index.html`, `monitor_watch.py`, `import_pdf.py`. `Add file` →
+`Upload files`, le tragi pe toate odată, `Commit changes`.
 
-**3. Verifică.** După un minut, deschide
-`https://igornistor2013-wq.github.io/acorduri/` cu Ctrl+F5.
+**3. Verifică** pe `https://nistor.vivi.md/acorduri.html`, cu Ctrl+F5.
 
-Ar trebui să vezi pagina de donatori, cu 7,57 mld EUR angajamente. Butonul
-„Acorduri →" din antet duce la registru, cu 66 de acorduri. Din registru,
-butonul „Donatori și proiecte →" te aduce înapoi, iar în orice rând deschis
-linkul „Vezi proiectele și sumele …" deschide pagina de donatori filtrată pe
-acel finanțator.
+Ar trebui să vezi 92 de acorduri, iar filtrul pe an să ofere 2024, 2025 și
+2026.
 
-Vechea adresă `…/acorduri/donatori.html` redirecționează automat, deci
-scurtătura ta de pe desktop continuă să meargă.
+## Despre `date.json`
 
-## De ce e inclus `date.json`
+Conține și actul colectat de automatizare pe 4 septembrie — un ordin privind
+amendamentul la acordul cu FICR. L-am preluat de pe GitHub și l-am unit cu
+importul din arhivele 2024, ca să nu se piardă la suprascriere. Am păstrat de
+la workflow și lista edițiilor văzute, și ora ultimei rulări.
 
-Nu e o versiune de-a mea: e chiar cel de pe GitHub, cu 194 de acte. L-am luat
-de acolo fiindcă workflow-ul a rulat pe 2 septembrie și a colectat un act nou —
-un ordin privind acordul de colaborare cu PNUD. Dacă aș fi pus copia mea, de pe
-27 august, actul acela s-ar fi pierdut.
+În șirul edițiilor nu există goluri.
 
-L-am verificat cu regulile curente: categoria și partenerul sunt corecte, iar
-în șirul edițiilor nu există goluri.
+## Ce a rămas de făcut
 
-## Dacă vrei un link și mai scurt
+Semnele de întrebare din coloana etapelor au scăzut de la 50 la 38 — sunt
+acordurile începute înainte de 12 ianuarie 2024. Se închid doar cu arhivele
+din 2023.
 
-Un domeniu propriu se configurează din repo → `Settings` → `Pages` → caseta
-`Custom domain`. Nu cere nicio modificare în fișiere: paginile se leagă între
-ele prin căi relative, deci merg pe orice domeniu.
+Linkurile din registru duc în majoritate la căutarea generală a Monitorului,
+nu la ediția exactă, fiindcă actele au venit din PDF-uri. Se repară rulând
+local:
+
+    python3 monitor_watch.py --backfill 3000 3311
+
+apoi urcând `date.json` rezultat.

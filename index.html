@@ -5329,21 +5329,38 @@ async function iatiFetchPage(offset){
 }
 
 async function iatiFetchFresh(){
-  const all = [];
-  const firstRows = await iatiFetchPage(0);
-  all.push(...firstRows);
+  /* Serverul plafonează răspunsul la 100 de rânduri, indiferent cât cerem prin
+     „limit" — e limita implicită documentată a API-ului Q. Pentru cele circa
+     3.000 de activități ale Moldovei asta înseamnă vreo 30 de cereri. Făcute
+     una după alta, cu latența reală a d-portal, pagina stă zeci de secunde cu
+     mesajul „se descarcă" și pare pur și simplu blocată.
 
+     Cerem câte patru pagini deodată, ceea ce taie timpul de aproape patru ori
+     fără să împovărăm serverul, și scriem progresul pe ecran, ca să se vadă că
+     lucrează. Varianta veche, care se oprea după prima pagină, părea rapidă
+     doar fiindcă aducea 100 de activități din 3.000. */
+  const PARALEL = 4;
+
+  const firstRows = await iatiFetchPage(0);
+  const all = firstRows.slice();
   const step = firstRows.length;          // pasul real, onorat de server
-  if(step > 0 && step >= firstRows.length){
-    let offset = step, page = 1;
-    while(true){
-      const rows = await iatiFetchPage(offset);
-      all.push(...rows);
-      page++;
-      if(rows.length < step) break;                        // ultima pagină
-      if(page >= IATI_SAFETY_MAX_PAGES){ IATI_TRUNCATED = true; break; }
-      offset += step;
+
+  if(step > 0){
+    let offset = step, pagini = 1, gata = false;
+    while(!gata && pagini < IATI_SAFETY_MAX_PAGES){
+      const cereri = [];
+      for(let k = 0; k < PARALEL; k++) cereri.push(iatiFetchPage(offset + k * step));
+      const rezultate = await Promise.all(cereri);
+      for(const rows of rezultate){
+        all.push(...rows);
+        if(rows.length < step) gata = true;   // am depășit capătul listei
+      }
+      offset += PARALEL * step;
+      pagini += PARALEL;
+      iatiSetStatus('Se descarcă activitățile IATI pentru Moldova… ' +
+        all.length.toLocaleString(t('localeTag')) + ' până acum', 'info');
     }
+    if(pagini >= IATI_SAFETY_MAX_PAGES) IATI_TRUNCATED = true;
   }
   /* Interogarea include acum și tabelul de sectoare (join „act,country,sector"),
      ca la pagina d-portal să putem arăta repartiția pe sectoare DAC. Efectul unui

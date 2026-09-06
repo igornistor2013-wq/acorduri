@@ -136,10 +136,17 @@ ITEM_PDF = re.compile(
 # înghite începutul intrării următoare din cuprins.
 GUNOI = re.compile(
     r"monitorul\.gov\.md|ISSN|MOLDPRES|PARTEA\s+[IVX]+"
-    r"|\b\d{2,4}\.\s+(?:Decret|Lege|Hotărâre|Ordin|Decizie|Aviz|Dispozi)",
+    r"|\b\d{2,4}\.\s+(?:Decret|Lege|Hotărâre|Ordin|Decizie|Aviz|Dispozi)"
+    # O denumire de act nu începe cu localitatea și data semnării — „Chişinău,
+    # 20 martie 2024. Aprobat prin…". Când apare așa, potrivirea a pornit din
+    # subsolul unui act și a înghițit începutul următorului.
+    r"|^Chi[şs]in[ăa]u,\s*\d",
     re.I)
 
-NR_EDITIE = re.compile(r"Nr\.\s*(\d{1,4}(?:\s*[-–]\s*\d{1,4})?)")
+# Numărul ediției poate purta o literă când ediția apare în mai multe volume:
+# „Nr. 150a-176", „Nr. 150b-176". Fără litera aia, toate cele șapte volume
+# ale ediției din 13 aprilie 2024 apăreau identic, ca „150".
+NR_EDITIE = re.compile(r"Nr\.\s*(\d{1,4}[a-z]?(?:\s*[-–]\s*\d{1,4})?)")
 DATA_EDITIE = re.compile(r"din\s+(\d{1,2})\.(\d{2})\.(\d{4})")
 DATA_COPERTA = re.compile(
     r"(\d{1,2})\s+(ianuarie|februarie|martie|aprilie|mai|iunie|iulie|august|"
@@ -158,17 +165,45 @@ def meta_editie(text, nume_fisier, nr_la_id=None):
 
     m = NR_EDITIE.search(cap)
     nr = re.sub(r"\s*[-–]\s*", "-", m.group(1)) if m else ""
+    # Edițiile speciale n-au număr — poartă un singur document, de obicei un
+    # plan sau o strategie. Le dăm o etichetă, ca actul din ele să nu ajungă în
+    # registru cu ediția „?".
+    if not nr and re.search(r"edi[țt]ie\s+special", cap, re.I):
+        nr = "ediție specială"
+
+    # Ordinea surselor pentru dată contează. Coperta scrie data în litere —
+    # „Miercuri, 13 noiembrie 2024" — deci tiparul numeric „din DD.MM.YYYY" nu
+    # găsește nimic acolo și continuă să caute în restul textului, unde nimerește
+    # prima citare de lege. Ediția nr. 466 din 13.11.2024 ajunsese astfel datată
+    # 29.07.1994, anul legii citate în primul act.
+    #
+    # Luăm întâi data din numele fișierului, care în arhivele Monitorului e chiar
+    # data ediției și nu poate fi confundată cu altceva; apoi forma în litere de
+    # pe copertă; abia la urmă cea numerică din text.
+    # Data de pe copertă, scrisă în litere. E cea mai de încredere: apare o
+    # singură dată, în antetul ediției, și nu poate fi confundată cu o citare.
+    coperta = ""
+    m = DATA_COPERTA.search(cap)
+    if m:
+        luna = mw.MONTHS.get(mw.norm(m.group(2)), 0)
+        if luna:
+            coperta = f"{int(m.group(1)):02d}.{luna:02d}.{m.group(3)}"
 
     data = ""
-    m = DATA_EDITIE.search(cap)
+    m = re.search(r"(\d{1,2})\.(\d{2})\.(\d{4})", os.path.basename(nume_fisier))
     if m:
         data = f"{int(m.group(1)):02d}.{m.group(2)}.{m.group(3)}"
-    else:
-        m = DATA_COPERTA.search(cap)
+        # Numele fișierelor sunt scrise de om și conțin greșeli: în arhiva pe
+        # 2024 există „din 31.07.2924" și „din 02.08.2023" pentru ediții din
+        # 2024. Când coperta spune altceva, coperta are dreptate.
+        if coperta and coperta != data:
+            data = coperta
+    if not data:
+        data = coperta
+    if not data:
+        m = DATA_EDITIE.search(cap)
         if m:
-            luna = mw.MONTHS.get(mw.norm(m.group(2)), 0)
-            if luna:
-                data = f"{int(m.group(1)):02d}.{luna:02d}.{m.group(3)}"
+            data = f"{int(m.group(1)):02d}.{m.group(2)}.{m.group(3)}"
 
     # Cel mai sigur ID: cel pe care îl știm deja din registru pentru acest număr
     # de ediție, pus acolo de colectarea de pe site.

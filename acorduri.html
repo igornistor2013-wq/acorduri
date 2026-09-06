@@ -973,6 +973,11 @@
      Acordul propriu-zis intră în vigoare mai târziu, după schimbul
      instrumentelor. Data aia nu e deductibilă din cuprinsul Monitorului, deci
      nu o inventăm — scriem explicit la ce se referă data afișată. */
+  /* Prima zi acoperită de registru. Era scrisă de mână în explicație — „ianuarie
+     2025" — și a devenit falsă în clipa în care am importat 2024. O calculăm din
+     date, ca să rămână adevărată oricâte arhive s-ar mai adăuga. */
+  var PRIMA_DATA = '';
+
   function inVigoareDin(g){
     var lege = null, ordin = null;
     g.acte.forEach(function(a){
@@ -1030,7 +1035,9 @@
       var titlu = nuSeAplica
         ? 'Nu se aplică: acordul a fost aprobat prin hotărâre de Guvern (HG 442/2015, pct. 169)'
         : necunoscut
-          ? 'Etapă parcursă obligatoriu, dar fără act în registru — probabil publicată înainte de perioada acoperită'
+          ? 'Etapă parcursă obligatoriu, dar fără act în registru — publicată cel mai ' +
+            'probabil înainte de ' + (PRIMA_DATA || 'perioada acoperită') +
+            ', de când începe acoperirea'
           : s.ref;
       return '<div class="' + cls + '" title="' + esc(titlu) + '"><span class="bead">' +
         (on ? '✓' : nuSeAplica ? '–' : necunoscut ? '?' : s.n) + '</span>' +
@@ -1153,6 +1160,9 @@
     citesteURL();          // filtrele din link, înainte de a desena butoanele
     var acte = Object.keys(db.acte||{}).map(function(k){ return db.acte[k]; });
     var grupuri = grupeaza(acte);
+    var dt = acte.map(ord).filter(function(x){ return x !== '0'; }).sort();
+    PRIMA_DATA = dt.length
+      ? dt[0].slice(6,8) + '.' + dt[0].slice(4,6) + '.' + dt[0].slice(0,4) : '';
 
     /* Golurile din șirul edițiilor se văd și pe pagină, nu doar în jurnalul
        rulării. O ediție necitită înseamnă acte care lipsesc din registru, iar

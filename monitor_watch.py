@@ -161,14 +161,17 @@ EXCLUDE = [
     # despre execuția banilor, nu sunt acorduri — registrul urmărește acorduri
     r"raport(?:ul|ului)?\s+de\s+audit",
     r"raportul\s+auditului",
+    # avizele Guvernului la proiecte de lege — opinii, nu acorduri
+    r"\baviz\b\s+la\s+proiectul\s+de\s+lege",
 ]
 
 # Partenerii externi recunoscuți, pentru coloana „Partener".
 # Tiparele se aplică tot pe text normalizat (fără diacritice), ca să prindem și
 # „Asociaţia" cu ş-cedilă, și „Asociația" cu ș-virgulă — în Monitor apar ambele.
 PARTNERS = [
-    (r"\bbird\b|banca internationala pentru reconstructie", "BIRD"),
-    (r"\bberd\b|banca europeana pentru reconstructie", "BERD"),
+    # În titlurile oficiale apare și forma greșită „pentru Reconstrucții".
+    (r"\bbird\b|banca internationala pentru reconstructi", "BIRD"),
+    (r"\bberd\b|banca europeana pentru reconstructi", "BERD"),
     (r"\bbei\b|banca europeana de investitii", "BEI"),
     (r"\baid\b|asociatia internationala pentru dezvoltare", "AID"),
     (r"banca mondiala|grupul bancii mondiale", "Banca Mondială"),
@@ -201,7 +204,9 @@ PARTNERS = [
     (r"guvernul romaniei", "România"),
     (r"guvernul elvetiei|confederatiei elvetiene", "Elveția"),
     (r"\bsida\b|guvernul suediei", "Suedia"),
-    (r"guvernul poloniei", "Polonia"),
+    # Bank Gospodarstwa Krajowego e banca de dezvoltare a Poloniei; apare în
+    # titluri sub denumirea poloneză, fără traducere.
+    (r"guvernul poloniei|bank gospodarstwa krajowego|\bbgk\b", "Polonia"),
     (r"guvernul turciei|\btika\b", "Turcia"),
     (r"guvernul regatului belgiei|guvernul belgiei", "Belgia"),
     (r"\bswedfund\b", "Suedia"),
