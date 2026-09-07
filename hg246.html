@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HG 246 — proiecte expirate</title>
+<style>
+  :root{
+    --bg:#ffffff;--panel:#ffffff;--line:#e4e7ef;--line-strong:#c9ceda;
+    --ink:#1c2230;--ink-dim:#6b7284;--navy:#22406b;--navy-deep:#16294a;
+    --blue-bg:#eaf0fb;--gold:#c8871a;--gold-bg:#fdf1dc;--red:#c0402c;--red-bg:#fbe8e3;
+    --green-bg:#e6f4ea;--green-ink:#276c3e;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,monospace;
+    --radius:10px;--shadow:0 1px 2px rgba(20,30,60,.04), 0 4px 14px rgba(20,30,60,.05);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 22px 60px}
+
+  .top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+    padding-bottom:22px;margin-bottom:24px;border-bottom:1px solid var(--line-strong)}
+  .title-row{display:flex;align-items:center;gap:13px}
+  .logo-badge{width:38px;height:38px;border-radius:9px;flex:none;
+    background:linear-gradient(135deg,var(--navy),#2f5691);display:flex;align-items:center;justify-content:center}
+  .logo-badge svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.1}
+  h1{font-weight:800;font-size:clamp(24px,3vw,34px);line-height:1.12;margin:0;
+    color:var(--navy-deep);letter-spacing:-.015em}
+  .top-sub{margin:9px 0 0;color:var(--ink-dim);font-size:13.5px;max-width:62ch}
+  .navbtns{display:flex;flex-wrap:wrap;gap:10px}
+  .navbtn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;border-radius:var(--radius);
+    padding:11px 18px;font-size:14px;font-weight:800;white-space:nowrap;border:1.5px solid var(--navy);
+    background:#fff;color:var(--navy);transition:background .2s,color .2s}
+  .navbtn:hover{background:var(--navy);color:#fff}
+  .navbtn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+    padding:14px 18px;border-bottom:1px solid var(--line)}
+  h2{font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);margin:0;font-weight:700}
+  .panel-body{padding:18px}
+
+  .zona{border:2px dashed var(--line-strong);border-radius:var(--radius);padding:34px 20px;
+    text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+  .zona:hover,.zona.peste{border-color:var(--navy);background:var(--blue-bg)}
+  .zona strong{display:block;font-size:15px;color:var(--navy-deep);margin-bottom:6px}
+  .zona span{font-size:12.5px;color:var(--ink-dim)}
+  .zona input{display:none}
+
+  .stare{font-size:12.5px;color:var(--ink-dim);margin-top:14px;min-height:20px}
+  .stare.err{color:var(--red)}
+  .stare.ok{color:var(--green-ink);font-weight:600}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+  @media (max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px 18px}
+  .kpi .lbl{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-dim);
+    font-weight:700;margin-bottom:7px}
+  .kpi .val{font-size:26px;font-weight:800;color:var(--navy-deep);line-height:1}
+  .kpi .sub{font-size:11.5px;color:var(--ink-dim);margin-top:6px;font-family:var(--mono)}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;border:none;
+    border-radius:7px;padding:11px 20px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+  .btn:hover{background:var(--navy-deep)}
+  .btn:disabled{background:var(--line-strong);cursor:not-allowed}
+  .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .tbl-scroll{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;min-width:820px}
+  th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;
+    text-align:left;padding:11px 14px;border-bottom:1px solid var(--line-strong);background:#fbfcfe;white-space:nowrap}
+  td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;font-size:13px}
+  tbody tr:last-child td{border-bottom:none}
+  .c-id{font-family:var(--mono);font-size:11.5px;color:var(--navy);white-space:nowrap}
+  .c-data{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--red);white-space:nowrap}
+  .sursa{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap}
+  .s-live{background:var(--green-bg);color:var(--green-ink)}
+  .s-arh{background:var(--blue-bg);color:var(--navy)}
+  .nil{color:var(--line-strong)}
+  .footer-source{border-top:1px solid var(--line);padding-top:16px;margin-top:8px;
+    font-size:12px;color:var(--ink-dim);max-width:84ch}
+  .footer-nav{display:flex;gap:22px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+  .footer-nav a{font-size:12.5px;font-weight:700;color:var(--navy);text-decoration:none}
+  .footer-nav a:hover{color:var(--gold);text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <div class="title-row">
+        <div class="logo-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+        </div>
+        <h1>HG 246 — proiecte expirate</h1>
+      </div>
+      <p class="top-sub">Încarcă anexa nr. 1 la Hotărârea Guvernului nr. 246/2010. Fiecare proiect
+        din listă e căutat după numărul de înregistrare în Platforma pentru gestionarea asistenței
+        externe, iar cele a căror dată de finalizare a trecut sunt extrase într-un document Word cu
+        aceeași structură, plus o coloană nouă cu data de finalizare.</p>
+    </div>
+    <div class="navbtns">
+      <a class="navbtn" href="index.html">Donatori și proiecte</a>
+      <a class="navbtn" href="acorduri.html">Acorduri</a>
+    </div>
+  </header>
+
+  <div class="panel">
+    <div class="panel-head"><h2>1. Documentul de comparat</h2>
+      <span class="stare" id="stareDate">Se încarcă baza de proiecte…</span></div>
+    <div class="panel-body">
+      <label class="zona" id="zona">
+        <strong>Trage aici anexa în format Word, sau apasă ca s-o alegi</strong>
+        <span>Fișier .docx — lista proiectelor de asistență tehnică în derulare</span>
+        <input type="file" id="fisier" accept=".docx">
+      </label>
+      <div class="stare" id="stare"></div>
+    </div>
+  </div>
+
+  <div id="rezultat"></div>
+
+  <div class="footer-source">
+    Comparația se face după numărul de înregistrare din coloana a doua a anexei, care este
+    identificatorul proiectului în Platforma pentru gestionarea asistenței externe. Se caută în
+    două surse: raportul live al platformei și arhiva încorporată, care acoperă perioada
+    1993–2022. Când proiectul apare în amândouă, câștigă datele live. Un proiect e considerat
+    expirat dacă data lui de finalizare a trecut; proiectele fără dată de finalizare în platformă
+    nu sunt incluse, fiindcă absența datei nu înseamnă că proiectul s-a încheiat.
+    <nav class="footer-nav">
+      <a href="index.html">← Donatori și proiecte</a>
+      <a href="acorduri.html">Acorduri</a>
+    </nav>
+  </div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+const W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+const AMP_PROXY = 'https://amp.vivi.md';
+const AMP_REPORT = 661;
+
+let BAZA = null;         // id -> {t, d, ds, de, src}
+let DOC_BYTES = null;    // documentul încărcat, ca să-l putem rescrie
+
+const stareDate = document.getElementById('stareDate');
+const stare = document.getElementById('stare');
+const rezultat = document.getElementById('rezultat');
+
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ================================================================= ZIP
+
+   Un .docx e o arhivă ZIP. Citim intrările desfăcând directorul central și
+   decomprimând cu DecompressionStream, care e în browser de câțiva ani — așa
+   evităm o bibliotecă externă de care pagina ar depinde pe termen lung.
+   Scriem înapoi cu metoda „stocat", fără compresie, pe care Word o acceptă. */
+
+const CRC = (function(){
+  const t = new Uint32Array(256);
+  for(let i=0;i<256;i++){ let c=i; for(let k=0;k<8;k++) c = (c&1) ? (0xEDB88320^(c>>>1)) : (c>>>1); t[i]=c>>>0; }
+  return t;
+})();
+function crc32(u8){
+  let c = 0xFFFFFFFF;
+  for(let i=0;i<u8.length;i++) c = CRC[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+async function inflateRaw(u8){
+  const ds = new DecompressionStream('deflate-raw');
+  const stream = new Blob([u8]).stream().pipeThrough(ds);
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function citesteZip(buf){
+  const dv = new DataView(buf), u8 = new Uint8Array(buf);
+  let eocd = -1;
+  for(let i = buf.byteLength - 22; i >= 0 && i > buf.byteLength - 66000; i--)
+    if(dv.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+  if(eocd < 0) throw new Error('fișierul nu pare o arhivă ZIP validă');
+
+  const nrIntrari = dv.getUint16(eocd + 10, true);
+  let p = dv.getUint32(eocd + 16, true);
+  const fisiere = {};
+  const dec = new TextDecoder();
+
+  for(let i = 0; i < nrIntrari; i++){
+    if(dv.getUint32(p, true) !== 0x02014b50) throw new Error('director central corupt');
+    const metoda   = dv.getUint16(p + 10, true);
+    const lenNume  = dv.getUint16(p + 28, true);
+    const lenExtra = dv.getUint16(p + 30, true);
+    const lenCom   = dv.getUint16(p + 32, true);
+    const offset   = dv.getUint32(p + 42, true);
+    const nume     = dec.decode(u8.subarray(p + 46, p + 46 + lenNume));
+
+    const lnLenNume  = dv.getUint16(offset + 26, true);
+    const lnLenExtra = dv.getUint16(offset + 28, true);
+    const start = offset + 30 + lnLenNume + lnLenExtra;
+    const compr = dv.getUint32(p + 20, true);
+    fisiere[nume] = { metoda, date: u8.subarray(start, start + compr) };
+    p += 46 + lenNume + lenExtra + lenCom;
+  }
+
+  const out = {};
+  for(const nume of Object.keys(fisiere)){
+    const f = fisiere[nume];
+    out[nume] = f.metoda === 0 ? f.date : await inflateRaw(f.date);
+  }
+  return out;
+}
+
+function scrieZip(fisiere){
+  const enc = new TextEncoder(), parti = [], central = [];
+  let offset = 0;
+  const u16 = n => [n & 255, (n >>> 8) & 255];
+  const u32 = n => [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
+
+  for(const nume of Object.keys(fisiere)){
+    const numeB = enc.encode(nume);
+    const date  = fisiere[nume];
+    const c = crc32(date);
+    const local = [].concat([0x50,0x4B,0x03,0x04], u16(20), u16(0), u16(0), u16(0), u16(0),
+      u32(c), u32(date.length), u32(date.length), u16(numeB.length), u16(0));
+    parti.push(new Uint8Array(local), numeB, date);
+    central.push({ numeB, crc: c, len: date.length, off: offset });
+    offset += local.length + numeB.length + date.length;
+  }
+
+  const cd = []; let cdLen = 0;
+  for(const e of central){
+    const h = [].concat([0x50,0x4B,0x01,0x02], u16(20), u16(20), u16(0), u16(0), u16(0), u16(0),
+      u32(e.crc), u32(e.len), u32(e.len), u16(e.numeB.length),
+      u16(0), u16(0), u16(0), u16(0), u32(0), u32(e.off));
+    cd.push(new Uint8Array(h), e.numeB);
+    cdLen += h.length + e.numeB.length;
+  }
+  const eocd = new Uint8Array([].concat([0x50,0x4B,0x05,0x06], u16(0), u16(0),
+    u16(central.length), u16(central.length), u32(cdLen), u32(offset), u16(0)));
+
+  const toate = parti.concat(cd, [eocd]);
+  const total = toate.reduce((s,x)=>s+x.length, 0);
+  const out = new Uint8Array(total);
+  let poz = 0;
+  for(const x of toate){ out.set(x, poz); poz += x.length; }
+  return out;
+}
+
+/* ================================================== documentul Word */
+
+const el = (nod, nume) => [...nod.children].filter(c => c.localName === nume);
+const textul = nod => [...nod.getElementsByTagNameNS(W, 't')].map(t => t.textContent).join('');
+
+function clasificaRand(tr){
+  const celule = el(tr, 'tc');
+  const texte = celule.map(textul);
+  const id = (texte[1] || '').replace(/\s/g, '');
+  if(/^\d{10,15}$/.test(id)) return { tip: 'proiect', id: id, celule: celule, texte: texte };
+  // Rândurile de secțiune poartă numele țării sau al finanțatorului pe toată
+  // lățimea tabelului: o singură celulă, sau restul goale.
+  if(celule.length <= 1 || texte.slice(1).every(t => !t.trim()))
+    return { tip: 'sectiune', celule: celule, texte: texte };
+  return { tip: 'antet', celule: celule, texte: texte };
+}
+
+function celulaNoua(model, text){
+  /* Clonăm o celulă existentă în loc să construim una nouă: așa moștenim
+     bordurile, fontul și aliniereaformatării originale, fără să le descriem noi.
+     Ștergem doar textul și eventualul gridSpan, ca să ocupe o singură coloană. */
+  const tc = model.cloneNode(true);
+  const pr = el(tc, 'tcPr')[0];
+  if(pr) for(const gs of el(pr, 'gridSpan')) pr.removeChild(gs);
+
+  const paragrafe = el(tc, 'p');
+  for(let i = 1; i < paragrafe.length; i++) tc.removeChild(paragrafe[i]);
+  const p = paragrafe[0];
+  if(!p) return tc;
+  for(const r of el(p, 'r')) p.removeChild(r);
+
+  const doc = tc.ownerDocument;
+  const r = doc.createElementNS(W, 'w:r');
+  const t = doc.createElementNS(W, 'w:t');
+  t.setAttribute('xml:space', 'preserve');
+  t.textContent = text;
+  r.appendChild(t);
+  p.appendChild(r);
+  return tc;
+}
+
+function filtreazaDocument(xmlText, pastreaza, dataPentru){
+  const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+  if(doc.getElementsByTagName('parsererror').length)
+    throw new Error('document.xml nu a putut fi analizat');
+
+  const tbl = doc.getElementsByTagNameNS(W, 'tbl')[0];
+  if(!tbl) throw new Error('documentul nu conține niciun tabel');
+
+  const randuri = el(tbl, 'tr');
+  const info = randuri.map(clasificaRand);
+
+  /* Un rând de secțiune rămâne doar dacă are sub el măcar un proiect păstrat.
+     Altfel documentul s-ar umple de titluri de țară fără nimic dedesubt. */
+  const deTinut = new Array(randuri.length).fill(false);
+  for(let i = 0; i < randuri.length; i++){
+    const t = info[i].tip;
+    if(t === 'antet') deTinut[i] = true;
+    else if(t === 'proiect') deTinut[i] = pastreaza(info[i].id);
+  }
+  for(let i = 0; i < randuri.length; i++){
+    if(info[i].tip !== 'sectiune') continue;
+    for(let j = i + 1; j < randuri.length && info[j].tip !== 'sectiune'; j++)
+      if(info[j].tip === 'proiect' && deTinut[j]){ deTinut[i] = true; break; }
+  }
+
+  // coloană nouă în grila tabelului
+  const grid = el(tbl, 'tblGrid')[0];
+  if(grid){
+    const col = doc.createElementNS(W, 'w:gridCol');
+    col.setAttribute('w:w', '1400');
+    grid.appendChild(col);
+  }
+
+  let antetScris = false;
+  for(let i = 0; i < randuri.length; i++){
+    const tr = randuri[i], nfo = info[i];
+    if(!deTinut[i]){ tbl.removeChild(tr); continue; }
+
+    if(nfo.tip === 'sectiune'){
+      /* Titlurile de secțiune se întind pe tot tabelul printr-un gridSpan;
+         îl mărim cu unu în loc să adăugăm o celulă, ca să rămână întinse. */
+      let marit = false;
+      for(const tc of nfo.celule){
+        const pr = el(tc, 'tcPr')[0];
+        const gs = pr && el(pr, 'gridSpan')[0];
+        if(gs){ gs.setAttribute('w:val', String(parseInt(gs.getAttribute('w:val'), 10) + 1)); marit = true; }
+      }
+      if(!marit && nfo.celule.length)
+        tr.appendChild(celulaNoua(nfo.celule[nfo.celule.length - 1], ''));
+      continue;
+    }
+
+    const model = nfo.celule[nfo.celule.length - 1];
+    if(!model) continue;
+    if(nfo.tip === 'antet'){
+      // Primul rând de antet primește denumirea coloanei, al doilea numărul ei.
+      tr.appendChild(celulaNoua(model, antetScris ? '7' : 'Data de finalizare'));
+      antetScris = true;
+    } else {
+      tr.appendChild(celulaNoua(model, dataPentru(nfo.id)));
+    }
+  }
+
+  return new XMLSerializer().serializeToString(doc);
+}
+
+/* ============================================================== date */
+
+function dataDinAmp(s){
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(s || '').trim());
+  return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null;
+}
+
+async function incarcaBaza(){
+  const baza = new Map();
+
+  // arhiva încorporată — sigură, locală, fără dependențe
+  try{
+    const res = await fetch('amp-arhiva.json', { cache: 'no-cache' });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    for(const p of await res.json())
+      baza.set(String(p.id), { t: p.t, d: p.d || [], ds: p.ds, de: p.de, src: 'arhivă' });
+  }catch(e){
+    stareDate.className = 'stare err';
+    stareDate.textContent = 'Arhiva de proiecte nu a putut fi citită: ' + e.message;
+  }
+
+  // raportul live — dacă nu răspunde, arhiva rămâne suficientă ca să lucrezi
+  let live = 0;
+  try{
+    stareDate.className = 'stare';
+    stareDate.textContent = 'Arhivă: ' + baza.size + ' proiecte. Se descarcă raportul live…';
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 25000);
+    const res = await fetch(AMP_PROXY + '/rest/data/saikureport/export/csv/' + AMP_REPORT + '?language=ro', {
+      method: 'POST', signal: ctrl.signal,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'query=' + encodeURIComponent(JSON.stringify({
+        name: 'spa-export',
+        queryModel: { filters: {}, filtersApplied: true, settingsApplied: false, page: 1 },
+        queryType: 'OLAP', type: 'QUERYMODEL',
+        parameters: {}, plugins: {}, properties: {}, metadata: {},
+        querySettings: { info: ['generatedHeaders'] }
+      }))
+    });
+    clearTimeout(t);
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    for(const p of parseCsvAmp(await res.text())){
+      baza.set(p.id, { t: p.t, d: p.d, ds: p.ds, de: p.de, src: 'live' });
+      live++;
+    }
+  }catch(e){
+    stareDate.className = 'stare';
+    stareDate.innerHTML = 'Arhivă: <b>' + baza.size + '</b> proiecte. ' +
+      'Raportul live nu a răspuns (' + esc(e.message) + ') — se lucrează doar cu arhiva, ' +
+      'care acoperă până în 2022.';
+    return baza;
+  }
+
+  stareDate.className = 'stare ok';
+  stareDate.innerHTML = 'Bază pregătită: <b>' + baza.size + '</b> proiecte — ' +
+    live + ' din raportul live, restul din arhivă.';
+  return baza;
+}
+
+/* Analizăm CSV-ul cu aceleași denumiri de coloane pe care le folosește pagina
+   de donatori, în ambele limbi în care platforma poate exporta. */
+function parseCsvAmp(text){
+  text = text.replace(/^\uFEFF/, '');
+  const primaLinie = text.split(/\r\n|\n/, 1)[0] || '';
+  const delim = (primaLinie.match(/;/g) || []).length >= (primaLinie.match(/,/g) || []).length ? ';' : ',';
+
+  const randuri = []; let rand = [], cur = '', inGhilimele = false;
+  for(let i = 0; i < text.length; i++){
+    const c = text[i];
+    if(inGhilimele){
+      if(c === '"'){ if(text[i+1] === '"'){ cur += '"'; i++; } else inGhilimele = false; }
+      else cur += c;
+    } else if(c === '"') inGhilimele = true;
+    else if(c === delim){ rand.push(cur); cur = ''; }
+    else if(c === '\n'){ rand.push(cur); randuri.push(rand); rand = []; cur = ''; }
+    else if(c !== '\r') cur += c;
+  }
+  if(cur || rand.length){ rand.push(cur); randuri.push(rand); }
+  if(randuri.length < 2) return [];
+
+  const cap = randuri[0].map(h => (h || '').trim());
+  const idx = (...nume) => {
+    for(const n of nume){
+      const i = cap.findIndex(h => h.toLowerCase() === n.toLowerCase());
+      if(i !== -1) return i;
+    }
+    return -1;
+  };
+  const iId    = idx('AMP ID', 'ID PGA');
+  const iTitlu = idx('Project Title', 'Titlul proiectului');
+  const iDonor = idx('Donor Agency', 'Organizație finanțatoare');
+  const iStart = idx('Actual Start Date', 'Data efectivă de începere', 'Proposed Start Date');
+  const iEnd   = idx('Actual Completion Date', 'Data efectivă de finalizare',
+                     'Proposed Completion Date', 'Data planificată de finalizare');
+  if(iId === -1) throw new Error('raportul live nu are coloana „AMP ID”');
+
+  const out = new Map();
+  for(let i = 1; i < randuri.length; i++){
+    const r = randuri[i];
+    const id = (r[iId] || '').trim();
+    if(!id) continue;
+    const vechi = out.get(id);
+    const de = iEnd > -1 ? (r[iEnd] || '').trim() : '';
+    // Raportul are un rând pe an; păstrăm cea mai târzie dată de finalizare.
+    if(vechi){
+      const a = dataDinAmp(vechi.de), b = dataDinAmp(de);
+      if(b && (!a || b > a)) vechi.de = de;
+      continue;
+    }
+    out.set(id, {
+      id: id,
+      t: iTitlu > -1 ? (r[iTitlu] || '').trim() : '',
+      d: iDonor > -1 ? (r[iDonor] || '').split('|').map(s => s.trim()).filter(Boolean) : [],
+      ds: iStart > -1 ? (r[iStart] || '').trim() : '',
+      de: de
+    });
+  }
+  return [...out.values()];
+}
+
+/* ========================================================= comparația */
+
+function formateaza(d){
+  return String(d.getDate()).padStart(2,'0') + '.' +
+         String(d.getMonth()+1).padStart(2,'0') + '.' + d.getFullYear();
+}
+
+async function proceseaza(file){
+  stare.className = 'stare';
+  stare.textContent = 'Se citește documentul…';
+  rezultat.innerHTML = '';
+
+  const buf = await file.arrayBuffer();
+  DOC_BYTES = buf;
+  const zip = await citesteZip(buf);
+  const xmlBytes = zip['word/document.xml'];
+  if(!xmlBytes) throw new Error('arhiva nu conține word/document.xml — nu e un fișier Word');
+  const xml = new TextDecoder().decode(xmlBytes);
+
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  const tbl = doc.getElementsByTagNameNS(W, 'tbl')[0];
+  if(!tbl) throw new Error('documentul nu conține niciun tabel');
+
+  const azi = new Date(); azi.setHours(0,0,0,0);
+  const proiecte = [], negasite = [], faraData = [];
+
+  for(const tr of el(tbl, 'tr')){
+    const nfo = clasificaRand(tr);
+    if(nfo.tip !== 'proiect') continue;
+    const rec = BAZA.get(nfo.id);
+    const denumire = (nfo.texte[2] || '').trim();
+    if(!rec){ negasite.push({ id: nfo.id, denumire: denumire }); continue; }
+    const de = dataDinAmp(rec.de);
+    if(!de){ faraData.push({ id: nfo.id, denumire: denumire, src: rec.src }); continue; }
+    if(de < azi) proiecte.push({
+      id: nfo.id, denumire: denumire || rec.t, donator: (rec.d || []).join(' / '),
+      de: de, deText: formateaza(de), src: rec.src
+    });
+  }
+
+  proiecte.sort((a, b) => b.de - a.de);
+  arata(proiecte, negasite, faraData, xml, file.name);
+}
+
+function arata(proiecte, negasite, faraData, xml, numeFisier){
+  const total = proiecte.length + negasite.length + faraData.length;
+  stare.className = 'stare ok';
+  stare.textContent = 'Document citit: ' + total + ' proiecte în anexă.';
+
+  rezultat.innerHTML =
+    '<div class="kpis">' +
+      kpi('Proiecte în anexă', total, 'cu număr de înregistrare') +
+      kpi('Expirate', proiecte.length, 'data de finalizare a trecut') +
+      kpi('Fără dată de finalizare', faraData.length, 'nu se poate spune') +
+      kpi('Negăsite în platformă', negasite.length, 'numărul nu există în AMP') +
+    '</div>' +
+    '<div class="panel"><div class="panel-head"><h2>Proiecte expirate</h2>' +
+      '<button class="btn" id="descarca"' + (proiecte.length ? '' : ' disabled') + '>' +
+      'Descarcă documentul Word</button></div>' +
+      (proiecte.length
+        ? '<div class="tbl-scroll"><table><thead><tr>' +
+          '<th>Nr. de înregistrare</th><th>Denumirea proiectului</th>' +
+          '<th>Finanțator</th><th>Data de finalizare</th><th>Sursa</th>' +
+          '</tr></thead><tbody>' +
+          proiecte.map(p =>
+            '<tr><td class="c-id">' + esc(p.id) + '</td>' +
+            '<td>' + esc(p.denumire) + '</td>' +
+            '<td>' + (p.donator ? esc(p.donator) : '<span class="nil">—</span>') + '</td>' +
+            '<td class="c-data">' + esc(p.deText) + '</td>' +
+            '<td><span class="sursa ' + (p.src === 'live' ? 's-live' : 's-arh') + '">' +
+              esc(p.src) + '</span></td></tr>').join('') +
+          '</tbody></table></div>'
+        : '<div class="panel-body">Niciun proiect din anexă nu are data de finalizare trecută.</div>') +
+    '</div>';
+
+  const buton = document.getElementById('descarca');
+  if(buton) buton.addEventListener('click', function(){
+    const set = new Set(proiecte.map(p => p.id));
+    const dupaId = new Map(proiecte.map(p => [p.id, p.deText]));
+    try{
+      descarcaWord(xml, id => set.has(id), id => dupaId.get(id) || '', numeFisier);
+    }catch(e){
+      stare.className = 'stare err';
+      stare.textContent = 'Documentul nu a putut fi generat: ' + e.message;
+    }
+  });
+}
+
+function kpi(lbl, val, sub){
+  return '<div class="kpi"><div class="lbl">' + esc(lbl) + '</div><div class="val">' + val +
+    '</div><div class="sub">' + esc(sub) + '</div></div>';
+}
+
+async function descarcaWord(xml, pastreaza, dataPentru, numeFisier){
+  const nou = filtreazaDocument(xml, pastreaza, dataPentru);
+  const zip = await citesteZip(DOC_BYTES);
+  zip['word/document.xml'] = new TextEncoder().encode(nou);
+
+  const octeti = scrieZip(zip);
+  const url = URL.createObjectURL(new Blob([octeti],
+    { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = numeFisier.replace(/\.docx$/i, '') + ' — expirate ' +
+    new Date().toISOString().slice(0, 10) + '.docx';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+/* ============================================================= pornire */
+
+const zona = document.getElementById('zona');
+const input = document.getElementById('fisier');
+
+['dragenter','dragover'].forEach(ev => zona.addEventListener(ev, e => {
+  e.preventDefault(); zona.classList.add('peste');
+}));
+['dragleave','drop'].forEach(ev => zona.addEventListener(ev, e => {
+  e.preventDefault(); zona.classList.remove('peste');
+}));
+zona.addEventListener('drop', e => {
+  const f = e.dataTransfer.files[0];
+  if(f) porneste(f);
+});
+input.addEventListener('change', () => { if(input.files[0]) porneste(input.files[0]); });
+
+async function porneste(file){
+  if(!/\.docx$/i.test(file.name)){
+    stare.className = 'stare err';
+    stare.textContent = 'Alege un fișier .docx. Formatul vechi .doc trebuie salvat întâi ca .docx.';
+    return;
+  }
+  if(!BAZA){
+    stare.className = 'stare err';
+    stare.textContent = 'Baza de proiecte nu s-a încărcat încă. Așteaptă câteva secunde.';
+    return;
+  }
+  try{ await proceseaza(file); }
+  catch(e){
+    stare.className = 'stare err';
+    stare.textContent = 'Documentul nu a putut fi citit: ' + e.message;
+  }
+}
+
+if(typeof DecompressionStream === 'undefined'){
+  stareDate.className = 'stare err';
+  stareDate.textContent = 'Browserul e prea vechi pentru a desface fișiere Word. ' +
+    'Folosește Chrome, Edge sau Firefox actualizat.';
+} else {
+  incarcaBaza().then(b => { BAZA = b; });
+}
+
+})();
+</script>
+</body>
+</html>

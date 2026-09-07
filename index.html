@@ -72,32 +72,32 @@
      iar diferența față de celelalte două îl făcea să pară stricat. Primește
      același tratament, adaptat conturului lui alb cu navy: la hover se umple
      cu albastru și inversează culorile. */
-  #acorduriNavBtn{
+  #acorduriNavBtn, #hg246NavBtn{
     transition:transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease,
                background .25s ease, color .25s ease, border-color .25s ease;
     position:relative; overflow:hidden;
   }
-  #acorduriNavBtn::before{
+  #acorduriNavBtn::before, #hg246NavBtn::before{
     content:''; position:absolute; inset:0; border-radius:inherit;
     background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.3), transparent 70%);
     opacity:0; transition:opacity .3s ease; pointer-events:none;
   }
-  #acorduriNavBtn:hover{
+  #acorduriNavBtn:hover, #hg246NavBtn:hover{
     transform:translateY(-3px) scale(1.035);
     background:linear-gradient(135deg,var(--navy),#2f5691);
     color:#fff; border-color:var(--navy);
     box-shadow:0 10px 26px rgba(34,64,107,.35),0 3px 8px rgba(34,64,107,.25),
                0 0 0 1px rgba(34,64,107,.3);
   }
-  #acorduriNavBtn:hover::before{ opacity:1; }
-  #acorduriNavBtn:active{
+  #acorduriNavBtn:hover::before, #hg246NavBtn:hover::before{ opacity:1; }
+  #acorduriNavBtn:active, #hg246NavBtn:active{
     transform:translateY(-1px) scale(.97);
     transition:transform .12s ease;
   }
-  #acorduriNavBtn svg{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
-  #acorduriNavBtn:hover svg{ transform:translateX(3px); }
+  #acorduriNavBtn svg, #hg246NavBtn svg{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
+  #acorduriNavBtn:hover svg, #hg246NavBtn:hover svg{ transform:translateX(3px); }
   /* Focusul din tastatură era invizibil pe toate trei. */
-  #acorduriNavBtn:focus-visible, #advancedAnalysisNavBtn:focus-visible,
+  #acorduriNavBtn:focus-visible, #hg246NavBtn:focus-visible, #advancedAnalysisNavBtn:focus-visible,
   #updateNavBtn:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
 
   #advancedAnalysisNavBtn, #updateNavBtn{
@@ -869,6 +869,9 @@
         <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.3;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
         <span>Acorduri →</span>
       </a>
+      <a id="hg246NavBtn" href="hg246.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--navy);border:1.5px solid var(--navy);border-radius:10px;padding:11px 20px;font-size:14px;font-weight:800;white-space:nowrap;cursor:pointer;text-decoration:none;letter-spacing:.01em;">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.3;"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>
+        <span>HG 246 →</span></a>
       <button id="advancedAnalysisNavBtn" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--gold),#e0a545);color:#3a2a00;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 3px 10px rgba(200,135,26,.4),0 0 0 1px rgba(200,135,26,.25);letter-spacing:.01em;">
         <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#3a2a00;fill:none;stroke-width:2.3;"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg>
         <span data-i18n="advancedAnalysisBtn">Analize avansate →</span>
