@@ -266,7 +266,13 @@ function clasificaRand(tr){
   const celule = el(tr, 'tc');
   const texte = celule.map(textul);
   const id = (texte[1] || '').replace(/\s/g, '');
-  if(/^\d{10,15}$/.test(id)) return { tip: 'proiect', id: id, celule: celule, texte: texte };
+  /* Numărul de înregistrare are de obicei 13 cifre, dar proiectele mai vechi
+     din anexă poartă numere scurte — 2029, 2730, 3014. Cerând exact 13, ele
+     ajungeau clasificate drept rânduri de antet: rămâneau mereu în document și
+     primeau „7" în coloana nouă, numărul de coloană în loc de o dată. Acceptăm
+     orice șir de cifre de la trei în sus; „1", „2", „3" din rândul de numerotare
+     a coloanelor rămân sub prag și sunt tratate corect ca antet. */
+  if(/^\d{3,15}$/.test(id)) return { tip: 'proiect', id: id, celule: celule, texte: texte };
   // Rândurile de secțiune poartă numele țării sau al finanțatorului pe toată
   // lățimea tabelului: o singură celulă, sau restul goale.
   if(celule.length <= 1 || texte.slice(1).every(t => !t.trim()))
@@ -286,7 +292,18 @@ function celulaNoua(model, text){
   for(let i = 1; i < paragrafe.length; i++) tc.removeChild(paragrafe[i]);
   const p = paragrafe[0];
   if(!p) return tc;
-  for(const r of el(p, 'r')) p.removeChild(r);
+
+  /* Golim paragraful complet, nu doar rulările lui directe. Celula pe care o
+     clonăm e „Baza legală", iar acolo trimiterile la legi sunt hyperlinkuri:
+     textul stă în <w:hyperlink><w:r>, nu în <w:r>. Ștergând doar rulările,
+     rămâneau în coloana nouă bucăți ca „Legea nr.58 din 9 aprilie 2015" lipite
+     înaintea datei — 23 de rânduri din 115 arătau așa. Păstrăm doar <w:pPr>,
+     care ține alinierea și spațierea, adică tocmai formatarea pentru care am
+     clonat celula. */
+  for(let i = p.childNodes.length - 1; i >= 0; i--){
+    const c = p.childNodes[i];
+    if(c.nodeType !== 1 || c.localName !== 'pPr') p.removeChild(c);
+  }
 
   const doc = tc.ownerDocument;
   const r = doc.createElementNS(W, 'w:r');
