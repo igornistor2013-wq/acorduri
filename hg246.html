@@ -21,6 +21,9 @@
 
   .top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
     padding-bottom:22px;margin-bottom:24px;border-bottom:1px solid var(--line-strong)}
+  /* Fără asta, blocul de text se strânge la lățimea conținutului și paragraful
+     se rupe pe patru rânduri, deși are loc de trei. */
+  .top > div:first-child{flex:1 1 520px;min-width:0}
   .title-row{display:flex;align-items:center;gap:13px}
   .logo-badge{width:38px;height:38px;border-radius:9px;flex:none;
     background:linear-gradient(135deg,var(--navy),#2f5691);display:flex;align-items:center;justify-content:center}
@@ -39,15 +42,28 @@
     box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
   .panel-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
     padding:14px 18px;border-bottom:1px solid var(--line)}
+  .panel-head h2{flex:0 0 auto}
+  .panel-head .stare{flex:1 1 260px;text-align:right;margin-top:0}
+  @media (max-width:700px){.panel-head .stare{text-align:left;flex-basis:100%}}
   h2{font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);margin:0;font-weight:700}
   .panel-body{padding:18px}
 
-  .zona{border:2px dashed var(--line-strong);border-radius:var(--radius);padding:34px 20px;
+  /* Zona de încărcare e un <label>, iar <label> e implicit element inline.
+     Cu un <strong> bloc înăuntru, cutia se rupea: chenarul punctat se strângea
+     în stânga, iar textul ieșea afară din el. Îl facem explicit container
+     flex pe verticală. */
+  .zona{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:6px;width:100%;min-height:132px;
+    border:2px dashed var(--line-strong);border-radius:var(--radius);padding:30px 22px;
     text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
   .zona:hover,.zona.peste{border-color:var(--navy);background:var(--blue-bg)}
-  .zona strong{display:block;font-size:15px;color:var(--navy-deep);margin-bottom:6px}
-  .zona span{font-size:12.5px;color:var(--ink-dim)}
+  .zona .ico{width:26px;height:26px;stroke:var(--line-strong);fill:none;stroke-width:2;
+    transition:stroke .2s}
+  .zona:hover .ico,.zona.peste .ico{stroke:var(--navy)}
+  .zona strong{font-size:15px;color:var(--navy-deep);line-height:1.35;max-width:62ch}
+  .zona span{font-size:12.5px;color:var(--ink-dim);max-width:52ch}
   .zona input{display:none}
+  .zona:focus-within{border-color:var(--navy);outline:2px solid var(--gold);outline-offset:3px}
 
   .stare{font-size:12.5px;color:var(--ink-dim);margin-top:14px;min-height:20px}
   .stare.err{color:var(--red)}
@@ -143,6 +159,10 @@
       <span class="stare" id="stareDate">Se încarcă baza de proiecte…</span></div>
     <div class="panel-body">
       <label class="zona" id="zona">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/>
+        </svg>
         <strong>Trage aici anexa în format Word, sau apasă ca s-o alegi</strong>
         <span>Fișier .docx — lista proiectelor de asistență tehnică în derulare</span>
         <input type="file" id="fisier" accept=".docx">
