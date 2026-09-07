@@ -442,7 +442,7 @@ def parse_edition(eid, label):
             "editie": ed_nr,
             "data_editie": ed_date,
             "editie_id": eid,
-            "suport": e_suport_bugetar(titlu),
+            "suport": e_suport_bugetar(title),
             "url": f"{BASE}/ro/monitor/{eid}",
         })
     return True, found

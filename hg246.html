@@ -53,8 +53,8 @@
   .stare.err{color:var(--red)}
   .stare.ok{color:var(--green-ink);font-weight:600}
 
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-  @media (max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));
+    gap:14px;margin-bottom:20px}
   .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
     box-shadow:var(--shadow);padding:16px 18px}
   .kpi .lbl{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-dim);
@@ -76,10 +76,39 @@
   tbody tr:last-child td{border-bottom:none}
   .c-id{font-family:var(--mono);font-size:11.5px;color:var(--navy);white-space:nowrap}
   .c-data{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--red);white-space:nowrap}
+  .plan{display:block;font-size:9.5px;font-weight:700;color:var(--gold);
+    font-family:var(--mono);margin-top:2px;cursor:help}
+  .efect{display:block;font-size:9.5px;font-weight:700;color:var(--green-ink);
+    font-family:var(--mono);margin-top:2px;cursor:help}
   .sursa{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap}
   .s-live{background:var(--green-bg);color:var(--green-ink)}
   .s-arh{background:var(--blue-bg);color:var(--navy)}
   .nil{color:var(--line-strong)}
+
+  .perioada{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .perioada label{display:flex;flex-direction:column;gap:5px;font-size:10.5px;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);font-weight:700}
+  .perioada input[type=date]{border:1px solid var(--line-strong);border-radius:6px;
+    padding:8px 11px;font-family:inherit;font-size:13px;color:var(--ink);background:#fff}
+  .perioada input[type=date]:focus{outline:2px solid var(--gold);outline-offset:1px}
+  .scurte{display:flex;gap:6px;flex-wrap:wrap}
+  .scurte button{background:#fff;border:1px solid var(--line-strong);color:var(--navy);
+    font-family:inherit;font-size:11.5px;font-weight:600;border-radius:6px;padding:7px 12px;cursor:pointer}
+  .scurte button:hover{background:var(--blue-bg)}
+  .scurte button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .scurte button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+  .ajutor{font-size:12px;color:var(--ink-dim);margin:14px 0 0;max-width:78ch}
+  .count{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim)}
+  @media (max-width:560px){
+    .perioada{flex-direction:column;align-items:stretch;gap:12px}
+    table{min-width:0}
+    thead{display:none}
+    tbody tr{display:block;border:1px solid var(--line-strong);border-radius:9px;
+      padding:10px 12px;margin-bottom:9px}
+    tbody td{display:block;border:none;padding:4px 0}
+    tbody td:before{content:attr(data-l);display:block;font-size:9.5px;letter-spacing:.07em;
+      text-transform:uppercase;color:var(--ink-dim);font-weight:700;margin-bottom:2px}
+  }
   .footer-source{border-top:1px solid var(--line);padding-top:16px;margin-top:8px;
     font-size:12px;color:var(--ink-dim);max-width:84ch}
   .footer-nav{display:flex;gap:22px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
@@ -396,7 +425,7 @@ async function incarcaBaza(){
     const res = await fetch('amp-arhiva.json', { cache: 'no-cache' });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     for(const p of await res.json())
-      baza.set(String(p.id), { t: p.t, d: p.d || [], ds: p.ds, de: p.de, src: 'arhivă' });
+      baza.set(String(p.id), { t: p.t, d: p.d || [], ds: p.ds, de: p.de, tip: '', src: 'arhivă' });
   }catch(e){
     stareDate.className = 'stare err';
     stareDate.textContent = 'Arhiva de proiecte nu a putut fi citită: ' + e.message;
@@ -423,7 +452,7 @@ async function incarcaBaza(){
     clearTimeout(t);
     if(!res.ok) throw new Error('HTTP ' + res.status);
     for(const p of parseCsvAmp(await res.text())){
-      baza.set(p.id, { t: p.t, d: p.d, ds: p.ds, de: p.de, src: 'live' });
+      baza.set(p.id, { t: p.t, d: p.d, ds: p.ds, de: p.de, tip: p.tip, src: 'live' });
       live++;
     }
   }catch(e){
@@ -473,8 +502,14 @@ function parseCsvAmp(text){
   const iTitlu = idx('Project Title', 'Titlul proiectului');
   const iDonor = idx('Donor Agency', 'Organizație finanțatoare');
   const iStart = idx('Actual Start Date', 'Data efectivă de începere', 'Proposed Start Date');
-  const iEnd   = idx('Actual Completion Date', 'Data efectivă de finalizare',
-                     'Proposed Completion Date', 'Data planificată de finalizare');
+  /* Raportul are două coloane de finalizare, iar ele nu înseamnă același lucru:
+     una spune când s-a încheiat proiectul, cealaltă când era prevăzut să se
+     încheie. Le citim pe amândouă. Varianta veche lua doar prima găsită în
+     antet, deci pentru proiectele cu data efectivă goală nu rămânea nimic și
+     ajungeau la „fără dată de finalizare", deși data planificată era acolo. */
+  const iEndEf = idx('Actual Completion Date', 'Data efectivă de finalizare');
+  const iEndPl = idx('Proposed Completion Date', 'Planned Completion Date',
+                     'Data planificată de finalizare', 'Data planificată de finalizare a proiectului');
   if(iId === -1) throw new Error('raportul live nu are coloana „AMP ID”');
 
   const out = new Map();
@@ -482,12 +517,22 @@ function parseCsvAmp(text){
     const r = randuri[i];
     const id = (r[iId] || '').trim();
     if(!id) continue;
+    const ef = iEndEf > -1 ? (r[iEndEf] || '').trim() : '';
+    const pl = iEndPl > -1 ? (r[iEndPl] || '').trim() : '';
+    const de = ef || pl;                      // efectivă întâi, planificată ca rezervă
+    const tip = ef ? 'efectivă' : (pl ? 'planificată' : '');
+
     const vechi = out.get(id);
-    const de = iEnd > -1 ? (r[iEnd] || '').trim() : '';
-    // Raportul are un rând pe an; păstrăm cea mai târzie dată de finalizare.
+    /* Raportul are un rând pe an pentru același proiect. La contopire, o dată
+       efectivă bate una planificată, indiferent care e mai târzie; între două
+       date de același fel o alegem pe cea mai târzie. */
     if(vechi){
-      const a = dataDinAmp(vechi.de), b = dataDinAmp(de);
-      if(b && (!a || b > a)) vechi.de = de;
+      if(de){
+        const a = dataDinAmp(vechi.de), b = dataDinAmp(de);
+        const promovare = tip === 'efectivă' && vechi.tip !== 'efectivă';
+        const maiTarzie = b && (!a || b > a) && tip === vechi.tip;
+        if(promovare || maiTarzie){ vechi.de = de; vechi.tip = tip; }
+      }
       continue;
     }
     out.set(id, {
@@ -495,7 +540,7 @@ function parseCsvAmp(text){
       t: iTitlu > -1 ? (r[iTitlu] || '').trim() : '',
       d: iDonor > -1 ? (r[iDonor] || '').split('|').map(s => s.trim()).filter(Boolean) : [],
       ds: iStart > -1 ? (r[iStart] || '').trim() : '',
-      de: de
+      de: de, tip: tip
     });
   }
   return [...out.values()];
@@ -507,6 +552,8 @@ function formateaza(d){
   return String(d.getDate()).padStart(2,'0') + '.' +
          String(d.getMonth()+1).padStart(2,'0') + '.' + d.getFullYear();
 }
+
+let CTX = null;   // ce s-a citit din document, ca filtrarea să nu-l recitească
 
 async function proceseaza(file){
   stare.className = 'stare';
@@ -525,7 +572,7 @@ async function proceseaza(file){
   if(!tbl) throw new Error('documentul nu conține niciun tabel');
 
   const azi = new Date(); azi.setHours(0,0,0,0);
-  const proiecte = [], negasite = [], faraData = [];
+  const expirate = [], negasite = [], faraData = [];
 
   for(const tr of el(tbl, 'tr')){
     const nfo = clasificaRand(tr);
@@ -535,53 +582,101 @@ async function proceseaza(file){
     if(!rec){ negasite.push({ id: nfo.id, denumire: denumire }); continue; }
     const de = dataDinAmp(rec.de);
     if(!de){ faraData.push({ id: nfo.id, denumire: denumire, src: rec.src }); continue; }
-    if(de < azi) proiecte.push({
+    if(de < azi) expirate.push({
       id: nfo.id, denumire: denumire || rec.t, donator: (rec.d || []).join(' / '),
-      de: de, deText: formateaza(de), src: rec.src
+      de: de, deText: formateaza(de), tip: rec.tip || '', src: rec.src
     });
   }
 
-  proiecte.sort((a, b) => b.de - a.de);
-  arata(proiecte, negasite, faraData, xml, file.name);
+  expirate.sort((a, b) => b.de - a.de);
+  CTX = { expirate: expirate, negasite: negasite, faraData: faraData,
+          xml: xml, numeFisier: file.name,
+          total: expirate.length + negasite.length + faraData.length };
+
+  stare.className = 'stare ok';
+  stare.textContent = 'Document citit: ' + CTX.total + ' proiecte în anexă.';
+  deseneaza();
+  aplica();
 }
 
-function arata(proiecte, negasite, faraData, xml, numeFisier){
-  const total = proiecte.length + negasite.length + faraData.length;
-  stare.className = 'stare ok';
-  stare.textContent = 'Document citit: ' + total + ' proiecte în anexă.';
+/* Perioada de finalizare. Lista completă de proiecte expirate e adesea prea
+   largă pentru ce ai de făcut: dacă pregătești o modificare a hotărârii pentru
+   proiectele încheiate anul trecut, restul doar încurcă. Filtrul lucrează pe
+   ce s-a citit deja din document, deci schimbarea perioadei nu cere reîncărcarea
+   fișierului. */
+function limiteleDatelor(){
+  const de = document.getElementById('dela').value;
+  const pana = document.getElementById('panala').value;
+  return {
+    dela: de ? new Date(de + 'T00:00:00') : null,
+    panala: pana ? new Date(pana + 'T23:59:59') : null
+  };
+}
+
+function selectate(){
+  if(!CTX) return [];
+  const lim = limiteleDatelor();
+  return CTX.expirate.filter(p =>
+    (!lim.dela || p.de >= lim.dela) && (!lim.panala || p.de <= lim.panala));
+}
+
+function deseneaza(){
+  const ani = [...new Set(CTX.expirate.map(p => p.de.getFullYear()))].sort((a,b) => b - a);
+  const anCurent = new Date().getFullYear();
 
   rezultat.innerHTML =
-    '<div class="kpis">' +
-      kpi('Proiecte în anexă', total, 'cu număr de înregistrare') +
-      kpi('Expirate', proiecte.length, 'data de finalizare a trecut') +
-      kpi('Fără dată de finalizare', faraData.length, 'nu se poate spune') +
-      kpi('Negăsite în platformă', negasite.length, 'numărul nu există în AMP') +
-    '</div>' +
-    '<div class="panel"><div class="panel-head"><h2>Proiecte expirate</h2>' +
-      '<button class="btn" id="descarca"' + (proiecte.length ? '' : ' disabled') + '>' +
-      'Descarcă documentul Word</button></div>' +
-      (proiecte.length
-        ? '<div class="tbl-scroll"><table><thead><tr>' +
-          '<th>Nr. de înregistrare</th><th>Denumirea proiectului</th>' +
-          '<th>Finanțator</th><th>Data de finalizare</th><th>Sursa</th>' +
-          '</tr></thead><tbody>' +
-          proiecte.map(p =>
-            '<tr><td class="c-id">' + esc(p.id) + '</td>' +
-            '<td>' + esc(p.denumire) + '</td>' +
-            '<td>' + (p.donator ? esc(p.donator) : '<span class="nil">—</span>') + '</td>' +
-            '<td class="c-data">' + esc(p.deText) + '</td>' +
-            '<td><span class="sursa ' + (p.src === 'live' ? 's-live' : 's-arh') + '">' +
-              esc(p.src) + '</span></td></tr>').join('') +
-          '</tbody></table></div>'
-        : '<div class="panel-body">Niciun proiect din anexă nu are data de finalizare trecută.</div>') +
-    '</div>';
+    '<div class="panel"><div class="panel-head"><h2>2. Perioada de finalizare</h2>' +
+      '<span class="count" id="rezumat"></span></div>' +
+      '<div class="panel-body">' +
+        '<div class="perioada">' +
+          '<label>De la <input type="date" id="dela"></label>' +
+          '<label>Până la <input type="date" id="panala"></label>' +
+          '<div class="scurte" id="scurte">' +
+            '<button data-p="tot">Toate</button>' +
+            (ani.includes(anCurent) ? '<button data-p="' + anCurent + '">' + anCurent + '</button>' : '') +
+            (ani.includes(anCurent-1) ? '<button data-p="' + (anCurent-1) + '">' + (anCurent-1) + '</button>' : '') +
+            '<button data-p="12luni">Ultimele 12 luni</button>' +
+            '<button data-p="vechi">Mai vechi de 3 ani</button>' +
+          '</div>' +
+        '</div>' +
+        '<p class="ajutor">Se numără numai proiectele a căror dată de finalizare a trecut. ' +
+          'Lăsând ambele câmpuri goale, intră toate.</p>' +
+      '</div></div>' +
+    '<div class="kpis" id="kpis"></div>' +
+    '<div class="panel"><div class="panel-head"><h2>Proiecte expirate în perioada aleasă</h2>' +
+      '<button class="btn" id="descarca">Descarcă documentul Word</button></div>' +
+      '<div id="lista"></div></div>';
 
-  const buton = document.getElementById('descarca');
-  if(buton) buton.addEventListener('click', function(){
-    const set = new Set(proiecte.map(p => p.id));
-    const dupaId = new Map(proiecte.map(p => [p.id, p.deText]));
+  document.getElementById('dela').addEventListener('change', aplica);
+  document.getElementById('panala').addEventListener('change', aplica);
+
+  document.querySelectorAll('#scurte button').forEach(b => {
+    b.addEventListener('click', () => {
+      const dela = document.getElementById('dela'), panala = document.getElementById('panala');
+      const p = b.dataset.p, azi = new Date();
+      const iso = d => d.toISOString().slice(0, 10);
+      if(p === 'tot'){ dela.value = ''; panala.value = ''; }
+      else if(p === '12luni'){
+        const u = new Date(azi); u.setFullYear(u.getFullYear() - 1);
+        dela.value = iso(u); panala.value = iso(azi);
+      } else if(p === 'vechi'){
+        const u = new Date(azi); u.setFullYear(u.getFullYear() - 3);
+        dela.value = ''; panala.value = iso(u);
+      } else { dela.value = p + '-01-01'; panala.value = p + '-12-31'; }
+      document.querySelectorAll('#scurte button').forEach(o =>
+        o.setAttribute('aria-pressed', String(o === b)));
+      aplica();
+    });
+  });
+
+  document.getElementById('descarca').addEventListener('click', function(){
+    const alese = selectate();
+    if(!alese.length) return;
+    const set = new Set(alese.map(p => p.id));
+    const dupaId = new Map(alese.map(p => [p.id, p.deText]));
     try{
-      descarcaWord(xml, id => set.has(id), id => dupaId.get(id) || '', numeFisier);
+      descarcaWord(CTX.xml, id => set.has(id), id => dupaId.get(id) || '',
+                   CTX.numeFisier, numeDePerioada());
     }catch(e){
       stare.className = 'stare err';
       stare.textContent = 'Documentul nu a putut fi generat: ' + e.message;
@@ -589,12 +684,63 @@ function arata(proiecte, negasite, faraData, xml, numeFisier){
   });
 }
 
+function numeDePerioada(){
+  const d = document.getElementById('dela').value, p = document.getElementById('panala').value;
+  if(!d && !p) return 'toate';
+  if(d && p) return d + ' – ' + p;
+  return d ? 'din ' + d : 'până la ' + p;
+}
+
+function aplica(){
+  const alese = selectate();
+  const lim = limiteleDatelor();
+
+  document.getElementById('kpis').innerHTML =
+    kpi('Proiecte în anexă', CTX.total, 'cu număr de înregistrare') +
+    kpi('Expirate, în perioadă', alese.length,
+        alese.length === CTX.expirate.length ? 'toate cele expirate'
+                                             : 'din ' + CTX.expirate.length + ' expirate') +
+    kpi('Din care, date planificate', alese.filter(p => p.tip === 'planificată').length,
+        'fără dată efectivă în platformă') +
+    kpi('Fără dată de finalizare', CTX.faraData.length, 'nici efectivă, nici planificată') +
+    kpi('Negăsite în platformă', CTX.negasite.length, 'numărul nu există în AMP');
+
+  const rez = document.getElementById('rezumat');
+  rez.textContent = (!lim.dela && !lim.panala)
+    ? 'toate datele de finalizare trecute'
+    : alese.length + ' proiecte în intervalul ales';
+
+  document.getElementById('descarca').disabled = alese.length === 0;
+
+  document.getElementById('lista').innerHTML = alese.length
+    ? '<div class="tbl-scroll"><table><thead><tr>' +
+      '<th>Nr. de înregistrare</th><th>Denumirea proiectului</th>' +
+      '<th>Finanțator</th><th>Data de finalizare</th><th>Sursa</th>' +
+      '</tr></thead><tbody>' +
+      alese.map(p =>
+        '<tr><td class="c-id" data-l="Nr. de înregistrare">' + esc(p.id) + '</td>' +
+        '<td data-l="Denumirea proiectului">' + esc(p.denumire) + '</td>' +
+        '<td data-l="Finanțator">' + (p.donator ? esc(p.donator) : '<span class="nil">—</span>') + '</td>' +
+        '<td class="c-data" data-l="Data de finalizare">' + esc(p.deText) +
+          (p.tip === 'planificată'
+            ? '<span class="plan" title="Platforma nu are dată efectivă de finalizare ' +
+              'pentru acest proiect, deci se folosește data planificată. Proiectul poate ' +
+              'să nu fi fost încheiat la termen.">planificată</span>'
+            : p.tip === 'efectivă'
+              ? '<span class="efect" title="Data efectivă de finalizare, din platformă.">efectivă</span>'
+              : '') + '</td>' +
+        '<td data-l="Sursa"><span class="sursa ' + (p.src === 'live' ? 's-live' : 's-arh') + '">' +
+          esc(p.src) + '</span></td></tr>').join('') +
+      '</tbody></table></div>'
+    : '<div class="panel-body">Niciun proiect expirat în perioada aleasă.</div>';
+}
+
 function kpi(lbl, val, sub){
   return '<div class="kpi"><div class="lbl">' + esc(lbl) + '</div><div class="val">' + val +
     '</div><div class="sub">' + esc(sub) + '</div></div>';
 }
 
-async function descarcaWord(xml, pastreaza, dataPentru, numeFisier){
+async function descarcaWord(xml, pastreaza, dataPentru, numeFisier, perioada){
   const nou = filtreazaDocument(xml, pastreaza, dataPentru);
   const zip = await citesteZip(DOC_BYTES);
   zip['word/document.xml'] = new TextEncoder().encode(nou);
@@ -605,7 +751,7 @@ async function descarcaWord(xml, pastreaza, dataPentru, numeFisier){
   const a = document.createElement('a');
   a.href = url;
   a.download = numeFisier.replace(/\.docx$/i, '') + ' — expirate ' +
-    new Date().toISOString().slice(0, 10) + '.docx';
+    (perioada || new Date().toISOString().slice(0, 10)) + '.docx';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

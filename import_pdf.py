@@ -256,6 +256,7 @@ def acte_din_text(text, nr, data, eid, url):
             "editie": nr or "?",
             "data_editie": data,
             "editie_id": eid or ("pdf-" + (nr or "?")),
+            "suport": mw.e_suport_bugetar(titlu),
             "url": url,
             "sursa": "PDF",
         })
