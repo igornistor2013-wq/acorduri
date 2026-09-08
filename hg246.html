@@ -197,6 +197,7 @@ const AMP_PROXY = 'https://amp.vivi.md';
 const AMP_REPORT = 661;
 
 let BAZA = null;         // id -> {t, d, ds, de, src}
+let COLOANE_GASITE = null;   // ce coloane de dată s-au recunoscut în raport
 let DOC_BYTES = null;    // documentul încărcat, ca să-l putem rescrie
 
 const stareDate = document.getElementById('stareDate');
@@ -472,7 +473,20 @@ async function incarcaBaza(){
     clearTimeout(t);
     if(!res.ok) throw new Error('HTTP ' + res.status);
     for(const p of parseCsvAmp(await res.text())){
-      baza.set(p.id, { t: p.t, d: p.d, ds: p.ds, de: p.de, tip: p.tip, src: 'live' });
+      /* Raportul live e mai bogat și mai nou, deci înlocuiește arhiva — dar
+         numai acolo unde chiar are ce spune. Un proiect fără dată de finalizare
+         în raport nu trebuie să șteargă data pe care o avea în arhivă; altfel
+         proiectele prezente în ambele surse ieșeau din listă tocmai fiindcă
+         adăugasem o sursă mai bună. */
+      const vechi = baza.get(p.id);
+      baza.set(p.id, {
+        t: p.t || (vechi ? vechi.t : ''),
+        d: (p.d && p.d.length) ? p.d : (vechi ? vechi.d : []),
+        ds: p.ds || (vechi ? vechi.ds : ''),
+        de: p.de || (vechi ? vechi.de : ''),
+        tip: p.de ? p.tip : (vechi ? vechi.tip : ''),
+        src: p.de ? 'live' : (vechi && vechi.de ? 'arhivă' : 'live')
+      });
       live++;
     }
   }catch(e){
@@ -483,9 +497,16 @@ async function incarcaBaza(){
     return baza;
   }
 
-  stareDate.className = 'stare ok';
+  const cuData = [...baza.values()].filter(p => p.de).length;
+  const col = COLOANE_GASITE || {};
+  stareDate.className = (col.efectiva || col.propusa) ? 'stare ok' : 'stare err';
   stareDate.innerHTML = 'Bază pregătită: <b>' + baza.size + '</b> proiecte — ' +
-    live + ' din raportul live, restul din arhivă.';
+    live + ' din raportul live, restul din arhivă. ' +
+    '<b>' + cuData + '</b> au dată de finalizare.' +
+    ((col.efectiva || col.propusa)
+      ? ''
+      : ' <b>Atenție:</b> în raport nu s-a recunoscut nicio coloană de dată de ' +
+        'finalizare, deci se folosesc doar datele din arhivă.');
   return baza;
 }
 
@@ -527,10 +548,25 @@ function parseCsvAmp(text){
      încheie. Le citim pe amândouă. Varianta veche lua doar prima găsită în
      antet, deci pentru proiectele cu data efectivă goală nu rămânea nimic și
      ajungeau la „fără dată de finalizare", deși data planificată era acolo. */
-  const iEndEf = idx('Actual Completion Date', 'Data efectivă de finalizare');
-  const iEndPl = idx('Proposed Completion Date', 'Planned Completion Date',
-                     'Data planificată de finalizare', 'Data planificată de finalizare a proiectului');
+  /* Denumirile coloanelor nu pot fi ghicite pe de rost: raportul vine în română
+     sau în engleză, iar traducerea nu e literală — coloana propusă se numește
+     „Data propusă de terminare", nu „Data planificată de finalizare", cum
+     scrisesem. Când niciun nume nu se potrivea, toate proiectele live rămâneau
+     fără dată. Căutăm după cuvinte-cheie: o coloană de finalizare trebuie să
+     conțină un cuvânt care spune „încheiere" și unul care spune dacă e efectivă
+     sau propusă. */
+  const cauta = (...grupuri) => cap.findIndex(h => {
+    const x = h.toLowerCase();
+    return grupuri.every(grup => grup.some(k => x.indexOf(k) > -1));
+  });
+  const INCHEIERE = ['completion', 'terminare', 'finalizare', 'închei', 'inchei'];
+  const iEndEf = cauta(['actual', 'efectiv'], INCHEIERE);
+  const iEndPl = cauta(['proposed', 'planned', 'propus', 'planificat', 'preconizat'], INCHEIERE);
   if(iId === -1) throw new Error('raportul live nu are coloana „AMP ID”');
+  COLOANE_GASITE = {
+    efectiva: iEndEf > -1 ? cap[iEndEf] : null,
+    propusa:  iEndPl > -1 ? cap[iEndPl] : null
+  };
 
   const out = new Map();
   for(let i = 1; i < randuri.length; i++){
