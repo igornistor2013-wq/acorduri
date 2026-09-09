@@ -4226,6 +4226,30 @@
       "editie_id": "3331",
       "url": "https://monitorul.gov.md/ro/monitor/3331",
       "suport": false
+    },
+    "nr. 763-X, 3 septembrie 2026|3336": {
+      "act": "nr. 763-X, 3 septembrie 2026",
+      "titlu": "Decret cu privire la promulgarea Legii pentru ratificarea Scrisorii de modificare la Acordul de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare „RLF – Răspuns de urgență – Căile Ferate din Moldova”",
+      "categorie": "Împrumut",
+      "partener": "BERD",
+      "semnat": "",
+      "editie": "435-438",
+      "data_editie": "09.09.2026",
+      "editie_id": "3336",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3336"
+    },
+    "nr. 188, 24 august 2026|3336": {
+      "act": "nr. 188, 24 august 2026",
+      "titlu": "Lege pentru ratificarea Scrisorii de modificare la Acordul de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare „RLF – Răspuns de urgență – Căile Ferate din Moldova”",
+      "categorie": "Împrumut",
+      "partener": "BERD",
+      "semnat": "",
+      "editie": "435-438",
+      "data_editie": "09.09.2026",
+      "editie_id": "3336",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3336"
     }
   },
   "editii_vazute": [
@@ -4251,9 +4275,10 @@
     "3331",
     "3332",
     "3334",
-    "3335"
+    "3335",
+    "3336"
   ],
-  "ultima_rulare": "08.09.2026 06:17",
+  "ultima_rulare": "09.09.2026 06:45",
   "editii_lipsa": [
     "3333"
   ]
