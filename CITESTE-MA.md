@@ -2,61 +2,78 @@
 
 Repository: `igornistor2013-wq/acorduri` · Site: `nistor.vivi.md`
 
+## Ce s-a schimbat
+
+Toate cele zece arhive ale Monitorului au fost **reprocesate de la zero** cu
+filtrul curent. Importurile anterioare rulaseră cu versiuni mai vechi, care
+nu cunoșteau asistența tehnică și o parte din finanțatori — actele care se
+potriveau doar cu regulile noi nu fuseseră extrase deloc.
+
+Registrul are acum **332 de acte în 96 de acorduri**, din 12.01.2024 până în
+09.09.2026.
+
+### Actele recuperate
+
+| Data | Partener | Ce e |
+|---|---|---|
+| 19.08.2025 | PAM | Acord de Asistență Tehnică cu Ministerul Muncii |
+| 04.09.2025 | BEI | Acord de cooperare privind servicii de consultanță |
+| 20.11.2025 | JICA | Memorandum de înțelegere cu ODA |
+| 29.05.2026 | Elveția | Acord de înțelegere cu Ministerul Dezvoltării Economice |
+
+Categoria „Asistență tehnică" a urcat de la 3 la 7 acte. Au intrat în registru
+doi finanțatori noi: PAM și Elveția.
+
 ## De urcat — patru fișiere
 
-| Fișier | Ce e |
+| Fișier | De ce |
 |---|---|
-| `hg246.html` | **pagină nouă.** Compară anexa nr. 1 la HG 246/2010 cu baza AMP și scoate proiectele expirate într-un document Word |
-| `amp-arhiva.json` | **fișier nou.** Cele 3.008 proiecte din arhiva AMP, doar câmpurile de care are nevoie pagina HG 246 |
-| `index.html` | buton nou de navigare către HG 246 |
-| `acorduri.html` | același buton |
+| `date.json` | 332 de acte, cu tot ce s-a recuperat |
+| `monitor_watch.py` | renunță la edițiile inaccesibile după cinci încercări; golurile se salvează înainte de scrierea fișierului |
+| `acorduri.html` | „suport bugetar" e filtru funcțional, cu culoare proprie |
+| `import_pdf.py` | câmpul `suport` pus și pe actele venite din PDF |
 
-Identice cu ce e deja pe GitHub, pot fi sărite: `date.json`, `donatori.html`,
-`monitor_watch.py`, `import_pdf.py`, `.github/workflows/monitor.yml`.
+Identice cu ce e pe GitHub, pot fi sărite: `index.html`, `hg246.html`,
+`amp-arhiva.json`, `donatori.html`, `.github/workflows/monitor.yml`.
 
 ## Pașii
 
 1. **Dezarhivează.** GitHub nu despachetează arhive.
 2. Urcă cele patru fișiere: `Add file` → `Upload files`, `Commit changes`.
-3. Deschide `https://nistor.vivi.md/hg246.html`.
+3. Verifică pe `https://nistor.vivi.md/acorduri.html` cu Ctrl+F5.
 
-`amp-arhiva.json` trebuie să stea lângă `hg246.html`, în rădăcina repo-ului —
-pagina îl cere prin cale relativă.
+Ar trebui să vezi 96 de acorduri, iar filtrul pe tip să arate Împrumut 46,
+Grant 44, Asistență tehnică 6.
 
-## Cum se folosește pagina nouă
+## Despre `date.json`
 
-Tragi anexa în format `.docx` în zona punctată. Numărul de înregistrare din
-coloana a doua este chiar ID-ul proiectului în Platforma pentru gestionarea
-asistenței externe, deci comparația se face după el.
+Conține și cele două acte colectate de automatizare pe 9 septembrie — legea și
+decretul privind Scrisoarea de modificare la un acord de împrumut. Le-am
+preluat de pe GitHub și le-am unit cu reprocesarea, ca să nu se piardă la
+suprascriere.
 
-Fiecare proiect e căutat în două surse: raportul live al platformei și arhiva
-încorporată, care acoperă până în 2022. Când proiectul apare în amândouă,
-câștigă datele live.
+## Verificarea încrucișată
 
-Proiectele a căror dată de finalizare a trecut apar într-un tabel pe ecran,
-apoi le descarci în Word.
+Am recitit fiecare ediție din toate cele zece arhive — peste 11.000 de intrări
+de cuprins — și am căutat ediții cu formulări de finanțare din care n-a ieșit
+niciun act. Toate semnalările s-au dovedit mențiuni în corpul altor acte,
+volume de continuare fără cuprins sau anexe.
 
-## Ce conține documentul generat
+Un caz merită reținut: două ediții din februarie 2025, nr. 53-57 și nr. 70-88,
+au codificarea textului grav stricată și cuprinsul nu poate fi citit. Am
+verificat direct dacă ascund acte de finanțare — zero. Dar dacă o astfel de
+ediție ar conține un acord, l-am rata. E singura slăbiciune structurală rămasă
+la import.
 
-Nu e construit de la zero: se pornește de la fișierul tău, se șterg rândurile
-care nu ne interesează și se adaugă o coloană. Bordurile, fonturile, titlurile
-de secțiune pe toată lățimea și indicii superiori din numerotare rămân exact
-cum erau. Coloana 7, „Data de finalizare", se adaugă la dreapta.
+## Ce a rămas nerezolvat
 
-Titlurile de țară se păstrează doar dacă au sub ele măcar un proiect expirat.
+Linkurile duc în majoritate la căutarea generală a Monitorului, nu la ediția
+exactă, fiindcă actele vin din PDF-uri. Se repară rulând local
+`python3 monitor_watch.py --backfill 3000 3311` și urcând `date.json`.
 
-## Rezultatul pe anexa trimisă
+Data semnării se extrage doar pentru un sfert din acte.
 
-Din 1102 proiecte: 115 expirate, 193 fără dată de finalizare în platformă, 794
-negăsite. Ultimele două cifre scad mult când raportul live răspunde — cifrele
-de mai sus sunt obținute doar din arhivă, care se oprește în 2022.
+Lipsește 2023 — de acolo vin cele 38 de etape marcate cu semnul întrebării.
 
-Proiectele fără dată de finalizare nu sunt incluse în document. Absența datei
-nu înseamnă că proiectul s-a încheiat, iar a le declara expirate ar fi o
-afirmație pe care datele n-o susțin.
-
-## Dacă raportul live nu răspunde
-
-Pagina scrie asta explicit și continuă doar cu arhiva. Mesajul conține și
-motivul între paranteze — de acolo se vede dacă e blocaj de rețea, CORS sau
-altceva.
+Ediția 3333 rămâne necitită. Scriptul o mai cere de câteva ori, apoi renunță
+singur și avertismentul dispare.
