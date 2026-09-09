@@ -93,7 +93,6 @@
   .t-contract{background:var(--blue-bg);color:var(--navy)}
   .t-credit{background:var(--purple-bg);color:var(--purple)}
   .t-tehnica{background:#e8eef7;color:#3d5a80}
-  .t-externa{background:#eef0f4;color:var(--ink-dim)}
   .t-suport{background:var(--purple-bg);color:var(--purple);margin-left:5px;cursor:help}
   .t-alt{background:#eef0f4;color:var(--ink-dim)}
   .t-simpl{background:var(--green-bg);color:var(--green-ink)}
@@ -519,12 +518,9 @@
        'Ca și categorie separată, ascundea tocmai ce contează: dacă statul are de rambursat.'},
     {cat:'Asistență tehnică', legal:'Consultanță, instruire, expertiză (pct. 9.3)',
      nota:'Acord sau contract de asistență ori cooperare tehnică, memorandum privind ' +
-       'consultanța sau instruirea. Ajunge în Monitor prin ordinul autorității semnatare.'},
-    {cat:'Asistență externă', legal:'Noțiunea-umbrelă (pct. 9.1)',
-     nota:'Ultima soluție, folosită când actul e limpede despre asistență externă — partener ' +
-       'extern recunoscut, implementarea unui proiect — dar titlul nu spune nici măcar dacă ' +
-       'e vorba de bani sau de expertiză. Un „acord de colaborare pentru implementarea ' +
-       'proiectului" intră aici; a-l numi grant ar afirma ceva ce textul nu susține.'},
+       'consultanța sau instruirea. Tot aici intră acordurile de colaborare prin care o ' +
+       'agenție de dezvoltare implementează un proiect: aduc expertiză și capacitate de ' +
+       'execuție, nu bani rambursabili. Ajung în Monitor prin ordinul autorității semnatare.'},
     {cat:'Asistență financiară', legal:'Categoria-părinte (pct. 9.2)',
      nota:'Se folosește doar când titlul spune „acord de finanțare" fără să arate dacă banii ' +
        'se întorc, iar finanțatorul nu e nici bancă de dezvoltare, nici agenție de donații. ' +
@@ -588,7 +584,7 @@
   /* Categoriile sunt cele din HG 377/2018, anexa nr. 1, pct. 9. */
   var CLS = {'Grant':'t-grant', 'Împrumut':'t-imprumut',
     'Suport bugetar':'t-suport', 'Asistență tehnică':'t-tehnica',
-    'Asistență financiară':'t-finantare', 'Asistență externă':'t-externa'};
+    'Asistență financiară':'t-finantare'};
 
   var app = document.getElementById('app'), topMeta = document.getElementById('topMeta');
   // „acorduri" = un rând per acord, cu etapele lui. „acte" = lista plată a

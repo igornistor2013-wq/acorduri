@@ -55,8 +55,6 @@ UA = {"User-Agent": "Mozilla/5.0 (compatible; monitor-watch/1.0)"}
 #   Asistență tehnică    (pct. 9.3)   consultanță, instruire, expertiză
 #   Asistență financiară (pct. 9.2)   categoria-părinte, folosită doar când
 #                                     titlul nu spune dacă e rambursabilă
-#   Asistență externă    (pct. 9.1)   noțiunea-umbrelă, când nu se poate spune
-#                                     nici măcar dacă e financiară sau tehnică
 #
 # „Credit" și „Contract de finanțare" nu mai sunt categorii separate, fiindcă
 # nu există ca noțiuni în regulament: facilitatea de credit e tot împrumut, iar
@@ -138,16 +136,17 @@ INCLUDE = [
 # reale, între ele încap denumirile complete ale ambelor părți — 140 de caractere
 # în cazul acordului cu Agenția Elvețiană pentru Dezvoltare și Cooperare.
 INCLUDE_PARTENER = [
-    # „Acord de colaborare dintre X și PNUD pentru implementarea proiectului Y"
-    # nu spune nicăieri că e vorba de bani, cu atât mai puțin de bani
-    # nerambursabili. Îl trecuseră la „Grant", ceea ce afirma ceva ce textul nu
-    # susține: un acord de colaborare poate fi asistență tehnică, poate fi
-    # finanțare, poate fi doar punerea în comun a unor resurse.
+    # „Acord de colaborare dintre X și PNUD pentru implementarea proiectului Y".
+    # Titlul nu numește niciun instrument financiar, deci nu e grant — asta ar
+    # afirma că banii sunt nerambursabili, ceea ce textul nu spune. Dar nici nu
+    # e un act oarecare: o agenție de dezvoltare care implementează un proiect
+    # aduce expertiză și capacitate de execuție, adică exact ce descrie pct. 9.3
+    # ca asistență tehnică — sprijin nerambursabil pentru transfer de cunoștințe
+    # și consolidarea capacităților instituționale.
     #
-    # Folosim noțiunea-umbrelă din pct. 9.1 — asistență externă — care e tot ce
-    # se poate spune cu temei: partenerul e extern și recunoscut, obiectul e
-    # implementarea unui proiect, dar forma asistenței nu e numită.
-    (ACORD + r"\s+de\s+colaborare\s+dintre", "Asistență externă"),
+    # Regula cere un partener extern recunoscut, altfel ar înghiți orice
+    # colaborare între două instituții moldovenești.
+    (ACORD + r"\s+de\s+colaborare\s+dintre", "Asistență tehnică"),
     (r"(?=.*\b(?:acord|acordul|acordului|memorandum|memorandumul|memorandumului)\b)"
      r".*\b(?:consultanta|instruire|expertiza|transfer\s+de\s+cunostinte)",
      "Asistență tehnică"),
@@ -279,10 +278,7 @@ def classify(title):
     #
     # „Asistență financiară" e ultima, fiind categoria-părinte din pct. 9.2: o
     # folosim doar când titlul nu spune dacă banii sunt rambursabili sau nu.
-    # „Asistență externă" e ultima: e noțiunea cea mai largă, bună doar când
-    # nimic mai precis nu se poate afirma.
-    for pref in ("Împrumut", "Grant", "Asistență tehnică", "Asistență financiară",
-                 "Asistență externă"):
+    for pref in ("Împrumut", "Grant", "Asistență tehnică", "Asistență financiară"):
         if pref in hits:
             if pref == "Asistență financiară":
                 return dupa_finantator(title)
@@ -464,7 +460,8 @@ def parse_edition(eid, label):
 
 def load():
     if not os.path.exists(DATA):
-        return {"acte": {}, "editii_vazute": [], "ultima_rulare": None}
+        return {"acte": {}, "editii_vazute": [],
+            "editii_esuate": {}, "ultima_rulare": None}
     with open(DATA, encoding="utf-8") as f:
         return json.load(f)
 
@@ -511,6 +508,15 @@ def culege(db, eid, label):
     return True, noi
 
 
+# După atâtea încercări nereușite, o ediție e considerată inaccesibilă și nu
+# mai e cerută. Numerotarea Monitorului are găuri reale: edițiile speciale și
+# volumele suplimentare („424-434b") ocupă numere proprii, iar unele nu ajung
+# niciodată pe prima pagină. Fără pragul ăsta, scriptul ar cere la nesfârșit o
+# pagină care nu există, iar pagina ar afișa pentru totdeauna un avertisment pe
+# care nimeni nu-l poate rezolva.
+MAX_INCERCARI = 5
+
+
 def goluri(db):
     """Edițiile lipsă din șirul celor văzute.
 
@@ -527,7 +533,10 @@ def goluri(db):
     vazute = sorted(int(x) for x in db["editii_vazute"] if str(x).isdigit())
     if len(vazute) < 2:
         return []
-    return [i for i in range(vazute[0], vazute[-1] + 1) if i not in vazute]
+    renuntat = {int(k) for k, v in db.get("editii_esuate", {}).items()
+                if v >= MAX_INCERCARI and str(k).isdigit()}
+    return [i for i in range(vazute[0], vazute[-1] + 1)
+            if i not in vazute and i not in renuntat]
 
 
 def main():
@@ -597,12 +606,19 @@ def main():
     if lipsa:
         print(f"\n{len(lipsa)} ediții lipsă din șir — le recuperez "
               f"({min(len(lipsa), MAX_RECUPERARI)} acum, de la cele mai noi):")
+        esuate = db.setdefault("editii_esuate", {})
         for eid in lipsa[:MAX_RECUPERARI]:
             print(f" ← ediția {eid}")
             ok, n = culege(db, str(eid), "")
             noi += n
             if ok:
                 db["editii_vazute"].append(str(eid))
+                esuate.pop(str(eid), None)
+            else:
+                esuate[str(eid)] = esuate.get(str(eid), 0) + 1
+                if esuate[str(eid)] >= MAX_INCERCARI:
+                    print(f"   ediția {eid} nu răspunde de {MAX_INCERCARI} ori — "
+                          f"o consider inexistentă și nu o mai cer")
             time.sleep(1)
         db["editii_vazute"] = sorted(set(db["editii_vazute"]),
                                      key=lambda x: int(x) if x.isdigit() else 0)
@@ -615,6 +631,10 @@ def main():
     # de zile întregi fără ca nimic s-o semnaleze.
     ramase = goluri(db)
     db["editii_lipsa"] = [str(x) for x in ramase]
+    renuntate = [k for k, v in db.get("editii_esuate", {}).items() if v >= MAX_INCERCARI]
+    if renuntate:
+        print(f"{len(renuntate)} ediții inaccesibile, verificate de "
+              f"{MAX_INCERCARI} ori: " + ", ".join(sorted(renuntate)))
     save(db)
 
     total = len(db["acte"])

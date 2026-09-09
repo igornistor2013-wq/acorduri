@@ -63,7 +63,7 @@
     "nr. 430, 5 august 2026|3314": {
       "act": "nr. 430, 5 august 2026",
       "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de colaborare dintre Instituția Publică Organizația pentru Dezvoltarea Antreprenoriatului și Programul Națiunilor Unite pentru Dezvoltare pentru implementarea proiectului „Comunități reziliente prin abilitarea femeilor”",
-      "categorie": "Asistență externă",
+      "categorie": "Asistență tehnică",
       "partener": "PNUD",
       "semnat": "",
       "editie": "359-362",
@@ -2503,7 +2503,7 @@
     "nr. 147, 24 august 2026|3327": {
       "act": "nr. 147, 24 august 2026",
       "titlu": "Ordin cu privire la aducerea la cunoştinţa publică a datei intrării în vigoare a Acordului de colaborare dintre Instituţia Publică Organizaţia pentru Dezvoltarea Antreprenoriatului şi Programul Naţiunilor Unite pentru Dezvoltare pentru implementarea proiectului „Comunităţi reziliente prin abilitarea femeilor”",
-      "categorie": "Asistență externă",
+      "categorie": "Asistență tehnică",
       "partener": "PNUD",
       "semnat": "",
       "editie": "407-409",
@@ -4226,30 +4226,6 @@
       "editie_id": "3331",
       "url": "https://monitorul.gov.md/ro/monitor/3331",
       "suport": false
-    },
-    "nr. 763-X, 3 septembrie 2026|3336": {
-      "act": "nr. 763-X, 3 septembrie 2026",
-      "titlu": "Decret cu privire la promulgarea Legii pentru ratificarea Scrisorii de modificare la Acordul de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare „RLF – Răspuns de urgență – Căile Ferate din Moldova”",
-      "categorie": "Împrumut",
-      "partener": "BERD",
-      "semnat": "",
-      "editie": "435-438",
-      "data_editie": "09.09.2026",
-      "editie_id": "3336",
-      "suport": false,
-      "url": "https://monitorul.gov.md/ro/monitor/3336"
-    },
-    "nr. 188, 24 august 2026|3336": {
-      "act": "nr. 188, 24 august 2026",
-      "titlu": "Lege pentru ratificarea Scrisorii de modificare la Acordul de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare „RLF – Răspuns de urgență – Căile Ferate din Moldova”",
-      "categorie": "Împrumut",
-      "partener": "BERD",
-      "semnat": "",
-      "editie": "435-438",
-      "data_editie": "09.09.2026",
-      "editie_id": "3336",
-      "suport": false,
-      "url": "https://monitorul.gov.md/ro/monitor/3336"
     }
   },
   "editii_vazute": [
@@ -4275,10 +4251,9 @@
     "3331",
     "3332",
     "3334",
-    "3335",
-    "3336"
+    "3335"
   ],
-  "ultima_rulare": "09.09.2026 06:45",
+  "ultima_rulare": "08.09.2026 06:17",
   "editii_lipsa": [
     "3333"
   ]
