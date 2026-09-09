@@ -93,6 +93,7 @@
   .t-contract{background:var(--blue-bg);color:var(--navy)}
   .t-credit{background:var(--purple-bg);color:var(--purple)}
   .t-tehnica{background:#e8eef7;color:#3d5a80}
+  .t-externa{background:#eef0f4;color:var(--ink-dim)}
   .t-suport{background:var(--purple-bg);color:var(--purple);margin-left:5px;cursor:help}
   .t-alt{background:#eef0f4;color:var(--ink-dim)}
   .t-simpl{background:var(--green-bg);color:var(--green-ink)}
@@ -439,6 +440,8 @@
         autoritatea responsabilă publică un ordin care CHIAR numește acordul
         (HG 377/2018, anexa 1¹, pct. 44). Pe acela îl arătăm ca informație
         derivată, nu ca etapă. */
+  var MARCAJ_SUPORT = 'suport bugetar';
+
   var VIGOARE = {k:'vig', cap:'Ordin de punere în aplicare',
                  ref:'HG 377/2018, anexa 1¹, pct. 44'};
 
@@ -517,6 +520,11 @@
     {cat:'Asistență tehnică', legal:'Consultanță, instruire, expertiză (pct. 9.3)',
      nota:'Acord sau contract de asistență ori cooperare tehnică, memorandum privind ' +
        'consultanța sau instruirea. Ajunge în Monitor prin ordinul autorității semnatare.'},
+    {cat:'Asistență externă', legal:'Noțiunea-umbrelă (pct. 9.1)',
+     nota:'Ultima soluție, folosită când actul e limpede despre asistență externă — partener ' +
+       'extern recunoscut, implementarea unui proiect — dar titlul nu spune nici măcar dacă ' +
+       'e vorba de bani sau de expertiză. Un „acord de colaborare pentru implementarea ' +
+       'proiectului" intră aici; a-l numi grant ar afirma ceva ce textul nu susține.'},
     {cat:'Asistență financiară', legal:'Categoria-părinte (pct. 9.2)',
      nota:'Se folosește doar când titlul spune „acord de finanțare" fără să arate dacă banii ' +
        'se întorc, iar finanțatorul nu e nici bancă de dezvoltare, nici agenție de donații. ' +
@@ -580,14 +588,14 @@
   /* Categoriile sunt cele din HG 377/2018, anexa nr. 1, pct. 9. */
   var CLS = {'Grant':'t-grant', 'Împrumut':'t-imprumut',
     'Suport bugetar':'t-suport', 'Asistență tehnică':'t-tehnica',
-    'Asistență financiară':'t-finantare'};
+    'Asistență financiară':'t-finantare', 'Asistență externă':'t-externa'};
 
   var app = document.getElementById('app'), topMeta = document.getElementById('topMeta');
   // „acorduri" = un rând per acord, cu etapele lui. „acte" = lista plată a
   // actelor publicate, în ordinea apariției în Monitor. Aceleași date, aceleași
   // filtre — doar felul de a le citi diferă.
   var db = null, fCat = 'all', fOrg = 'all', fAn = 'all', fEt = 'all',
-      seek = '', vedere = 'acorduri';
+      fSuport = false, seek = '', vedere = 'acorduri';
 
   var q = new URLSearchParams(location.search).get('src');
   if (q) DATA_URL = q;
@@ -1060,6 +1068,11 @@
     if (fAn  !== 'all') filtre.push('anul ' + fAn);
     if (fOrg !== 'all') filtre.push('partener: ' + fOrg);
     if (fCat !== 'all') filtre.push('tip: ' + fCat);
+    if (fEt  !== 'all'){
+      var se = STEPS.filter(function(x){ return x.k === fEt; })[0];
+      filtre.push('etapa: ' + (se ? se.n + '. ' + se.cap : fEt));
+    }
+    if (fSuport)        filtre.push('doar cu marcaj de suport bugetar');
     if (seek)           filtre.push('căutare: ' + seek);
     var antet = 'Acorduri de asistență externă — Monitorul Oficial al Republicii Moldova. ' +
       'Extras la ' + new Date().toLocaleDateString('ro-RO') + '. ' +
@@ -1129,6 +1142,7 @@
       (fAn  !== 'all' ? '-' + fAn : '') +
       (fOrg !== 'all' ? bucata(fOrg) : '') +
       (fCat !== 'all' ? bucata(fCat) : '') +
+      (fSuport ? '-suportbugetar' : '') +
       '-' + new Date().toISOString().slice(0,10) + '.xlsx';
     document.body.appendChild(a);
     a.click();
@@ -1297,9 +1311,14 @@
     }).join('');
 
     var etichHtml = ETICHETE.map(function(e){
-      var ng = cats[e.cat] || 0, na = catsA[e.cat] || 0;
-      return '<li><button class="et-map" data-cat="' + esc(e.cat) + '">' +
-        '<span class="tag ' + (CLS[e.cat]||'t-alt') + '">' + esc(e.cat) + '</span>' +
+      var ng, na;
+      if (e.cat === MARCAJ_SUPORT){
+        ng = grupuri.filter(function(g){ return g.suport; }).length;
+        na = acte.filter(function(a){ return a.suport; }).length;
+      } else { ng = cats[e.cat] || 0; na = catsA[e.cat] || 0; }
+      var cls = e.cat === MARCAJ_SUPORT ? 't-suport' : (CLS[e.cat] || 't-alt');
+      return '<li><button class="et-map" data-cat="' + esc(e.cat) + '" aria-pressed="false">' +
+        '<span class="tag ' + cls + '">' + esc(e.cat) + '</span>' +
         '<span class="map-sag">→</span>' +
         '<span class="map-legal">' + esc(e.legal) + '</span>' +
         '<span class="inv-n">' + ng + ' acorduri · ' + na + ' acte</span></button>' +
@@ -1398,10 +1417,22 @@
     // trece direct de la definiție la acordurile care intră sub ea.
     app.querySelectorAll('.et-map').forEach(function(b){
       b.addEventListener('click', function(){
-        fCat = b.dataset.cat;
-        app.querySelectorAll('#catBtns button').forEach(function(o){
-          o.setAttribute('aria-pressed', String(o.dataset.cat === fCat));
-        });
+        /* Suportul bugetar nu e categorie, ci marcaj — un clic pe el trebuie să
+           comute marcajul. Tratat ca o categorie, filtra după o valoare care nu
+           există pe niciun acord și golea lista. */
+        if (b.dataset.cat === MARCAJ_SUPORT){
+          fSuport = !fSuport;
+          b.setAttribute('aria-pressed', String(fSuport));
+        } else {
+          fCat = b.dataset.cat;
+          fSuport = false;
+          app.querySelectorAll('#catBtns button').forEach(function(o){
+            o.setAttribute('aria-pressed', String(o.dataset.cat === fCat));
+          });
+          app.querySelectorAll('.et-map').forEach(function(o){
+            if (o.dataset.cat === MARCAJ_SUPORT) o.setAttribute('aria-pressed', 'false');
+          });
+        }
         rows(grupuri, acte);
         document.getElementById('lista').scrollIntoView({behavior:'smooth', block:'start'});
       });
@@ -1550,6 +1581,7 @@
     if (fOrg !== 'all') p.push('org=' + encodeURIComponent(fOrg));
     if (fCat !== 'all') p.push('cat=' + encodeURIComponent(fCat));
     if (fEt  !== 'all') p.push('et=' + encodeURIComponent(fEt));
+    if (fSuport) p.push('sup=1');
     if (vedere !== 'acorduri') p.push('v=' + vedere);
     if (seek) p.push('q=' + encodeURIComponent(seek));
     var nou = p.length ? '#' + p.join('&') : ' ';
@@ -1567,6 +1599,7 @@
       else if (k === 'org') fOrg = v;
       else if (k === 'cat') fCat = v;
       else if (k === 'et')  fEt = v;
+      else if (k === 'sup') fSuport = (v === '1');
       else if (k === 'v' && (v === 'acte' || v === 'acorduri')) vedere = v;
       else if (k === 'q')   seek = fold(v);
     });
@@ -1579,25 +1612,40 @@
        rânduri în loc de 73 și n-are cum să înțeleagă de ce. */
     var chip = document.getElementById('etChip');
     if (chip){
-      if (fEt === 'all'){ chip.hidden = true; }
+      /* Filtrele care se aplică din alt panou — etapa și marcajul de suport
+         bugetar — nu au niciun buton lângă tabel. Fără eticheta asta, cine
+         derulează direct la listă vede două rânduri din nouăzeci și două și
+         n-are cum să afle de ce. */
+      var active = [];
+      if (fEt !== 'all'){
+        var st = STEPS.filter(function(x){ return x.k === fEt; })[0];
+        if (st) active.push({ text: 'etapa: ' + st.cap, sterge: function(){ fEt = 'all'; } });
+      }
+      if (fSuport) active.push({ text: MARCAJ_SUPORT, sterge: function(){ fSuport = false; } });
+
+      if (!active.length){ chip.hidden = true; }
       else {
-        var s = STEPS.concat([VIGOARE]).filter(function(x){ return x.k === fEt; })[0];
         chip.hidden = false;
-        chip.innerHTML = 'etapa: ' + esc(s.cap) + '<b title="Șterge filtrul">×</b>';
-        chip.querySelector('b').onclick = function(){
-          fEt = 'all';
-          document.querySelectorAll('#flux .et-card').forEach(function(o){
-            o.classList.remove('activ');
-            o.setAttribute('aria-expanded', 'false');
-          });
-          // Închidem și panoul de detaliu: altfel butonul din el ar rămâne pe
-          // „Șterge filtrul", deși filtrul tocmai a fost șters de aici.
-          var det = document.getElementById('etDetail');
-          if (det){ det.hidden = true; det.innerHTML = ''; }
-          var h = document.getElementById('etHint');
-          if (h) h.textContent = 'Apasă o etapă pentru detalii';
-          rows(grupuri, acte);
-        };
+        chip.innerHTML = active.map(function(f){
+          return esc(f.text) + '<b title="Șterge filtrul">×</b>';
+        }).join(' ');
+        chip.querySelectorAll('b').forEach(function(x, i){
+          x.onclick = function(){
+            active[i].sterge();
+            document.querySelectorAll('#flux .et-card').forEach(function(o){
+              o.classList.remove('activ');
+              o.setAttribute('aria-expanded', 'false');
+            });
+            document.querySelectorAll('.et-map').forEach(function(o){
+              if (o.dataset.cat === MARCAJ_SUPORT) o.setAttribute('aria-pressed', String(fSuport));
+            });
+            var det = document.getElementById('etDetail');
+            if (det){ det.hidden = true; det.innerHTML = ''; }
+            var h = document.getElementById('etHint');
+            if (h) h.textContent = 'Apasă o etapă pentru detalii';
+            rows(grupuri, acte);
+          };
+        });
       }
     }
     if (vedere === 'acte') return randActe(acte);
@@ -1612,6 +1660,7 @@
     if (fOrg !== 'all' && (a.partener||'').split(' / ').indexOf(fOrg) === -1) return false;
     if (fAn !== 'all' && an(a) !== fAn) return false;
     if (fEt !== 'all' && etapa(a).indexOf(fEt) === -1) return false;
+    if (fSuport && !a.suport) return false;
     return true;
   }
 
@@ -1620,6 +1669,7 @@
     if (fOrg !== 'all' && !g.orgs[fOrg]) return false;
     if (fAn !== 'all' && aniGrup(g).indexOf(fAn) === -1) return false;
     if (fEt !== 'all' && !g.et[fEt]) return false;
+    if (fSuport && !g.suport) return false;
     return true;
   }
 

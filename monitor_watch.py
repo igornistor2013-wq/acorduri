@@ -55,6 +55,8 @@ UA = {"User-Agent": "Mozilla/5.0 (compatible; monitor-watch/1.0)"}
 #   Asistență tehnică    (pct. 9.3)   consultanță, instruire, expertiză
 #   Asistență financiară (pct. 9.2)   categoria-părinte, folosită doar când
 #                                     titlul nu spune dacă e rambursabilă
+#   Asistență externă    (pct. 9.1)   noțiunea-umbrelă, când nu se poate spune
+#                                     nici măcar dacă e financiară sau tehnică
 #
 # „Credit" și „Contract de finanțare" nu mai sunt categorii separate, fiindcă
 # nu există ca noțiuni în regulament: facilitatea de credit e tot împrumut, iar
@@ -136,7 +138,16 @@ INCLUDE = [
 # reale, între ele încap denumirile complete ale ambelor părți — 140 de caractere
 # în cazul acordului cu Agenția Elvețiană pentru Dezvoltare și Cooperare.
 INCLUDE_PARTENER = [
-    (ACORD + r"\s+de\s+colaborare\s+dintre", "Grant"),
+    # „Acord de colaborare dintre X și PNUD pentru implementarea proiectului Y"
+    # nu spune nicăieri că e vorba de bani, cu atât mai puțin de bani
+    # nerambursabili. Îl trecuseră la „Grant", ceea ce afirma ceva ce textul nu
+    # susține: un acord de colaborare poate fi asistență tehnică, poate fi
+    # finanțare, poate fi doar punerea în comun a unor resurse.
+    #
+    # Folosim noțiunea-umbrelă din pct. 9.1 — asistență externă — care e tot ce
+    # se poate spune cu temei: partenerul e extern și recunoscut, obiectul e
+    # implementarea unui proiect, dar forma asistenței nu e numită.
+    (ACORD + r"\s+de\s+colaborare\s+dintre", "Asistență externă"),
     (r"(?=.*\b(?:acord|acordul|acordului|memorandum|memorandumul|memorandumului)\b)"
      r".*\b(?:consultanta|instruire|expertiza|transfer\s+de\s+cunostinte)",
      "Asistență tehnică"),
@@ -268,7 +279,10 @@ def classify(title):
     #
     # „Asistență financiară" e ultima, fiind categoria-părinte din pct. 9.2: o
     # folosim doar când titlul nu spune dacă banii sunt rambursabili sau nu.
-    for pref in ("Împrumut", "Grant", "Asistență tehnică", "Asistență financiară"):
+    # „Asistență externă" e ultima: e noțiunea cea mai largă, bună doar când
+    # nimic mai precis nu se poate afirma.
+    for pref in ("Împrumut", "Grant", "Asistență tehnică", "Asistență financiară",
+                 "Asistență externă"):
         if pref in hits:
             if pref == "Asistență financiară":
                 return dupa_finantator(title)
@@ -594,6 +608,13 @@ def main():
                                      key=lambda x: int(x) if x.isdigit() else 0)
 
     db["ultima_rulare"] = datetime.now().strftime("%d.%m.%Y %H:%M")
+
+    # Golurile rămase se calculează ÎNAINTE de salvare. Erau calculate după, așa
+    # că valoarea proaspătă nu ajungea niciodată în fișier: date.json păstra o
+    # listă goală, iar pagina nu avea ce afișa. Ediția 3333 lipsea din registru
+    # de zile întregi fără ca nimic s-o semnaleze.
+    ramase = goluri(db)
+    db["editii_lipsa"] = [str(x) for x in ramase]
     save(db)
 
     total = len(db["acte"])
@@ -603,8 +624,6 @@ def main():
         print(f"\nNimic nou. Total în registru: {total}.")
     if esecuri:
         print("Ediții nedescărcate (se reiau la rularea următoare): " + ", ".join(esecuri))
-    ramase = goluri(db)
-    db["editii_lipsa"] = [str(x) for x in ramase]
     if ramase:
         print(f"Încă {len(ramase)} ediții lipsă din șir, cele mai noi: " +
               ", ".join(str(x) for x in sorted(ramase, reverse=True)[:12]) +
