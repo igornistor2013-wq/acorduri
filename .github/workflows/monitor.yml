@@ -36,6 +36,13 @@ jobs:
       - name: Instalează bibliotecile
         run: pip install --quiet requests beautifulsoup4
 
+      # Testele rulează înaintea colectării. Dacă pică, colectarea nici nu
+      # pornește: o rulare oprită se vede imediat în Actions, un registru
+      # stricat ar trece neobservat. În septembrie o greșeală de o literă a
+      # oprit colectarea zile întregi fără ca nimeni să afle.
+      - name: Verifică scriptul
+        run: python teste.py
+
       - name: Rulează colectarea
         run: python monitor_watch.py
 
