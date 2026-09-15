@@ -24,7 +24,7 @@ import os
 import re
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, date
 
 try:
     import requests
@@ -366,8 +366,18 @@ def signed_on(title):
         return ""
     day, mon, year = m.group(1), norm(m.group(2)), m.group(3)
     for name, num in MONTHS.items():
-        if norm(name) == mon:
-            return f"{int(day):02d}.{num:02d}.{year}"
+        if norm(name) != mon:
+            continue
+        # Verificăm că data chiar există. Un titlu cu „31 februarie" nu e
+        # imposibil — sunt texte scrise de om — iar o dată inventată ar ajunge
+        # în registru și de acolo în exportul Excel, arătând la fel de sigură
+        # ca oricare alta. Mai bine niciun răspuns decât unul fals.
+        try:
+            date(int(year), num, int(day))
+        except ValueError:
+            print(f"   ! data semnării imposibilă, o ignor: {day} {name} {year}")
+            return ""
+        return f"{int(day):02d}.{num:02d}.{year}"
     return ""
 
 

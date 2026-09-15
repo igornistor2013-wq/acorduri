@@ -1215,6 +1215,17 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
+  /* Pagina reacționează și la schimbarea fragmentului din adresă. Un link cu
+     filtre funcționa doar la încărcarea paginii; lipit în bara de adrese cât
+     timp pagina era deja deschisă, nu făcea nimic — browserul schimbă doar
+     fragmentul, fără să reîncarce. La fel la butonul „înapoi" al browserului. */
+  window.addEventListener('hashchange', function(){
+    if (!db) return;
+    fCat = 'all'; fOrg = 'all'; fAn = 'all'; fEt = 'all'; fSuport = false;
+    seek = ''; vedere = 'acorduri';
+    paint();
+  });
+
   function paint(){
     citesteURL();          // filtrele din link, înainte de a desena butoanele
     var acte = Object.keys(db.acte||{}).map(function(k){ return db.acte[k]; });
