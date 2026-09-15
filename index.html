@@ -3602,8 +3602,30 @@ function archiveRecords(){
 function mergeRecords(archive, live){
   const byId = new Map();
   archive.forEach(r => byId.set(r.id, r));
+
+  /* Evidența suprapunerilor, pentru diagnostic. După contopire nu se mai poate
+     spune din rezultat ce a adus raportul live și ce s-a păstrat din arhivă —
+     anii se amestecă. O reținem aici, unde ambele surse sunt încă separate. */
+  const suprapuneri = [];
+
   (live || []).forEach(r => {
     const old = byId.get(r.id);
+    if(old){
+      const aniLive = Object.keys(r.y || {});
+      const aniArhiva = Object.keys(old.y || {})
+        .filter(a => (old.y[a][0] || old.y[a][1]));
+      const pastrati = aniArhiva.filter(a => aniLive.indexOf(a) === -1);
+      suprapuneri.push({
+        id: r.id,
+        titlu: r.t || old.t || '',
+        donator: (r.d && r.d.length ? r.d : (old.d || [])).join(' / '),
+        aniLive: aniLive.sort().join(' '),
+        aniArhiva: aniArhiva.sort().join(' '),
+        aniPastrati: pastrati.sort().join(' '),
+        sumaPastrata: Math.round(pastrati.reduce(
+          (s, a) => s + (old.y[a][0] || 0) + (old.y[a][1] || 0), 0))
+      });
+    }
     if(old){
       r.snd = old.snd; r.gb = old.gb; r.bug = old.bug; r.vp = old.vp;
       if(!r.loc.length) r.loc = old.loc;
@@ -3629,6 +3651,9 @@ function mergeRecords(archive, live){
     }
     byId.set(r.id, r);
   });
+
+  suprapuneri.sort((a, b) => b.sumaPastrata - a.sumaPastrata);
+  window.__suprapuneri = suprapuneri;
   return [...byId.values()];
 }
 
