@@ -626,6 +626,9 @@
   .data-status.loading{background:var(--blue-bg);border-color:#c3d2ec;color:var(--navy);}
   .data-status.ok{background:var(--green-bg);border-color:#bfe0cb;color:var(--green-ink);}
   .data-status.error{background:var(--red-bg);border-color:#eec4ba;color:var(--red);}
+  /* Avertisment: datele au venit, dar nu toate. Nici verde, nici roșu. */
+  .data-status.warn{background:var(--gold-bg);border-color:#e8cf9a;color:#8a5c0d;}
+  .data-status.warn b{color:#6b460a;}
   .data-status .spin{
     width:14px;height:14px;flex:none;border-radius:50%;
     border:2px solid rgba(34,64,107,.25);border-top-color:var(--navy);
@@ -3389,7 +3392,30 @@ async function fetchAmpCsv(lang){
 /* ---------- Parsare CSV live ---------- */
 // Se folosesc DOAR coloanele „... Total" pe an. Coloanele defalcate pe tip de
 // asistență sunt sub-componente ale acestora — însumarea lor ar dubla valorile.
-const LIVE_FUNDING_RE = /^\s*(?:Funding|Finanțare)\s+(\d{4})\s+Actual\s+(Commitments|Disbursements)\s+Total\s*$/i;
+/* Denumirea coloanelor de sume nu poate fi ghicită pe de rost: raportul vine în
+   română sau în engleză, iar traducerea nu e literală. Un tipar fix a mers cât
+   timp exportul a fost „Funding 2021 Actual Commitments Total"; dacă platforma
+   trece pe „Finanțare 2021 Angajamente efective Total", nicio coloană nu se mai
+   potrivește, toate proiectele live rămân cu zero, iar totalurile SCAD sub
+   valorile din arhivă — fără niciun semn că ceva n-a mers.
+
+   Cerem trei lucruri, oricum ar fi scrise: un cuvânt de finanțare, un an, și
+   „total". Pe cel din urmă îl cerem fiindcă raportul are și coloane defalcate
+   pe tip de asistență, care sunt sub-componente — însumarea lor ar dubla
+   valorile. */
+function coloanaFinantare(h){
+  /* Fără diacritice: „Debursări" nu se potrivea cu tiparul scris cu „a" simplu,
+     iar coloana de debursări trecea neobservată chiar și după ce cea de
+     angajamente era recunoscută. */
+  const x = (h || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if(!/funding|finantare/.test(x)) return null;
+  if(!/total/.test(x)) return null;
+  const an = x.match(/\b(\d{4})\b/);
+  if(!an) return null;
+  if(/commitment|angajament/.test(x)) return { year: an[1], metric: 0 };
+  if(/disbursement|debursa|plati/.test(x)) return { year: an[1], metric: 1 };
+  return null;
+}
 
 /* Cedăm controlul browserului la fiecare N rânduri procesate. Fără asta, la
    un raport live mare, tot lucrul (tokenizare + potrivire donatori/beneficiari)
@@ -3428,9 +3454,11 @@ async function parseLiveCSV(csvText, onProgress){
 
   const fundingCols = [];
   header.forEach((h, i) => {
-    const m = h.match(LIVE_FUNDING_RE);
-    if(m) fundingCols.push({ i, year: m[1], metric: /^c/i.test(m[2]) ? 0 : 1 });
+    const m = coloanaFinantare(h);
+    if(m) fundingCols.push({ i, year: m.year, metric: m.metric });
   });
+  // Ca să se vadă imediat dacă platforma și-a schimbat denumirile.
+  window.__coloaneFinantare = fundingCols.length;
 
   const num = s => {
     s = (s || '').trim().replace(/\s/g, '').replace(/,/g, '');
@@ -3579,6 +3607,17 @@ function mergeRecords(archive, live){
     if(old){
       r.snd = old.snd; r.gb = old.gb; r.bug = old.bug; r.vp = old.vp;
       if(!r.loc.length) r.loc = old.loc;
+
+      /* Anii pe care raportul live nu-i acoperă se păstrează din arhivă.
+         Fără asta, o înregistrare live fără sume ștergea valorile arhivei, iar
+         totalul afișat scădea — cu atât mai mult cu cât raportul acoperea mai
+         multe proiecte. Un raport care chiar corectează o sumă aduce anul
+         respectiv cu valoarea lui nouă, deci corecțiile trec în continuare. */
+      Object.keys(old.y).forEach(k => {
+        if(r.y[k]) return;
+        const ov = old.y[k];
+        if(ov && (ov[0] || ov[1])) r.y[k] = ov.slice();
+      });
       Object.keys(old.y).forEach(k => {
         const ov = old.y[k];
         if(ov.length <= 2 || !(ov[2] || ov[3] || ov[4])) return;
@@ -3922,12 +3961,20 @@ async function loadLiveData(){
     const introWasActive = !!window.__introRunning;
     rebuildAll(merged);
     if(!introWasActive && window.tweenKpiNumbers) window.tweenKpiNumbers(kpiBefore, lastKpiTotals, 900);
-    setDataStatus('ok', 'statusOk', {
-      live:  fmtNum(liveRo.length),
-      upd:   fmtNum(updated),
-      new:   fmtNum(added),
-      total: fmtNum(ALL_RECORDS.length)   // după excluderea celor fără donator
-    });
+    /* Dacă raportul a venit fără nicio coloană de sume recunoscută, cifrele
+       arătate sunt ale arhivei, nu ale zilei de azi. Diferența nu se vede din
+       tabel, așa că o spunem explicit — altfel cineva ar citi totaluri vechi
+       crezându-le proaspete. */
+    if(window.__coloaneFinantare === 0 && liveRo.length){
+      setDataStatus('warn', 'statusFaraSume', {});
+    } else {
+      setDataStatus('ok', 'statusOk', {
+        live:  fmtNum(liveRo.length),
+        upd:   fmtNum(updated),
+        new:   fmtNum(added),
+        total: fmtNum(ALL_RECORDS.length)   // după excluderea celor fără donator
+      });
+    }
     startIatiAfterAmp();
   }catch(err){
     console.warn('AMP live:', err);
@@ -6868,6 +6915,7 @@ Object.assign(I18N.ro, {
   introWaitingLive: 'se așteaptă datele actualizate din raportul live…',
   statusOk: '<b>Date actualizate.</b> {live} proiecte din AMP (live) — {upd} actualizate față de arhivă, {new} noi. Total afișat: <b>{total}</b> proiecte.',
   statusError: '<b>Datele live nu au putut fi încărcate.</b> Se afișează doar arhiva (1993–2022). Detalii: {err}',
+  statusFaraSume: '<b>Raportul live nu are coloane de sume recunoscute.</b> Proiectele s-au preluat, dar angajamentele și debursările rămân cele din arhivă. Probabil platforma a redenumit coloanele de finanțare.',
   statusRetry: 'Reîncearcă',
   footerSource: 'Sursă: platforma AMP (Aid Management Platform) a Republicii Moldova — arhivă 1993–2022 + raport live 2008–2026 · sume în EUR',
   footerIatiSource: 'Sursă: standardul internațional IATI (International Aid Transparency Initiative), via d-portal · potriviri cu platforma AMP a Republicii Moldova'
@@ -6888,6 +6936,7 @@ Object.assign(I18N.en, {
   introWaitingLive: 'waiting for the updated live report…',
   statusOk: '<b>Data updated.</b> {live} projects from AMP (live) — {upd} updated over the archive, {new} new. Total shown: <b>{total}</b> projects.',
   statusError: '<b>Live data could not be loaded.</b> Showing the archive only (1993–2022). Details: {err}',
+  statusFaraSume: '<b>The live report has no recognisable funding columns.</b> Projects were loaded, but commitments and disbursements remain those of the archive. The platform has probably renamed the funding columns.',
   statusRetry: 'Retry',
   footerSource: 'Source: the Republic of Moldova AMP (Aid Management Platform) — 1993–2022 archive + live 2008–2026 report · amounts in EUR',
   footerIatiSource: 'Source: the international IATI standard (International Aid Transparency Initiative), via d-portal · matched against the Republic of Moldova AMP platform'

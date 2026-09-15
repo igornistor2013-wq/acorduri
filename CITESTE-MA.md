@@ -1,79 +1,50 @@
-# Ce se urcă pe GitHub
+# De urcat pe GitHub — patru fișiere
 
 Repository: `igornistor2013-wq/acorduri` · Site: `nistor.vivi.md`
 
-## Ce s-a schimbat
-
-Toate cele zece arhive ale Monitorului au fost **reprocesate de la zero** cu
-filtrul curent. Importurile anterioare rulaseră cu versiuni mai vechi, care
-nu cunoșteau asistența tehnică și o parte din finanțatori — actele care se
-potriveau doar cu regulile noi nu fuseseră extrase deloc.
-
-Registrul are acum **332 de acte în 96 de acorduri**, din 12.01.2024 până în
-09.09.2026.
-
-### Actele recuperate
-
-| Data | Partener | Ce e |
+| Fișier | Unde | Ce aduce |
 |---|---|---|
-| 19.08.2025 | PAM | Acord de Asistență Tehnică cu Ministerul Muncii |
-| 04.09.2025 | BEI | Acord de cooperare privind servicii de consultanță |
-| 20.11.2025 | JICA | Memorandum de înțelegere cu ODA |
-| 29.05.2026 | Elveția | Acord de înțelegere cu Ministerul Dezvoltării Economice |
+| `teste.py` | rădăcină | **fișier nou.** Set de teste rulat de automatizare înainte de colectare |
+| `index.html` | rădăcină | butoane reordonate și colorate; coloanele de sume din raportul live se recunosc după înțeles; datele live nu mai pot șterge sumele din arhivă |
+| `acorduri.html` | rădăcină | avertisment când colectarea a tăcut prea mult |
+| `monitor.yml` | `.github/workflows/` | rulează testele înaintea colectării |
 
-Categoria „Asistență tehnică" a urcat de la 3 la 7 acte. Au intrat în registru
-doi finanțatori noi: PAM și Elveția.
+## Ce NU se urcă
 
-## De urcat — patru fișiere
+**`date.json` — nu-l atinge.** Versiunea de pe GitHub e mai nouă decât a mea:
+aceleași 332 de acte, dar cu edițiile 3338–3340 deja parcurse și cu ediția 3333
+marcată ca inaccesibilă după cinci încercări. A mea ar da înapoi o săptămână de
+colectare.
 
-| Fișier | De ce |
-|---|---|
-| `date.json` | 332 de acte, cu tot ce s-a recuperat |
-| `monitor_watch.py` | renunță la edițiile inaccesibile după cinci încercări; golurile se salvează înainte de scrierea fișierului |
-| `acorduri.html` | „suport bugetar" e filtru funcțional, cu culoare proprie |
-| `import_pdf.py` | câmpul `suport` pus și pe actele venite din PDF |
-
-Identice cu ce e pe GitHub, pot fi sărite: `index.html`, `hg246.html`,
-`amp-arhiva.json`, `donatori.html`, `.github/workflows/monitor.yml`.
+Nici acestea nu s-au schimbat: `hg246.html`, `donatori.html`, `amp-arhiva.json`,
+`monitor_watch.py`, `import_pdf.py`.
 
 ## Pașii
 
 1. **Dezarhivează.** GitHub nu despachetează arhive.
-2. Urcă cele patru fișiere: `Add file` → `Upload files`, `Commit changes`.
-3. Verifică pe `https://nistor.vivi.md/acorduri.html` cu Ctrl+F5.
+2. Urcă cele trei fișiere din rădăcină: `Add file` → `Upload files`,
+   `Commit changes`.
+3. Intră în folderul `.github/workflows` din repository și urcă acolo
+   `monitor.yml`.
+4. Deschide fila `Actions` → „Verifică Monitorul Oficial" → `Run workflow`.
 
-Ar trebui să vezi 96 de acorduri, iar filtrul pe tip să arate Împrumut 46,
-Grant 44, Asistență tehnică 6.
+## Ce ar trebui să vezi
 
-## Despre `date.json`
+În jurnalul rulării apare un pas nou, **„Verifică scriptul"**, înaintea
+colectării. Trebuie să scrie „Toate testele au trecut (9 grupuri)". Dacă pică,
+colectarea nici nu pornește — mai bine o rulare oprită, care se vede în
+Actions, decât un registru stricat, care trece neobservat.
 
-Conține și cele două acte colectate de automatizare pe 9 septembrie — legea și
-decretul privind Scrisoarea de modificare la un acord de împrumut. Le-am
-preluat de pe GitHub și le-am unit cu reprocesarea, ca să nu se piardă la
-suprascriere.
+Pe `acorduri.html`, lângă „Ultima verificare" apare de acum vechimea ei. Dacă
+trec mai mult de patru zile fără colectare, textul devine roșu.
 
-## Verificarea încrucișată
+## De ce există `teste.py`
 
-Am recitit fiecare ediție din toate cele zece arhive — peste 11.000 de intrări
-de cuprins — și am căutat ediții cu formulări de finanțare din care n-a ieșit
-niciun act. Toate semnalările s-au dovedit mențiuni în corpul altor acte,
-volume de continuare fără cuprins sau anexe.
+Pe 7 septembrie automatizarea a picat cu `NameError: name 'titlu' is not
+defined` — o literă greșită într-un nume de variabilă. Python o semnalează abia
+când linia e atinsă, iar verificările de atunci apelau direct funcțiile de
+clasificare, fără să treacă prin `parse_edition`. Linia stricată era pe o cale
+pe care n-o atingea nimic. A stat picată zile întregi.
 
-Un caz merită reținut: două ediții din februarie 2025, nr. 53-57 și nr. 70-88,
-au codificarea textului grav stricată și cuprinsul nu poate fi citit. Am
-verificat direct dacă ascund acte de finanțare — zero. Dar dacă o astfel de
-ediție ar conține un acord, l-am rata. E singura slăbiciune structurală rămasă
-la import.
-
-## Ce a rămas nerezolvat
-
-Linkurile duc în majoritate la căutarea generală a Monitorului, nu la ediția
-exactă, fiindcă actele vin din PDF-uri. Se repară rulând local
-`python3 monitor_watch.py --backfill 3000 3311` și urcând `date.json`.
-
-Data semnării se extrage doar pentru un sfert din acte.
-
-Lipsește 2023 — de acolo vin cele 38 de etape marcate cu semnul întrebării.
-
-Ediția 3333 rămâne necitită. Scriptul o mai cere de câteva ori, apoi renunță
-singur și avertismentul dispare.
+Testele au fost validate reintroducând exact acea greșeală: pică imediat, la
+două grupuri.

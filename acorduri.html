@@ -1234,12 +1234,30 @@
     function frumoasa(v){
       return v ? v.slice(6,8) + '.' + v.slice(4,6) + '.' + v.slice(0,4) : '';
     }
+    /* Cât de veche e ultima verificare. Automatizarea a stat oprită zile întregi
+       după o eroare, iar pagina arăta senină: scria data ultimei rulări, dar
+       nimeni nu compară din ochi o dată cu ziua de azi. Acum o compară pagina.
+       Pragul e de patru zile, fiindcă rularea e programată doar în zilele
+       lucrătoare — un weekend prelungit nu înseamnă o defecțiune. */
+    var vechime = (function(){
+      var m = /(\d{2})\.(\d{2})\.(\d{4})/.exec(db.ultima_rulare || '');
+      if (!m) return null;
+      var atunci = new Date(+m[3], +m[2] - 1, +m[1]);
+      return Math.floor((new Date() - atunci) / 86400000);
+    })();
+    var tarziu = vechime !== null && vechime > 4;
+
     topMeta.innerHTML =
       (dtToate.length
         ? '<span>Acoperă: <b>' + frumoasa(dtToate[0]) + ' – ' +
           frumoasa(dtToate[dtToate.length-1]) + '</b></span>'
         : '') +
-      '<span>Ultima verificare: <b>' + esc(db.ultima_rulare||'—') + '</b></span>' +
+      '<span' + (tarziu ? ' class="gol" title="Colectarea rulează în fiecare zi ' +
+        'lucrătoare. O pauză mai lungă înseamnă de obicei că automatizarea a ' +
+        'eșuat — verifică fila Actions din repository."' : '') +
+      '>Ultima verificare: <b>' + esc(db.ultima_rulare||'—') + '</b>' +
+      (vechime !== null && vechime > 1
+        ? ' <b>(acum ' + numeral(vechime, 'zile') + ')</b>' : '') + '</span>' +
       '<span>Ediții parcurse: <b>' + ((db.editii_vazute||[]).length) + '</b></span>' +
       (lipsa
         ? '<span class="gol" title="Ediții din interiorul intervalului acoperit care ' +
