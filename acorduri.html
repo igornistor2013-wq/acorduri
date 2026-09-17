@@ -74,11 +74,23 @@
   .seek:focus{outline:2px solid var(--gold);outline-offset:1px}
 
   .tbl-scroll{overflow-x:auto}
-  table{border-collapse:collapse;width:100%;min-width:1000px}
+  table{border-collapse:collapse;width:100%;min-width:1000px;table-layout:fixed}
+  /* Fără lățimi explicite, browserul dădea 191 de pixeli categoriei — pentru o
+     etichetă de 60 — și tăia denumirea acordului la 450. Acum spațiul merge
+     acolo unde e nevoie de el. */
+  #tabel.v-acorduri th:nth-child(1), #tabel.v-acorduri td:nth-child(1){width:104px}
+  #tabel.v-acorduri th:nth-child(3), #tabel.v-acorduri td:nth-child(3){width:128px}
+  #tabel.v-acorduri th:nth-child(4), #tabel.v-acorduri td:nth-child(4){width:376px}
+  #tabel.v-acorduri th:nth-child(5), #tabel.v-acorduri td:nth-child(5){width:116px}
+  /* Vederea „acte" are șapte coloane și altă împărțire — acolo lăsăm browserul. */
+  #tabel.v-acte{table-layout:auto}
   th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;
     text-align:left;padding:11px 14px;border-bottom:1px solid var(--line-strong);
     white-space:nowrap;background:#fbfcfe}
-  td{padding:14px;border-bottom:1px solid var(--line);vertical-align:top}
+  /* Rândul avea 106 px: 28 din padding, 48 din blocul de etape. Strângem
+     ambele — pe un ecran obișnuit intră zece rânduri în loc de șapte, fără să
+     se piardă nimic din conținut. */
+  td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
   tr.acord{cursor:pointer}
   tr.acord:hover{background:#fafbfd}
   tr.acord td{border-bottom:1px solid var(--line)}
@@ -111,8 +123,8 @@
 
   /* etapele acordului */
   .steps{display:flex;align-items:flex-start;gap:0;min-width:250px}
-  .step{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative}
-  .step .bead{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;
+  .step{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;position:relative}
+  .step .bead{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;
     justify-content:center;font-size:10.5px;font-weight:800;font-family:var(--mono);
     border:1.5px solid var(--line-strong);background:#fff;color:var(--line-strong);z-index:1}
   .step.on .bead{background:var(--navy);border-color:var(--navy);color:#fff}
@@ -125,9 +137,13 @@
   .step.nu .cap{color:var(--line-strong)}
   .step.last .bead{background:var(--gold);border-color:var(--gold);color:#fff;
     box-shadow:0 0 0 3px rgba(200,135,26,.2)}
-  .step .cap{font-size:9.5px;line-height:1.25;text-align:center;color:var(--ink-dim);max-width:64px}
+  /* „Proiect de lege" se rupea pe două rânduri și înălța tot blocul. Cu 78 px
+     intră pe unul singur; coloana are loc, după ce am luat lățimea de la
+     categorie. */
+  .step .cap{font-size:9.5px;line-height:1.2;text-align:center;color:var(--ink-dim);
+    max-width:78px;white-space:nowrap}
   .step.on .cap{color:var(--navy-deep);font-weight:700}
-  .step:not(:last-child):after{content:'';position:absolute;top:10.5px;left:50%;width:100%;
+  .step:not(:last-child):after{content:'';position:absolute;top:9px;left:50%;width:100%;
     height:1.5px;background:var(--line-strong)}
   .step.on:not(:last-child):after{background:var(--navy)}
   .vig-note{margin-top:7px;font-size:10.5px;font-weight:700;color:var(--green-ink);
@@ -1788,6 +1804,7 @@
 
     /* Coloana „Etapa" lipsea, deși exportul acestei vederi o avea. Ce vezi pe
        ecran și ce descarci trebuie să fie același lucru. */
+    document.getElementById('tabel').className = 'v-acte';
     document.getElementById('cap').innerHTML = '<tr>' +
       '<th>Act</th><th>Categorie</th><th>Partener</th><th>Etapa</th>' +
       '<th>Denumire</th><th>Semnat</th><th>Ediția</th></tr>';
@@ -1828,6 +1845,7 @@
     var deCateOri = {};
     grupuri.forEach(function(g){ deCateOri[g.nume] = (deCateOri[g.nume] || 0) + 1; });
 
+    document.getElementById('tabel').className = 'v-acorduri';
     document.getElementById('cap').innerHTML = '<tr>' +
       '<th>Partener</th><th>Acordul</th><th>Categorie</th>' +
       '<th>Etape parcurse</th><th>Semnat</th></tr>';

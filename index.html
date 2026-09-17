@@ -298,9 +298,14 @@
     transition:.1s ease;
   }
   .year-chip:hover{border-color:var(--navy);color:var(--navy);}
+  /* Anul selectat era vișiniu — o culoare care în restul paginii înseamnă
+     avertisment sau Republica Moldova pe hartă, și care nu apare nicăieri ca
+     stare „ales". Navy e culoarea selecției peste tot altundeva; o folosim și
+     aici, ca să nu pară o eroare. */
   .year-chip.active{
-    background:var(--red);border-color:var(--red);color:#fff;
-    box-shadow:0 2px 6px rgba(192,64,44,.35);
+    background:linear-gradient(135deg,var(--navy),#2f5691);
+    border-color:var(--navy);color:#fff;
+    box-shadow:0 2px 6px rgba(34,64,107,.3);
   }
 
   .na-year-row{
@@ -440,16 +445,16 @@
   #mapPanel .panel-head{background:var(--dk-panel-alt);border-bottom-color:var(--dk-line-strong);}
   #mapPanel .panel-head h2{color:var(--teal);font-family:var(--mono);letter-spacing:.08em;}
   .map-layout{display:grid;grid-template-columns:1fr 300px;gap:0;background:var(--dk-panel);}
-  #mapPanel .map-layout{grid-template-columns:1fr 272px;}
+  #mapPanel .map-layout,#dpMapPanel .map-layout{grid-template-columns:1fr 272px;}
   .map-layout>*{min-width:0;}
   /* Regula pe #mapPanel de mai sus bate pe cea de clasă, deci trebuie repetată
      și aici — altfel coloana laterală rămâne și pe telefon, iar hărții îi
      rămân 92 de pixeli lățime. */
   @media (max-width:900px){
     .map-layout{grid-template-columns:1fr;}
-    #mapPanel .map-layout{grid-template-columns:1fr;}
-    #mapSvgWrap{min-height:360px;}
-    #mapSvgWrap svg{min-height:332px;}
+    #mapPanel .map-layout,#dpMapPanel .map-layout{grid-template-columns:1fr;}
+    #mapSvgWrap,#dpMapSvgWrap{min-height:360px;}
+    #mapSvgWrap svg,#dpMapSvgWrap svg{min-height:332px;}
   }
     /* Harta arăta toată lumea deodată într-o fâșie de 682×327 px. Europa, de unde
      vine aproape toată asistența, încăpea într-un dreptunghi de 153×82 din cele
@@ -459,13 +464,21 @@
   .map-svg-wrap{padding:14px;background:radial-gradient(800px 400px at 50% 20%, #f7f8fb, #eef1f7);position:relative;overflow:hidden;}
   /* Doar harta principală. Pagina mai are una, în secțiunea d-portal, care are
      propriul ei comportament — o regulă pe clasă le-ar fi schimbat pe amândouă. */
-  #mapSvgWrap{min-height:480px;display:flex;}
-  #mapSide{max-height:480px;}
+  #mapSvgWrap,#dpMapSvgWrap{min-height:480px;display:flex;}
+  /* Clasamentul se oprea la înălțimea hărții, deși coloana lui e mai înaltă cu
+     131 de pixeli — cât ocupă legenda și butoanele de sub hartă. Rămânea o
+     bandă albă lângă ele.
+     Scoțând limita, lista își impunea propria înălțime și umfla panoul la 1617
+     px. „flex:1 1 0" cu „min-height:0" face ca lista să nu contribuie la
+     înălțimea intrinsecă: coloana se întinde exact cât e cea din stânga, iar
+     surplusul se derulează. */
+  #mapSide,#dpMapSide{max-height:none;overflow:hidden;min-height:0;}
+  #mapSide .map-list,#dpMapSide .map-list{flex:1 1 0;min-height:0;overflow-y:auto;}
   .map-svg-wrap svg{width:100%;height:auto;display:block;cursor:grab;}
   /* Într-un container flex, SVG-ul se strânge la conținutul lui: pe telefon
      harta ajungea lată de 92 de pixeli. „flex:1 1 100%" cu „min-width:0" o
      obligă să ocupe toată lățimea disponibilă. */
-  #mapSvgWrap svg{flex:1 1 100%;width:100%;min-width:0;height:100%;min-height:452px;}
+  #mapSvgWrap svg,#dpMapSvgWrap svg{flex:1 1 100%;width:100%;min-width:0;height:100%;min-height:452px;}
   .map-svg-wrap svg.grabbing{cursor:grabbing;}
   .land-path{fill:#e3e7f0;stroke:#cdd4e4;stroke-width:.5;vector-effect:non-scaling-stroke;}
     /* Conturul se desenează la grosime constantă, oricât s-ar mări harta. Fără
@@ -1434,7 +1447,7 @@
           <div class="map-layout">
             <div>
               <div class="map-svg-wrap" id="dpMapSvgWrap">
-                <svg id="dpMapSvg" viewBox="0 0 960 460" xmlns="http://www.w3.org/2000/svg">
+                <svg id="dpMapSvg" viewBox="0 0 960 460" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
                   <defs>
                     <marker id="dpArrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                       <path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/>
@@ -1451,16 +1464,21 @@
                   <button id="dpMapZoomIn" title="Mărește" data-i18n-title="zoomIn">+</button>
                   <button id="dpMapZoomOut" title="Micșorează" data-i18n-title="zoomOut">–</button>
                   <button id="dpMapZoomReset" title="Resetează" data-i18n-title="zoomReset">⤾</button>
+                  <button id="dpMapViewEurope" title="Europa">EU</button>
+                  <button id="dpMapViewWorld" title="Toată lumea">🌍</button>
                 </div>
               </div>
               <div class="map-legend">
-                <span><span class="sw tara"></span><span data-i18n="dpMapLegend">intensitatea culorii = nr. activități</span></span>
+                <span class="scala"><span data-i18n="dpMapLegend">activități pe țară</span>
+                  <span class="scala-min">0</span>
+                  <span class="scala-bara"></span>
+                  <span class="scala-max" id="dpScalaMax">—</span></span>
                 <span><span class="sw moldova"></span><span data-i18n="countryName">Republica Moldova</span></span>
                 <span style="margin-left:auto;" data-i18n="mapHint">clic pe o țară · scroll / butoane pentru zoom · trage pentru a deplasa</span>
               </div>
               <div class="chart-note" style="padding:0 16px 12px;" data-i18n="dpMapNote">țara donatorului este dedusă din identificatorul IATI al publicatorului (prefixul ISO al codului de organizație). Organizațiile multilaterale (UE, ONU, bănci de dezvoltare) nu au contur de țară și apar doar în clasamentul din dreapta.</div>
             </div>
-            <div class="map-side">
+            <div class="map-side" id="dpMapSide">
               <div class="map-side-head"><span style="display:flex;align-items:center;gap:6px;"><svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/></svg><span data-i18n="mapRankingTitle">Clasament donatori</span></span><button id="dpMapResetSelection" data-i18n="resetSelectionBtn">Resetează selecția</button></div>
               <div class="map-list" id="dpMapList"></div>
             </div>
@@ -2447,7 +2465,12 @@ function renderProjects(){
     tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">${t('emptyAdjustFilters')}</div></td></tr>`;
     return;
   }
-  const MAX_ROWS = 500;
+  /* Lista desena 500 de rânduri dintr-o dată — 32.000 de pixeli de derulare —
+     iar restul dispăreau după un mesaj care te trimitea să îngustezi filtrele.
+     Acum arată 120 și crește la cerere: pagina se încarcă mai ușor, iar cine
+     chiar are nevoie de toate le poate cere. */
+  if(typeof state.projLimit !== 'number') state.projLimit = 120;
+  const MAX_ROWS = state.projLimit;
   const shown = rows.slice(0, MAX_ROWS);
   const __totAng = rows.reduce((s,r)=>s+(r.ang||0),0);
   const __totDeb = rows.reduce((s,r)=>s+(r.deb||0),0);
@@ -2464,8 +2487,15 @@ function renderProjects(){
       <td class="num">${fmtNum(p.ang)}</td>
       <td class="num">${fmtNum(p.deb)}</td>
     </tr>`;
-  }).join('') + (rows.length>MAX_ROWS ? `<tr><td colspan="6"><div class="empty-state">... și încă ${rows.length-MAX_ROWS} proiecte (îngustează filtrele pentru a le vedea pe toate)</div></td></tr>` : '') + __totalRow;
+  }).join('') + (rows.length>MAX_ROWS ? `<tr><td colspan="6" style="text-align:center;padding:14px;"><button class="mai-proiecte" id="maiProiecte">${currentLang==='en'?'Show':'Arată'} +${Math.min(240, rows.length-MAX_ROWS)} &nbsp;·&nbsp; ${rows.length-MAX_ROWS} ${currentLang==='en'?'remaining':'rămase'}</button></td></tr>` : '') + __totalRow;
 }
+
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('#maiProiecte');
+  if(!b) return;
+  state.projLimit = (state.projLimit || 120) + 240;
+  renderProjects();
+});
 
 document.querySelectorAll('#projectsPanel th[data-key]').forEach(th=>{
   th.addEventListener('click',()=>{
@@ -2837,10 +2867,13 @@ function renderMapProjects(){
   }, {passive:false});
   svg.addEventListener('touchend',()=>{ touchMode=null; lastTouchDist=0; }, {passive:true});
 
-  /* Europa măsurată pe hartă: x 455–608, y 64–146. La mărirea de 4,2 o țară de
-     5×4 pixeli devine 21×17 — se poate nimeri cu mouse-ul. „Lume" rămâne la o
-     apăsare distanță, pentru donatorii de peste ocean. */
-  const EUROPA = { s: 4.2, cx: 531, cy: 105 };
+  /* Cadrul implicit: Europa întreagă, cu Scandinavia sus, Atlanticul la stânga
+     și nordul Africii jos, iar Moldova aproape de centru. Mărirea de 3,2 e
+     compromisul între „se văd țările" și „se vede contextul" — o țară mijlocie
+     are 1.600 de pixeli pătrați în loc de 20, dar rămân în cadru și Turcia, și
+     Marea Britanie, și țările nordice.
+     „Lume" rămâne la o apăsare distanță, pentru donatorii de peste ocean. */
+  const EUROPA = { s: 3.2, cx: 555, cy: 103 };
 
   function setView(v){
     scale = v.s;
@@ -6214,13 +6247,16 @@ function dpRenderMap(){
     agg.get(c).n++; agg.get(c).deb += a.spend_eur||0;
   });
   const max = Math.max(1, ...[...agg.values()].map(o=>o.n));
+  const scalaMaxDp = document.getElementById('dpScalaMax');
+  if (scalaMaxDp) scalaMaxDp.textContent = fmtNum(max);
   const isActive = label => dpState.mapSelected === null || dpState.mapSelected.has(label);
 
   cpEl.innerHTML = Object.entries(COUNTRY_PATHS).map(([label, geo]) => {
     const o = agg.get(label);
     const n = o ? o.n : 0;
     const fill = n>0 ? choroplethColor(n/max) : '#e3e7f0';
-    return `<path class="country-path${isActive(label)?'':' dimmed'}" data-label="${esc(label)}" d="${geo.d}" fill="${fill}">
+    const aleasa = dpState.mapSelected && dpState.mapSelected.has(label);
+    return `<path class="country-path${isActive(label)?'':' dimmed'}${aleasa?' aleasa':''}" data-label="${esc(label)}" d="${geo.d}" fill="${fill}">
       <title>${esc(label)}\n${n} activități\n${o?fmtNum(o.deb):'0'} EUR debursări</title></path>`;
   }).join('');
   cpEl.querySelectorAll('.country-path').forEach(el => {
@@ -6385,9 +6421,17 @@ function dpRender(){
   }, {passive:false});
   svg.addEventListener('touchend', () => { mode=null; lastDist=0; }, {passive:true});
   const on=(id,fn)=>{ const el=document.getElementById(id); if(el) el.addEventListener('click',fn); };
+  // Același cadru implicit ca pe pagina principală: Europa, cu Moldova la
+  // jumătatea lățimii. Harta asta arăta tot globul, cu aceleași țări mărunte.
+  const EUROPA_DP = { s: 3.2, cx: 555, cy: 103 };
+  function setViewDp(v){ scale=v.s; tx=480-v.s*v.cx; ty=230-v.s*v.cy; apply(); }
+
   on('dpMapZoomIn', ()=>zoomAt(1.4,480,230));
   on('dpMapZoomOut', ()=>zoomAt(1/1.4,480,230));
-  on('dpMapZoomReset', ()=>{ scale=1;tx=0;ty=0;apply(); });
+  on('dpMapZoomReset', ()=>setViewDp(EUROPA_DP));
+  on('dpMapViewEurope', ()=>setViewDp(EUROPA_DP));
+  on('dpMapViewWorld', ()=>{ scale=1;tx=0;ty=0;apply(); });
+  setViewDp(EUROPA_DP);
 })();
 
 function showDportalView(){
@@ -6906,7 +6950,7 @@ Object.assign(I18N.ro, {
  "dpSearchPh": "Caută după denumire, donator sau ID IATI...",
  "dpColActivityName": "Denumire activitate",
  "dpMapTitle": "Hartă globală · număr de activități pe donator",
- "dpMapLegend": "intensitatea culorii = nr. activități",
+ "dpMapLegend": "activități pe țară",
  "dpMapNote": "țara donatorului este dedusă din identificatorul IATI al publicatorului (prefixul ISO al codului de organizație). Organizațiile multilaterale (UE, ONU, bănci de dezvoltare) nu au contur de țară și apar doar în clasamentul din dreapta.",
  "dpKpiActivities": "Activități",
  "dpKpiActivitiesSub": "raportate în IATI pentru Moldova",
@@ -6979,7 +7023,7 @@ Object.assign(I18N.en, {
  "dpSearchPh": "Search by name, donor or IATI ID...",
  "dpColActivityName": "Activity name",
  "dpMapTitle": "World map · number of activities per donor",
- "dpMapLegend": "color intensity = no. of activities",
+ "dpMapLegend": "activities per country",
  "dpMapNote": "the donor's country is derived from the publisher's IATI identifier (the ISO prefix of the organisation code). Multilateral organisations (EU, UN, development banks) have no country outline and appear only in the ranking on the right.",
  "dpKpiActivities": "Activities",
  "dpKpiActivitiesSub": "reported in IATI for Moldova",
