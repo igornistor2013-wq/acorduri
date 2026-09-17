@@ -440,16 +440,41 @@
   #mapPanel .panel-head{background:var(--dk-panel-alt);border-bottom-color:var(--dk-line-strong);}
   #mapPanel .panel-head h2{color:var(--teal);font-family:var(--mono);letter-spacing:.08em;}
   .map-layout{display:grid;grid-template-columns:1fr 300px;gap:0;background:var(--dk-panel);}
+  #mapPanel .map-layout{grid-template-columns:1fr 272px;}
   .map-layout>*{min-width:0;}
-  @media (max-width:900px){.map-layout{grid-template-columns:1fr;}}
+  /* Regula pe #mapPanel de mai sus bate pe cea de clasă, deci trebuie repetată
+     și aici — altfel coloana laterală rămâne și pe telefon, iar hărții îi
+     rămân 92 de pixeli lățime. */
+  @media (max-width:900px){
+    .map-layout{grid-template-columns:1fr;}
+    #mapPanel .map-layout{grid-template-columns:1fr;}
+    #mapSvgWrap{min-height:360px;}
+    #mapSvgWrap svg{min-height:332px;}
+  }
+    /* Harta arăta toată lumea deodată într-o fâșie de 682×327 px. Europa, de unde
+     vine aproape toată asistența, încăpea într-un dreptunghi de 153×82 din cele
+     960×460 ale hărții: o țară mijlocie avea patru pe cinci pixeli, imposibil de
+     nimerit cu mouse-ul. Zona e acum mai înaltă, iar „slice" o lasă să umple
+     spațiul tăind din oceane în loc să lase benzi goale. */
   .map-svg-wrap{padding:14px;background:radial-gradient(800px 400px at 50% 20%, #f7f8fb, #eef1f7);position:relative;overflow:hidden;}
+  /* Doar harta principală. Pagina mai are una, în secțiunea d-portal, care are
+     propriul ei comportament — o regulă pe clasă le-ar fi schimbat pe amândouă. */
+  #mapSvgWrap{min-height:480px;display:flex;}
+  #mapSide{max-height:480px;}
   .map-svg-wrap svg{width:100%;height:auto;display:block;cursor:grab;}
+  /* Într-un container flex, SVG-ul se strânge la conținutul lui: pe telefon
+     harta ajungea lată de 92 de pixeli. „flex:1 1 100%" cu „min-width:0" o
+     obligă să ocupe toată lățimea disponibilă. */
+  #mapSvgWrap svg{flex:1 1 100%;width:100%;min-width:0;height:100%;min-height:452px;}
   .map-svg-wrap svg.grabbing{cursor:grabbing;}
-  .land-path{fill:#e3e7f0;stroke:#cdd4e4;stroke-width:.5;}
-  .country-path{stroke:#ffffff;stroke-width:.7;cursor:pointer;transition:filter .12s ease;}
+  .land-path{fill:#e3e7f0;stroke:#cdd4e4;stroke-width:.5;vector-effect:non-scaling-stroke;}
+    /* Conturul se desenează la grosime constantă, oricât s-ar mări harta. Fără
+     asta, la mărirea de 4,2 liniile de frontieră ajung groase de trei pixeli și
+     înghit țările mici. */
+  .country-path{stroke:#ffffff;stroke-width:.7;cursor:pointer;transition:filter .12s ease;vector-effect:non-scaling-stroke;}
   .country-path:hover{filter:brightness(1.3);}
   .country-path.dimmed{opacity:.22;}
-  .moldova-path{fill:var(--dk-red);stroke:#ffffff;stroke-width:1.3;filter:drop-shadow(0 0 4px rgba(192,64,44,.6));}
+  .moldova-path{fill:var(--dk-red);stroke:#ffffff;stroke-width:1.3;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 4px rgba(192,64,44,.6));}
   .flow-arrow{fill:none;stroke-linecap:round;stroke-dasharray:5 4;animation:march 1.2s linear infinite;pointer-events:none;transition:opacity .12s ease;}
   @keyframes march{to{stroke-dashoffset:-18;}}
   .flow-arrow.dimmed{opacity:.06 !important;}
@@ -1034,7 +1059,7 @@
     <div class="map-layout">
       <div>
         <div class="map-svg-wrap" id="mapSvgWrap">
-          <svg id="mapSvg" viewBox="0 0 960 460" xmlns="http://www.w3.org/2000/svg">
+          <svg id="mapSvg" viewBox="0 0 960 460" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <marker id="arrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                 <path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/>
@@ -1051,6 +1076,8 @@
             <button id="mapZoomIn" title="Mărește" data-i18n-title="zoomIn">+</button>
             <button id="mapZoomOut" title="Micșorează" data-i18n-title="zoomOut">–</button>
             <button id="mapZoomReset" title="Resetează" data-i18n-title="zoomReset">⤾</button>
+            <button id="mapViewEurope" title="Europa">EU</button>
+            <button id="mapViewWorld" title="Toată lumea">🌍</button>
           </div>
         </div>
         <div class="map-legend">
@@ -1064,7 +1091,7 @@
         </div>
         <div class="chart-note" style="padding:0 16px 12px;" data-i18n="mapNote">un proiect cu mai mulți donatori este numărat la fiecare țară implicată — suma poate depăși totalul general de proiecte. Organizațiile multilaterale (UE, ONU, bănci de dezvoltare etc.) nu au un contur de țară propriu și apar doar în clasamentul din dreapta.</div>
       </div>
-      <div class="map-side">
+      <div class="map-side" id="mapSide">
         <div class="map-side-head"><span style="display:flex;align-items:center;gap:6px;"><svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/></svg><span data-i18n="mapRankingTitle">Clasament donatori</span></span><button id="mapResetSelection" data-i18n="resetSelectionBtn">Resetează selecția</button></div>
         <div class="map-list" id="mapList"></div>
       </div>
@@ -2782,9 +2809,26 @@ function renderMapProjects(){
   }, {passive:false});
   svg.addEventListener('touchend',()=>{ touchMode=null; lastTouchDist=0; }, {passive:true});
 
+  /* Europa măsurată pe hartă: x 455–608, y 64–146. La mărirea de 4,2 o țară de
+     5×4 pixeli devine 21×17 — se poate nimeri cu mouse-ul. „Lume" rămâne la o
+     apăsare distanță, pentru donatorii de peste ocean. */
+  const EUROPA = { s: 4.2, cx: 531, cy: 105 };
+
+  function setView(v){
+    scale = v.s;
+    tx = 480 - v.s * v.cx;
+    ty = 230 - v.s * v.cy;
+    apply();
+  }
+
   document.getElementById('mapZoomIn').addEventListener('click',()=>zoomAt(1.4,480,230));
   document.getElementById('mapZoomOut').addEventListener('click',()=>zoomAt(1/1.4,480,230));
-  document.getElementById('mapZoomReset').addEventListener('click',()=>{ scale=1;tx=0;ty=0;apply(); });
+  document.getElementById('mapZoomReset').addEventListener('click',()=>setView(EUROPA));
+  document.getElementById('mapViewEurope').addEventListener('click',()=>setView(EUROPA));
+  document.getElementById('mapViewWorld').addEventListener('click',()=>{ scale=1;tx=0;ty=0;apply(); });
+
+  // Pornim pe Europa: acolo sunt aproape toți donatorii.
+  setView(EUROPA);
 })();
 
 // ---------- Year window / strip UI ----------

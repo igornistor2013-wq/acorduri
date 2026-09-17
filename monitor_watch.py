@@ -383,7 +383,18 @@ def signed_on(title):
 
 # ------------------------------------------------------------------ colectare
 
-def get(url, tries=3):
+def get(url, tries=3, pauze=(3, 8, 20, 45)):
+    """Descarcă o pagină, cu reîncercări răbdătoare.
+
+    Pe 16 septembrie colectarea a picat fiindcă monitorul.gov.md n-a răspuns:
+    trei încercări a câte 30 de secunde, 98 de secunde în total, apoi ieșire cu
+    eroare. Site-ul își revenise probabil în minutul următor, dar rularea era
+    deja pierdută, iar ziua aceea a rămas necolectată.
+
+    Pauzele cresc: 3, 8, 20, 45 de secunde. Un hop de rețea de un minut nu mai
+    doboară rularea, iar o pană adevărată tot e semnalată — doar că după ce am
+    dat sursei o șansă reală."""
+    ultima = None
     for i in range(tries):
         try:
             r = requests.get(url, headers=UA, timeout=30)
@@ -391,10 +402,14 @@ def get(url, tries=3):
             r.encoding = "utf-8"
             return r.text
         except Exception as e:
-            if i == tries - 1:
-                print(f"   ! nu am putut deschide {url}: {e}")
-                return None
-            time.sleep(2 * (i + 1))
+            ultima = e
+            if i < tries - 1:
+                asteptare = pauze[min(i, len(pauze) - 1)]
+                print(f"   … {url} nu răspunde ({e.__class__.__name__}), "
+                      f"reîncerc peste {asteptare}s")
+                time.sleep(asteptare)
+    print(f"   ! nu am putut deschide {url}: {ultima}")
+    return None
 
 
 def recent_editions(html):
@@ -576,9 +591,13 @@ def main():
 
     print("Verific Monitorul Oficial…")
 
-    home = get(HOME)
+    # Pagina principală e singurul lucru fără de care nu se poate face nimic,
+    # așa că îi dăm cinci încercări în loc de trei.
+    home = get(HOME, tries=5)
     if not home:
-        sys.exit("Nu am putut deschide monitorul.gov.md. Verifică conexiunea.")
+        sys.exit("Nu am putut deschide monitorul.gov.md după 5 încercări. "
+                 "Cel mai probabil site-ul e indisponibil — rularea următoare "
+                 "reia de unde s-a oprit, fără pierderi.")
 
     editions = recent_editions(home)
     if not editions:
