@@ -441,7 +441,7 @@
   #sectorPanel .empty-state,#beneficiaryPanel .empty-state{color:var(--dk-ink-dim);}
 
   /* --- World map panel (dark "arrivals board" style) --- */
-  #mapPanel{margin-top:20px;border-color:var(--dk-line-strong);}
+  #mapPanel{margin-top:0;border-color:var(--dk-line-strong);}
   #mapPanel .panel-head{background:var(--dk-panel-alt);border-bottom-color:var(--dk-line-strong);}
   #mapPanel .panel-head h2{color:var(--teal);font-family:var(--mono);letter-spacing:.08em;}
   .map-layout{display:grid;grid-template-columns:1fr 300px;gap:0;background:var(--dk-panel);}
@@ -643,18 +643,18 @@
     .footer-source img{height:18px;}
 
     /* pagina 2 — analize avansate */
-    #advancedView .panel-note{font-size:11px;padding-left:12px;padding-right:12px;}
-    #advancedView .exec-name{width:36vw;max-width:150px;font-size:10.5px;}
-    #advancedView .exec-pct{width:40px;font-size:11px;}
-    #advancedView .rank-badge{width:18px;height:18px;line-height:18px;font-size:9.5px;}
-    #advancedView table{min-width:520px;}
-    #advancedView th,#advancedView td{padding:6px 8px;font-size:11px;}
-    #advancedView .ong-year-chip{padding:5px 9px;font-size:11.5px;}
-    #advancedView #backToMainBtn{font-size:12px;padding:8px 12px;}
+    :is(#advancedView,#mapsSection) .panel-note{font-size:11px;padding-left:12px;padding-right:12px;}
+    :is(#advancedView,#mapsSection) .exec-name{width:36vw;max-width:150px;font-size:10.5px;}
+    :is(#advancedView,#mapsSection) .exec-pct{width:40px;font-size:11px;}
+    :is(#advancedView,#mapsSection) .rank-badge{width:18px;height:18px;line-height:18px;font-size:9.5px;}
+    :is(#advancedView,#mapsSection) table{min-width:520px;}
+    :is(#advancedView,#mapsSection) th,:is(#advancedView,#mapsSection) td{padding:6px 8px;font-size:11px;}
+    :is(#advancedView,#mapsSection) .ong-year-chip{padding:5px 9px;font-size:11.5px;}
+    :is(#advancedView,#mapsSection) #backToMainBtn{font-size:12px;padding:8px 12px;}
   }
 
   @media (max-width: 420px){
-    #advancedView .exec-name{width:30vw;max-width:110px;}
+    :is(#advancedView,#mapsSection) .exec-name{width:30vw;max-width:110px;}
     .kpis{grid-template-columns:1fr 1fr;}
     .kpi .lbl{font-size:9.5px;}
     .kpi .val{font-size:16px;}
@@ -972,120 +972,7 @@
     <span class="spin"></span><span data-i18n="introWaitingLive">se așteaptă datele actualizate din raportul live…</span>
   </div>
 
-<section id="advancedView" aria-labelledby="advSectionTitle">
-  <div class="adv-section-head">
-    <div>
-      <p class="eyebrow" data-i18n="advEyebrow" id="advEyebrowYears">1993–2026 · analize suplimentare</p>
-      <h2 class="adv-section-title" id="advSectionTitle" data-i18n="advTitle">Analize avansate — Asistență externă Republica Moldova</h2>
-    </div>
-    <p class="adv-scope-note" data-i18n="advScopeNote">Diagramele din această secțiune cuprind toate proiectele (arhivă + date live) și nu depind de filtrele de an și donator de mai jos.</p>
-  </div>
 
-
-  
-
-  <div class="panel">
-    <div class="panel-head">
-      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg><span data-i18n="advLineTitle">Evoluție în timp · Angajamente vs. Debursări pe ani</span></h2>
-    </div>
-    <div class="panel-note" data-i18n="advLineNote" id="advLineNoteYears">sumă totală pe an (proiecte cu an cunoscut, 1993–2026)</div>
-    <div class="panel-body" id="lineChartBody"></div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head">
-      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span data-i18n="advExecTitle">Rata de execuție · Debursări / Angajamente (top 20 donatori)</span></h2>
-    </div>
-    <div class="panel-note" data-i18n="advExecNote">arată cât din suma angajată a fost efectiv debursată — un procent scăzut poate indica proiecte recente sau întârzieri în implementare</div>
-    <div class="panel-body" id="execRateBody"></div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head">
-      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M3 6h4M3 12h4M3 18h4"/><path d="M21 6h-4M21 12h-4M21 18h-4"/><path d="M7 6l10 6M7 18l10-6M7 12h10"/></svg><span data-i18n="advSankeyTitle">Flux Donator → Sector → Beneficiar</span></h2>
-    </div>
-    <div class="panel-note" data-i18n="advSankeyNote">top 9 donatori · top 8 sectoare · top 10 beneficiari, după suma angajamentelor — grosimea fluxului e proporțională cu suma</div>
-    <div class="panel-body" id="sankeyBody" style="overflow-x:auto;"></div>
-  </div>
-
-  <div class="grid2">
-    <div class="panel">
-      <div class="panel-head">
-        <h2><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg><span data-i18n="advTreemapTitle">Distribuție sectoare (treemap)</span></h2>
-      </div>
-      <div class="panel-note" data-i18n="advTreemapNote">mărimea fiecărui bloc = suma angajamentelor pe sector</div>
-      <div class="panel-body" id="treemapBody"></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head">
-        <h2><svg class="ico" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span data-i18n="advTopProjTitle">Top 20 proiecte individuale</span></h2>
-      </div>
-      <div class="panel-note" data-i18n="advTopProjNote">după suma angajamentelor</div>
-      <div class="panel-body" id="topProjectsBody" style="padding:0;"></div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head">
-      <h2><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span data-i18n="advHeatmapTitle">Hartă termică · Donator × An (top 25 donatori)</span></h2>
-      <div class="btns" style="display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;">
-        <button id="hmMetricToggleAng" data-metric="ang" data-i18n="metricAngCap" style="border:none;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;background:var(--panel);color:var(--ink-dim);">Angajamente</button>
-        <button id="hmMetricToggleDeb" data-metric="deb" data-i18n="metricDebCap" style="border:none;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;background:var(--navy);color:#fff;">Debursări</button>
-      </div>
-    </div>
-    <div class="panel-note" data-i18n="advHeatmapNote">intensitatea culorii = suma pe acel an; donatorii sunt ordonați după suma totală</div>
-    <div class="panel-body" id="heatmapBody" style="overflow-x:auto;"></div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head">
-      <h2><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-i18n="advOngoingTitle">Proiecte în desfășurare · alege anul</span> <span id="ongoingCount" class="badge"></span></h2>
-    </div>
-    <div class="panel-note" data-i18n="advOngoingNote">arată toate proiectele cu activitate financiară (angajamente sau debursări) în anul selectat</div>
-    <div style="padding:11px 16px;display:flex;flex-wrap:wrap;gap:6px;" id="ongoingYearChips"></div>
-    <div style="padding:0 16px 12px;">
-      <select id="ongoingDonorFilter" style="width:100%;max-width:420px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:13px;outline:none;"></select>
-    </div>
-    <div class="panel-body" id="ongoingBody" style="padding:0;"></div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head">
-      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span data-i18n="advToaTitle">Distribuție după tipul de asistență</span></h2>
-      <div class="btns">
-        <button id="toaMetricToggle" data-metric="ang" data-i18n="metricAng">Angajamente</button>
-      </div>
-    </div>
-    <div class="panel-note" data-i18n="advToaNote">Grant, Împrumut, Suport bugetar, Asistență tehnică, Suport pentru proiect, Co-finanțare — pentru proiectele unde AMP are acest câmp completat; un proiect cu mai multe tipuri este numărat la fiecare tip</div>
-    <div class="panel-body" id="toaBody"></div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head">
-      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span data-i18n="advRegionTitle">Distribuție pe regiuni ale Moldovei</span></h2>
-      <div class="btns">
-        <button id="regionMetricToggle" data-metric="ang" data-i18n="metricAng">Angajamente</button>
-      </div>
-    </div>
-    <div class="panel-note" data-i18n="advRegionNote">regiunea de implementare a proiectului în Moldova — proiectele fără regiune atribuită sunt implementate la nivel național. Filtrează după an, donator sau tip de finanțare.</div>
-    <div style="padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:8px;">
-      <select id="regionYearFilter" style="flex:1;min-width:130px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:12.5px;outline:none;"></select>
-      <select id="regionDonorFilter" style="flex:2;min-width:200px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:12.5px;outline:none;"></select>
-      <select id="regionToaFilter" style="flex:1;min-width:170px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:12.5px;outline:none;"></select>
-    </div>
-    <div class="panel-body" id="regionMapContainer" style="overflow-x:auto;"></div>
-    <div style="padding:12px 16px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);">
-      <h3 style="margin:0;font-size:13px;color:var(--navy-deep);" id="regionListTitle"></h3>
-      <button id="regionResetSelection" style="display:none;background:var(--panel);color:var(--navy);border:1px solid var(--line-strong);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:600;cursor:pointer;" data-i18n="resetSelectionBtn">Resetează selecția</button>
-    </div>
-    <div class="panel-body" id="regionBody"></div>
-  </div>
-
-
-</section>
-
-  <div class="main-section-head" id="mainFilterSection"><h2 data-i18n="mainSectionTitle">Proiecte, donatori și filtre</h2></div>
   <div class="grid">
     <div style="display:flex;flex-direction:column;gap:20px;">
       <div class="panel" id="yearSlicerPanel">
@@ -1193,6 +1080,108 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+
+<section id="advancedView" aria-labelledby="advSectionTitle">
+  <div class="adv-section-head">
+    <div>
+      <p class="eyebrow" data-i18n="advEyebrow" id="advEyebrowYears">1993–2026 · analize suplimentare</p>
+      <h2 class="adv-section-title" id="advSectionTitle" data-i18n="advTitle">Analize avansate — Asistență externă Republica Moldova</h2>
+    </div>
+    <p class="adv-scope-note" data-i18n="advScopeNote">Diagramele din această secțiune cuprind toate proiectele (arhivă + date live) și nu depind de filtrele de an și donator de mai sus.</p>
+  </div>
+
+
+  
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg><span data-i18n="advLineTitle">Evoluție în timp · Angajamente vs. Debursări pe ani</span></h2>
+    </div>
+    <div class="panel-note" data-i18n="advLineNote" id="advLineNoteYears">sumă totală pe an (proiecte cu an cunoscut, 1993–2026)</div>
+    <div class="panel-body" id="lineChartBody"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span data-i18n="advExecTitle">Rata de execuție · Debursări / Angajamente (top 20 donatori)</span></h2>
+    </div>
+    <div class="panel-note" data-i18n="advExecNote">arată cât din suma angajată a fost efectiv debursată — un procent scăzut poate indica proiecte recente sau întârzieri în implementare</div>
+    <div class="panel-body" id="execRateBody"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M3 6h4M3 12h4M3 18h4"/><path d="M21 6h-4M21 12h-4M21 18h-4"/><path d="M7 6l10 6M7 18l10-6M7 12h10"/></svg><span data-i18n="advSankeyTitle">Flux Donator → Sector → Beneficiar</span></h2>
+    </div>
+    <div class="panel-note" data-i18n="advSankeyNote">top 9 donatori · top 8 sectoare · top 10 beneficiari, după suma angajamentelor — grosimea fluxului e proporțională cu suma</div>
+    <div class="panel-body" id="sankeyBody" style="overflow-x:auto;"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="panel-head">
+        <h2><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg><span data-i18n="advTreemapTitle">Distribuție sectoare (treemap)</span></h2>
+      </div>
+      <div class="panel-note" data-i18n="advTreemapNote">mărimea fiecărui bloc = suma angajamentelor pe sector</div>
+      <div class="panel-body" id="treemapBody"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2><svg class="ico" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span data-i18n="advTopProjTitle">Top 20 proiecte individuale</span></h2>
+      </div>
+      <div class="panel-note" data-i18n="advTopProjNote">după suma angajamentelor</div>
+      <div class="panel-body" id="topProjectsBody" style="padding:0;"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span data-i18n="advHeatmapTitle">Hartă termică · Donator × An (top 25 donatori)</span></h2>
+      <div class="btns" style="display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;">
+        <button id="hmMetricToggleAng" data-metric="ang" data-i18n="metricAngCap" style="border:none;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;background:var(--panel);color:var(--ink-dim);">Angajamente</button>
+        <button id="hmMetricToggleDeb" data-metric="deb" data-i18n="metricDebCap" style="border:none;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;background:var(--navy);color:#fff;">Debursări</button>
+      </div>
+    </div>
+    <div class="panel-note" data-i18n="advHeatmapNote">intensitatea culorii = suma pe acel an; donatorii sunt ordonați după suma totală</div>
+    <div class="panel-body" id="heatmapBody" style="overflow-x:auto;"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-i18n="advOngoingTitle">Proiecte în desfășurare · alege anul</span> <span id="ongoingCount" class="badge"></span></h2>
+    </div>
+    <div class="panel-note" data-i18n="advOngoingNote">arată toate proiectele cu activitate financiară (angajamente sau debursări) în anul selectat</div>
+    <div style="padding:11px 16px;display:flex;flex-wrap:wrap;gap:6px;" id="ongoingYearChips"></div>
+    <div style="padding:0 16px 12px;">
+      <select id="ongoingDonorFilter" style="width:100%;max-width:420px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:13px;outline:none;"></select>
+    </div>
+    <div class="panel-body" id="ongoingBody" style="padding:0;"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span data-i18n="advToaTitle">Distribuție după tipul de asistență</span></h2>
+      <div class="btns">
+        <button id="toaMetricToggle" data-metric="ang" data-i18n="metricAng">Angajamente</button>
+      </div>
+    </div>
+    <div class="panel-note" data-i18n="advToaNote">Grant, Împrumut, Suport bugetar, Asistență tehnică, Suport pentru proiect, Co-finanțare — pentru proiectele unde AMP are acest câmp completat; un proiect cu mai multe tipuri este numărat la fiecare tip</div>
+    <div class="panel-body" id="toaBody"></div>
+  </div>
+
+</section>
+
+<section id="mapsSection" aria-labelledby="mapsSectionTitle">
+  <div class="adv-section-head">
+    <div>
+      <h2 class="adv-section-title" id="mapsSectionTitle" data-i18n="mapsSectionTitle">Hărți</h2>
+    </div>
+  </div>
+
   <div class="panel" id="mapPanel">
     <div class="panel-head"><h2><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span data-i18n="mapTitle">Hartă globală · număr de proiecte pe donator</span></h2></div>
     <div class="map-layout">
@@ -1259,8 +1248,27 @@
     </div>
   </div>
 
+  <div class="panel">
+    <div class="panel-head">
+      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span data-i18n="advRegionTitle">Distribuție pe regiuni ale Moldovei</span></h2>
+      <div class="btns">
+        <button id="regionMetricToggle" data-metric="ang" data-i18n="metricAng">Angajamente</button>
+      </div>
     </div>
+    <div class="panel-note" data-i18n="advRegionNote">regiunea de implementare a proiectului în Moldova — proiectele fără regiune atribuită sunt implementate la nivel național. Filtrează după an, donator sau tip de finanțare.</div>
+    <div style="padding:0 16px 12px;display:flex;flex-wrap:wrap;gap:8px;">
+      <select id="regionYearFilter" style="flex:1;min-width:130px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:12.5px;outline:none;"></select>
+      <select id="regionDonorFilter" style="flex:2;min-width:200px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:12.5px;outline:none;"></select>
+      <select id="regionToaFilter" style="flex:1;min-width:170px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:12.5px;outline:none;"></select>
+    </div>
+    <div class="panel-body" id="regionMapContainer" style="overflow-x:auto;"></div>
+    <div style="padding:12px 16px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);">
+      <h3 style="margin:0;font-size:13px;color:var(--navy-deep);" id="regionListTitle"></h3>
+      <button id="regionResetSelection" style="display:none;background:var(--panel);color:var(--navy);border:1px solid var(--line-strong);border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:600;cursor:pointer;" data-i18n="resetSelectionBtn">Resetează selecția</button>
+    </div>
+    <div class="panel-body" id="regionBody"></div>
   </div>
+</section>
 
   <footer>
     <div class="footer-row">
@@ -1614,31 +1622,31 @@
 </div>
 
 <style>
-  #advancedView{margin:4px 0 36px;padding-bottom:12px;border-bottom:1px solid var(--line-strong);scroll-margin-top:16px;}
-  #advancedView .adv-section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px 28px;flex-wrap:wrap;margin:0 0 18px;}
-  #advancedView .adv-section-title{margin:0;font-size:22px;line-height:1.25;color:var(--navy-deep);font-weight:800;}
-  #advancedView .adv-scope-note{margin:0;max-width:520px;font-size:12.5px;line-height:1.5;color:var(--ink-dim);}
+  :is(#advancedView,#mapsSection){margin:36px 0 0;padding-top:28px;border-top:1px solid var(--line-strong);scroll-margin-top:16px;}
+  :is(#advancedView,#mapsSection) .adv-section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px 28px;flex-wrap:wrap;margin:0 0 18px;}
+  :is(#advancedView,#mapsSection) .adv-section-title{margin:0;font-size:22px;line-height:1.25;color:var(--navy-deep);font-weight:800;}
+  :is(#advancedView,#mapsSection) .adv-scope-note{margin:0;max-width:520px;font-size:12.5px;line-height:1.5;color:var(--ink-dim);}
   .main-section-head{margin:0 0 16px;}
   .main-section-head h2{margin:0;font-size:22px;line-height:1.25;color:var(--navy-deep);font-weight:800;}
-  @media (max-width:640px){#advancedView .adv-section-title,.main-section-head h2{font-size:18px;}}
-  #advancedView .panel{margin-bottom:20px;}
-  #advancedView .panel-note{padding:0 16px 12px;font-size:12px;color:var(--ink-dim);line-height:1.5;}
-  #advancedView .panel-body{padding:14px 16px;overflow-x:auto;box-sizing:border-box;}
-  #advancedView #topProjectsBody, #advancedView #ongoingBody{padding:0;}
-  #advancedView .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-  @media (max-width:900px){#advancedView .grid2{grid-template-columns:1fr;}}
-  #advancedView .exec-row{display:flex;align-items:center;gap:10px;padding:5px 0;}
-  #advancedView .exec-name{width:230px;flex:none;font-size:12px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  #advancedView .exec-pct{width:52px;flex:none;text-align:right;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;}
-  #advancedView .bar-track{background:var(--blue-bg);border-radius:5px;overflow:hidden;height:16px;flex:1;}
-  #advancedView .bar-fill{height:100%;border-radius:5px;}
-  #advancedView .rank-badge{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:var(--gold-bg);color:var(--gold);font-weight:700;font-size:11px;margin-right:6px;}
+  @media (max-width:640px){:is(#advancedView,#mapsSection) .adv-section-title,.main-section-head h2{font-size:18px;}}
+  :is(#advancedView,#mapsSection) .panel{margin-bottom:20px;}
+  :is(#advancedView,#mapsSection) .panel-note{padding:0 16px 12px;font-size:12px;color:var(--ink-dim);line-height:1.5;}
+  :is(#advancedView,#mapsSection) .panel-body{padding:14px 16px;overflow-x:auto;box-sizing:border-box;}
+  :is(#advancedView,#mapsSection) #topProjectsBody, :is(#advancedView,#mapsSection) #ongoingBody{padding:0;}
+  :is(#advancedView,#mapsSection) .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media (max-width:900px){:is(#advancedView,#mapsSection) .grid2{grid-template-columns:1fr;}}
+  :is(#advancedView,#mapsSection) .exec-row{display:flex;align-items:center;gap:10px;padding:5px 0;}
+  :is(#advancedView,#mapsSection) .exec-name{width:230px;flex:none;font-size:12px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  :is(#advancedView,#mapsSection) .exec-pct{width:52px;flex:none;text-align:right;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;}
+  :is(#advancedView,#mapsSection) .bar-track{background:var(--blue-bg);border-radius:5px;overflow:hidden;height:16px;flex:1;}
+  :is(#advancedView,#mapsSection) .bar-fill{height:100%;border-radius:5px;}
+  :is(#advancedView,#mapsSection) .rank-badge{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:var(--gold-bg);color:var(--gold);font-weight:700;font-size:11px;margin-right:6px;}
   #backToMainBtn{font-size:13.5px;padding:10px 16px;}
-  #advancedView .ong-year-chip{padding:6px 12px;border-radius:7px;background:var(--blue-bg);color:var(--navy);font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid transparent;user-select:none;}
-  #advancedView .ong-year-chip:hover{border-color:var(--navy);}
-  #advancedView .ong-year-chip.active{background:var(--navy);color:#fff;}
-  #advancedView .hm-label{fill:var(--ink-dim);font-size:9.5px;}
-  #advancedView .table-scroll{max-height:480px;overflow-y:auto;}
+  :is(#advancedView,#mapsSection) .ong-year-chip{padding:6px 12px;border-radius:7px;background:var(--blue-bg);color:var(--navy);font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid transparent;user-select:none;}
+  :is(#advancedView,#mapsSection) .ong-year-chip:hover{border-color:var(--navy);}
+  :is(#advancedView,#mapsSection) .ong-year-chip.active{background:var(--navy);color:#fff;}
+  :is(#advancedView,#mapsSection) .hm-label{fill:var(--ink-dim);font-size:9.5px;}
+  :is(#advancedView,#mapsSection) .table-scroll{max-height:480px;overflow-y:auto;}
   #advTooltip{position:fixed;pointer-events:none;background:var(--navy-deep);color:#fff;padding:7px 10px;border-radius:6px;font-size:12px;line-height:1.5;box-shadow:0 4px 14px rgba(0,0,0,.2);z-index:50;display:none;max-width:280px;}
 </style>
 
@@ -2980,8 +2988,8 @@ function render(){
 }
 
 const I18N = {"ro": {"mainTitle": "Asistență externă pentru", "countryName": "Republica Moldova", "yearFilterTitle": "Filtru · Ani", "allYears": "Toți anii", "yearSelectedLabel": "An(i) selectat(ți)", "yearHint": "clic pe un an · shift+clic pentru interval", "yearUnspecified": "An nespecificat în sursă", "donorFilterTitle": "Filtru · Donatori", "allDonorsBtn": "Toți", "noneDonorsBtn": "Niciunul", "donorSearchPlaceholder": "Caută donator…", "topDonorsTitle": "Top donatori · sumă totală", "metricDeb": "debursări", "metricAng": "Angajamente", "sectorsTitle": "Distribuție pe sectoare", "metricDebCap": "Debursări", "sectorNote": "un proiect poate acoperi mai multe sectoare — suma pe sectoare poate depăși totalul general", "beneficiariesTitle": "Distribuție pe beneficiari", "beneficiaryNote": "un proiect poate avea mai mulți beneficiari — fiecare beneficiar este numărat separat, cu suma integrală a proiectului", "donorTableTitle": "Donatori grupați · sume totale", "donorTableNote": "fiecare donator își arată suma integrală a proiectelor la care participă; pentru proiectele co-finanțate (mai mulți donatori), aceeași sumă apare la fiecare donator implicat — rândul TOTAL de mai jos elimină această suprapunere și arată suma reală, fără duplicare", "colDonor": "Donator", "colPeriod": "Perioadă", "colProjects": "Proiecte", "colCommitments": "Angajamente (EUR)", "colDisbursements": "Debursări (EUR)", "colPctTotal": "% din total", "colProjectName": "Denumire proiect", "colYear": "An", "projectsListTitle": "Lista proiectelor", "projSearchPlaceholder": "Caută după denumire sau AMP ID...", "mapTitle": "Hartă globală · număr de proiecte pe donator", "zoomIn": "Mărește", "zoomOut": "Micșorează", "zoomReset": "Resetează",
- "advScopeNote": "Diagramele din această secțiune cuprind toate proiectele (arhivă + date live) și nu depind de filtrele de an și donator de mai jos.", "mainSectionTitle": "Proiecte, donatori și filtre", "logoBackTitle": "Înapoi la pagina principală", "mapLegendIntensity": "proiecte pe țară", "mapHint": "clic pe o țară · scroll / butoane pentru zoom · trage pentru a deplasa", "mapNote": "un proiect cu mai mulți donatori este numărat la fiecare țară implicată — suma poate depăși totalul general de proiecte. Organizațiile multilaterale (UE, ONU, bănci de dezvoltare etc.) nu au un contur de țară propriu și apar doar în clasamentul din dreapta.", "mapRankingTitle": "Clasament donatori", "resetSelectionBtn": "Resetează selecția", "mapCountryProjectsTitle": "Proiectele țării selectate", "updateTitle": "Actualizare date — încarcă un export nou", "analyzeBtn": "Analizează și actualizează", "saveBtn": "💾 Salvează (suprascrie fișierul)", "downloadBtn": "Descarcă drept fișier nou", "resetOriginalBtn": "↺ Resetează la datele originale", "updateLogDefault": "Acceptă export .xml (recomandat, are AMP ID) sau .csv de pe amp.gov.md. Se potrivește automat după AMP ID — proiectele existente se actualizează, cele noi se adaugă, restul rămân neatinse.", "footerSource": "Sursă: platforma AMP (Aid Management Platform) a Republicii Moldova — versiune veche și versiune nouă · sume în EUR", "footerOwner": "Acest proiect aparține <b>Direcției Coordonare Asistență Externă și Proiecte Investiționale</b>, din cadrul <b>Direcției Generale Coordonarea Asistenței Externe și Fonduri Europene</b> — Cancelaria de Stat.", "kpiProjectsLbl": "Proiecte", "kpiProjectsSub": "proiecte unice (fără duplicare)", "kpiDonorsLbl": "Donatori activi", "kpiDonorsSub": "în selecția curentă", "emptyCurrentSelection": "Nicio dată pentru selecția curentă.", "emptyAdjustFilters": "Nicio dată — ajustează filtrele.", "totalUniqueRow": "TOTAL (proiecte unice)", "emptySelectDonor": "Selectează cel puțin un donator pentru a vedea proiectele.", "emptyNoCountrySelected": "Nicio țară selectată.", "kpiCommitmentsLbl": "Angajamente totale", "kpiDisbursementsLbl": "Debursări totale", "advancedAnalysisBtn": "Analize avansate ↓", "advTitle": "Analize avansate — Asistență externă Republica Moldova", "backToMainBtn": "← Înapoi la dashboard-ul principal", "advEyebrow": "1993–2026 · analize suplimentare", "advLineTitle": "Evoluție în timp · Angajamente vs. Debursări pe ani", "advLineNote": "sumă totală pe an (proiecte cu an cunoscut, 1993–2026)", "advExecTitle": "Rata de execuție · Debursări / Angajamente (top 20 donatori)", "advExecNote": "arată cât din suma angajată a fost efectiv debursată — un procent scăzut poate indica proiecte recente sau întârzieri în implementare", "advExecutionLbl": "Execuție", "advSankeyTitle": "Flux Donator → Sector → Beneficiar", "advSankeyNote": "top 9 donatori · top 8 sectoare · top 10 beneficiari, după suma angajamentelor — grosimea fluxului e proporțională cu suma", "advColDonors": "Donatori", "advColSectors": "Sectoare", "advColBeneficiaries": "Beneficiari", "advTreemapTitle": "Distribuție sectoare (treemap)", "advTreemapNote": "mărimea fiecărui bloc = suma angajamentelor pe sector", "advTopProjTitle": "Top 20 proiecte individuale", "advTopProjNote": "după suma angajamentelor", "advColProject": "Proiect", "advHeatmapTitle": "Hartă termică · Donator × An (top 25 donatori)", "advHeatmapNote": "intensitatea culorii = suma pe acel an; donatorii sunt ordonați după suma totală", "advOngoingTitle": "Proiecte în derulare · alege anul", "advOngoingNote": "proiectul apare pentru fiecare an cuprins între prima și ultima înregistrare financiară găsită — nu doar în anul exact al unei tranzacții", "advColSpan": "Perioadă activă", "advAllDonorsOption": "— Toți donatorii —", "yearFilterNote": "selectând un an, vezi proiectele lansate (angajate) în acel an", "advOtherSectors": "Alte sectoare", "advOngoingTotalRow": "TOTAL (selecția curentă)", "exportTitle": "Export complet — toate proiectele", "exportExcelBtn": "Descarcă Excel cu toate proiectele", "exportNote": "exportă exact datele curente afișate în pagină (AMP ID, an, denumire, donator, date de început/finalizare, sectoare, implementator, beneficiari, țări, angajamente, debursări) — reflectă orice actualizare făcută mai sus", "advToaTitle": "Distribuție după tipul de asistență", "advToaNote": "Grant, Împrumut, Suport bugetar, Asistență tehnică, Suport pentru proiect, Co-finanțare — pentru proiectele unde AMP are acest câmp completat; un proiect cu mai multe tipuri este numărat la fiecare tip", "advRegionTitle": "Distribuție pe regiuni ale Moldovei", "advRegionNote": "regiunea de implementare a proiectului în Moldova (nu țara donatoare) — disponibilă doar pentru proiectele unde AMP are acest câmp completat", "advAllYearsOption": "— Toți anii —", "advAllTypesOption": "— Toate tipurile —", "updateNavBtn": "Export →", "mapSelectAllBtn": "Selectează toate țările", "mapDeselectAllBtn": "Deselectează toate", "colAmpId": "AMP ID", "metricAngCap": "Angajamente"}, "en": {"mainTitle": "External Assistance for", "countryName": "the Republic of Moldova", "yearFilterTitle": "Filter · Years", "allYears": "All years", "yearSelectedLabel": "Selected year(s)", "yearHint": "click a year · shift+click for a range", "yearUnspecified": "Year not specified in source", "donorFilterTitle": "Filter · Donors", "allDonorsBtn": "All", "noneDonorsBtn": "None", "donorSearchPlaceholder": "Search donor…", "topDonorsTitle": "Top donors · total amount", "metricDeb": "disbursements", "metricAng": "Commitments", "sectorsTitle": "Distribution by sector", "metricDebCap": "Disbursements", "sectorNote": "a project may cover several sectors — the sum by sector may exceed the overall total", "beneficiariesTitle": "Distribution by beneficiary", "beneficiaryNote": "a project may have several beneficiaries — each beneficiary is counted separately, with the full project amount", "donorTableTitle": "Donors grouped · total amounts", "donorTableNote": "each donor shows the full amount of the projects it takes part in; for co-financed projects (multiple donors), the same amount appears for each donor involved — the TOTAL row below removes this overlap and shows the real, non-duplicated sum", "colDonor": "Donor", "colPeriod": "Period", "colProjects": "Projects", "colCommitments": "Commitments (EUR)", "colDisbursements": "Disbursements (EUR)", "colPctTotal": "% of total", "colProjectName": "Project name", "colYear": "Year", "projectsListTitle": "Project list", "projSearchPlaceholder": "Search by name or AMP ID...", "mapTitle": "World map · number of projects per donor", "zoomIn": "Zoom in", "zoomOut": "Zoom out", "zoomReset": "Reset",
- "advScopeNote": "The charts in this section cover all projects (archive + live data) and do not depend on the year and donor filters below.", "mainSectionTitle": "Projects, donors and filters", "logoBackTitle": "Back to the main page", "mapLegendIntensity": "projects per country", "mapHint": "click a country · scroll / buttons to zoom · drag to pan", "mapNote": "a project with multiple donors is counted for each country involved — the sum may exceed the overall project total. Multilateral organizations (EU, UN, development banks, etc.) have no country outline of their own and appear only in the ranking on the right.", "mapRankingTitle": "Donor ranking", "resetSelectionBtn": "Reset selection", "mapCountryProjectsTitle": "Projects of the selected country", "updateTitle": "Data update — upload a new export", "analyzeBtn": "Analyze and update", "saveBtn": "💾 Save (overwrite file)", "downloadBtn": "Download as new file", "resetOriginalBtn": "↺ Reset to original data", "updateLogDefault": "Accepts an .xml export (recommended, includes AMP ID) or .csv from amp.gov.md. Matching is done automatically by AMP ID — existing projects are updated, new ones are added, the rest stay unchanged.", "footerSource": "Source: the AMP (Aid Management Platform) of the Republic of Moldova — old and new versions · amounts in EUR", "footerOwner": "This project belongs to the <b>Directorate for Coordination of External Assistance and Investment Projects</b>, within the <b>General Directorate for Coordination of External Assistance and European Funds</b> — State Chancellery.", "kpiProjectsLbl": "Projects", "kpiProjectsSub": "unique projects (no duplicates)", "kpiDonorsLbl": "Active donors", "kpiDonorsSub": "in current selection", "emptyCurrentSelection": "No data for the current selection.", "emptyAdjustFilters": "No data — adjust the filters.", "totalUniqueRow": "TOTAL (unique projects)", "emptySelectDonor": "Select at least one donor to see projects.", "emptyNoCountrySelected": "No country selected.", "kpiCommitmentsLbl": "Total commitments", "kpiDisbursementsLbl": "Total disbursements", "advancedAnalysisBtn": "Advanced analytics ↓", "advTitle": "Advanced Analytics — External Assistance for Moldova", "backToMainBtn": "← Back to main dashboard", "advEyebrow": "1993–2026 · additional analytics", "advLineTitle": "Trends over time · Commitments vs. Disbursements by year", "advLineNote": "total amount per year (projects with a known year, 1993–2026)", "advExecTitle": "Execution rate · Disbursements / Commitments (top 20 donors)", "advExecNote": "shows how much of the committed amount was actually disbursed — a low percentage may indicate recent projects or implementation delays", "advExecutionLbl": "Execution", "advSankeyTitle": "Flow: Donor → Sector → Beneficiary", "advSankeyNote": "top 9 donors · top 8 sectors · top 10 beneficiaries, by commitment amount — flow width is proportional to the amount", "advColDonors": "Donors", "advColSectors": "Sectors", "advColBeneficiaries": "Beneficiaries", "advTreemapTitle": "Sector distribution (treemap)", "advTreemapNote": "the size of each block = total commitments for that sector", "advTopProjTitle": "Top 20 individual projects", "advTopProjNote": "by commitment amount", "advColProject": "Project", "advHeatmapTitle": "Heatmap · Donor × Year (top 25 donors)", "advHeatmapNote": "color intensity = amount for that year; donors are ordered by total amount", "advOngoingTitle": "Projects in progress · pick a year", "advOngoingNote": "a project appears for every year between its first and last recorded financial activity — not only the exact year of a single transaction", "advColSpan": "Active period", "advAllDonorsOption": "— All donors —", "yearFilterNote": "selecting a year shows the projects launched (committed) that year", "advOtherSectors": "Other sectors", "advOngoingTotalRow": "TOTAL (current selection)", "exportTitle": "Full export — all projects", "exportExcelBtn": "Download Excel with all projects", "exportNote": "exports the exact current data shown on the page (AMP ID, year, name, donor, start/end dates, sectors, implementer, beneficiaries, countries, commitments, disbursements) — reflects any update made above", "advToaTitle": "Distribution by type of assistance", "advToaNote": "Grant, Loan, Budget Support, Technical Assistance, Project Support, Co-funding — for projects where AMP has this field filled in; a project with multiple types is counted under each type", "advRegionTitle": "Distribution by region of Moldova", "advRegionNote": "the project's implementation region in Moldova (not the donor country) — available only for projects where AMP has this field filled in", "advAllYearsOption": "— All years —", "advAllTypesOption": "— All types —", "updateNavBtn": "Export →", "mapSelectAllBtn": "Select all countries", "mapDeselectAllBtn": "Deselect all", "colAmpId": "AMP ID", "metricAngCap": "Commitments"}};
+ "advScopeNote": "Diagramele din această secțiune cuprind toate proiectele (arhivă + date live) și nu depind de filtrele de an și donator de mai sus.", "mapsSectionTitle": "Hărți", "logoBackTitle": "Înapoi la pagina principală", "mapLegendIntensity": "proiecte pe țară", "mapHint": "clic pe o țară · scroll / butoane pentru zoom · trage pentru a deplasa", "mapNote": "un proiect cu mai mulți donatori este numărat la fiecare țară implicată — suma poate depăși totalul general de proiecte. Organizațiile multilaterale (UE, ONU, bănci de dezvoltare etc.) nu au un contur de țară propriu și apar doar în clasamentul din dreapta.", "mapRankingTitle": "Clasament donatori", "resetSelectionBtn": "Resetează selecția", "mapCountryProjectsTitle": "Proiectele țării selectate", "updateTitle": "Actualizare date — încarcă un export nou", "analyzeBtn": "Analizează și actualizează", "saveBtn": "💾 Salvează (suprascrie fișierul)", "downloadBtn": "Descarcă drept fișier nou", "resetOriginalBtn": "↺ Resetează la datele originale", "updateLogDefault": "Acceptă export .xml (recomandat, are AMP ID) sau .csv de pe amp.gov.md. Se potrivește automat după AMP ID — proiectele existente se actualizează, cele noi se adaugă, restul rămân neatinse.", "footerSource": "Sursă: platforma AMP (Aid Management Platform) a Republicii Moldova — versiune veche și versiune nouă · sume în EUR", "footerOwner": "Acest proiect aparține <b>Direcției Coordonare Asistență Externă și Proiecte Investiționale</b>, din cadrul <b>Direcției Generale Coordonarea Asistenței Externe și Fonduri Europene</b> — Cancelaria de Stat.", "kpiProjectsLbl": "Proiecte", "kpiProjectsSub": "proiecte unice (fără duplicare)", "kpiDonorsLbl": "Donatori activi", "kpiDonorsSub": "în selecția curentă", "emptyCurrentSelection": "Nicio dată pentru selecția curentă.", "emptyAdjustFilters": "Nicio dată — ajustează filtrele.", "totalUniqueRow": "TOTAL (proiecte unice)", "emptySelectDonor": "Selectează cel puțin un donator pentru a vedea proiectele.", "emptyNoCountrySelected": "Nicio țară selectată.", "kpiCommitmentsLbl": "Angajamente totale", "kpiDisbursementsLbl": "Debursări totale", "advancedAnalysisBtn": "Analize avansate ↓", "advTitle": "Analize avansate — Asistență externă Republica Moldova", "backToMainBtn": "← Înapoi la dashboard-ul principal", "advEyebrow": "1993–2026 · analize suplimentare", "advLineTitle": "Evoluție în timp · Angajamente vs. Debursări pe ani", "advLineNote": "sumă totală pe an (proiecte cu an cunoscut, 1993–2026)", "advExecTitle": "Rata de execuție · Debursări / Angajamente (top 20 donatori)", "advExecNote": "arată cât din suma angajată a fost efectiv debursată — un procent scăzut poate indica proiecte recente sau întârzieri în implementare", "advExecutionLbl": "Execuție", "advSankeyTitle": "Flux Donator → Sector → Beneficiar", "advSankeyNote": "top 9 donatori · top 8 sectoare · top 10 beneficiari, după suma angajamentelor — grosimea fluxului e proporțională cu suma", "advColDonors": "Donatori", "advColSectors": "Sectoare", "advColBeneficiaries": "Beneficiari", "advTreemapTitle": "Distribuție sectoare (treemap)", "advTreemapNote": "mărimea fiecărui bloc = suma angajamentelor pe sector", "advTopProjTitle": "Top 20 proiecte individuale", "advTopProjNote": "după suma angajamentelor", "advColProject": "Proiect", "advHeatmapTitle": "Hartă termică · Donator × An (top 25 donatori)", "advHeatmapNote": "intensitatea culorii = suma pe acel an; donatorii sunt ordonați după suma totală", "advOngoingTitle": "Proiecte în derulare · alege anul", "advOngoingNote": "proiectul apare pentru fiecare an cuprins între prima și ultima înregistrare financiară găsită — nu doar în anul exact al unei tranzacții", "advColSpan": "Perioadă activă", "advAllDonorsOption": "— Toți donatorii —", "yearFilterNote": "selectând un an, vezi proiectele lansate (angajate) în acel an", "advOtherSectors": "Alte sectoare", "advOngoingTotalRow": "TOTAL (selecția curentă)", "exportTitle": "Export complet — toate proiectele", "exportExcelBtn": "Descarcă Excel cu toate proiectele", "exportNote": "exportă exact datele curente afișate în pagină (AMP ID, an, denumire, donator, date de început/finalizare, sectoare, implementator, beneficiari, țări, angajamente, debursări) — reflectă orice actualizare făcută mai sus", "advToaTitle": "Distribuție după tipul de asistență", "advToaNote": "Grant, Împrumut, Suport bugetar, Asistență tehnică, Suport pentru proiect, Co-finanțare — pentru proiectele unde AMP are acest câmp completat; un proiect cu mai multe tipuri este numărat la fiecare tip", "advRegionTitle": "Distribuție pe regiuni ale Moldovei", "advRegionNote": "regiunea de implementare a proiectului în Moldova (nu țara donatoare) — disponibilă doar pentru proiectele unde AMP are acest câmp completat", "advAllYearsOption": "— Toți anii —", "advAllTypesOption": "— Toate tipurile —", "updateNavBtn": "Export →", "mapSelectAllBtn": "Selectează toate țările", "mapDeselectAllBtn": "Deselectează toate", "colAmpId": "AMP ID", "metricAngCap": "Angajamente"}, "en": {"mainTitle": "External Assistance for", "countryName": "the Republic of Moldova", "yearFilterTitle": "Filter · Years", "allYears": "All years", "yearSelectedLabel": "Selected year(s)", "yearHint": "click a year · shift+click for a range", "yearUnspecified": "Year not specified in source", "donorFilterTitle": "Filter · Donors", "allDonorsBtn": "All", "noneDonorsBtn": "None", "donorSearchPlaceholder": "Search donor…", "topDonorsTitle": "Top donors · total amount", "metricDeb": "disbursements", "metricAng": "Commitments", "sectorsTitle": "Distribution by sector", "metricDebCap": "Disbursements", "sectorNote": "a project may cover several sectors — the sum by sector may exceed the overall total", "beneficiariesTitle": "Distribution by beneficiary", "beneficiaryNote": "a project may have several beneficiaries — each beneficiary is counted separately, with the full project amount", "donorTableTitle": "Donors grouped · total amounts", "donorTableNote": "each donor shows the full amount of the projects it takes part in; for co-financed projects (multiple donors), the same amount appears for each donor involved — the TOTAL row below removes this overlap and shows the real, non-duplicated sum", "colDonor": "Donor", "colPeriod": "Period", "colProjects": "Projects", "colCommitments": "Commitments (EUR)", "colDisbursements": "Disbursements (EUR)", "colPctTotal": "% of total", "colProjectName": "Project name", "colYear": "Year", "projectsListTitle": "Project list", "projSearchPlaceholder": "Search by name or AMP ID...", "mapTitle": "World map · number of projects per donor", "zoomIn": "Zoom in", "zoomOut": "Zoom out", "zoomReset": "Reset",
+ "advScopeNote": "The charts in this section cover all projects (archive + live data) and do not depend on the year and donor filters above.", "mapsSectionTitle": "Maps", "logoBackTitle": "Back to the main page", "mapLegendIntensity": "projects per country", "mapHint": "click a country · scroll / buttons to zoom · drag to pan", "mapNote": "a project with multiple donors is counted for each country involved — the sum may exceed the overall project total. Multilateral organizations (EU, UN, development banks, etc.) have no country outline of their own and appear only in the ranking on the right.", "mapRankingTitle": "Donor ranking", "resetSelectionBtn": "Reset selection", "mapCountryProjectsTitle": "Projects of the selected country", "updateTitle": "Data update — upload a new export", "analyzeBtn": "Analyze and update", "saveBtn": "💾 Save (overwrite file)", "downloadBtn": "Download as new file", "resetOriginalBtn": "↺ Reset to original data", "updateLogDefault": "Accepts an .xml export (recommended, includes AMP ID) or .csv from amp.gov.md. Matching is done automatically by AMP ID — existing projects are updated, new ones are added, the rest stay unchanged.", "footerSource": "Source: the AMP (Aid Management Platform) of the Republic of Moldova — old and new versions · amounts in EUR", "footerOwner": "This project belongs to the <b>Directorate for Coordination of External Assistance and Investment Projects</b>, within the <b>General Directorate for Coordination of External Assistance and European Funds</b> — State Chancellery.", "kpiProjectsLbl": "Projects", "kpiProjectsSub": "unique projects (no duplicates)", "kpiDonorsLbl": "Active donors", "kpiDonorsSub": "in current selection", "emptyCurrentSelection": "No data for the current selection.", "emptyAdjustFilters": "No data — adjust the filters.", "totalUniqueRow": "TOTAL (unique projects)", "emptySelectDonor": "Select at least one donor to see projects.", "emptyNoCountrySelected": "No country selected.", "kpiCommitmentsLbl": "Total commitments", "kpiDisbursementsLbl": "Total disbursements", "advancedAnalysisBtn": "Advanced analytics ↓", "advTitle": "Advanced Analytics — External Assistance for Moldova", "backToMainBtn": "← Back to main dashboard", "advEyebrow": "1993–2026 · additional analytics", "advLineTitle": "Trends over time · Commitments vs. Disbursements by year", "advLineNote": "total amount per year (projects with a known year, 1993–2026)", "advExecTitle": "Execution rate · Disbursements / Commitments (top 20 donors)", "advExecNote": "shows how much of the committed amount was actually disbursed — a low percentage may indicate recent projects or implementation delays", "advExecutionLbl": "Execution", "advSankeyTitle": "Flow: Donor → Sector → Beneficiary", "advSankeyNote": "top 9 donors · top 8 sectors · top 10 beneficiaries, by commitment amount — flow width is proportional to the amount", "advColDonors": "Donors", "advColSectors": "Sectors", "advColBeneficiaries": "Beneficiaries", "advTreemapTitle": "Sector distribution (treemap)", "advTreemapNote": "the size of each block = total commitments for that sector", "advTopProjTitle": "Top 20 individual projects", "advTopProjNote": "by commitment amount", "advColProject": "Project", "advHeatmapTitle": "Heatmap · Donor × Year (top 25 donors)", "advHeatmapNote": "color intensity = amount for that year; donors are ordered by total amount", "advOngoingTitle": "Projects in progress · pick a year", "advOngoingNote": "a project appears for every year between its first and last recorded financial activity — not only the exact year of a single transaction", "advColSpan": "Active period", "advAllDonorsOption": "— All donors —", "yearFilterNote": "selecting a year shows the projects launched (committed) that year", "advOtherSectors": "Other sectors", "advOngoingTotalRow": "TOTAL (current selection)", "exportTitle": "Full export — all projects", "exportExcelBtn": "Download Excel with all projects", "exportNote": "exports the exact current data shown on the page (AMP ID, year, name, donor, start/end dates, sectors, implementer, beneficiaries, countries, commitments, disbursements) — reflects any update made above", "advToaTitle": "Distribution by type of assistance", "advToaNote": "Grant, Loan, Budget Support, Technical Assistance, Project Support, Co-funding — for projects where AMP has this field filled in; a project with multiple types is counted under each type", "advRegionTitle": "Distribution by region of Moldova", "advRegionNote": "the project's implementation region in Moldova (not the donor country) — available only for projects where AMP has this field filled in", "advAllYearsOption": "— All years —", "advAllTypesOption": "— All types —", "updateNavBtn": "Export →", "mapSelectAllBtn": "Select all countries", "mapDeselectAllBtn": "Deselect all", "colAmpId": "AMP ID", "metricAngCap": "Commitments"}};
 let currentLang = 'ro';
 function t(key){
   const entry = I18N[currentLang] && I18N[currentLang][key];
