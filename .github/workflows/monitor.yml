@@ -46,15 +46,21 @@ jobs:
       - name: Rulează colectarea
         run: python monitor_watch.py
 
+      # Pagina legis_acorduri.html = istoricul legis.md (legis_brut.json) +
+      # actele noi din Monitor (date.json). Se reconstruiește după fiecare
+      # colectare, deci acordurile noi apar în ambele registre în aceeași zi.
+      - name: Actualizează pagina legis
+        run: python legis_pagina.py
+
       - name: Salvează dacă au apărut acte noi
         run: |
-          if [ -z "$(git status --porcelain date.json)" ]; then
+          if [ -z "$(git status --porcelain date.json legis_acorduri.html)" ]; then
             echo "Nimic nou — nu fac commit."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add date.json
+          git add date.json legis_acorduri.html
           git commit -m "Acte noi — $(date +%d.%m.%Y)"
 
           # Dacă main a avansat între checkout și acum (o altă rulare, un fișier
