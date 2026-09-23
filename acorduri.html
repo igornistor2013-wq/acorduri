@@ -335,6 +335,8 @@
 
   /* rândurile din vederea „acte" refolosesc stilurile listei de acte */
   td.a-nr{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy);white-space:nowrap}
+  a.spre-legis{color:inherit;text-decoration:underline dotted;text-underline-offset:2px}
+  a.spre-legis:hover{text-decoration-style:solid}
   td.a-src{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);white-space:nowrap}
   td.a-src a{color:var(--navy);text-decoration:none;font-weight:700}
   td.a-src a:hover{text-decoration:underline;color:var(--gold)}
@@ -655,6 +657,23 @@
      simplu, fără link. */
   function linkSigur(u){
     return /^https?:\/\//i.test(String(u || '')) ? String(u) : '';
+  }
+
+  /* Numărul actului duce la căutarea lui în Registrul de stat (legis.md):
+     nr. documentului + anul adoptării. Legis nu are adrese stabile pe
+     număr, doar pe doc_id intern, deci căutarea e cea mai directă cale.
+     „nr. 188, 24 august 2026" → nr_doc=188&datepicker1=2026 */
+  function linkLegis(act){
+    var m = /nr\.\s*([0-9A-Za-z-]+)\s*,\s*\d{1,2}\s+\S+\s+(\d{4})/.exec(String(act || ''));
+    if (!m) return '';
+    return 'https://www.legis.md/cautare/getResults?document_status=0' +
+      '&nr_doc=' + encodeURIComponent(m[1]) + '&datepicker1=' + m[2] +
+      '&publication_status=+-+TOATE+-+&nr=&publish_date=&search_type=1&search_string=';
+  }
+  function nrAct(act){
+    var u = linkLegis(act);
+    return u ? '<a class="spre-legis" href="' + esc(u) + '" target="_blank" rel="noopener noreferrer"' +
+      ' title="Deschide actul în Registrul de stat (legis.md)">' + esc(act) + '</a>' : esc(act);
   }
 
   function esc(s){
@@ -1816,7 +1835,7 @@
                  : '<span class="et-mic vig">' + esc(VIGOARE.cap) + '</span>';
       }).join('');
       return '<tr class="act-rand">' +
-        '<td class="a-nr" data-l="Act">' + esc(a.act) + '</td>' +
+        '<td class="a-nr" data-l="Act">' + nrAct(a.act) + '</td>' +
         '<td data-l="Categorie"><span class="tag ' + (CLS[a.categorie]||'t-alt') + '">' +
           esc(a.categorie) + '</span>' +
           (a.suport ? '<span class="tag t-suport">suport bugetar</span>' : '') + '</td>' +
@@ -1863,7 +1882,7 @@
     document.getElementById('rows').innerHTML = out.map(function(g, i){
       var lista = g.acte.map(function(a){
         var u = linkSigur(a.url);
-        return '<li><div class="a-nr">' + esc(a.act) + '</div>' +
+        return '<li><div class="a-nr">' + nrAct(a.act) + '</div>' +
           '<div class="a-tit">' + esc(a.titlu) + '</div>' +
           '<div class="a-src">' +
             (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">MO '
