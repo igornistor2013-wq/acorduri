@@ -1,0 +1,69 @@
+name: Verifică legis.md
+
+on:
+  schedule:
+    # 07:00 UTC = 10:00 ora Chișinăului (vara), 09:00 (iarna). Zilnic.
+    # GitHub întârzie frecvent cron-urile cu 1-2 ore. E normal, nu e o eroare.
+    - cron: "0 7 * * *"
+  workflow_dispatch:        # permite pornirea manuală din interfața GitHub
+
+permissions:
+  contents: write
+
+concurrency:
+  # Dacă monitor.yml face push în același timp, pasul de salvare de mai jos
+  # rebazează și reîncearcă — cele două scriu fișiere diferite.
+  group: legis
+  cancel-in-progress: false
+
+jobs:
+  verifica:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Descarcă repository-ul
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Pregătește Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalează Playwright și Chromium
+        run: |
+          pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+
+      # Testele rulează înainte: dacă pică, căutarea nici nu pornește.
+      # --browser include un test complet pe un legis.md simulat local.
+      - name: Verifică scriptul
+        run: python teste_legis.py --browser
+
+      - name: Caută acte noi pe legis.md
+        run: python legis_watch.py
+
+      - name: Salvează dacă au apărut acte noi
+        run: |
+          FISIERE="legis_brut.json legis_acorduri.html raport_legis.md jurnal_legis.md"
+          if [ -z "$(git status --porcelain legis_brut.json)" ]; then
+            echo "Nimic nou — nu fac commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add $FISIERE
+          git commit -m "legis.md: acte noi — $(date +%d.%m.%Y)"
+          for incercare in 1 2 3; do
+            if git push; then
+              echo "Publicat."
+              exit 0
+            fi
+            echo "Push respins (încercarea $incercare) — reîmprospătez și reîncerc."
+            git pull --rebase origin main || exit 1
+            sleep 3
+          done
+          echo "Nu am reușit să public după 3 încercări."
+          exit 1
