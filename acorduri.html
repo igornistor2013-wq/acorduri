@@ -1902,7 +1902,15 @@
         });
         pop.hidden = !da; root.classList.toggle('deschis', da);
         btn.setAttribute('aria-expanded', String(da));
-        if (da){ var c = root.querySelector('.dd-cauta'); if (c) c.focus(); }
+        if (da){
+          // pe telefon, fereastra nu trebuie să iasă din ecran (butonul „Ani” e în dreapta)
+          pop.style.left = '0px';
+          var r = pop.getBoundingClientRect(), W = document.documentElement.clientWidth, dx = 0;
+          if (r.right > W - 16) dx = (W - 16) - r.right;
+          if (r.left + dx < 16) dx = 16 - r.left;
+          pop.style.left = dx + 'px';
+          var c = root.querySelector('.dd-cauta'); if (c) c.focus();
+        }
       }
       root.addEventListener('inchide', function(){ deschide(false); });
       btn.addEventListener('click', function(){ deschide(pop.hidden); });
@@ -1912,7 +1920,8 @@
       var c = root.querySelector('.dd-cauta');
       if (c) c.addEventListener('input', function(){ q = c.value.trim(); deseneaza(); });
       document.addEventListener('click', function(e){ if (!root.contains(e.target) && !pop.hidden) deschide(false); });
-      root.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !pop.hidden){ deschide(false); btn.focus(); } });
+      // pe document, nu pe root: după clic pe o opțiune, focusul poate rămâne pe <body>
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !pop.hidden){ deschide(false); btn.focus(); } });
       deseneaza();
       return { cifre: function(k){ cheie = k; deseneaza(); } };
     }

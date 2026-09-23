@@ -153,6 +153,7 @@ def main(BRUT=None, OUT=None):
     print(len(acte), 'acte', '(din care', din_mo, 'din Monitorul Oficial)')
 
     s = open(SRC, encoding='utf-8').read()
+    AN = azi[6:10] if re.match(r'\d\d\.\d\d\.\d{4}', azi) else str(datetime.date.today().year)
 
 
     def inlocuieste(vechi, nou, n=1):
@@ -201,7 +202,7 @@ def main(BRUT=None, OUT=None):
     inlocuieste('<h1>Acorduri de asistență externă</h1>',
                 '<h1>Acorduri de asistență externă · Registrul de stat</h1>')
     inlocuieste('Un acord, un rând. Actele publicate în Monitorul Oficial sunt grupate pe acordul din care fac parte, cu etapa la care a ajuns fiecare.',
-                'Un acord, un rând. Actele din Registrul de stat al actelor juridice (legis.md), 1992–2026, grupate pe acordul din care fac parte, '
+                'Un acord, un rând. Actele din Registrul de stat al actelor juridice (legis.md), 1992–' + AN + ', grupate pe acordul din care fac parte, '
                 'cu etapa la care a ajuns fiecare. <b>Versiune de test</b>: actele sunt găsite prin căutare în titlu și filtrate automat, '
                 'deci pot exista și acte în plus, și acte scăpate.')
     inlocuieste("      '<span>Ediții parcurse: <b>' + ((db.editii_vazute||[]).length) + '</b></span>' +",
@@ -209,7 +210,7 @@ def main(BRUT=None, OUT=None):
     inlocuieste("'>Ultima verificare: <b>'", "'>Extras la: <b>'")
     inlocuieste('Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova.',
                 'Sursa acestei versiuni: Registrul de stat al actelor juridice (legis.md), căutare după cuvinte-cheie în titlu, an cu an, '
-                '1990–2026, apoi filtrare cu clasificatorul registrului, extins. Numărul actului deschide fișa lui pe legis.md.')
+                '1990–' + AN + ', apoi filtrare cu clasificatorul registrului, extins. Numărul actului deschide fișa lui pe legis.md.')
     inlocuieste("var antet = 'Acorduri de asistență externă — Monitorul Oficial al Republicii Moldova. ' +",
                 "var antet = 'Acorduri de asistență externă — Registrul de stat (legis.md). ' +")
     # butonul „Acorduri" din antet duce la registrul din Monitor
