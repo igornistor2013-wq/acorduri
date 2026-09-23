@@ -105,6 +105,9 @@
   }
   #acorduriNavBtn svg, #hg246NavBtn svg{ transition:transform .35s cubic-bezier(.34,1.56,.64,1); }
   #acorduriNavBtn:hover svg, #hg246NavBtn:hover svg{ transform:translateX(3px); }
+  #acorduriNavBtn:hover #acorduriSelectorChevron{ transform:none; }
+  #acorduriSelector.deschis #acorduriSelectorChevron{ transform:rotate(180deg) !important; }
+  #acorduriSelectorMenu .acord-opt:hover, #acorduriSelectorMenu .acord-opt:focus-visible{ background:var(--blue-bg); outline:none; }
   /* Focusul din tastatură era invizibil pe toate trei. */
   #acorduriNavBtn:focus-visible, #hg246NavBtn:focus-visible, #advancedAnalysisNavBtn:focus-visible,
   #updateNavBtn:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
@@ -389,6 +392,51 @@
   .donor-list::-webkit-scrollbar{width:9px;}
   .donor-list::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:8px;}
   .donor-list::-webkit-scrollbar-track{background:transparent;}
+
+  /* --- Filtrele refăcute: ani vizibili toți, donatori cu selecție explicită ---
+     Anii stăteau într-o cutie cu derulare internă, sub o bandă decorativă care
+     lăsa un gol mare: jumătate din ani nu se vedeau. Acum toți sunt pe ecran,
+     fiecare cu bara lui de sumă. */
+  #yearSlicer .year-strip{display:none;}
+  #yearSlicer .year-chips{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:5px;
+    max-height:none;overflow:visible;border:none;background:none;padding:0;
+  }
+  #yearSlicer .year-chip{
+    min-width:0;padding:6px 3px 5px;display:flex;flex-direction:column;align-items:center;gap:4px;
+    font-size:12px;
+  }
+  .year-chip .yc-bar{display:block;width:78%;height:4px;border-radius:2px;background:var(--line);overflow:hidden;}
+  .year-chip .yc-bar i{display:block;height:100%;background:var(--gold);border-radius:2px;}
+  .year-chip.active .yc-bar{background:rgba(255,255,255,.25);}
+  .year-chip.active .yc-bar i{background:#ffd88a;}
+  /* „toți anii": nu evidențiem fiecare an ca ales — ar arăta ca o selecție făcută de mână */
+  #yearSlicer.toti .year-chip.active{background:var(--panel);color:var(--ink);border-color:var(--line-strong);box-shadow:none;}
+  #yearSlicer.toti .year-chip.active .yc-bar{background:var(--line);}
+  #yearSlicer.toti .year-chip.active .yc-bar i{background:var(--gold);}
+
+  .donor-sel{padding:10px 14px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--ink-dim);line-height:1.45;}
+  .donor-sel b{color:var(--navy);}
+  .donor-sel .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+  .donor-sel .chip{display:inline-flex;align-items:center;gap:5px;max-width:100%;background:var(--navy);color:#fff;
+    border-radius:14px;padding:3px 5px 3px 10px;font-size:11.5px;font-weight:600;}
+  .donor-sel .chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .donor-sel .chip button{border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:50%;width:17px;height:17px;
+    line-height:15px;padding:0;cursor:pointer;font-size:12px;flex:none;}
+  .donor-sel .chip button:hover{background:rgba(255,255,255,.4);}
+  .donor-sel .reset{border:none;background:none;color:var(--navy);text-decoration:underline;cursor:pointer;font:inherit;padding:0;margin-left:4px;}
+  .donor-group-header .group-sum,.donor-item .sum{font-size:11px;font-variant-numeric:tabular-nums;color:var(--ink-dim);font-weight:500;flex:none;}
+  .donor-group-header .group-name{cursor:pointer;}
+  /* numele lungi împingeau suma în afara panoului: coloana trebuie să poată
+     să se strângă sub lățimea conținutului, ca să apară „…" */
+  #donorSlicer .donor-group-items{grid-template-columns:minmax(0,1fr);}
+  #donorSlicer .donor-item{min-width:0;}
+  #donorSlicer .donor-item .name{min-width:0;}
+  .donor-group-header.partial{background:#eef4ea;}
+  /* modul „toți": nicio bifă, niciun verde — altfel pare că selecția e deja făcută */
+  .donor-list.toti .donor-item.checked{background:none;}
+  .donor-list.toti .donor-item.checked .name{color:var(--ink);font-weight:400;}
+  .donor-list.toti .donor-group-header.all-checked{background:var(--blue-bg);color:var(--navy);}
 
   /* ---------- Main column ---------- */
   .main-col{display:flex;flex-direction:column;gap:20px;}
@@ -952,10 +1000,26 @@
           </button>
         </div>
       </div>
-      <a id="acorduriNavBtn" href="acorduri.html" style="display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:800;white-space:nowrap;cursor:pointer;text-decoration:none;letter-spacing:.01em;">
-        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.3;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
-        <span>Acorduri →</span>
-      </a>
+      <!-- Două registre de acorduri: din Monitorul Oficial (zilnic, din 2024)
+           și din Registrul de stat legis.md (1992 până azi). Butonul deschide
+           un meniu cu ambele, în același stil ca meniul IATI de alături. -->
+      <div id="acorduriSelector" style="position:relative;display:inline-block;">
+        <button type="button" id="acorduriNavBtn" aria-haspopup="true" aria-expanded="false" aria-controls="acorduriSelectorMenu" style="display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:800;white-space:nowrap;cursor:pointer;text-decoration:none;letter-spacing:.01em;border:none;font-family:inherit;">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.3;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+          <span>Acorduri</span>
+          <svg id="acorduriSelectorChevron" viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.3;transition:transform .15s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div id="acorduriSelectorMenu" role="menu" style="display:none;position:absolute;top:calc(100% + 6px);left:0;width:300px;max-width:calc(100vw - 32px);background:var(--panel);border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 12px 28px -8px rgba(20,35,60,.28);overflow:hidden;z-index:50;">
+          <a role="menuitem" href="legis_acorduri.html" class="acord-opt" style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;text-decoration:none;color:var(--ink);border-bottom:1px solid var(--line);">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;flex:none;margin-top:2px;stroke:var(--navy);fill:none;stroke-width:2.3;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span><b style="display:block;font-size:13.5px;">Acorduri · legis.md →</b><small style="font-size:11.5px;color:var(--ink-dim);white-space:normal;">Registrul de stat al actelor juridice, 1992 până azi</small></span>
+          </a>
+          <a role="menuitem" href="acorduri.html" class="acord-opt" style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;text-decoration:none;color:var(--ink);">
+            <svg viewBox="0 0 24 24" style="width:16px;height:16px;flex:none;margin-top:2px;stroke:var(--navy);fill:none;stroke-width:2.3;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+            <span><b style="display:block;font-size:13.5px;">Acorduri · Monitorul Oficial →</b><small style="font-size:11.5px;color:var(--ink-dim);white-space:normal;">Cuprinsurile Monitorului, actualizat zilnic, din 2024</small></span>
+          </a>
+        </div>
+      </div>
       <a id="hg246NavBtn" href="hg246.html" style="display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:800;white-space:nowrap;cursor:pointer;text-decoration:none;letter-spacing:.01em;">
         <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.3;"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>
         <span>HG 246 →</span></a>
@@ -984,7 +1048,7 @@
           </div>
           <div class="year-strip" id="yearStrip"></div>
           <div class="year-chips" id="yearChips"></div>
-          <div class="year-hint" data-i18n="yearHint">clic pe un an · shift+clic pentru interval</div>
+          <div class="year-hint" data-i18n="yearHint">clic = un an · Ctrl+clic = mai mulți · Shift+clic = interval</div>
           <div class="na-year-row" id="naYearRow">
             <span class="na-label" data-i18n="yearUnspecified">An nespecificat în sursă</span>
             <span class="na-val" id="naYearVal"></span>
@@ -1001,6 +1065,7 @@
           </div>
         </div>
         <div id="donorSlicer">
+          <div class="donor-sel" id="donorSel" aria-live="polite"></div>
           <div class="search-box"><input id="donorSearch" type="text" placeholder="Caută donator…" data-i18n-placeholder="donorSearchPlaceholder"/></div>
           <div class="donor-list" id="donorList"></div>
         </div>
@@ -1816,10 +1881,20 @@ let lastYearClicked = null;
 const yearStrip = document.getElementById('yearStrip');
 const yearChips = document.getElementById('yearChips');
 
-function handleYearPick(y, shiftKey){
+function handleYearPick(y, shiftKey, ctrlKey){
+  /* Un clic în timpul animației de deschidere o oprește: altfel animația
+     rescria selecția la următorul cadru și clicul părea ignorat. */
+  if(window.__introRunning && typeof finishIntro === 'function') finishIntro();
+  window.__aniAlesi = true;
+  const toti = state.selectedYears.size === ALL_KEYS.size;
   if(shiftKey && lastYearClicked!==null){
     const lo = Math.min(lastYearClicked,y), hi = Math.max(lastYearClicked,y);
     state.selectedYears = new Set(YEARS.filter(yy=>yy>=lo&&yy<=hi));
+  } else if(ctrlKey){
+    // Ctrl/Cmd+clic: adaugă sau scoate anul din selecție
+    const s = toti ? new Set() : new Set(state.selectedYears);
+    if(s.has(y)) s.delete(y); else s.add(y);
+    state.selectedYears = s.size ? s : new Set(ALL_KEYS);
   } else {
     const onlyThis = state.selectedYears.size===1 && state.selectedYears.has(y);
     if(onlyThis){
@@ -1848,9 +1923,12 @@ function buildYearUI(){
     const chip = document.createElement('div');
     chip.className='year-chip active';
     chip.dataset.year=y;
-    chip.textContent=y;
-    chip.title = fmtCompact(yearTotals[y])+' EUR debursări';
-    chip.addEventListener('click',(e)=>handleYearPick(y, e.shiftKey));
+    const pctAn = Math.max(4, Math.round((yearTotals[y]/maxYearTotal)*100));
+    chip.innerHTML = '<span class="yc-an">' + y + '</span><span class="yc-bar"><i style="width:' + pctAn + '%"></i></span>';
+    chip.title = y + ': ' + fmtCompact(yearTotals[y])+' EUR debursări';
+    chip.setAttribute('role','button'); chip.tabIndex = 0;
+    chip.addEventListener('click',(e)=>handleYearPick(y, e.shiftKey, e.ctrlKey || e.metaKey));
+    chip.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); handleYearPick(y, e.shiftKey, e.ctrlKey || e.metaKey); } });
     yearChips.appendChild(chip);
   });
   const naRow = document.getElementById('naYearRow');
@@ -1862,6 +1940,8 @@ function buildYearUI(){
   }
 }
 document.getElementById('resetYears').addEventListener('click', ()=>{
+  if(window.__introRunning && typeof finishIntro === 'function') finishIntro();
+  window.__aniAlesi = false;
   state.selectedYears = new Set(ALL_KEYS);
   render();
 });
@@ -2138,89 +2218,153 @@ function donorsByGroup(){
   return out;
 }
 
+/* ---------- Selecția de donatori ----------
+   Implicit sunt aleși TOȚI donatorii. Înainte, un clic pe un donator în starea
+   asta îl SCOTEA din selecție: lista de proiecte arăta toți ceilalți 152, adică
+   aproape nicio schimbare, și părea că filtrul nu funcționează. Acum:
+   – din „toți", un clic pe donator (sau grup) arată DOAR acel donator;
+   – apoi, clicurile adaugă sau scot donatori din selecție;
+   – dacă scoți ultimul donator, revii la „toți". */
+function donoriToti(){ return state.selectedDonors.size === DONORS.length; }
+
+function aplicaDonatori(set){
+  if(window.__introRunning && typeof finishIntro === 'function') finishIntro();
+  state.selectedDonors = set.size ? set : new Set(DONORS);
+  window.__donatoriAlesi = !donoriToti();
+  const sc = donorList.scrollTop;
+  renderDonorList();
+  donorList.scrollTop = sc;
+  render();
+}
+
 function toggleGroupSelect(groupName) {
   const groupDonors = donorsByGroup().get(groupName) || [];
   if(!groupDonors.length) return;
-  const allSelected = groupDonors.every(d => state.selectedDonors.has(d));
-  if (allSelected) groupDonors.forEach(d => state.selectedDonors.delete(d));
-  else             groupDonors.forEach(d => state.selectedDonors.add(d));
-  renderDonorList();
-  render();
+  if(donoriToti()){ expandedGroups.add(groupName); return aplicaDonatori(new Set(groupDonors)); }
+  const s = new Set(state.selectedDonors);
+  const toate = groupDonors.every(d => s.has(d));
+  groupDonors.forEach(d => toate ? s.delete(d) : s.add(d));
+  aplicaDonatori(s);
+}
+
+function renderDonorSelection(){
+  const box = document.getElementById('donorSel');
+  if(!box) return;
+  const en = (typeof currentLang !== 'undefined' && currentLang === 'en');
+  if(donoriToti()){
+    box.innerHTML = en
+      ? '<b>All donors</b> (' + DONORS.length + '). Click a donor to see only its projects.'
+      : '<b>Toți donatorii</b> (' + DONORS.length + '). Apasă pe un donator ca să vezi doar proiectele lui.';
+    return;
+  }
+  const alesi = DONORS.filter(d => state.selectedDonors.has(d));
+  if(!alesi.length){
+    box.innerHTML = en ? '<b>No donor selected.</b> Click a donor below.' : '<b>Niciun donator ales.</b> Apasă pe un donator de mai jos.';
+    return;
+  }
+  const MAX = 12;
+  box.innerHTML = '<b>' + alesi.length + '</b> ' + (en ? (alesi.length === 1 ? 'donor selected' : 'donors selected') : (alesi.length === 1 ? 'donator ales' : 'donatori aleși')) +
+    ' <button class="reset" type="button">' + (en ? 'show all' : 'arată toți') + '</button>' +
+    '<div class="chips">' + alesi.slice(0, MAX).map(d =>
+      '<span class="chip" title="' + esc(donorLabel(d)) + '"><span>' + esc(donorLabel(d)) + '</span>' +
+      '<button type="button" data-d="' + esc(d) + '" aria-label="' + (en ? 'remove' : 'scoate') + '">×</button></span>').join('') +
+    (alesi.length > MAX ? '<span class="chip"><span>+' + (alesi.length - MAX) + '</span></span>' : '') + '</div>';
+  box.querySelector('.reset').addEventListener('click', () => aplicaDonatori(new Set(DONORS)));
+  box.querySelectorAll('.chip button[data-d]').forEach(b => b.addEventListener('click', () => {
+    const s = new Set(state.selectedDonors); s.delete(b.dataset.d); aplicaDonatori(s);
+  }));
 }
 
 function renderDonorList(){
   const q = state.search.trim().toLowerCase();
   donorList.innerHTML='';
+  const toti = donoriToti();
+  donorList.classList.toggle('toti', toti);
+  renderDonorSelection();
 
   const byGroup = donorsByGroup();
-  const matches = name => {
+  /* Căutarea ignoră diacriticele („Elvetia" găsește „Elveția"), acceptă
+     acronimele (BERD, BEI, AID, BIRD — din inițialele cuvintelor cu majusculă)
+     și numele grupului („Germania" arată toți donatorii germani). */
+  const pliaza = x => String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const acronim = x => (String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').match(/\b[A-Z]/g) || []).join('').toLowerCase();
+  const qf = pliaza(q), qa = qf.replace(/[^a-z]/g,'');
+  const potriveste = x => pliaza(x).includes(qf) || (qa.length >= 2 && acronim(x) === qa);
+  const matchesName = name => {
     if(!q) return true;
-    if(name.toLowerCase().includes(q)) return true;
-    try{ return donorLabel(name).toLowerCase().includes(q); }catch(e){ return false; }
+    if(potriveste(name)) return true;
+    try{ return potriveste(donorLabel(name)); }catch(e){ return false; }
   };
+  let grupPotrivit = '';
+  const matches = name => !q || matchesName(name) || (grupPotrivit && potriveste(grupPotrivit));
+  const sumaGrup = g => (byGroup.get(g) || []).reduce((t, d) => t + (donorTotals[d] || 0), 0);
 
-  // grupurile se afișează alfabetic, „Neîncadrați" la final
+  // grupurile, descrescător după sumă (cei mai mari finanțatori sus); „Neîncadrați" la final
   const allGroups = [...byGroup.keys()].sort((a,b)=>{
     if(a === GROUP_UNCLASSIFIED) return 1;
     if(b === GROUP_UNCLASSIFIED) return -1;
-    return a.localeCompare(b,'ro');
+    return sumaGrup(b) - sumaGrup(a) || a.localeCompare(b,'ro');
   });
 
   let rendered = 0;
 
   allGroups.forEach(groupName => {
     const groupDonors = byGroup.get(groupName) || [];
+    grupPotrivit = groupName;
     const filteredDonors = groupDonors.filter(matches);
     if (filteredDonors.length === 0) return;
     rendered++;
+
+    const nAlesi = toti ? 0 : groupDonors.filter(d => state.selectedDonors.has(d)).length;
+    const allChecked = !toti && nAlesi === groupDonors.length;
+    const partial = !toti && nAlesi > 0 && !allChecked;
+    // deschis: la căutare, când are donatori aleși, sau când l-ai deschis tu
+    const isExpanded = expandedGroups.has(groupName) || !!q || partial || (allChecked && groupDonors.length > 1);
 
     const groupDiv = document.createElement('div');
     groupDiv.className = 'donor-group';
 
     const header = document.createElement('div');
-    const isExpanded = expandedGroups.has(groupName);
-    const allChecked = groupDonors.every(d => state.selectedDonors.has(d));
-
-    header.className = 'donor-group-header' + (isExpanded ? '' : ' collapsed') + (allChecked ? ' all-checked' : '');
+    header.className = 'donor-group-header' + (isExpanded ? '' : ' collapsed') + (allChecked ? ' all-checked' : '') + (partial ? ' partial' : '');
     header.innerHTML = `
-      <div class="toggle">▼</div>
-      <input type="checkbox" ${allChecked ? 'checked' : ''} />
+      <div class="toggle" title="${currentLang==='en'?'expand':'deschide'}">▼</div>
+      <input type="checkbox" ${allChecked ? 'checked' : ''} aria-label="${esc(groupName)}" />
       <span class="group-name">${esc(groupName)}</span>
-      <span class="group-count">(${filteredDonors.length})</span>`;
+      <span class="group-count">(${filteredDonors.length})</span>
+      <span class="group-sum">${fmtCompact(sumaGrup(groupName))}</span>`;
+    const cb = header.querySelector('input');
+    cb.indeterminate = partial;
 
     header.querySelector('.toggle').addEventListener('click', (e) => {
       e.stopPropagation();
       toggleGroupExpand(groupName);
     });
-    header.querySelector('input').addEventListener('change', (e) => {
-      e.stopPropagation();
-      toggleGroupSelect(groupName);
-    });
+    cb.addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); toggleGroupSelect(groupName); });
+    // clic pe numele grupului = selectează grupul; un grup cu un singur donator nu mai trebuie deschis
+    header.addEventListener('click', () => toggleGroupSelect(groupName));
 
     groupDiv.appendChild(header);
 
     const itemsDiv = document.createElement('div');
     itemsDiv.className = 'donor-group-items' + (isExpanded ? '' : ' collapsed');
 
-    // în interiorul grupului: descrescător după debursări, ca barele să aibă sens
     filteredDonors
       .slice()
       .sort((a,b) => (donorTotals[b]||0) - (donorTotals[a]||0))
       .forEach(name => {
+        const ales = !toti && state.selectedDonors.has(name);
         const itemDiv = document.createElement('div');
-        itemDiv.className = 'donor-item' + (state.selectedDonors.has(name) ? ' checked' : '');
+        itemDiv.className = 'donor-item' + (ales ? ' checked' : '');
         const total = donorTotals[name] || 0;
         const pct = Math.max(2, (total / (maxDonorTotal || 1)) * 100);
         itemDiv.innerHTML = `
           <div class="bar-bg" style="width:${pct}%"></div>
-          <input type="checkbox" ${state.selectedDonors.has(name) ? 'checked' : ''} />
-          <span class="name">${esc(donorLabel(name))}</span>`;
-
-        itemDiv.addEventListener('click', (e) => {
-          if(e.target.tagName === 'INPUT') return;
-          toggleDonor(name, itemDiv);
-        });
-        itemDiv.querySelector('input').addEventListener('change', () => toggleDonor(name, itemDiv));
+          <input type="checkbox" ${ales ? 'checked' : ''} aria-label="${esc(donorLabel(name))}" />
+          <span class="name" title="${esc(donorLabel(name))}">${esc(donorLabel(name))}</span>
+          <span class="sum">${fmtCompact(total)}</span>`;
+        // un singur handler pe tot rândul, inclusiv pe căsuță — altfel clicul pe
+        // căsuță declanșa și „change", și „click", adică două comutări
+        itemDiv.addEventListener('click', (e) => { e.preventDefault(); toggleDonor(name); });
         itemsDiv.appendChild(itemDiv);
       });
 
@@ -2249,51 +2393,24 @@ window.__auditDonors = function(){
   return { reali: DONORS.length, orfane: orfane.length, neacoperiti: neacoperiti.length };
 };
 
-function toggleDonor(name, itemDiv){
-  if(state.selectedDonors.has(name)) state.selectedDonors.delete(name);
-  else state.selectedDonors.add(name);
-
-  /* Bifa trebuie actualizată explicit. render() recalculează cifrele și
-     tabelul, dar nu atinge lista de finanțatori — așa că, la un clic pe numele
-     donatorului, sumele se schimbau iar căsuța rămânea bifată. Părea că
-     apăsarea n-a avut efect, deși avusese.
-
-     Actualizăm doar elementul atins, nu toată lista: renderDonorList() ar
-     reconstrui cele 153 de rânduri și ar arunca poziția derulării la fiecare
-     clic. Antetul grupului se recalculează din stare, nu din DOM, ca să fie
-     corect și când o căutare ascunde o parte din donatorii grupului. */
-  if(itemDiv){
-    const bifat = state.selectedDonors.has(name);
-    itemDiv.classList.toggle('checked', bifat);
-    const caseta = itemDiv.querySelector('input');
-    if(caseta) caseta.checked = bifat;
-
-    const grup = itemDiv.closest('.donor-group');
-    const antet = grup && grup.querySelector('.donor-group-header');
-    if(antet){
-      const aiGrupului = donorsByGroup().get(groupOfDonor(name)) || [];
-      const toate = aiGrupului.length > 0 &&
-                    aiGrupului.every(d => state.selectedDonors.has(d));
-      antet.classList.toggle('all-checked', toate);
-      const casetaAntet = antet.querySelector('input');
-      if(casetaAntet) casetaAntet.checked = toate;
-    }
-  } else {
-    renderDonorList();
-  }
-  render();
+function toggleDonor(name){
+  if(donoriToti()) return aplicaDonatori(new Set([name]));
+  const s = new Set(state.selectedDonors);
+  if(s.has(name)) s.delete(name); else s.add(name);
+  aplicaDonatori(s);
 }
 document.getElementById('donorSearch').addEventListener('input',(e)=>{
   state.search = e.target.value;
   renderDonorList();
 });
 document.getElementById('selectAllDonors').addEventListener('click',()=>{
-  state.selectedDonors = new Set(DONORS);
-  renderDonorList();
-  render();
+  aplicaDonatori(new Set(DONORS));
 });
 document.getElementById('deselectAllDonors').addEventListener('click',()=>{
+  // „Niciunul" golește selecția; următorul clic pe un donator îl adaugă
+  if(window.__introRunning && typeof finishIntro === 'function') finishIntro();
   state.selectedDonors = new Set();
+  window.__donatoriAlesi = true;
   renderDonorList();
   render();
 });
@@ -2908,6 +3025,8 @@ function updateYearUI(){
   const sel = [...state.selectedYears].filter(y=>y!=='NA').sort((a,b)=>a-b);
   const hasNaSel = state.selectedYears.has('NA');
   const box = document.getElementById('yearWindowVal');
+  const slicer = document.getElementById('yearSlicer');
+  if(slicer) slicer.classList.toggle('toti', state.selectedYears.size===ALL_KEYS.size);
   if(state.selectedYears.size===ALL_KEYS.size){
     box.textContent = `Toți anii (${YEAR_MIN}–${YEAR_MAX})`;
     box.classList.add('multi');
@@ -2975,8 +3094,8 @@ function render(){
   });
 }
 
-const I18N = {"ro": {"mainTitle": "Asistență externă pentru", "countryName": "Republica Moldova", "yearFilterTitle": "Filtru · Ani", "allYears": "Toți anii", "yearSelectedLabel": "An(i) selectat(ți)", "yearHint": "clic pe un an · shift+clic pentru interval", "yearUnspecified": "An nespecificat în sursă", "donorFilterTitle": "Filtru · Donatori", "allDonorsBtn": "Toți", "noneDonorsBtn": "Niciunul", "donorSearchPlaceholder": "Caută donator…", "topDonorsTitle": "Top donatori · sumă totală", "metricDeb": "debursări", "metricAng": "Angajamente", "sectorsTitle": "Distribuție pe sectoare", "metricDebCap": "Debursări", "sectorNote": "un proiect poate acoperi mai multe sectoare — suma pe sectoare poate depăși totalul general", "beneficiariesTitle": "Distribuție pe beneficiari", "beneficiaryNote": "un proiect poate avea mai mulți beneficiari — fiecare beneficiar este numărat separat, cu suma integrală a proiectului", "donorTableTitle": "Donatori grupați · sume totale", "donorTableNote": "fiecare donator își arată suma integrală a proiectelor la care participă; pentru proiectele co-finanțate (mai mulți donatori), aceeași sumă apare la fiecare donator implicat — rândul TOTAL de mai jos elimină această suprapunere și arată suma reală, fără duplicare", "colDonor": "Donator", "colPeriod": "Perioadă", "colProjects": "Proiecte", "colCommitments": "Angajamente (EUR)", "colDisbursements": "Debursări (EUR)", "colPctTotal": "% din total", "colProjectName": "Denumire proiect", "colYear": "An", "projectsListTitle": "Lista proiectelor", "projSearchPlaceholder": "Caută după denumire sau AMP ID...", "mapTitle": "Hartă globală · număr de proiecte pe donator", "zoomIn": "Mărește", "zoomOut": "Micșorează", "zoomReset": "Resetează",
- "logoBackTitle": "Înapoi la pagina principală", "mapLegendIntensity": "proiecte pe țară", "mapHint": "clic pe o țară · scroll / butoane pentru zoom · trage pentru a deplasa", "mapNote": "un proiect cu mai mulți donatori este numărat la fiecare țară implicată — suma poate depăși totalul general de proiecte. Organizațiile multilaterale (UE, ONU, bănci de dezvoltare etc.) nu au un contur de țară propriu și apar doar în clasamentul din dreapta.", "mapRankingTitle": "Clasament donatori", "resetSelectionBtn": "Resetează selecția", "mapCountryProjectsTitle": "Proiectele țării selectate", "updateTitle": "Actualizare date — încarcă un export nou", "analyzeBtn": "Analizează și actualizează", "saveBtn": "💾 Salvează (suprascrie fișierul)", "downloadBtn": "Descarcă drept fișier nou", "resetOriginalBtn": "↺ Resetează la datele originale", "updateLogDefault": "Acceptă export .xml (recomandat, are AMP ID) sau .csv de pe amp.gov.md. Se potrivește automat după AMP ID — proiectele existente se actualizează, cele noi se adaugă, restul rămân neatinse.", "footerSource": "Sursă: platforma AMP (Aid Management Platform) a Republicii Moldova — versiune veche și versiune nouă · sume în EUR", "footerOwner": "Acest proiect aparține <b>Direcției Coordonare Asistență Externă și Proiecte Investiționale</b>, din cadrul <b>Direcției Generale Coordonarea Asistenței Externe și Fonduri Europene</b> — Cancelaria de Stat.", "kpiProjectsLbl": "Proiecte", "kpiProjectsSub": "proiecte unice (fără duplicare)", "kpiDonorsLbl": "Donatori activi", "kpiDonorsSub": "în selecția curentă", "emptyCurrentSelection": "Nicio dată pentru selecția curentă.", "emptyAdjustFilters": "Nicio dată — ajustează filtrele.", "totalUniqueRow": "TOTAL (proiecte unice)", "emptySelectDonor": "Selectează cel puțin un donator pentru a vedea proiectele.", "emptyNoCountrySelected": "Nicio țară selectată.", "kpiCommitmentsLbl": "Angajamente totale", "kpiDisbursementsLbl": "Debursări totale", "advancedAnalysisBtn": "Analize avansate →", "advTitle": "Analize avansate — Asistență externă Republica Moldova", "backToMainBtn": "← Înapoi la dashboard-ul principal", "advEyebrow": "1993–2026 · analize suplimentare", "advLineTitle": "Evoluție în timp · Angajamente vs. Debursări pe ani", "advLineNote": "sumă totală pe an (proiecte cu an cunoscut, 1993–2026)", "advExecTitle": "Rata de execuție · Debursări / Angajamente (top 20 donatori)", "advExecNote": "arată cât din suma angajată a fost efectiv debursată — un procent scăzut poate indica proiecte recente sau întârzieri în implementare", "advExecutionLbl": "Execuție", "advSankeyTitle": "Flux Donator → Sector → Beneficiar", "advSankeyNote": "top 9 donatori · top 8 sectoare · top 10 beneficiari, după suma angajamentelor — grosimea fluxului e proporțională cu suma", "advColDonors": "Donatori", "advColSectors": "Sectoare", "advColBeneficiaries": "Beneficiari", "advTreemapTitle": "Distribuție sectoare (treemap)", "advTreemapNote": "mărimea fiecărui bloc = suma angajamentelor pe sector", "advTopProjTitle": "Top 20 proiecte individuale", "advTopProjNote": "după suma angajamentelor", "advColProject": "Proiect", "advHeatmapTitle": "Hartă termică · Donator × An (top 25 donatori)", "advHeatmapNote": "intensitatea culorii = suma pe acel an; donatorii sunt ordonați după suma totală", "advOngoingTitle": "Proiecte în derulare · alege anul", "advOngoingNote": "proiectul apare pentru fiecare an cuprins între prima și ultima înregistrare financiară găsită — nu doar în anul exact al unei tranzacții", "advColSpan": "Perioadă activă", "advAllDonorsOption": "— Toți donatorii —", "yearFilterNote": "selectând un an, vezi proiectele lansate (angajate) în acel an", "advOtherSectors": "Alte sectoare", "advOngoingTotalRow": "TOTAL (selecția curentă)", "exportTitle": "Export complet — toate proiectele", "exportExcelBtn": "Descarcă Excel cu toate proiectele", "exportNote": "exportă exact datele curente afișate în pagină (AMP ID, an, denumire, donator, date de început/finalizare, sectoare, implementator, beneficiari, țări, angajamente, debursări) — reflectă orice actualizare făcută mai sus", "advToaTitle": "Distribuție după tipul de asistență", "advToaNote": "Grant, Împrumut, Suport bugetar, Asistență tehnică, Suport pentru proiect, Co-finanțare — pentru proiectele unde AMP are acest câmp completat; un proiect cu mai multe tipuri este numărat la fiecare tip", "advRegionTitle": "Distribuție pe regiuni ale Moldovei", "advRegionNote": "regiunea de implementare a proiectului în Moldova (nu țara donatoare) — disponibilă doar pentru proiectele unde AMP are acest câmp completat", "advAllYearsOption": "— Toți anii —", "advAllTypesOption": "— Toate tipurile —", "updateNavBtn": "Export →", "mapSelectAllBtn": "Selectează toate țările", "mapDeselectAllBtn": "Deselectează toate", "colAmpId": "AMP ID", "metricAngCap": "Angajamente"}, "en": {"mainTitle": "External Assistance for", "countryName": "the Republic of Moldova", "yearFilterTitle": "Filter · Years", "allYears": "All years", "yearSelectedLabel": "Selected year(s)", "yearHint": "click a year · shift+click for a range", "yearUnspecified": "Year not specified in source", "donorFilterTitle": "Filter · Donors", "allDonorsBtn": "All", "noneDonorsBtn": "None", "donorSearchPlaceholder": "Search donor…", "topDonorsTitle": "Top donors · total amount", "metricDeb": "disbursements", "metricAng": "Commitments", "sectorsTitle": "Distribution by sector", "metricDebCap": "Disbursements", "sectorNote": "a project may cover several sectors — the sum by sector may exceed the overall total", "beneficiariesTitle": "Distribution by beneficiary", "beneficiaryNote": "a project may have several beneficiaries — each beneficiary is counted separately, with the full project amount", "donorTableTitle": "Donors grouped · total amounts", "donorTableNote": "each donor shows the full amount of the projects it takes part in; for co-financed projects (multiple donors), the same amount appears for each donor involved — the TOTAL row below removes this overlap and shows the real, non-duplicated sum", "colDonor": "Donor", "colPeriod": "Period", "colProjects": "Projects", "colCommitments": "Commitments (EUR)", "colDisbursements": "Disbursements (EUR)", "colPctTotal": "% of total", "colProjectName": "Project name", "colYear": "Year", "projectsListTitle": "Project list", "projSearchPlaceholder": "Search by name or AMP ID...", "mapTitle": "World map · number of projects per donor", "zoomIn": "Zoom in", "zoomOut": "Zoom out", "zoomReset": "Reset",
+const I18N = {"ro": {"mainTitle": "Asistență externă pentru", "countryName": "Republica Moldova", "yearFilterTitle": "Filtru · Ani", "allYears": "Toți anii", "yearSelectedLabel": "An(i) selectat(ți)", "yearHint": "clic = un an · Ctrl+clic = mai mulți · Shift+clic = interval", "yearUnspecified": "An nespecificat în sursă", "donorFilterTitle": "Filtru · Donatori", "allDonorsBtn": "Toți", "noneDonorsBtn": "Niciunul", "donorSearchPlaceholder": "Caută donator…", "topDonorsTitle": "Top donatori · sumă totală", "metricDeb": "debursări", "metricAng": "Angajamente", "sectorsTitle": "Distribuție pe sectoare", "metricDebCap": "Debursări", "sectorNote": "un proiect poate acoperi mai multe sectoare — suma pe sectoare poate depăși totalul general", "beneficiariesTitle": "Distribuție pe beneficiari", "beneficiaryNote": "un proiect poate avea mai mulți beneficiari — fiecare beneficiar este numărat separat, cu suma integrală a proiectului", "donorTableTitle": "Donatori grupați · sume totale", "donorTableNote": "fiecare donator își arată suma integrală a proiectelor la care participă; pentru proiectele co-finanțate (mai mulți donatori), aceeași sumă apare la fiecare donator implicat — rândul TOTAL de mai jos elimină această suprapunere și arată suma reală, fără duplicare", "colDonor": "Donator", "colPeriod": "Perioadă", "colProjects": "Proiecte", "colCommitments": "Angajamente (EUR)", "colDisbursements": "Debursări (EUR)", "colPctTotal": "% din total", "colProjectName": "Denumire proiect", "colYear": "An", "projectsListTitle": "Lista proiectelor", "projSearchPlaceholder": "Caută după denumire sau AMP ID...", "mapTitle": "Hartă globală · număr de proiecte pe donator", "zoomIn": "Mărește", "zoomOut": "Micșorează", "zoomReset": "Resetează",
+ "logoBackTitle": "Înapoi la pagina principală", "mapLegendIntensity": "proiecte pe țară", "mapHint": "clic pe o țară · scroll / butoane pentru zoom · trage pentru a deplasa", "mapNote": "un proiect cu mai mulți donatori este numărat la fiecare țară implicată — suma poate depăși totalul general de proiecte. Organizațiile multilaterale (UE, ONU, bănci de dezvoltare etc.) nu au un contur de țară propriu și apar doar în clasamentul din dreapta.", "mapRankingTitle": "Clasament donatori", "resetSelectionBtn": "Resetează selecția", "mapCountryProjectsTitle": "Proiectele țării selectate", "updateTitle": "Actualizare date — încarcă un export nou", "analyzeBtn": "Analizează și actualizează", "saveBtn": "💾 Salvează (suprascrie fișierul)", "downloadBtn": "Descarcă drept fișier nou", "resetOriginalBtn": "↺ Resetează la datele originale", "updateLogDefault": "Acceptă export .xml (recomandat, are AMP ID) sau .csv de pe amp.gov.md. Se potrivește automat după AMP ID — proiectele existente se actualizează, cele noi se adaugă, restul rămân neatinse.", "footerSource": "Sursă: platforma AMP (Aid Management Platform) a Republicii Moldova — versiune veche și versiune nouă · sume în EUR", "footerOwner": "Acest proiect aparține <b>Direcției Coordonare Asistență Externă și Proiecte Investiționale</b>, din cadrul <b>Direcției Generale Coordonarea Asistenței Externe și Fonduri Europene</b> — Cancelaria de Stat.", "kpiProjectsLbl": "Proiecte", "kpiProjectsSub": "proiecte unice (fără duplicare)", "kpiDonorsLbl": "Donatori activi", "kpiDonorsSub": "în selecția curentă", "emptyCurrentSelection": "Nicio dată pentru selecția curentă.", "emptyAdjustFilters": "Nicio dată — ajustează filtrele.", "totalUniqueRow": "TOTAL (proiecte unice)", "emptySelectDonor": "Selectează cel puțin un donator pentru a vedea proiectele.", "emptyNoCountrySelected": "Nicio țară selectată.", "kpiCommitmentsLbl": "Angajamente totale", "kpiDisbursementsLbl": "Debursări totale", "advancedAnalysisBtn": "Analize avansate →", "advTitle": "Analize avansate — Asistență externă Republica Moldova", "backToMainBtn": "← Înapoi la dashboard-ul principal", "advEyebrow": "1993–2026 · analize suplimentare", "advLineTitle": "Evoluție în timp · Angajamente vs. Debursări pe ani", "advLineNote": "sumă totală pe an (proiecte cu an cunoscut, 1993–2026)", "advExecTitle": "Rata de execuție · Debursări / Angajamente (top 20 donatori)", "advExecNote": "arată cât din suma angajată a fost efectiv debursată — un procent scăzut poate indica proiecte recente sau întârzieri în implementare", "advExecutionLbl": "Execuție", "advSankeyTitle": "Flux Donator → Sector → Beneficiar", "advSankeyNote": "top 9 donatori · top 8 sectoare · top 10 beneficiari, după suma angajamentelor — grosimea fluxului e proporțională cu suma", "advColDonors": "Donatori", "advColSectors": "Sectoare", "advColBeneficiaries": "Beneficiari", "advTreemapTitle": "Distribuție sectoare (treemap)", "advTreemapNote": "mărimea fiecărui bloc = suma angajamentelor pe sector", "advTopProjTitle": "Top 20 proiecte individuale", "advTopProjNote": "după suma angajamentelor", "advColProject": "Proiect", "advHeatmapTitle": "Hartă termică · Donator × An (top 25 donatori)", "advHeatmapNote": "intensitatea culorii = suma pe acel an; donatorii sunt ordonați după suma totală", "advOngoingTitle": "Proiecte în derulare · alege anul", "advOngoingNote": "proiectul apare pentru fiecare an cuprins între prima și ultima înregistrare financiară găsită — nu doar în anul exact al unei tranzacții", "advColSpan": "Perioadă activă", "advAllDonorsOption": "— Toți donatorii —", "yearFilterNote": "selectând un an, vezi proiectele lansate (angajate) în acel an", "advOtherSectors": "Alte sectoare", "advOngoingTotalRow": "TOTAL (selecția curentă)", "exportTitle": "Export complet — toate proiectele", "exportExcelBtn": "Descarcă Excel cu toate proiectele", "exportNote": "exportă exact datele curente afișate în pagină (AMP ID, an, denumire, donator, date de început/finalizare, sectoare, implementator, beneficiari, țări, angajamente, debursări) — reflectă orice actualizare făcută mai sus", "advToaTitle": "Distribuție după tipul de asistență", "advToaNote": "Grant, Împrumut, Suport bugetar, Asistență tehnică, Suport pentru proiect, Co-finanțare — pentru proiectele unde AMP are acest câmp completat; un proiect cu mai multe tipuri este numărat la fiecare tip", "advRegionTitle": "Distribuție pe regiuni ale Moldovei", "advRegionNote": "regiunea de implementare a proiectului în Moldova (nu țara donatoare) — disponibilă doar pentru proiectele unde AMP are acest câmp completat", "advAllYearsOption": "— Toți anii —", "advAllTypesOption": "— Toate tipurile —", "updateNavBtn": "Export →", "mapSelectAllBtn": "Selectează toate țările", "mapDeselectAllBtn": "Deselectează toate", "colAmpId": "AMP ID", "metricAngCap": "Angajamente"}, "en": {"mainTitle": "External Assistance for", "countryName": "the Republic of Moldova", "yearFilterTitle": "Filter · Years", "allYears": "All years", "yearSelectedLabel": "Selected year(s)", "yearHint": "click = one year · Ctrl+click = several · Shift+click = range", "yearUnspecified": "Year not specified in source", "donorFilterTitle": "Filter · Donors", "allDonorsBtn": "All", "noneDonorsBtn": "None", "donorSearchPlaceholder": "Search donor…", "topDonorsTitle": "Top donors · total amount", "metricDeb": "disbursements", "metricAng": "Commitments", "sectorsTitle": "Distribution by sector", "metricDebCap": "Disbursements", "sectorNote": "a project may cover several sectors — the sum by sector may exceed the overall total", "beneficiariesTitle": "Distribution by beneficiary", "beneficiaryNote": "a project may have several beneficiaries — each beneficiary is counted separately, with the full project amount", "donorTableTitle": "Donors grouped · total amounts", "donorTableNote": "each donor shows the full amount of the projects it takes part in; for co-financed projects (multiple donors), the same amount appears for each donor involved — the TOTAL row below removes this overlap and shows the real, non-duplicated sum", "colDonor": "Donor", "colPeriod": "Period", "colProjects": "Projects", "colCommitments": "Commitments (EUR)", "colDisbursements": "Disbursements (EUR)", "colPctTotal": "% of total", "colProjectName": "Project name", "colYear": "Year", "projectsListTitle": "Project list", "projSearchPlaceholder": "Search by name or AMP ID...", "mapTitle": "World map · number of projects per donor", "zoomIn": "Zoom in", "zoomOut": "Zoom out", "zoomReset": "Reset",
  "logoBackTitle": "Back to the main page", "mapLegendIntensity": "projects per country", "mapHint": "click a country · scroll / buttons to zoom · drag to pan", "mapNote": "a project with multiple donors is counted for each country involved — the sum may exceed the overall project total. Multilateral organizations (EU, UN, development banks, etc.) have no country outline of their own and appear only in the ranking on the right.", "mapRankingTitle": "Donor ranking", "resetSelectionBtn": "Reset selection", "mapCountryProjectsTitle": "Projects of the selected country", "updateTitle": "Data update — upload a new export", "analyzeBtn": "Analyze and update", "saveBtn": "💾 Save (overwrite file)", "downloadBtn": "Download as new file", "resetOriginalBtn": "↺ Reset to original data", "updateLogDefault": "Accepts an .xml export (recommended, includes AMP ID) or .csv from amp.gov.md. Matching is done automatically by AMP ID — existing projects are updated, new ones are added, the rest stay unchanged.", "footerSource": "Source: the AMP (Aid Management Platform) of the Republic of Moldova — old and new versions · amounts in EUR", "footerOwner": "This project belongs to the <b>Directorate for Coordination of External Assistance and Investment Projects</b>, within the <b>General Directorate for Coordination of External Assistance and European Funds</b> — State Chancellery.", "kpiProjectsLbl": "Projects", "kpiProjectsSub": "unique projects (no duplicates)", "kpiDonorsLbl": "Active donors", "kpiDonorsSub": "in current selection", "emptyCurrentSelection": "No data for the current selection.", "emptyAdjustFilters": "No data — adjust the filters.", "totalUniqueRow": "TOTAL (unique projects)", "emptySelectDonor": "Select at least one donor to see projects.", "emptyNoCountrySelected": "No country selected.", "kpiCommitmentsLbl": "Total commitments", "kpiDisbursementsLbl": "Total disbursements", "advancedAnalysisBtn": "Advanced analytics →", "advTitle": "Advanced Analytics — External Assistance for Moldova", "backToMainBtn": "← Back to main dashboard", "advEyebrow": "1993–2026 · additional analytics", "advLineTitle": "Trends over time · Commitments vs. Disbursements by year", "advLineNote": "total amount per year (projects with a known year, 1993–2026)", "advExecTitle": "Execution rate · Disbursements / Commitments (top 20 donors)", "advExecNote": "shows how much of the committed amount was actually disbursed — a low percentage may indicate recent projects or implementation delays", "advExecutionLbl": "Execution", "advSankeyTitle": "Flow: Donor → Sector → Beneficiary", "advSankeyNote": "top 9 donors · top 8 sectors · top 10 beneficiaries, by commitment amount — flow width is proportional to the amount", "advColDonors": "Donors", "advColSectors": "Sectors", "advColBeneficiaries": "Beneficiaries", "advTreemapTitle": "Sector distribution (treemap)", "advTreemapNote": "the size of each block = total commitments for that sector", "advTopProjTitle": "Top 20 individual projects", "advTopProjNote": "by commitment amount", "advColProject": "Project", "advHeatmapTitle": "Heatmap · Donor × Year (top 25 donors)", "advHeatmapNote": "color intensity = amount for that year; donors are ordered by total amount", "advOngoingTitle": "Projects in progress · pick a year", "advOngoingNote": "a project appears for every year between its first and last recorded financial activity — not only the exact year of a single transaction", "advColSpan": "Active period", "advAllDonorsOption": "— All donors —", "yearFilterNote": "selecting a year shows the projects launched (committed) that year", "advOtherSectors": "Other sectors", "advOngoingTotalRow": "TOTAL (current selection)", "exportTitle": "Full export — all projects", "exportExcelBtn": "Download Excel with all projects", "exportNote": "exports the exact current data shown on the page (AMP ID, year, name, donor, start/end dates, sectors, implementer, beneficiaries, countries, commitments, disbursements) — reflects any update made above", "advToaTitle": "Distribution by type of assistance", "advToaNote": "Grant, Loan, Budget Support, Technical Assistance, Project Support, Co-funding — for projects where AMP has this field filled in; a project with multiple types is counted under each type", "advRegionTitle": "Distribution by region of Moldova", "advRegionNote": "the project's implementation region in Moldova (not the donor country) — available only for projects where AMP has this field filled in", "advAllYearsOption": "— All years —", "advAllTypesOption": "— All types —", "updateNavBtn": "Export →", "mapSelectAllBtn": "Select all countries", "mapDeselectAllBtn": "Deselect all", "colAmpId": "AMP ID", "metricAngCap": "Commitments"}};
 let currentLang = 'ro';
 function t(key){
@@ -3962,7 +4081,14 @@ function rebuildAll(records){
 
   // Cât timp rulează animația de intro, ea deține selecția de ani — nu i-o smulgem
   // de sub picioare dacă datele live sosesc la mijlocul rulării.
-  if(!window.__introRunning) state.selectedYears = new Set(ALL_KEYS);
+  /* Datele live sosesc la câteva secunde după deschidere și reconstruiesc
+     tot. Înainte, asta reseta anii și donatorii la „toți" — dacă apucai să
+     alegi un donator, alegerea dispărea singură. Acum o păstrăm. */
+  const aniVechi = state.selectedYears;
+  if(window.__aniAlesi){
+    const pastrati = new Set([...aniVechi].filter(y => ALL_KEYS.has(y)));
+    state.selectedYears = pastrati.size ? pastrati : new Set(ALL_KEYS);
+  } else if(!window.__introRunning) state.selectedYears = new Set(ALL_KEYS);
   /* Selecția cerută prin ?donator= supraviețuiește reconstrucțiilor. Datele
      live sosesc după prima randare și rulează rebuildAll din nou; fără linia
      asta, filtrul venit din registrul de acorduri era resetat la „toți
@@ -3973,8 +4099,11 @@ function rebuildAll(records){
       var a = String(d).toLowerCase(), b = window.__donatorCerut.toLowerCase();
       return a === b || a.indexOf(b) > -1 || b.indexOf(a) > -1;
     });
-  state.selectedDonors = (cerutDinLink && cerutDinLink.length)
-    ? new Set(cerutDinLink) : new Set(DONORS);
+  const donatoriVechi = state.selectedDonors;
+  const pastratiD = window.__donatoriAlesi
+    ? new Set(DONORS.filter(d => donatoriVechi.has(d))) : null;
+  state.selectedDonors = (pastratiD && pastratiD.size) ? pastratiD
+    : (cerutDinLink && cerutDinLink.length) ? new Set(cerutDinLink) : new Set(DONORS);
   mapState.selected = null;
 
   buildYearUI();
@@ -5975,9 +6104,14 @@ function dpRenderYearSlicer(){
 }
 
 /* ---------- slicer donatori, grupați pe țară ---------- */
+/* „Toți donatorii" = dpState.donors e null sau conține toți donatorii. */
+function dpToti(){
+  return !dpState.donors || (dpState.donors.size > 0 && dpState.donors.size >= dpAllDonors().length);
+}
 function dpRenderDonorList(){
   const list = document.getElementById('dpDonorList'); if(!list) return;
   const q = dpState.donorSearch.trim().toLowerCase();
+  const toti = dpToti();
   const totals = dpDonorTotals();
   const maxTotal = Math.max(1, ...totals.values());
   const byCountry = dpDonorsByCountry();
@@ -5988,7 +6122,7 @@ function dpRenderDonorList(){
     if(!shown.length) return;
     rendered++;
     const isExpanded = dpState.expandedGroups.has(country);
-    const allChecked = donors.every(d => !dpState.donors || dpState.donors.has(d));
+    const allChecked = !toti && donors.every(d => dpState.donors.has(d));
     const groupDiv = document.createElement('div');
     groupDiv.className = 'donor-group';
     const header = document.createElement('div');
@@ -6002,23 +6136,27 @@ function dpRenderDonorList(){
     });
     header.querySelector('input').addEventListener('change', e => {
       e.stopPropagation();
-      if(!dpState.donors) dpState.donors = new Set(dpAllDonors());
+      // la fel ca pe pagina principală: din „toți", clicul arată doar grupul
+      if(dpToti()){ dpState.donors = new Set(donors); dpState.expandedGroups.add(country); dpRender(); return; }
       const all = donors.every(d => dpState.donors.has(d));
       donors.forEach(d => all ? dpState.donors.delete(d) : dpState.donors.add(d));
+      if(!dpState.donors.size) dpState.donors = null;
       dpRender();
     });
     groupDiv.appendChild(header);
     const items = document.createElement('div');
     items.className = 'donor-group-items' + (isExpanded ? '' : ' collapsed');
     shown.slice().sort((a,b) => (totals.get(b)||0) - (totals.get(a)||0)).forEach(name => {
-      const checked = !dpState.donors || dpState.donors.has(name);
+      const checked = !toti && dpState.donors.has(name);
       const item = document.createElement('div');
       item.className = 'donor-item' + (checked ? ' checked' : '');
       const pct = Math.max(2, ((totals.get(name)||0) / maxTotal) * 100);
       item.innerHTML = `<div class="bar-bg" style="width:${pct}%"></div><input type="checkbox" ${checked ? 'checked' : ''} /><span class="name">${esc(iatiDonorLabel(name))}</span>`;
       const toggle = () => {
-        if(!dpState.donors) dpState.donors = new Set(dpAllDonors());
+        // din „toți", clicul arată doar acest donator; apoi adaugă / scoate
+        if(dpToti()){ dpState.donors = new Set([name]); dpRender(); return; }
         if(dpState.donors.has(name)) dpState.donors.delete(name); else dpState.donors.add(name);
+        if(!dpState.donors.size) dpState.donors = null;
         dpRender();
       };
       item.addEventListener('click', e => { if(e.target.tagName === 'INPUT') return; toggle(); });
@@ -7473,6 +7611,38 @@ mountAnimatedLogo('logoBadgeMain');
 
 loadLiveData();
 
+</script>
+<script>
+/* Meniul „Acorduri": se deschide la clic, se închide la clic în afară, cu Esc
+   sau după alegere. Săgețile sus/jos mută între cele două opțiuni. */
+(function(){
+  var sel = document.getElementById('acorduriSelector'),
+      btn = document.getElementById('acorduriNavBtn'),
+      menu = document.getElementById('acorduriSelectorMenu');
+  if (!sel || !btn || !menu) return;
+  var opts = menu.querySelectorAll('a');
+  function arata(da, focus){
+    menu.style.display = da ? 'block' : 'none';
+    if (da){
+      // pe ecrane înguste meniul ieșea din ecran în dreapta: îl mutăm înapoi
+      menu.style.left = '0px';
+      var r = menu.getBoundingClientRect(), vw = document.documentElement.clientWidth;
+      if (r.right > vw - 8) menu.style.left = Math.round(vw - 8 - r.right) + 'px';
+    }
+    sel.classList.toggle('deschis', da);
+    btn.setAttribute('aria-expanded', String(da));
+    if (da && focus) opts[0].focus();
+  }
+  btn.addEventListener('click', function(e){ e.stopPropagation(); arata(menu.style.display === 'none', false); });
+  btn.addEventListener('keydown', function(e){ if (e.key === 'ArrowDown'){ e.preventDefault(); arata(true, true); } });
+  menu.addEventListener('keydown', function(e){
+    var i = Array.prototype.indexOf.call(opts, document.activeElement);
+    if (e.key === 'ArrowDown'){ e.preventDefault(); opts[(i + 1) % opts.length].focus(); }
+    if (e.key === 'ArrowUp'){ e.preventDefault(); opts[(i - 1 + opts.length) % opts.length].focus(); }
+  });
+  document.addEventListener('click', function(e){ if (!sel.contains(e.target)) arata(false); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && menu.style.display !== 'none'){ arata(false); btn.focus(); } });
+})();
 </script>
 </body>
 </html>

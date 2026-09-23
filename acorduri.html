@@ -353,6 +353,68 @@
 
   /* butonul care desface finanțatorii rari */
   .rare{display:contents}
+  /* Filtrele cu selecție multiplă: partenerii au căutare și o linie cu ce e
+     ales; anii acceptă Ctrl+clic (mai mulți) și Shift+clic (interval). */
+  .f-unelte{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:10px}
+  .f-unelte input{flex:0 1 260px;min-width:0;border:1px solid var(--line-strong);border-radius:7px;
+    padding:7px 10px;font:inherit;font-size:13px;color:var(--ink);background:var(--panel)}
+  .f-unelte input:focus{outline:none;border-color:var(--navy)}
+  .f-sel{font-size:12px;color:var(--ink-dim);display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+  .f-sel b{color:var(--navy)}
+  .f-sel .tag-sel{display:inline-flex;align-items:center;gap:4px;background:var(--navy);color:#fff;border-radius:12px;
+    padding:2px 4px 2px 9px;font-size:11.5px;font-weight:600}
+  .f-sel .tag-sel button{border:none;background:rgba(255,255,255,.22);color:#fff;border-radius:50%;width:16px;height:16px;
+    line-height:14px;padding:0;cursor:pointer;font-size:12px}
+  .f-sel .tag-sel button:hover{background:rgba(255,255,255,.4)}
+  .f-sel .toti{border:none;background:none;color:var(--navy);text-decoration:underline;cursor:pointer;font:inherit;padding:0}
+  .f-hint{font-size:11px;color:var(--ink-dim);margin-top:6px}
+  .btns button.ascuns{display:none}
+
+  /* rândul compact de filtre: Partener ▾ · An ▾ · Tip */
+  .filtre-rand{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+  .f-tip{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .f-tip .f-lbl{padding-top:0;width:auto;min-width:0;flex:none}
+  .dd-pop.dd-ani{width:410px}
+  .dd{position:relative;display:inline-flex;align-items:center}
+  .dd-btn{display:inline-flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line-strong);
+    border-radius:8px;padding:7px 12px;font:inherit;font-size:13px;color:var(--ink);cursor:pointer;max-width:280px}
+  .dd-btn:hover{border-color:var(--navy)}
+  .dd-btn:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+  .dd-lbl{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);font-weight:700}
+  .dd-val{font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dd-sag{color:var(--ink-dim);font-size:11px}
+  .dd.activ .dd-btn{background:var(--navy);border-color:var(--navy);padding-right:34px}
+  .dd.activ .dd-lbl,.dd.activ .dd-sag{color:#c9d6ea}
+  .dd.activ .dd-val{color:#fff}
+  .dd-x{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:none;background:rgba(255,255,255,.22);
+    color:#fff;border-radius:50%;width:20px;height:20px;line-height:18px;padding:0;cursor:pointer;font-size:14px}
+  .dd-x:hover{background:rgba(255,255,255,.4)}
+  .dd-pop{position:absolute;top:calc(100% + 6px);left:0;z-index:50;width:340px;max-width:calc(100vw - 32px);
+    background:var(--panel);border:1px solid var(--line-strong);border-radius:10px;
+    box-shadow:0 10px 30px rgba(20,30,60,.16);padding:10px}
+  .dd-cauta{width:100%;border:1px solid var(--line-strong);border-radius:7px;padding:7px 10px;font:inherit;font-size:13px;margin-bottom:8px}
+  .dd-cauta:focus{outline:none;border-color:var(--navy)}
+  .dd-lista{max-height:300px;overflow-y:auto}
+  .dd-opt{display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:13px}
+  .dd-opt:hover{background:var(--blue-bg)}
+  .dd-opt[aria-selected="true"]{background:#e8eef8}
+  .dd-opt input{accent-color:var(--navy);margin:0;flex:none;pointer-events:none}
+  .dd-nume{flex:1;min-width:0;font-weight:600;color:var(--ink)}
+  .dd-nume small{display:block;font-weight:400;font-size:11px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dd-opt .n{font-family:var(--mono);font-size:11px;color:var(--ink-dim)}
+  .dd-ani .dd-lista{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+  .dd-ani .dd-opt{padding:5px 6px;gap:6px}
+  .dd-rapide{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  .dd-rapide button{border:1px solid var(--line-strong);background:var(--panel);color:var(--navy);border-radius:14px;
+    padding:3px 9px;font:inherit;font-size:11.5px;font-weight:600;cursor:pointer}
+  .dd-rapide button:hover{background:var(--blue-bg)}
+  .dd-jos{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);margin-top:8px;padding-top:8px}
+  .dd-info{flex:1;font-size:11.5px;color:var(--ink-dim)}
+  .dd-jos button{border:1px solid var(--line-strong);background:var(--panel);color:var(--navy);border-radius:6px;
+    padding:4px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+  .dd-jos .dd-gata{background:var(--navy);border-color:var(--navy);color:#fff}
+  .dd-gol{padding:10px;font-size:12.5px;color:var(--ink-dim)}
+  @media (max-width:640px){.dd,.dd-btn{max-width:100%}.dd-ani .dd-lista{grid-template-columns:repeat(3,1fr)}}
   .mai{background:none;border:1px dashed var(--line-strong);color:var(--ink-dim);
     font-family:inherit;font-size:11.5px;font-weight:600;border-radius:6px;
     padding:7px 12px;cursor:pointer}
@@ -647,6 +709,41 @@
   // filtre — doar felul de a le citi diferă.
   var db = null, fCat = 'all', fOrg = 'all', fAn = 'all', fEt = 'all',
       fSuport = false, seek = '', vedere = 'acorduri';
+
+  /* Partenerul și anul pot avea mai multe valori: 'all' sau o listă separată
+     prin „|" („BERD|BEI", „2024|2025"). Așa rămân simple și linkul, și exportul. */
+  function alesi(f){ return f === 'all' ? [] : String(f).split('|').filter(Boolean); }
+  function lipeste(l){ return l.length ? l.join('|') : 'all'; }
+
+  /* Denumirile complete ale partenerilor, pentru căutare și pentru indiciul de
+     pe buton: cine caută „Europeană" trebuie să găsească BERD și BEI. */
+  var NUME_PARTENER = {
+    'AID':'Asociația Internațională pentru Dezvoltare (Banca Mondială) IDA',
+    'BIRD':'Banca Internațională pentru Reconstrucție și Dezvoltare (Banca Mondială) IBRD',
+    'BERD':'Banca Europeană pentru Reconstrucție și Dezvoltare EBRD',
+    'BEI':'Banca Europeană de Investiții EIB',
+    'CEB':'Banca de Dezvoltare a Consiliului Europei',
+    'UE':'Uniunea Europeană, Comisia Europeană',
+    'AFD':'Agenția Franceză de Dezvoltare, Franța',
+    'KfW':'Banca Germană de Dezvoltare, Germania',
+    'GIZ':'Agenția de Cooperare Internațională a Germaniei',
+    'JICA':'Agenția Japoneză de Cooperare Internațională, Japonia',
+    'FIDA':'Fondul Internațional pentru Dezvoltare Agricolă IFAD',
+    'FICR':'Federația Internațională a Societăților de Cruce Roșie și Semilună Roșie',
+    'FMI':'Fondul Monetar Internațional IMF',
+    'PNUD':'Programul Națiunilor Unite pentru Dezvoltare UNDP',
+    'PAM':'Programul Alimentar Mondial WFP',
+    'UNOPS':'Oficiul Națiunilor Unite pentru Servicii de Proiect',
+    'UNHCR':'Înaltul Comisariat al ONU pentru Refugiați',
+    'SUA':'Statele Unite ale Americii, USAID',
+    'SUA (MCC)':'Corporația Provocările Mileniului, Statele Unite',
+    'IFC':'Corporația Financiară Internațională',
+    'OFID':'Fondul OPEC pentru Dezvoltare Internațională',
+    'BSTDB':'Banca de Comerț și Dezvoltare a Mării Negre',
+    'Japonia (JBIC)':'Banca Export-Import a Japoniei',
+    'Nordici':'Danemarca, Norvegia, Fondul Nordic de Dezvoltare, NEFCO',
+    'Baltici':'Estonia, Letonia, Lituania'
+  };
 
   var q = new URLSearchParams(location.search).get('src');
   if (q) DATA_URL = q;
@@ -1150,8 +1247,8 @@
      era bifat în momentul descărcării. */
   function exporta(grupuri, acte){
     var filtre = [];
-    if (fAn  !== 'all') filtre.push('anul ' + fAn);
-    if (fOrg !== 'all') filtre.push('partener: ' + fOrg);
+    if (fAn  !== 'all') filtre.push((alesi(fAn).length > 1 ? 'anii ' : 'anul ') + alesi(fAn).join(', '));
+    if (fOrg !== 'all') filtre.push('partener: ' + alesi(fOrg).join(', '));
     if (fCat !== 'all') filtre.push('tip: ' + fCat);
     if (fEt  !== 'all'){
       var se = STEPS.filter(function(x){ return x.k === fEt; })[0];
@@ -1224,7 +1321,7 @@
     a.href = url;
     function bucata(v){ return '-' + fold(v).replace(/[^a-z0-9]+/g, ''); }
     a.download = 'registru-' + nume.toLowerCase() +
-      (fAn  !== 'all' ? '-' + fAn : '') +
+      (fAn  !== 'all' ? '-' + alesi(fAn).join('_') : '') +
       (fOrg !== 'all' ? bucata(fOrg) : '') +
       (fCat !== 'all' ? bucata(fCat) : '') +
       (fSuport ? '-suportbugetar' : '') +
@@ -1362,12 +1459,13 @@
        ar fi ascuns. */
     var PRAG_PUTINE = 2;
     var ordonati = Object.keys(orgs).sort(function(a,b){ return orgs[b]-orgs[a]; });
-    var multe = ordonati.filter(function(o){ return orgs[o] >= PRAG_PUTINE || o === fOrg; });
+    var multe = ordonati.filter(function(o){ return orgs[o] >= PRAG_PUTINE || alesi(fOrg).indexOf(o) > -1; });
     var putine = ordonati.filter(function(o){ return multe.indexOf(o) === -1; });
 
     function butonOrg(o){
       return '<button data-org="' + esc(o) + '" data-a="' + orgs[o] + '" data-b="' +
-        (orgsA[o]||0) + '" aria-pressed="' + (fOrg === o) + '">' + esc(o) +
+        (orgsA[o]||0) + '" aria-pressed="' + (alesi(fOrg).indexOf(o) > -1) + '"' +
+        (NUME_PARTENER[o] ? ' title="' + esc(NUME_PARTENER[o]) + '"' : '') + '>' + esc(o) +
         ' <span class="n">' + orgs[o] + '</span></button>';
     }
 
@@ -1398,7 +1496,7 @@
       grupuri.length + '</span></button>'].concat(
       Object.keys(ani).sort().reverse().map(function(y){
         return '<button data-an="' + y + '" data-a="' + ani[y] + '" data-b="' +
-          (aniA[y]||0) + '" aria-pressed="' + (fAn === y) + '">' + y +
+          (aniA[y]||0) + '" aria-pressed="' + (alesi(fAn).indexOf(y) > -1) + '">' + y +
           ' <span class="n">' + ani[y] + '</span></button>';
       })).join('');
 
@@ -1526,9 +1624,6 @@
           '<ul class="def-list">' + contracteHtml + '</ul>' +
           '<span class="inv-ref">Excepțiile: anexa 1¹, pct. 7 și 30</span></div>' +
       '</div>' +
-      '<div class="panel"><div class="panel-head"><h2>' + ico('layers') +
-        'Creditori și parteneri</h2></div>' +
-        '<div class="panel-body"><div class="btns" id="orgBtns">' + orgBtns + '</div></div></div>' +
       '<div class="panel" id="lista"><div class="panel-head"><h2>' + ico('file') +
         '<span id="titluLista">Acorduri</span></h2>' +
         '<span class="chip" id="etChip" hidden></span>' +
@@ -1538,10 +1633,10 @@
         '<button class="xls" id="export" title="Descarcă exact rândurile filtrate">' +
           ico('down') + 'Excel</button>' +
       '</div>' +
-      '<div class="panel-sub"><div class="filtru-rand"><span class="f-lbl">An</span>' +
-        '<div class="btns" id="anBtns">' + anBtns + '</div></div>' +
-        '<div class="filtru-rand"><span class="f-lbl">Tip de finanțare</span>' +
-        '<div class="btns" id="catBtns">' + catBtns + '</div></div></div>' +
+      '<div class="panel-sub"><div class="filtre-rand">' +
+        '<div class="dd" id="ddOrg"></div><div class="dd" id="ddAn"></div>' +
+        '<div class="f-tip"><span class="f-lbl">Tip</span><div class="btns" id="catBtns">' + catBtns + '</div></div>' +
+      '</div></div>' +
       '<div class="tbl-scroll"><table id="tabel"><thead id="cap"></thead>' +
         '<tbody id="rows"></tbody></table></div><div id="none"></div></div>';
 
@@ -1555,9 +1650,26 @@
         : '− ascunde';
     });
 
-    bind('#orgBtns button', 'org', function(v){ fOrg = v; });
     bind('#catBtns button', 'cat', function(v){ fCat = v; });
-    bind('#anBtns button',  'an',  function(v){ fAn  = v; });
+
+    /* Partenerii și anii erau câte un zid de butoane — 43 de parteneri și 35
+       de ani ocupau jumătate de ecran. Acum sunt două liste derulante pe un
+       singur rând: în ele cauți, bifezi unul sau mai mulți, iar la ani ai și
+       intervale gata făcute. Nimic bifat = toți. */
+    var ddOrg = dropdown('ddOrg', {
+      titlu: 'Partener', toti: 'Toți', cauta: true,
+      opt: Object.keys(orgs).sort(function(a, b){ return orgs[b] - orgs[a] || a.localeCompare(b, 'ro'); })
+        .map(function(o){ return { v: o, nume: o, sub: NUME_PARTENER[o] || '', a: orgs[o], b: orgsA[o] || 0 }; }),
+      get: function(){ return fOrg; }, set: function(v){ fOrg = v; },
+      schimbat: function(){ rows(grupuri, acte); }
+    });
+    var aniOrd = Object.keys(ani).sort().reverse();
+    var ddAn = dropdown('ddAn', {
+      titlu: 'An', toti: 'Toți anii', ani: true,
+      opt: aniOrd.map(function(y){ return { v: y, nume: y, a: ani[y], b: aniA[y] || 0 }; }),
+      get: function(){ return fAn; }, set: function(v){ fAn = v; },
+      schimbat: function(){ rows(grupuri, acte); }
+    });
     bind('#vedBtns button', 'ved', function(v){ vedere = v; numere(); });
 
     var detaliu = document.getElementById('etDetail'), deschis = null;
@@ -1683,7 +1795,8 @@
     // de 39 de acte BERD și cifra ar părea greșită.
     function numere(){
       var cheie = vedere === 'acte' ? 'b' : 'a';
-      app.querySelectorAll('#catBtns button, #orgBtns button, #anBtns button, #vedBtns button')
+      if (typeof ddOrg !== 'undefined'){ ddOrg.cifre(cheie); ddAn.cifre(cheie); }
+      app.querySelectorAll('#catBtns button, #vedBtns button')
         .forEach(function(b){
           if (b.dataset.ved) return;
           var n = b.dataset[cheie];
@@ -1691,6 +1804,177 @@
         });
       document.getElementById('titluLista').textContent =
         vedere === 'acte' ? 'Acte publicate' : 'Acorduri';
+    }
+
+    /* Listă derulantă cu selecție multiplă. Butonul arată ce e ales
+       („Toți", „BERD", „BERD, BEI", „2022–2026"); panoul se deschide sub el,
+       cu căutare (la parteneri), intervale rapide (la ani) și căsuțe.
+       Se închide la clic în afară sau cu Esc; filtrul se aplică imediat. */
+    function dropdown(id, cfg){
+      var root = document.getElementById(id), cheie = 'a', q = '', ultim = null;
+      if (!root) return { cifre: function(){} };
+      root.innerHTML =
+        '<button type="button" class="dd-btn" aria-haspopup="true" aria-expanded="false">' +
+          '<span class="dd-lbl">' + esc(cfg.titlu) + '</span><span class="dd-val"></span>' +
+          '<span class="dd-sag" aria-hidden="true">▾</span></button>' +
+        '<button type="button" class="dd-x" title="Șterge filtrul" aria-label="Șterge filtrul ' + esc(cfg.titlu) + '" hidden>×</button>' +
+        '<div class="dd-pop' + (cfg.ani ? ' dd-ani' : '') + '" hidden>' +
+          (cfg.cauta ? '<input type="search" class="dd-cauta" placeholder="Caută (ex. BERD, Europeană, Japonia)…" aria-label="Caută">' : '') +
+          (cfg.ani ? '<div class="dd-rapide"></div>' : '') +
+          '<div class="dd-lista" role="listbox" aria-multiselectable="true"></div>' +
+          '<div class="dd-jos"><span class="dd-info"></span>' +
+            '<button type="button" class="dd-toti">' + esc(cfg.toti) + '</button>' +
+            '<button type="button" class="dd-gata">Gata</button></div>' +
+        '</div>';
+      var btn = root.querySelector('.dd-btn'), pop = root.querySelector('.dd-pop'),
+          lista = root.querySelector('.dd-lista'), x = root.querySelector('.dd-x');
+
+      function eticheta(){
+        var l = alesi(cfg.get());
+        if (!l.length) return cfg.toti;
+        if (cfg.ani){
+          var s2 = l.slice().sort(), cont = s2.every(function(y, i){ return !i || +y === +s2[i-1] + 1; });
+          if (l.length > 2 && cont) return s2[0] + '–' + s2[s2.length-1];
+        }
+        return l.length <= 2 ? l.join(', ') : l.slice(0, 2).join(', ') + ' +' + (l.length - 2);
+      }
+      function aplica(l){
+        cfg.set(lipeste(cfg.ani ? l.slice().sort() : l));
+        stare(); cfg.schimbat();
+      }
+      function stare(){
+        var l = alesi(cfg.get());
+        root.querySelector('.dd-val').textContent = eticheta();
+        root.classList.toggle('activ', l.length > 0);
+        x.hidden = !l.length;
+        lista.querySelectorAll('[data-v]').forEach(function(o){
+          var on = l.indexOf(o.dataset.v) > -1;
+          o.setAttribute('aria-selected', String(on));
+          o.querySelector('input').checked = on;
+        });
+        root.querySelector('.dd-info').textContent = l.length
+          ? l.length + ' ' + (cfg.ani ? (l.length === 1 ? 'an ales' : 'ani aleși') : (l.length === 1 ? 'ales' : 'aleși'))
+          : 'nimic bifat = toți';
+      }
+      function deseneaza(){
+        var qf = fold(q);
+        lista.innerHTML = cfg.opt.filter(function(o){
+          return !qf || fold(o.nume + ' ' + (o.sub || '')).indexOf(qf) > -1;
+        }).map(function(o){
+          return '<label class="dd-opt" data-v="' + esc(o.v) + '" role="option">' +
+            '<input type="checkbox" tabindex="-1"><span class="dd-nume">' + esc(o.nume) +
+            (o.sub && !cfg.ani ? '<small>' + esc(o.sub) + '</small>' : '') + '</span>' +
+            '<span class="n">' + o[cheie] + '</span></label>';
+        }).join('') || '<div class="dd-gol">Nimic găsit.</div>';
+        lista.querySelectorAll('[data-v]').forEach(function(el){
+          el.addEventListener('click', function(e){
+            e.preventDefault();
+            var v = el.dataset.v, l = alesi(cfg.get());
+            if (cfg.ani && e.shiftKey && ultim){
+              var toate = cfg.opt.map(function(o){ return o.v; }).sort(),
+                  i = toate.indexOf(ultim), j = toate.indexOf(v);
+              if (i > -1 && j > -1){ ultim = v; return aplica(toate.slice(Math.min(i, j), Math.max(i, j) + 1)); }
+            }
+            ultim = v;
+            var k = l.indexOf(v);
+            if (k > -1) l.splice(k, 1); else l.push(v);
+            aplica(l);
+          });
+        });
+        stare();
+      }
+      if (cfg.ani){
+        var ys = cfg.opt.map(function(o){ return +o.v; }), max = Math.max.apply(null, ys);
+        var rapide = [['Ultimul an', 1], ['Ultimii 3 ani', 3], ['Ultimii 5 ani', 5], ['Ultimii 10 ani', 10]];
+        root.querySelector('.dd-rapide').innerHTML = rapide.map(function(r){
+          return '<button type="button" data-n="' + r[1] + '">' + r[0] + '</button>';
+        }).join('');
+        root.querySelectorAll('.dd-rapide button').forEach(function(b){
+          b.addEventListener('click', function(){
+            var n = +b.dataset.n;
+            aplica(cfg.opt.map(function(o){ return o.v; }).filter(function(y){ return +y > max - n; }));
+          });
+        });
+      }
+      function deschide(da){
+        if (da) document.querySelectorAll('.dd.deschis').forEach(function(d){
+          if (d !== root) d.dispatchEvent(new CustomEvent('inchide'));
+        });
+        pop.hidden = !da; root.classList.toggle('deschis', da);
+        btn.setAttribute('aria-expanded', String(da));
+        if (da){ var c = root.querySelector('.dd-cauta'); if (c) c.focus(); }
+      }
+      root.addEventListener('inchide', function(){ deschide(false); });
+      btn.addEventListener('click', function(){ deschide(pop.hidden); });
+      x.addEventListener('click', function(){ aplica([]); });
+      root.querySelector('.dd-toti').addEventListener('click', function(){ aplica([]); });
+      root.querySelector('.dd-gata').addEventListener('click', function(){ deschide(false); btn.focus(); });
+      var c = root.querySelector('.dd-cauta');
+      if (c) c.addEventListener('input', function(){ q = c.value.trim(); deseneaza(); });
+      document.addEventListener('click', function(e){ if (!root.contains(e.target) && !pop.hidden) deschide(false); });
+      root.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !pop.hidden){ deschide(false); btn.focus(); } });
+      deseneaza();
+      return { cifre: function(k){ cheie = k; deseneaza(); } };
+    }
+
+    /* Selecție multiplă, ca pe pagina de donatori: un clic alege doar
+       valoarea apăsată (al doilea clic pe ea revine la „toți"); Ctrl/Cmd+clic
+       adaugă sau scoate; la ani, Shift+clic alege intervalul de la ultimul an
+       apăsat. Deasupra apare ce e ales, cu × pentru fiecare. */
+    function multi(sel, key, get, set, interval, selId, unu, multi_){
+      var list = app.querySelectorAll(sel), ultim = null;
+      function valori(){ return Array.prototype.map.call(list, function(b){ return b.dataset[key]; })
+                               .filter(function(v){ return v !== 'all'; }); }
+      function aplica(v){
+        set(v);
+        var l = alesi(get());
+        list.forEach(function(o){
+          var d = o.dataset[key];
+          o.setAttribute('aria-pressed', String(d === 'all' ? !l.length : l.indexOf(d) > -1));
+        });
+        // un partener rar ales rămâne vizibil
+        var rare = document.getElementById('rare');
+        if (rare && key === 'org' && l.some(function(o){ return rare.querySelector('[data-org="' + o.replace(/"/g, '\\"') + '"]'); }))
+          rare.hidden = false;
+        arata();
+        rows(grupuri, acte);
+      }
+      function arata(){
+        var box = document.getElementById(selId);
+        if (!box) return;
+        var l = alesi(get());
+        if (!l.length){ box.innerHTML = ''; return; }
+        box.innerHTML = '<span><b>' + l.length + '</b> ' + (l.length === 1 ? unu + ' ales' : multi_ + ' aleși') + ':</span>' +
+          l.map(function(v){
+            return '<span class="tag-sel">' + esc(v) + '<button type="button" data-v="' + esc(v) +
+              '" aria-label="scoate ' + esc(v) + '">×</button></span>';
+          }).join('') + '<button type="button" class="toti">toți</button>';
+        box.querySelector('.toti').onclick = function(){ aplica('all'); };
+        box.querySelectorAll('.tag-sel button').forEach(function(x){
+          x.onclick = function(){
+            aplica(lipeste(alesi(get()).filter(function(v){ return v !== x.dataset.v; })));
+          };
+        });
+      }
+      list.forEach(function(b){
+        b.addEventListener('click', function(e){
+          var v = b.dataset[key], l = alesi(get());
+          if (v === 'all') { ultim = null; return aplica('all'); }
+          if (interval && e.shiftKey && ultim){
+            var toate = valori().slice().sort(), i = toate.indexOf(ultim), j = toate.indexOf(v);
+            if (i > -1 && j > -1) return aplica(lipeste(toate.slice(Math.min(i, j), Math.max(i, j) + 1)));
+          }
+          ultim = v;
+          if (e.ctrlKey || e.metaKey){
+            var k = l.indexOf(v);
+            if (k > -1) l.splice(k, 1); else l.push(v);
+            if (interval) l.sort();
+            return aplica(lipeste(l));
+          }
+          aplica(l.length === 1 && l[0] === v ? 'all' : v);
+        });
+      });
+      arata();
     }
 
     function bind(sel, key, set){
@@ -1808,8 +2092,11 @@
   // fie exact ce vezi pe ecran.
   function trece_act(a){
     if (fCat !== 'all' && a.categorie !== fCat) return false;
-    if (fOrg !== 'all' && (a.partener||'').split(' / ').indexOf(fOrg) === -1) return false;
-    if (fAn !== 'all' && an(a) !== fAn) return false;
+    if (fOrg !== 'all'){
+      var po = (a.partener||'').split(' / ');
+      if (!alesi(fOrg).some(function(o){ return po.indexOf(o) > -1; })) return false;
+    }
+    if (fAn !== 'all' && alesi(fAn).indexOf(an(a)) === -1) return false;
     if (fEt !== 'all' && etapa(a).indexOf(fEt) === -1) return false;
     if (fSuport && !a.suport) return false;
     return true;
@@ -1817,8 +2104,11 @@
 
   function trece_grup(g){
     if (fCat !== 'all' && g.categorie !== fCat) return false;
-    if (fOrg !== 'all' && !g.orgs[fOrg]) return false;
-    if (fAn !== 'all' && aniGrup(g).indexOf(fAn) === -1) return false;
+    if (fOrg !== 'all' && !alesi(fOrg).some(function(o){ return g.orgs[o]; })) return false;
+    if (fAn !== 'all'){
+      var ag = aniGrup(g);
+      if (!alesi(fAn).some(function(y){ return ag.indexOf(y) > -1; })) return false;
+    }
     if (fEt !== 'all' && !g.et[fEt]) return false;
     if (fSuport && !g.suport) return false;
     return true;

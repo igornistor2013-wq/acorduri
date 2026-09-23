@@ -1,13 +1,13 @@
 # Asistență externă pentru Republica Moldova
 
-Trei pagini care arată, din surse oficiale, cine finanțează Republica Moldova
+Patru pagini care arată, din surse oficiale, cine finanțează Republica Moldova
 și unde au ajuns banii.
 
 **Site:** https://nistor.vivi.md
 
 | Pagina | Ce arată | Sursa |
 |---|---|---|
-| `index.html` | Donatori, proiecte, sume — tabloul principal, cu analize avansate și export | Platforma AMP (live) + arhiva 1993–2022, verificare încrucișată cu IATI |
+| `index.html` | Donatori, proiecte, sume — tabloul principal, cu analize avansate și export. Butonul **Acorduri** deschide un meniu cu cele două registre de acorduri | Platforma AMP (live) + arhiva 1993–2022, verificare încrucișată cu IATI |
 | `acorduri.html` | Registrul acordurilor de asistență externă, act cu act, cu etapa la care a ajuns fiecare | Cuprinsurile Monitorului Oficial |
 | `hg246.html` | Compară anexa nr. 1 la HG 246/2010 cu baza AMP și scoate în Word proiectele expirate | Documentul încărcat de utilizator + AMP |
 
@@ -49,7 +49,46 @@ programată doar în zilele lucrătoare.
 | `import_pdf.py` | Importul din arhivele PDF ale Monitorului. Se rulează local |
 | `teste.py` | Testele colectorului. Rulate de workflow înaintea colectării |
 | `.github/workflows/monitor.yml` | Programarea rulării |
+| `legis_acorduri.html` | Acordurile din legis.md, grupate pe acord. Datele sunt incluse în pagină |
+| `legis_brut.json` | Toate actele găsite pe legis.md (baza); actualizat de `legis.yml` |
+| `legis_watch.py` | Verificarea zilnică pe legis.md, cu browser (Playwright) |
+| `legis_extrage.js` | Căutările rulate în pagina legis.md |
+| `legis_clasifica.py` | Ce e asistență externă, categoria, partenerul (extinde `monitor_watch.py`) |
+| `legis_pagina.py` | Construiește `legis_acorduri.html` din `acorduri.html` + bază |
+| `teste_legis.py` | Testele verificării legis.md |
+| `legis_local.bat` | Aceeași verificare, rulată de pe calculatorul tău (Windows) |
+| `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi |
+| `.github/workflows/legis.yml` | Programarea verificării legis.md |
 | `CNAME` | Domeniul propriu |
+
+## Registrul din legis.md — cum se actualizează
+
+Workflow-ul **Verifică legis.md** rulează zilnic la 07:00 UTC (10:00 la
+Chișinău vara). Deschide legis.md într-un Chromium invizibil, face 18 căutări
+după cuvinte-cheie în actele din anul curent (în ianuarie–martie și din anul
+trecut), păstrează doar actele care nu sunt deja în `legis_brut.json`, le trece
+prin clasificator și reconstruiește `legis_acorduri.html`. Face commit doar
+dacă a apărut ceva nou. Ce a găsit se vede în rezumatul rulării, în Actions.
+
+**Cloudflare.** legis.md e protejat de Cloudflare. Un browser adevărat trece
+de obicei de verificarea automată, dar Cloudflare poate cere bifa „nu sunt
+robot" — mai ales serverelor GitHub. Scriptul nu încearcă s-o ocolească: se
+oprește cu mesajul „Blocat de Cloudflare" și rularea apare roșie. Dacă se
+întâmplă zilnic, dezactivează workflow-ul (Actions → Verifică legis.md → ⋯ →
+Disable workflow) și rulează local:
+
+1. o singură dată: `pip install playwright` și `python -m playwright install chromium`;
+2. dublu-click pe `legis_local.bat` în folderul repository-ului. Se deschide o
+   fereastră de browser; dacă apare bifa, bifeaz-o. Profilul `.legis_profil`
+   păstrează cookie-ul, deci rulările următoare trec singure;
+3. pentru rulare zilnică: Task Scheduler → Creare activitate de bază → Zilnic
+   → Pornire program → `legis_local.bat`.
+
+Fișierul `.bat` face `git pull`, rulează verificarea și, dacă sunt acte noi,
+`git commit` și `git push`.
+
+Testele: `python teste_legis.py` (rapid) sau `python teste_legis.py --browser`
+(include o rulare completă pe un legis.md simulat local, și cazul blocat).
 
 ## Importul din arhive PDF
 
