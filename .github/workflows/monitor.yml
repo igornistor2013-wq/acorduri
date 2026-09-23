@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Descarcă repository-ul
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Fixat explicit pe main. Fără asta, un "Re-run jobs" pe o rulare
           # veche face checkout pe commit-ul de ATUNCI: rulează codul vechi și
@@ -29,7 +29,7 @@ jobs:
           ref: main
 
       - name: Pregătește Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 

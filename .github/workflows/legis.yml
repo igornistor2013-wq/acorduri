@@ -18,24 +18,52 @@ concurrency:
 
 jobs:
   verifica:
-    runs-on: ubuntu-latest
+    # Fixat pe 24.04, nu „ubuntu-latest": Playwright își instalează singur
+    # bibliotecile de sistem ale browserului doar pe versiunile de Ubuntu pe
+    # care le cunoaște. Când GitHub mută „latest" pe o versiune nouă, instalarea
+    # pica în câteva secunde, înainte de orice căutare.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
       - name: Descarcă repository-ul
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: main
 
+      # Primul lucru verificat: sunt toate fișierele la locul lor? Cea mai
+      # frecventă cauză de eșec e un fișier neurcat sau urcat într-un subfolder.
+      - name: Verifică fișierele
+        run: |
+          lipsa=0
+          for f in legis_watch.py legis_extrage.js legis_clasifica.py legis_pagina.py \
+                   teste_legis.py legis_brut.json monitor_watch.py acorduri.html; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Lipsește fișierul $f din rădăcina repository-ului. Urcă-l lângă index.html."
+              lipsa=1
+            fi
+          done
+          if [ -f acorduri.html ] && ! grep -q "function linkLegis" acorduri.html; then
+            echo "::error::acorduri.html din repository e versiunea veche. Urcă acorduri.html din setul nou — pagina legis se construiește din el."
+            lipsa=1
+          fi
+          [ $lipsa -eq 0 ] && echo "Toate fișierele sunt la locul lor."
+          exit $lipsa
+
       - name: Pregătește Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Instalează Playwright și Chromium
         run: |
           pip install --quiet playwright
-          python -m playwright install --with-deps chromium
+          # dacă instalarea completă eșuează, încercăm în doi pași
+          python -m playwright install --with-deps chromium || {
+            echo "::warning::Instalarea completă a eșuat — reîncerc în doi pași."
+            sudo python -m playwright install-deps chromium || true
+            python -m playwright install chromium
+          }
 
       # Testele rulează înainte: dacă pică, căutarea nici nu pornește.
       # --browser include un test complet pe un legis.md simulat local.
