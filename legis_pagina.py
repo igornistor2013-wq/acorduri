@@ -85,7 +85,9 @@ def main(BRUT=None, OUT=None):
     def inlocuieste(vechi, nou, n=1):
         global s
         c = s.count(vechi)
-        assert c == n, (c, vechi[:80])
+        if c != n:
+            raise SystemExit('EROARE: acorduri.html nu are forma așteptată (nu găsesc: ' + repr(vechi[:70]) +
+                             '). Pagina legis se construiește din acorduri.html — urcă versiunea din setul nou.')
         s = s.replace(vechi, nou)
 
 
