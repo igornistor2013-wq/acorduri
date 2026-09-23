@@ -659,15 +659,28 @@
     return /^https?:\/\//i.test(String(u || '')) ? String(u) : '';
   }
 
-  /* Numărul actului duce la căutarea lui în Registrul de stat (legis.md):
-     nr. documentului + anul adoptării. Legis nu are adrese stabile pe
-     număr, doar pe doc_id intern, deci căutarea e cea mai directă cale.
-     „nr. 188, 24 august 2026" → nr_doc=188&datepicker1=2026 */
+  /* Numărul actului duce la actul din Registrul de stat (legis.md).
+     Legis nu are adrese stabile pe număr, doar pe doc_id intern, așa că
+     folosim căutarea: nr. documentului + data adoptării completă.
+     – Doar anul nu ajunge: „nr. 188 din 2026" dă trei acte (lege, HG, ordin).
+       Cu data întreagă rămâne unul singur.
+     – Decretele au sufixul legislaturii („763-X", „1331-IX"), dar legis le
+       înregistrează fără el (DP763/2026); cu sufix căutarea dă zero.
+     „nr. 763-X, 3 septembrie 2026" → nr_doc=763&datepicker1=03.09.2026 */
+  var LUNI = {ianuarie:1,februarie:2,martie:3,aprilie:4,mai:5,iunie:6,iulie:7,
+              august:8,septembrie:9,octombrie:10,noiembrie:11,decembrie:12};
+  /* Excepții verificate: legis.md are altă dată de adoptare decât cuprinsul
+     Monitorului. Cu data din Monitor căutarea dă zero rezultate. */
+  var LEGIS_DATA = {
+    'nr. 68, 27 martie 2025': '31.03.2025'   // LP68/2025, gaze naturale BERD
+  };
   function linkLegis(act){
-    var m = /nr\.\s*([0-9A-Za-z-]+)\s*,\s*\d{1,2}\s+\S+\s+(\d{4})/.exec(String(act || ''));
+    var m = /nr\.\s*(\d+)(?:-[IVXLC]+)?\s*,\s*(\d{1,2})\s+(\S+)\s+(\d{4})/i.exec(String(act || ''));
     if (!m) return '';
+    var luna = LUNI[fold(m[3])];
+    var data = LEGIS_DATA[String(act).trim()] || (luna ? ('0' + m[2]).slice(-2) + '.' + ('0' + luna).slice(-2) + '.' + m[4] : m[4]);
     return 'https://www.legis.md/cautare/getResults?document_status=0' +
-      '&nr_doc=' + encodeURIComponent(m[1]) + '&datepicker1=' + m[2] +
+      '&nr_doc=' + m[1] + '&datepicker1=' + data +
       '&publication_status=+-+TOATE+-+&nr=&publish_date=&search_type=1&search_string=';
   }
   function nrAct(act){
