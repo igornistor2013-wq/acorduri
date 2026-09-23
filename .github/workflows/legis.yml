@@ -57,7 +57,7 @@ jobs:
 
       - name: Instalează Playwright și Chromium
         run: |
-          pip install --quiet playwright
+          pip install --quiet playwright requests beautifulsoup4
           # dacă instalarea completă eșuează, încercăm în doi pași
           python -m playwright install --with-deps chromium || {
             echo "::warning::Instalarea completă a eșuat — reîncerc în doi pași."
