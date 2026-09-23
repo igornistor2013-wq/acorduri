@@ -103,7 +103,7 @@ def actualizeaza(nou, baza_p, out_dir):
 
 # ------------------------------------------------------------------- browser
 
-def extrage(ani, cunoscute, baza_url, headed, profil, asteapta_cf, limita_min):
+def extrage(ani, cunoscute, baza_url, headed, profil, asteapta_cf, limita_min, canal=None):
     from playwright.sync_api import sync_playwright
 
     js = (AICI / 'legis_extrage.js').read_text(encoding='utf-8')
@@ -114,12 +114,14 @@ def extrage(ani, cunoscute, baza_url, headed, profil, asteapta_cf, limita_min):
 
     with sync_playwright() as p:
         opt = dict(headless=not headed, locale='ro-RO', viewport={'width': 1280, 'height': 900})
+        if canal:
+            opt['channel'] = canal          # ex. 'msedge': browserul deja instalat în Windows
         if profil:
             ctx = p.chromium.launch_persistent_context(str(profil), **opt)
             page = ctx.pages[0] if ctx.pages else ctx.new_page()
             browser = None
         else:
-            browser = p.chromium.launch(headless=not headed)
+            browser = p.chromium.launch(headless=not headed, **({'channel': canal} if canal else {}))
             ctx = browser.new_context(locale='ro-RO', viewport=opt['viewport'])
             page = ctx.new_page()
         try:
@@ -177,6 +179,8 @@ def main():
     ap.add_argument('--asteapta-cf', type=int, default=None,
                     help='câte secunde așteaptă trecerea de Cloudflare (implicit 60; 300 cu --headed)')
     ap.add_argument('--limita', type=int, default=15, help='minute maxim pentru căutări')
+    ap.add_argument('--browser', dest='canal', default=None,
+                    help='browserul instalat de folosit (msedge sau chrome); implicit Chromium-ul Playwright')
     a = ap.parse_args()
 
     # data după ora Chișinăului, nu UTC
@@ -188,7 +192,7 @@ def main():
 
     print(f'Ani: {", ".join(ani)}; acte cunoscute în acești ani: {len(id_cunoscute(baza, ani))}')
     try:
-        nou = extrage(ani, id_cunoscute(baza, ani), a.url, a.headed, a.profil, asteapta, a.limita)
+        nou = extrage(ani, id_cunoscute(baza, ani), a.url, a.headed, a.profil, asteapta, a.limita, a.canal)
     except TimeoutError as e:
         print('Eroare:', e); rezumat_github(f'### ⚠️ legis.md: {e}'); return 4
 

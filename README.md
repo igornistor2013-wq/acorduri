@@ -50,45 +50,40 @@ programată doar în zilele lucrătoare.
 | `teste.py` | Testele colectorului. Rulate de workflow înaintea colectării |
 | `.github/workflows/monitor.yml` | Programarea rulării |
 | `legis_acorduri.html` | Acordurile din legis.md, grupate pe acord. Datele sunt incluse în pagină |
-| `legis_brut.json` | Toate actele găsite pe legis.md (baza); actualizat de `legis.yml` |
-| `legis_watch.py` | Verificarea zilnică pe legis.md, cu browser (Playwright) |
+| `legis_brut.json` | Istoricul: toate actele găsite pe legis.md, 1992–2026 |
+| `legis_watch.py` | Reîmprospătarea istoricului de pe legis.md, cu browser (ocazional, de pe calculator) |
 | `legis_extrage.js` | Căutările rulate în pagina legis.md |
 | `legis_clasifica.py` | Ce e asistență externă, categoria, partenerul (extinde `monitor_watch.py`) |
-| `legis_pagina.py` | Construiește `legis_acorduri.html` din `acorduri.html` + bază |
+| `legis_pagina.py` | Construiește `legis_acorduri.html` din `acorduri.html` + istoric + `date.json`; rulat de `monitor.yml` |
 | `teste_legis.py` | Testele verificării legis.md |
 | `legis_local.bat` | Aceeași verificare, rulată de pe calculatorul tău (Windows) |
 | `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi |
-| `.github/workflows/legis.yml` | Programarea verificării legis.md |
 | `CNAME` | Domeniul propriu |
 
 ## Registrul din legis.md — cum se actualizează
 
-Workflow-ul **Verifică legis.md** rulează zilnic la 07:00 UTC (10:00 la
-Chișinău vara). Deschide legis.md într-un Chromium invizibil, face 18 căutări
-după cuvinte-cheie în actele din anul curent (în ianuarie–martie și din anul
-trecut), păstrează doar actele care nu sunt deja în `legis_brut.json`, le trece
-prin clasificator și reconstruiește `legis_acorduri.html`. Face commit doar
-dacă a apărut ceva nou. Ce a găsit se vede în rezumatul rulării, în Actions.
+`legis_acorduri.html` e construită din două surse:
 
-**Cloudflare.** legis.md e protejat de Cloudflare. Un browser adevărat trece
-de obicei de verificarea automată, dar Cloudflare poate cere bifa „nu sunt
-robot" — mai ales serverelor GitHub. Scriptul nu încearcă s-o ocolească: se
-oprește cu mesajul „Blocat de Cloudflare" și rularea apare roșie. Dacă se
-întâmplă zilnic, dezactivează workflow-ul (Actions → Verifică legis.md → ⋯ →
-Disable workflow) și rulează local:
+- **istoricul** din Registrul de stat (legis.md), 1992 până azi, extras o dată
+  în `legis_brut.json`;
+- **actele noi** din Monitorul Oficial (`date.json`), colectate zilnic de
+  workflow-ul existent `monitor.yml`.
 
-1. o singură dată: `pip install playwright` și `python -m playwright install chromium`;
-2. dublu-click pe `legis_local.bat` în folderul repository-ului. Se deschide o
-   fereastră de browser; dacă apare bifa, bifeaz-o. Profilul `.legis_profil`
-   păstrează cookie-ul, deci rulările următoare trec singure;
-3. pentru rulare zilnică: Task Scheduler → Creare activitate de bază → Zilnic
-   → Pornire program → `legis_local.bat`.
+Orice lege, hotărâre sau decret apare întâi în Monitorul Oficial și abia apoi
+în legis.md, deci actele noi nu trebuie căutate pe legis.md. După fiecare
+colectare, `monitor.yml` rulează `legis_pagina.py`, care reconstruiește pagina
+și publică dacă s-a schimbat ceva. Totul rulează pe GitHub; nimic de instalat.
 
-Fișierul `.bat` face `git pull`, rulează verificarea și, dacă sunt acte noi,
-`git commit` și `git push`.
+Actele venite din Monitor apar cu sursa „MO …", iar numărul lor duce la
+căutarea pe legis.md după număr și data adoptării. Actele din istoric duc
+direct la fișa lor pe legis.md.
 
-Testele: `python teste_legis.py` (rapid) sau `python teste_legis.py --browser`
-(include o rulare completă pe un legis.md simulat local, și cazul blocat).
+legis.md însuși nu poate fi citit de pe serverele GitHub: e protejat de
+Cloudflare („nu sunt robot"). Pentru o reîmprospătare completă a istoricului,
+ocazional, se poate rula de pe calculator `legis_local.bat` (cere Python, Git
+și `pip install playwright requests beautifulsoup4`).
+
+Testele: `python teste_legis.py` (rapid) sau `python teste_legis.py --browser`.
 
 ## Importul din arhive PDF
 

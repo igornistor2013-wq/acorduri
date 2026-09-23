@@ -48,6 +48,66 @@ def repara(t):
 
 
 
+LUNI = {'ianuarie': 1, 'februarie': 2, 'martie': 3, 'aprilie': 4, 'mai': 5, 'iunie': 6, 'iulie': 7,
+        'august': 8, 'septembrie': 9, 'octombrie': 10, 'noiembrie': 11, 'decembrie': 12}
+PREFIX = {'lege': 'LP', 'hotarare': 'HG', 'decret': 'DP', 'ordin': 'O'}
+
+
+def cod_legis(a):
+    """„nr. 188, 24 august 2026" + „Lege…" -> ('LP188/2026', '24.08.2026')."""
+    m = re.search(r'nr\.\s*(\d+)(?:-[IVXLC]+)?\s*,\s*(\d{1,2})\s+(\S+)\s+(\d{4})', a.get('act', ''))
+    if not m:
+        return None, None
+    pre = PREFIX.get(norm(a.get('titlu', '')).split(' ')[0])
+    luna = LUNI.get(norm(m.group(3)))
+    if not pre or not luna:
+        return None, None
+    return pre + m.group(1) + '/' + m.group(4), '%02d.%02d.%s' % (int(m.group(2)), luna, m.group(4))
+
+
+def adauga_din_monitor(acte, ids, cale=None):
+    cale = Path(cale or AICI / 'date.json')
+    if not cale.exists():
+        return 0
+    try:
+        mo = json.load(open(cale, encoding='utf-8')).get('acte', {})
+    except Exception as e:
+        print('date.json nu a putut fi citit:', e)
+        return 0
+    # ce e deja în baza legis: (prefix, număr, an); ordinele au prefixe diferite (OMF, OMS…)
+    def cheie(c):
+        m = re.match(r'^([A-Z]+?)(\d+)(?:/\d+)?/(\d{4})$', c or '')
+        if not m:
+            return None
+        p = 'DP' if m.group(1).startswith('DP') else ('O' if m.group(1).startswith('O') else m.group(1))
+        return (p, m.group(2), m.group(3))
+    exista = {cheie(c) for c in ids}
+    n = 0
+    for k, a in mo.items():
+        cod, data = cod_legis(a)
+        if not cod or cheie(cod) in exista:
+            continue
+        exista.add(cheie(cod))
+        nr, an = re.match(r'^[A-Z]+(\d+)/(\d{4})$', cod).groups()
+        acte[cod + '|mo' + k] = {
+            'act': cod,
+            'titlu': a.get('titlu', ''),
+            'categorie': a.get('categorie', ''),
+            'partener': a.get('partener', ''),
+            'semnat': a.get('semnat', ''),
+            'editie': 'MO ' + a.get('editie', '') if a.get('editie') else 'Monitorul Oficial',
+            'data_editie': a.get('data_editie', ''),
+            'editie_id': a.get('editie_id', ''),
+            # fișa legis nu are încă doc_id cunoscut: ducem la căutarea după număr + data adoptării
+            'url': 'https://www.legis.md/cautare/getResults?document_status=0&nr_doc=' + nr +
+                   '&datepicker1=' + data + '&publication_status=+-+TOATE+-+&nr=&publish_date=&search_type=1&search_string=',
+            'suport': bool(a.get('suport')),
+        }
+        ids[cod] = 'mo'
+        n += 1
+    return n
+
+
 def main(BRUT=None, OUT=None):
     global s
     BRUT = BRUT or str(AICI / 'legis_brut.json')
@@ -75,9 +135,22 @@ def main(BRUT=None, OUT=None):
         }
         ids[r['c']] = r['id']
 
+    # Actele noi vin zilnic din Monitorul Oficial (date.json, colectat de
+    # monitor.yml pe GitHub, fără Cloudflare). Orice act ajunge întâi în
+    # Monitor, apoi în legis.md — deci baza legis (istoricul) + Monitorul
+    # (ce e nou) dau registrul complet, actualizat zilnic, fără ca cineva să
+    # mai citească legis.md. Ce există deja în baza legis nu se dublează.
+    din_mo = adauga_din_monitor(acte, ids)
+
+    # data afișată = ultima colectare din Monitor, nu ziua de azi: altfel pagina
+    # s-ar schimba (și s-ar face commit) în fiecare zi, fără nimic nou
     azi = datetime.date.today().strftime('%d.%m.%Y')
+    try:
+        azi = json.load(open(AICI / 'date.json', encoding='utf-8')).get('ultima_rulare') or azi
+    except Exception:
+        pass
     db = {'acte': acte, 'editii_vazute': [], 'ultima_rulare': azi, 'editii_lipsa': []}
-    print(len(acte), 'acte')
+    print(len(acte), 'acte', '(din care', din_mo, 'din Monitorul Oficial)')
 
     s = open(SRC, encoding='utf-8').read()
 

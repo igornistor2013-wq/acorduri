@@ -111,6 +111,10 @@ if '--browser' in sys.argv:
     url = f'http://127.0.0.1:{srv.server_port}/'
 
     tmp = Path(tempfile.mkdtemp())
+    # rulările de test nu scriu în rezumatul GitHub — altfel actul simulat
+    # LP500/2026 apare acolo ca și cum ar fi fost găsit pe legis.md
+    import os
+    env_test = {k: v for k, v in os.environ.items() if k != 'GITHUB_STEP_SUMMARY'}
     try:
         for f in ('acorduri.html', 'legis_watch.py', 'legis_pagina.py', 'legis_clasifica.py',
                   'monitor_watch.py', 'legis_extrage.js'):
@@ -120,7 +124,7 @@ if '--browser' in sys.argv:
                   open(tmp / 'legis_brut.json', 'w', encoding='utf-8'))
 
         p = subprocess.run([sys.executable, str(tmp / 'legis_watch.py'), '--url', url, '--ani', '2026', '--asteapta-cf', '5'],
-                           capture_output=True, text=True, timeout=600)
+                           capture_output=True, text=True, timeout=600, env=env_test)
         verifica('rulare reușită (cod 0)', p.returncode == 0, p.stdout[-800:] + p.stderr[-800:])
         rap = (tmp / 'raport_legis.md').read_text(encoding='utf-8') if (tmp / 'raport_legis.md').exists() else ''
         verifica('raportul are acordul nou LP500/2026', 'LP500/2026' in rap, rap)
@@ -128,7 +132,7 @@ if '--browser' in sys.argv:
 
         Legis.blocat = True
         p = subprocess.run([sys.executable, str(tmp / 'legis_watch.py'), '--url', url, '--ani', '2026', '--asteapta-cf', '5'],
-                           capture_output=True, text=True, timeout=300)
+                           capture_output=True, text=True, timeout=300, env=env_test)
         verifica('blocat de Cloudflare → cod 3, fără modificări', p.returncode == 3, p.stdout[-500:])
     finally:
         srv.shutdown()
