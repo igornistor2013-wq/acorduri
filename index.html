@@ -965,6 +965,43 @@
   #backToMainBtn, #backFromDportalBtn{display:none !important;}
   #updateView > .wrap > .panel-head:first-child, #iatiView > .wrap > .panel-head:first-child{display:none !important;}
   #updateView > .wrap, #iatiView > .wrap, #dportalView > .wrap, #advancedView > .wrap{padding:0 0 40px;max-width:none;}
+  /* harta Moldovei pe raioane */
+  #regionMapContainer{overflow:visible !important}
+  .rmap-wrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(240px,1fr);gap:18px;align-items:start}
+  @media (max-width:820px){.rmap-wrap{grid-template-columns:1fr}}
+  .rmap-box{position:relative;background:#f6f8fc;border:1px solid var(--line);border-radius:12px;padding:10px}
+  .rmap{display:block;width:100%;height:auto;max-height:560px;aspect-ratio:1/1;margin:0 auto}
+  .rpath{stroke:#fff;stroke-width:calc(1.2px * var(--rz,1));cursor:pointer;transition:opacity .35s ease,filter .2s ease;outline:none}
+  .rpath:hover,.rpath:focus-visible{filter:brightness(1.12) saturate(1.1);stroke:#16294a;stroke-width:calc(1.6px * var(--rz,1))}
+  .rpath.stins{opacity:.28}
+  .rpath.ales{stroke:#16294a;stroke-width:calc(2.6px * var(--rz,1));filter:drop-shadow(0 calc(4px * var(--rz,1)) calc(8px * var(--rz,1)) rgba(22,41,74,.35))}
+  .rpath.gol{cursor:pointer}
+  .rmap-back{position:absolute;top:14px;left:14px;background:#fff;color:var(--navy);border:1px solid var(--line-strong);border-radius:8px;
+    padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(20,30,60,.12)}
+  .rmap-back:hover{background:var(--blue-bg)}
+  .rmap-leg{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-dim);margin-top:6px;flex-wrap:wrap}
+  .rmap-leg i{display:block;height:8px;width:140px;border-radius:4px}
+  .rmap-leg em{font-style:normal;margin-left:auto}
+  .rmap-credit{font-size:10px;color:var(--ink-dim);margin-top:2px}
+  .rmap-side{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel);max-height:600px;overflow:auto}
+  .rs-tit{font-weight:800;color:var(--navy-deep);font-size:14px;margin-bottom:4px}
+  .rs-raion{font-size:20px;letter-spacing:-.01em}
+  .rs-hint{font-size:11.5px;color:var(--ink-dim);margin-bottom:10px}
+  .rs-row{display:grid;grid-template-columns:1fr auto;gap:2px 10px;width:100%;text-align:left;background:none;border:none;
+    border-radius:8px;padding:7px 8px;cursor:pointer;font:inherit;color:var(--ink)}
+  .rs-row:hover,.rs-row:focus-visible{background:var(--blue-bg);outline:none}
+  .rs-n{font-size:12.5px;font-weight:600}
+  .rs-v{font-size:12px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .rs-bar{grid-column:1 / -1;height:5px;background:#e7edf7;border-radius:3px;overflow:hidden}
+  .rs-bar i{display:block;height:100%;background:#3f75bd;border-radius:3px}
+  .rs-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 14px}
+  .rs-kpi div{background:var(--blue-bg);border-radius:8px;padding:8px}
+  .rs-kpi b{display:block;font-size:16px;color:var(--navy-deep)}
+  .rs-kpi span{font-size:10.5px;color:var(--ink-dim)}
+  .rs-sub{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);margin:4px 0 6px}
+  .rs-p{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+  .rs-p b{color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .rs-gol{font-size:12px;color:var(--ink-dim);padding:10px 0}
 </style>
 </head>
 <body>
@@ -1619,6 +1656,7 @@
       <select id="regionYearFilter" style="flex:1;min-width:130px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:12.5px;outline:none;"></select>
       <select id="regionDonorFilter" style="flex:2;min-width:200px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:12.5px;outline:none;"></select>
       <select id="regionToaFilter" style="flex:1;min-width:170px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:12.5px;outline:none;"></select>
+      <select id="regionRaionFilter" aria-label="Raion" style="flex:1;min-width:150px;background:var(--bg);border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:8px 10px;font-family:inherit;font-size:12.5px;outline:none;"></select>
     </div>
     <div class="panel-body" id="regionMapContainer" style="overflow-x:auto;"></div>
     <div style="padding:12px 16px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);">
@@ -2719,6 +2757,7 @@ function toggleMapCountry(label, allLabels){
     mapState.selected.add(label);
   }
   renderMap(aggregateByCountry(getFilteredProjects()));
+  if(mapState.selected && mapState.selected.has(label) && window.__mapFlyTo) window.__mapFlyTo(label);
 }
 document.getElementById('mapResetSelection').addEventListener('click',()=>{
   mapState.selected = null;
@@ -2968,6 +3007,30 @@ function renderMapProjects(){
     apply();
   }
 
+
+  /* Clic pe o țară (pe hartă sau în clasament): harta se apropie lin de ea,
+     ca la harta raioanelor și ca în rapoartele Power BI. */
+  let __anim = null;
+  function animTo(ns, ntx, nty){
+    if(__anim) cancelAnimationFrame(__anim);
+    const s0=scale, x0=tx, y0=ty, t0=performance.now();
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const dur = reduce ? 0 : 650, ease = x => x<.5 ? 4*x*x*x : 1-Math.pow(-2*x+2,3)/2;
+    (function step(now){
+      const k = dur ? Math.min(1,(now-t0)/dur) : 1, e = ease(k);
+      scale = s0+(ns-s0)*e; tx = x0+(ntx-x0)*e; ty = y0+(nty-y0)*e; apply();
+      if(k<1) __anim = requestAnimationFrame(step); else __anim = null;
+    })(t0);
+  }
+  function flyTo(label){
+    const el = [...g.querySelectorAll('[data-label]')].find(x=>x.getAttribute('data-label')===label);
+    if(!el || typeof el.getBBox !== 'function') return;
+    const b = el.getBBox();
+    const ns = Math.max(2, Math.min(8, Math.min(960*0.42/Math.max(b.width,1), 460*0.42/Math.max(b.height,1))));
+    const cx = b.x+b.width/2, cy = b.y+b.height/2;
+    animTo(ns, 480-ns*cx, 230-ns*cy);
+  }
+  window.__mapFlyTo = flyTo;
   document.getElementById('mapZoomIn').addEventListener('click',()=>zoomAt(1.4,480,230));
   document.getElementById('mapZoomOut').addEventListener('click',()=>zoomAt(1/1.4,480,230));
   document.getElementById('mapZoomReset').addEventListener('click',()=>setView(EUROPA));
@@ -5017,46 +5080,183 @@ function findSvgRegion(rawName){
   return SVG_REGION_BY_FOLD.get(key) || null;
 }
 
+/* ---------- Harta Moldovei pe raioane, în stilul hărții din Power BI ----------
+   Nuanțe de albastru după sumă; clic pe un raion (sau alegerea lui din listă)
+   îl aduce în centru: harta se apropie lin de raion, raionul rămâne plin, iar
+   restul se estompează. Alături — partenerii care finanțează acolo. Al doilea
+   clic pe raion, butonul „Toată Moldova" sau Esc revin la țara întreagă. */
+// denumirile raioanelor cu diacritice (harta le are fără)
+const RAION_NUME = {"MDAN": "Anenii Noi", "MDBA": "Bălți", "MDBS": "Basarabeasca", "MDBD": "Bender (Tighina)", "MDBR": "Briceni", "MDCA": "Cahul", "MDCL": "Călărași", "MDCT": "Cantemir", "MDCS": "Căușeni", "MDCU": "Chișinău", "MDCM": "Cimișlia", "MDCR": "Criuleni", "MDDO": "Dondușeni", "MDDR": "Drochia", "MDDU": "Dubăsari", "MDED": "Edineț", "MDFA": "Fălești", "MDFL": "Florești", "MDGL": "Glodeni", "MDHI": "Hîncești", "MDIA": "Ialoveni", "MDLE": "Leova", "MDNI": "Nisporeni", "MDOC": "Ocnița", "MDOR": "Orhei", "MDRE": "Rezina", "MDRI": "Rîșcani", "MDSI": "Sîngerei", "MDSD": "Șoldănești", "MDSO": "Soroca", "MDSV": "Ștefan Vodă", "MDST": "Strășeni", "MDTA": "Taraclia", "MDTE": "Telenești", "MDSN": "Stînga Nistrului", "MDUN": "Ungheni", "MDGA": "UTA Găgăuzia"};
+function raionNume(r){
+  if(r && currentLang==='en' && ({MDGA:1,MDSN:1,MDBD:1})[r.id]) return {MDGA:'ATU Gagauzia', MDSN:'Transnistria region', MDBD:'Bender'}[r.id];
+  return (r && RAION_NUME[r.id]) || (r && r.name) || '';
+}
+const REGION_VB_FULL = [0, 0, 1000, 1000];
+let regionViewBox = REGION_VB_FULL.slice();
+let regionAnim = null;
+const REGION_BLUES = ['#dce8f7','#b9d0ee','#8fb3e2','#6494d2','#3f75bd','#22549c','#15386e'];
+function regionColor(frac){
+  const f = Math.max(0, Math.min(1, Math.pow(frac, 0.5)));
+  return REGION_BLUES[Math.min(REGION_BLUES.length-1, Math.round(f*(REGION_BLUES.length-1)))];
+}
+function regionValues(totals){
+  const vals = new Map();
+  MOLDOVA_REGIONS_SVG.forEach(r => vals.set(r.id, {ang:0, deb:0, count:0, has:false}));
+  totals.forEach((v, key)=>{
+    if(key===NATIONAL_LEVEL_KEY) return;
+    const ids = new Set(key.split(',').map(x=>findSvgRegion(x.trim())).filter(Boolean).map(r=>r.id));
+    ids.forEach(id=>{ const o = vals.get(id); o.ang+=v.ang; o.deb+=v.deb; o.count+=v.count; o.has=true; });
+  });
+  return vals;
+}
+function animateRegionViewBox(svg, target){
+  if(regionAnim) cancelAnimationFrame(regionAnim);
+  const from = regionViewBox.slice();
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const dur = reduce ? 0 : 650, t0 = performance.now();
+  const ease = x => x<.5 ? 4*x*x*x : 1-Math.pow(-2*x+2,3)/2;
+  function step(now){
+    const k = dur ? Math.min(1, (now-t0)/dur) : 1, e = ease(k);
+    regionViewBox = from.map((v,i)=>v+(target[i]-v)*e);
+    svg.setAttribute('viewBox', regionViewBox.map(v=>v.toFixed(1)).join(' '));
+    // contururile rămân la fel de subțiri oricât de aproape e harta
+    svg.style.setProperty('--rz', (regionViewBox[2]/1000).toFixed(3));
+    if(k<1) regionAnim = requestAnimationFrame(step); else regionAnim = null;
+  }
+  regionAnim = requestAnimationFrame(step);
+}
+function selectRegion(id){
+  selectedRegionId = id;
+  const sel = document.getElementById('regionRaionFilter');
+  if(sel) sel.value = id || '';
+  renderRegionChart();
+}
 function renderRegionMap(totals, maxVal){
   const container = document.getElementById('regionMapContainer');
-  const W = 1000, H = 1000;
-  const svg = svgEl('svg',{viewBox:`0 0 ${W} ${H}`, width:'100%', height:520, style:'display:block;max-width:520px;margin:0 auto;'});
+  const en = currentLang==='en';
+  const vals = regionValues(totals);
+  const maxR = Math.max(1, ...[...vals.values()].map(v=>v[regionMetric]));
+
+  // selectorul de raion (ca filtrul „Raion" din Power BI)
+  const rsel = document.getElementById('regionRaionFilter');
+  if(rsel){
+    const sorted = MOLDOVA_REGIONS_SVG.slice().sort((a,b)=>raionNume(a).localeCompare(raionNume(b),'ro'));
+    rsel.innerHTML = `<option value="">${en?'All districts':'Toate raioanele'}</option>` +
+      sorted.map(r=>`<option value="${r.id}">${esc(raionNume(r))}${vals.get(r.id).has?'':' —'}</option>`).join('');
+    rsel.value = selectedRegionId || '';
+  }
+
+  container.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'rmap-wrap';
+  const mapBox = document.createElement('div');
+  mapBox.className = 'rmap-box';
+  const svg = svgEl('svg',{viewBox: regionViewBox.join(' '), class:'rmap', role:'img',
+    'aria-label': en?'Map of Moldova by district':'Harta Moldovei pe raioane'});
+  svg.style.setProperty('--rz', (regionViewBox[2]/1000).toFixed(3));
+  const gAll = svgEl('g',{});
+  svg.appendChild(gAll);
+  let selPath = null;
   MOLDOVA_REGIONS_SVG.forEach(region=>{
-    // find matching totals entry: sum across every real-region key that includes this raion
-    // (a project can list several raions, e.g. "Cahul, Ungheni" — it's counted for each on the map too)
-    let val = {ang:0, deb:0, count:0};
-    let hasData = false;
-    totals.forEach((v, key)=>{
-      if(key===NATIONAL_LEVEL_KEY) return;
-      const parts = key.split(',').map(p=>p.trim());
-      if(parts.some(p=>{ const m=findSvgRegion(p); return m && m.id===region.id; })){
-        val = {ang:val.ang+v.ang, deb:val.deb+v.deb, count:val.count+v.count};
-        hasData = true;
-      }
-    });
-    const alpha = hasData ? 0.12 + 0.88*Math.pow(Math.min(1,val[regionMetric]/maxVal), 0.45) : 0;
-    const fill = hasData ? `rgba(45,212,191,${alpha.toFixed(3)})` : 'var(--blue-bg)';
-    const path = svgEl('path',{d:region.d, fill, stroke: selectedRegionId===region.id?'#22406b':'#ffffff', 'stroke-width': selectedRegionId===region.id?'2.5':'1', style:'cursor:pointer;'});
+    const v = vals.get(region.id);
+    const fill = v.has ? regionColor(v[regionMetric]/maxR) : '#eef1f6';
+    const cls = 'rpath' + (selectedRegionId ? (selectedRegionId===region.id ? ' ales' : ' stins') : '') + (v.has?'':' gol');
+    const path = svgEl('path',{d:region.d, fill, class:cls, tabindex:'0', role:'button',
+      'aria-label': raionNume(region) + (v.has ? `: ${v.count} ${en?'projects':'proiecte'}` : '')});
     path.addEventListener('mousemove', e=>{
-      const label = region.name;
-      showTip(hasData
-        ? `<b>${label}</b><br>${t('metricAng')}: ${fmtNum(val.ang)} EUR<br>${t('metricDebCap')}: ${fmtNum(val.deb)} EUR<br>${currentLang==='en'?'Projects':'Proiecte'}: ${val.count}`
-        : `<b>${label}</b><br>${currentLang==='en'?'No projects for this selection':'Niciun proiect pentru această selecție'}`, e);
+      showTip(v.has
+        ? `<b>${esc(raionNume(region))}</b><br>${t('metricAng')}: ${fmtNum(v.ang)} EUR<br>${t('metricDebCap')}: ${fmtNum(v.deb)} EUR<br>${en?'Projects':'Proiecte'}: ${v.count}`
+        : `<b>${esc(raionNume(region))}</b><br>${en?'No projects for this selection':'Niciun proiect pentru această selecție'}`, e);
     });
     path.addEventListener('mouseleave', hideTip);
-    path.addEventListener('click', ()=>{
-      selectedRegionId = selectedRegionId===region.id ? null : region.id;
-      renderRegionChart();
-    });
-    svg.appendChild(path);
+    const alege = ()=>{ hideTip(); selectRegion(selectedRegionId===region.id ? null : region.id); };
+    path.addEventListener('click', alege);
+    path.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); alege(); } });
+    gAll.appendChild(path);
+    if(selectedRegionId===region.id) selPath = path;
   });
-  container.innerHTML = '';
-  container.appendChild(svg);
+  // raionul ales, desenat ultimul, ca marginea lui să nu fie acoperită de vecini
+  if(selPath) gAll.appendChild(selPath);
+  mapBox.appendChild(svg);
+
+  // butonul de revenire, în colțul hărții
+  const back = document.createElement('button');
+  back.type = 'button'; back.className = 'rmap-back';
+  back.textContent = en ? '← Whole of Moldova' : '← Toată Moldova';
+  back.hidden = !selectedRegionId;
+  back.addEventListener('click', ()=>selectRegion(null));
+  mapBox.appendChild(back);
+
+  // legenda
+  const leg = document.createElement('div');
+  leg.className = 'rmap-leg';
+  leg.innerHTML = `<span>0</span><i style="background:linear-gradient(90deg,${REGION_BLUES.join(',')})"></i><span>${fmtCompact(maxR)}${regionMetric==='count'?'':' EUR'}</span>` +
+    `<em>${regionMetric==='ang' ? t('metricAng') : t('metricDebCap')}</em>`;
+  mapBox.appendChild(leg);
   const credit = document.createElement('div');
-  credit.style.cssText = 'text-align:center;font-size:10px;color:var(--ink-dim);margin-top:4px;';
+  credit.className = 'rmap-credit';
   credit.textContent = 'Map: simplemaps.com';
-  container.appendChild(credit);
+  mapBox.appendChild(credit);
+  wrap.appendChild(mapBox);
+
+  // panoul din dreapta: raionul ales și partenerii lui (ca tabelul „Raion" din Power BI)
+  const side = document.createElement('div');
+  side.className = 'rmap-side';
+  side.innerHTML = regionSideHtml(vals, en);
+  side.querySelectorAll('[data-raion]').forEach(b=>b.addEventListener('click', ()=>selectRegion(b.dataset.raion)));
+  wrap.appendChild(side);
+  container.appendChild(wrap);
+
+  // apropierea de raion (după ce harta e în pagină, ca getBBox să aibă dimensiuni)
+  let target = REGION_VB_FULL;
+  if(selPath){
+    const b = selPath.getBBox();
+    const side0 = Math.max(b.width, b.height) * 1.6 + 30;
+    const cx = b.x + b.width/2, cy = b.y + b.height/2;
+    target = [cx - side0/2, cy - side0/2, side0, side0];
+  }
+  animateRegionViewBox(svg, target);
 }
+function regionSideHtml(vals, en){
+  const fmtM = v => fmtCompact(v) + ' EUR';
+  if(!selectedRegionId){
+    // clasamentul raioanelor
+    const top = MOLDOVA_REGIONS_SVG.map(r=>({r, v:vals.get(r.id)})).filter(x=>x.v.has)
+      .sort((a,b)=>b.v[regionMetric]-a.v[regionMetric]).slice(0, 12);
+    if(!top.length) return `<div class="rs-gol">${t('emptyCurrentSelection')}</div>`;
+    const mx = top[0].v[regionMetric] || 1;
+    return `<div class="rs-tit">${en?'Top districts':'Raioanele cu cele mai mari sume'}</div>` +
+      `<div class="rs-hint">${en?'Click a district on the map or in the list to zoom in.':'Apasă pe un raion pe hartă sau în listă ca să te apropii.'}</div>` +
+      top.map(x=>`<button type="button" class="rs-row" data-raion="${x.r.id}">
+        <span class="rs-n">${esc(raionNume(x.r))}</span><span class="rs-v">${fmtM(x.v[regionMetric])}</span>
+        <span class="rs-bar"><i style="width:${Math.max(3, x.v[regionMetric]/mx*100)}%"></i></span></button>`).join('');
+  }
+  const r = MOLDOVA_REGIONS_SVG.find(x=>x.id===selectedRegionId);
+  const v = vals.get(selectedRegionId);
+  // partenerii care finanțează proiecte în raion
+  const parteneri = new Map();
+  PROJECTS.forEach(p=>{
+    if(!regionFilterPredicate(p)) return;
+    const raw = p.id && REGION_LOOKUP[p.id];
+    if(!raw || !raw.split(',').some(x=>{ const m=findSvgRegion(x.trim()); return m && m.id===selectedRegionId; })) return;
+    (p.donatori && p.donatori.length ? p.donatori : [p.donator]).forEach(d=>{
+      const o = parteneri.get(d) || {ang:0, deb:0}; o.ang += p.ang; o.deb += p.deb; parteneri.set(d, o);
+    });
+  });
+  const lista = [...parteneri.entries()].sort((a,b)=>b[1][regionMetric]-a[1][regionMetric]);
+  return `<div class="rs-tit rs-raion">${esc(raionNume(r))}</div>` +
+    `<div class="rs-kpi"><div><b>${v.count}</b><span>${en?'projects':'proiecte'}</span></div>` +
+    `<div><b>${fmtCompact(v.ang)}</b><span>${t('metricAng').toLowerCase()}, EUR</span></div>` +
+    `<div><b>${fmtCompact(v.deb)}</b><span>${t('metricDeb')}, EUR</span></div></div>` +
+    `<div class="rs-sub">${en?'Development partners':'Parteneri de dezvoltare'} (${lista.length})</div>` +
+    (lista.length ? lista.map(([d,o])=>`<div class="rs-p"><span>${esc(donorLabel(d))}</span><b>${fmtCompact(o[regionMetric])}</b></div>`).join('')
+                  : `<div class="rs-gol">${en?'No projects for this selection':'Niciun proiect pentru această selecție'}</div>`);
+}
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape' && selectedRegionId && document.getElementById('advancedView').style.display!=='none'){
+    selectRegion(null);
+  }
+});
 
 let regionYearFilter = '';
 let regionDonorFilter = '';
@@ -5165,7 +5365,7 @@ function renderRegionProjectsList(consideredProjects, matchedProjects){
 
   if(selectedRegionId){
     const svgRegion = MOLDOVA_REGIONS_SVG.find(r=>r.id===selectedRegionId);
-    titleEl.textContent = (currentLang==='en' ? 'Projects in ' : 'Proiecte în ') + svgRegion.name + ` (${rows.length})`;
+    titleEl.textContent = (currentLang==='en' ? 'Projects in ' : 'Proiecte în ') + raionNume(svgRegion) + ` (${rows.length})`;
     resetBtn.style.display = 'inline-block';
   } else {
     titleEl.textContent = (currentLang==='en'
@@ -5213,10 +5413,8 @@ function renderRegionProjectsList(consideredProjects, matchedProjects){
   wrap.appendChild(table);
   body.appendChild(wrap);
 }
-document.getElementById('regionResetSelection').addEventListener('click', ()=>{
-  selectedRegionId = null;
-  renderRegionChart();
-});
+document.getElementById('regionResetSelection').addEventListener('click', ()=>selectRegion(null));
+document.getElementById('regionRaionFilter').addEventListener('change', e=>selectRegion(e.target.value || null));
 document.getElementById('regionMetricToggle').addEventListener('click', function(){
   regionMetric = regionMetric==='ang' ? 'deb' : 'ang';
   this.textContent = regionMetric==='ang' ? t('metricAng') : t('metricDebCap');
@@ -6444,6 +6642,7 @@ function dpToggleCountry(label){
     if(!dpState.mapSelected.size) dpState.mapSelected = null;
   } else dpState.mapSelected.add(label);
   dpRender();
+  if(dpState.mapSelected && dpState.mapSelected.has(label) && window.__dpMapFlyTo) window.__dpMapFlyTo(label);
 }
 
 /* ---------- randare completă ---------- */
@@ -6576,6 +6775,30 @@ function dpRender(){
   const EUROPA_DP = { s: 3.2, cx: 555, cy: 103 };
   function setViewDp(v){ scale=v.s; tx=480-v.s*v.cx; ty=230-v.s*v.cy; apply(); }
 
+
+  /* Clic pe o țară (pe hartă sau în clasament): harta se apropie lin de ea,
+     ca la harta raioanelor și ca în rapoartele Power BI. */
+  let __anim = null;
+  function animTo(ns, ntx, nty){
+    if(__anim) cancelAnimationFrame(__anim);
+    const s0=scale, x0=tx, y0=ty, t0=performance.now();
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const dur = reduce ? 0 : 650, ease = x => x<.5 ? 4*x*x*x : 1-Math.pow(-2*x+2,3)/2;
+    (function step(now){
+      const k = dur ? Math.min(1,(now-t0)/dur) : 1, e = ease(k);
+      scale = s0+(ns-s0)*e; tx = x0+(ntx-x0)*e; ty = y0+(nty-y0)*e; apply();
+      if(k<1) __anim = requestAnimationFrame(step); else __anim = null;
+    })(t0);
+  }
+  function flyTo(label){
+    const el = [...g.querySelectorAll('[data-label]')].find(x=>x.getAttribute('data-label')===label);
+    if(!el || typeof el.getBBox !== 'function') return;
+    const b = el.getBBox();
+    const ns = Math.max(2, Math.min(8, Math.min(960*0.42/Math.max(b.width,1), 460*0.42/Math.max(b.height,1))));
+    const cx = b.x+b.width/2, cy = b.y+b.height/2;
+    animTo(ns, 480-ns*cx, 230-ns*cy);
+  }
+  window.__dpMapFlyTo = flyTo;
   on('dpMapZoomIn', ()=>zoomAt(1.4,480,230));
   on('dpMapZoomOut', ()=>zoomAt(1/1.4,480,230));
   on('dpMapZoomReset', ()=>setViewDp(EUROPA_DP));
