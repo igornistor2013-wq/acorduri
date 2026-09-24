@@ -111,6 +111,33 @@ EXCLUDE_EXTRA = [
 EXCLUDE_INTERN = [r"fermier|producator\w*\s+agricol", r"cooperativ"]
 E_ACORD = r"acord|memorand|intelege|schimb\s+de\s+(?:note|scrisori)"
 
+# Un act intră în registru doar dacă e despre un document încheiat cu un
+# partener: acord, memorandum, înțelegere, protocol, contract, convenție,
+# schimb de note/scrisori — sau numește direct împrumutul/grantul/creditul.
+# Fără asta intrau acte care doar pomenesc „asistența tehnică": modificările
+# HG 246/2010, programele naționale de asistență tehnică, comunicate fiscale,
+# regulamentele SFS pentru „centrele de asistență tehnică" ale caselor de marcat.
+# „acordarea/acordat" nu contează — nu sunt acorduri.
+DOCUMENT_ACORD = (r"\bacord(?!a|at|and|in)|memorand|intelegeri|\bcontract(?!elor\s+de\s+stat)|protocol|"
+                  r"schimb\w*\s+de\s+(?:note|scrisori)|conventi|scrisor|amendament|aranjament|"
+                  r"\bimprumut|\bgrant|\bcredit|finantar|tratat\w*\s+(?:de|privind|dintre|intre)")
+
+# Acte de cadru (reguli generale, nu acorduri), chiar dacă titlul lor pomenește
+# tratate sau contracte de stat.
+EXCLUDE_CADRU = [
+    r"246/2010|facilitat\w*\s+fiscale\s+si\s+vamale\s+aferente",       # HG 246/2010 și modificările ei
+    r"facilitat\w*\s+prevazute\s+la\s+importul\s+marfurilor",
+    r"centr\w*\s+de\s+asistenta\s+tehnica\s+pentru\s+masinile\s+de\s+casa",
+    r"programul\w*\s+(?:national\w*\s+)?(?:de\s+|al\s+)?asistent\w*\s+tehnic\w*\s+pentru\s+anii",
+    r"oficiul\w*\s+de\s+gestionare\s+a\s+programelor",
+    r"managementul\s+asistentei\s+financiare",
+    r"organizarea\s+si\s+functionarea",
+    r"credit\w*\s+pentru\s+consumatori",
+    r"contractelor\s+de\s+creditare\s+si\s+de\s+sprijin",
+    r"asistentei\s+medicale\s+cetatenilor",
+    r"dreptului\s+de\s+sedere",
+]
+
 
 def partener(title):
     p = [x for x in (mw.partner(title) or '').split(' / ') if x]
@@ -128,6 +155,8 @@ def clasifica(title):
     if any(re.search(norm(x), n) for x in mw.EXCLUDE) or any(re.search(x, n) for x in EXCLUDE_EXTRA):
         return None
     if not re.search(E_ACORD, n) and any(re.search(x, n) for x in EXCLUDE_INTERN):
+        return None
+    if not re.search(DOCUMENT_ACORD, n) or any(re.search(x, n) for x in EXCLUDE_CADRU):
         return None
     cat = _categorie(title, n)
     if cat and cat != "Împrumut" and re.search(IMPRUMUT, n) and not re.search(r"acord\w*\s+de\s+grant", n):

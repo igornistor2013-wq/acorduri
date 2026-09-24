@@ -34,6 +34,13 @@ CAZURI = [
     ('cu privire la acordarea ajutorului umanitar populației din Republica Turcia', None, None),
     ('pentru ratificarea Acordului dintre Republica Moldova și Uniunea Europeană privind participarea Republicii Moldova la Programul Europa Digitală', None, None),
     ('cu privire la reperfectarea licenţei Asociaţiei de Economii şi Împrumut „CIRCULA”', None, None),
+    # acte de cadru, nu acorduri
+    ('pentru modificarea Hotărârii Guvernului nr. 246/2010 cu privire la modul de aplicare a facilităților fiscale și vamale aferente realizării proiectelor de asistență tehnică și investițională în derulare, care cad sub incidența tratatelor internaționale la care Republica Moldova este parte sau a contractelor de stat', None, None),
+    ('cu privire la Programul de asistenţă tehnică pentru anii 2001-2002', None, None),
+    ('cu privire la aprobarea Regulamentului privind autorizarea centrelor de asistenţă tehnică pentru maşinile de casă şi de control/imprimantele fiscale', None, None),
+    ('cu privire la Oficiul de Gestionare a Programelor de Asistență Externă', None, None),
+    ('privind contractele de credit pentru consumatori', None, None),
+    ('pentru ratificarea Acordului de finanțare dintre Republica Moldova și Fondul Internațional pentru Dezvoltarea Agricolă în vederea realizării Proiectului de Reziliență Rurală (IFAD VII)', 'Asistență financiară', None),
 ]
 for t, cat, part in CAZURI:
     c = clasifica(t)
