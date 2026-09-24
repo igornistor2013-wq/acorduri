@@ -2757,11 +2757,13 @@ function toggleMapCountry(label, allLabels){
     mapState.selected.add(label);
   }
   renderMap(aggregateByCountry(getFilteredProjects()));
-  if(mapState.selected && mapState.selected.has(label) && window.__mapFlyTo) window.__mapFlyTo(label);
+  if(mapState.selected && mapState.selected.has(label)){ if(window.__mapFlyTo) window.__mapFlyTo(label); }
+  else if(window.__mapHome) window.__mapHome();
 }
 document.getElementById('mapResetSelection').addEventListener('click',()=>{
   mapState.selected = null;
   renderMap(aggregateByCountry(getFilteredProjects()));
+  if(window.__mapHome) window.__mapHome();
 });
 document.getElementById('mapSelectAllBtn').addEventListener('click',()=>{
   mapState.selected = new Set(Object.keys(COUNTRY_META));
@@ -3031,6 +3033,8 @@ function renderMapProjects(){
     animTo(ns, 480-ns*cx, 230-ns*cy);
   }
   window.__mapFlyTo = flyTo;
+  // țara debifată: harta revine lin la cadrul de pornire (Europa)
+  window.__mapHome = () => animTo(EUROPA.s, 480 - EUROPA.s*EUROPA.cx, 230 - EUROPA.s*EUROPA.cy);
   document.getElementById('mapZoomIn').addEventListener('click',()=>zoomAt(1.4,480,230));
   document.getElementById('mapZoomOut').addEventListener('click',()=>zoomAt(1/1.4,480,230));
   document.getElementById('mapZoomReset').addEventListener('click',()=>setView(EUROPA));
@@ -6642,7 +6646,8 @@ function dpToggleCountry(label){
     if(!dpState.mapSelected.size) dpState.mapSelected = null;
   } else dpState.mapSelected.add(label);
   dpRender();
-  if(dpState.mapSelected && dpState.mapSelected.has(label) && window.__dpMapFlyTo) window.__dpMapFlyTo(label);
+  if(dpState.mapSelected && dpState.mapSelected.has(label)){ if(window.__dpMapFlyTo) window.__dpMapFlyTo(label); }
+  else if(window.__dpMapHome) window.__dpMapHome();
 }
 
 /* ---------- randare completă ---------- */
@@ -6688,7 +6693,7 @@ function dpRender(){
   on('dpNaYearRow','click', () => { dpState.naYear = !dpState.naYear; if(dpState.naYear) dpState.years = null; dpRender(); });
   on('dpSelectAllDonors','click', () => { dpState.donors = null; dpRender(); });
   on('dpDeselectAllDonors','click', () => { dpState.donors = new Set(); dpRender(); });
-  on('dpMapResetSelection','click', () => { dpState.mapSelected = null; dpRender(); });
+  on('dpMapResetSelection','click', () => { dpState.mapSelected = null; dpRender(); if(window.__dpMapHome) window.__dpMapHome(); });
   on('dpMetricToggle','click', () => {
     dpState.metric = dpState.metric === 'deb' ? 'ang' : 'deb';
     const btn = document.getElementById('dpMetricToggle');
@@ -6799,6 +6804,7 @@ function dpRender(){
     animTo(ns, 480-ns*cx, 230-ns*cy);
   }
   window.__dpMapFlyTo = flyTo;
+  window.__dpMapHome = () => animTo(EUROPA_DP.s, 480 - EUROPA_DP.s*EUROPA_DP.cx, 230 - EUROPA_DP.s*EUROPA_DP.cy);
   on('dpMapZoomIn', ()=>zoomAt(1.4,480,230));
   on('dpMapZoomOut', ()=>zoomAt(1/1.4,480,230));
   on('dpMapZoomReset', ()=>setViewDp(EUROPA_DP));
