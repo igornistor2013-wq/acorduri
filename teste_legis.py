@@ -34,6 +34,10 @@ CAZURI = [
     ('cu privire la acordarea ajutorului umanitar populației din Republica Turcia', None, None),
     ('pentru ratificarea Acordului dintre Republica Moldova și Uniunea Europeană privind participarea Republicii Moldova la Programul Europa Digitală', None, None),
     ('cu privire la reperfectarea licenţei Asociaţiei de Economii şi Împrumut „CIRCULA”', None, None),
+    # partenerul din formulări vechi
+    ('pentru ratificarea Acordului de finanţare dintre Republica Moldova şi Asociaţia Internaţională de Dezvoltare privind realizarea Proiectului „Suport de urgenţă pentru agricultura Moldovei”', 'Asistență financiară', 'AID'),
+    ('pentru ratificarea Acordului de împrumut dintre Guvernul Republicii Moldova și Guvernul Republicii Polone în sumă de 20 de milioane de euro', 'Împrumut', 'Polonia'),
+    ('pentru ratificarea Acordului-cadru dintre Guvernul Republicii Moldova şi Comisia Comunităţilor Europene privind asistenţa externă', 'Asistență financiară', 'UE'),
     # acte de cadru, nu acorduri
     ('pentru modificarea Hotărârii Guvernului nr. 246/2010 cu privire la modul de aplicare a facilităților fiscale și vamale aferente realizării proiectelor de asistență tehnică și investițională în derulare, care cad sub incidența tratatelor internaționale la care Republica Moldova este parte sau a contractelor de stat', None, None),
     ('cu privire la Programul de asistenţă tehnică pentru anii 2001-2002', None, None),

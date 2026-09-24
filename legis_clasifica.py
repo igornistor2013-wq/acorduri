@@ -41,6 +41,35 @@ PARTENERI_EXTRA = [
     (r"agentia de dezvoltare internationala a statelor unite", "SUA"),
 ]
 
+# Denumiri vechi sau diferite de cele din Monitor, găsite în titlurile legis.md.
+# Servesc la AFIȘAREA partenerului. La includerea memorandumurilor de cooperare
+# nu contează — altfel intrau memorandumuri de colaborare între instituții
+# (combaterea corupției, sport, educație), care nu sunt asistență externă.
+PARTENERI_NUME = [
+    (r"asociatia internationala de dezvoltare|agentia internationala pentru dezvoltare(?!\s+a\s+statelor)", "AID"),
+    (r"fondul international pentru dezvoltare\s*a?\s*(?:agricol|agriculturii)|\bifad\b", "FIDA"),
+    (r"banca europeana pentru investitii", "BEI"),
+    (r"banca\W+internationala\s+(?:pentru|de)\s+reconstructi", "BIRD"),
+    (r"banca europeana pentru\s*reconstructi", "BERD"),
+    (r"comisia comunitatilor europene|comunitatea (?:economica )?europeana|uniunea\s*eu\s*ropeana|\benpi\b|politicii sectoriale de sanatate", "UE"),
+    (r"republicii polon[ea]\b|guvernul republicii polonia", "Polonia"),
+    # „între Republica Moldova și România" apare și în numele proiectelor de interconectare
+    # BERD — acolo România nu e partener; o luăm doar din acordul de asistență rambursabilă
+    (r"guvernul rom[ai]niei|rambursabil\w*\s+(?:intre|dintre)\s+republica moldova\s+si\s+romania", "România"),
+    (r"republicii bulgaria", "Bulgaria"),
+    (r"federatiei ruse", "Rusia"),
+    (r"kazahstan", "Kazahstan"),
+    (r"republicii populare chineze|\bicbc\b|comerciala din china|citic bank|bank of communication|medicina traditionala chineza", "China"),
+    (r"fondul dezvoltarii economice arabe din kuwait|\bkuwait\b", "Kuweit"),
+    (r"export credit bank", "Turcia"),
+    (r"hewlett-packard", "Hewlett-Packard"),
+    (r"siemens|simens", "Siemens (Germania)"),
+    (r"dre[sz]dner bank|banca \W?aka\W", "Bancă comercială străină"),
+    (r"\bfao\b|organizatia natiunilor unite pentru agricultura", "FAO"),
+    (r"societatea germana pentru cooperare internationala|deutsche gesellschaft", "GIZ"),
+    (r"ajutorul umanitar primit din strainatate", "CSI"),
+]
+
 INCLUDE_EXTRA = [
     (r"acord\w*-cadru\s+de\s+imprumut", "Împrumut"),
     (r"acord\w*-cadru\s+de\s+finantare", "Asistență financiară"),
@@ -102,6 +131,8 @@ EXCLUDE_EXTRA = [
     r"promovarea\s+si\s+protejarea\s+(?:reciproca\s+)?a\s+investitiilor",
     r"readmisie",
     r"securitat\w*\s+sociala",
+    # cooperare între instituții de combatere a corupției / spălării banilor
+    r"combaterea\s+crimelor\s+economice|spalarii\s+banilor|finantarii\s+terorismului",
 ]
 
 
@@ -139,12 +170,12 @@ EXCLUDE_CADRU = [
 ]
 
 
-def partener(title):
+def partener(title, doar_baza=False):
     p = [x for x in (mw.partner(title) or '').split(' / ') if x]
     if re.search(r"banca (?:pentru|de) dezvoltare a consiliului europei", norm(title)) and "Consiliul Europei" in p:
         p.remove("Consiliul Europei")
     n = norm(title)
-    for pat, name in PARTENERI_EXTRA:
+    for pat, name in PARTENERI_EXTRA + ([] if doar_baza else PARTENERI_NUME):
         if re.search(pat, n) and name not in p:
             p.append(name)
     return ' / '.join(p)
@@ -176,6 +207,10 @@ def _categorie(title, n):
     hits = [cat for pat, cat in INCLUDE_EXTRA if re.search(pat, n)]
     if not hits and partener(title):
         hits = [cat for pat, cat in INCLUDE_CU_PARTENER if re.search(pat, n)]
+        # memorandumurile de cooperare intră doar cu un partener de asistență cunoscut
+        if hits and not partener(title, doar_baza=True) and not re.search(
+                r"\bimprumut|\bcredit|\bgrant|finantar|asistent\w*\s+(?:financiar|tehnic|umanitar)|\bavans|restructurare", n):
+            hits = []
     if not hits:
         return None
     for pref in ("Împrumut", "Grant", "Asistență tehnică", "Asistență financiară"):
