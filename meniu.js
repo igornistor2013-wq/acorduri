@@ -20,7 +20,9 @@
   if (!script) return;
   var PAGINA = script.getAttribute('data-pagina') || '';
   var PE_INDEX = PAGINA === 'index';
-  var CU_LIMBA = script.getAttribute('data-limba') === 'da';
+  // comutatorul RO/EN apare pe toate paginile; pe index îl leagă pagina (setLanguage),
+  // pe celelalte îl leagă traducere.js
+  var CU_LIMBA = true;
   var limba = 'ro';
 
   var T = {
@@ -31,7 +33,7 @@
       acorduri: 'Acorduri', legis: 'Acorduri · legis.md', legisSub: 'Registrul de stat al actelor juridice, 1992 până azi',
       mo: 'Acorduri · Monitorul Oficial', moSub: 'Cuprinsurile Monitorului, actualizat zilnic, din 2024',
       hg: 'HG 246', hgSub: '', meniu: 'Navigare', doarRo: '',
-      acasaS: 'Donatori', analizeS: 'Analize', acorduriS: 'Acorduri'
+      acasaS: 'Donatori', analizeS: 'Analize', acorduriS: 'Acorduri', despre: 'Despre date'
     },
     en: {
       acasa: 'Donors & projects', analize: 'Advanced analytics', export: 'Export',
@@ -40,7 +42,7 @@
       acorduri: 'Agreements', legis: 'Agreements · legis.md', legisSub: 'State Register of Legal Acts, 1992 to date',
       mo: 'Agreements · Official Gazette', moSub: 'Official Gazette contents, updated daily, since 2024',
       hg: 'HG 246', hgSub: '', meniu: 'Navigation', doarRo: ' · in Romanian',
-      acasaS: 'Donors', analizeS: 'Analytics', acorduriS: 'Agreements'
+      acasaS: 'Donors', analizeS: 'Analytics', acorduriS: 'Agreements', despre: 'About the data'
     }
   };
 
@@ -54,7 +56,8 @@
     acord: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
     carte: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
     hg: '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>',
-    sag: '<polyline points="6 9 12 15 18 9"/>'
+    sag: '<polyline points="6 9 12 15 18 9"/>',
+    info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'
   };
   function svg(k, cls) { return '<svg class="' + (cls || 'mg-ico') + '" viewBox="0 0 24 24" aria-hidden="true">' + I[k] + '</svg>'; }
 
@@ -93,7 +96,10 @@
     '.mg-opt .mg-ico{stroke:#22406b;margin-top:2px}' +
     '.mg-opt b{display:block;font-size:13.5px}' +
     '.mg-opt small{display:block;font-size:11.5px;color:#6b7284;margin-top:2px;white-space:normal;line-height:1.35}' +
-    '.mg-limba{display:flex;gap:4px;background:#f5f6f9;border:1px solid #c9ceda;border-radius:8px;padding:3px;margin-left:auto}' +
+    '.mg-despre{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:13px;font-weight:700;color:#22406b;text-decoration:none;padding:8px 6px;border-radius:8px;white-space:nowrap}' +
+    '.mg-despre:hover{color:#c8871a}.mg-despre.activ{color:#c8871a;text-decoration:underline;text-underline-offset:4px}' +
+    '.mg-despre:focus-visible{outline:2px solid #c8871a;outline-offset:2px}' +
+    '.mg-limba{display:flex;gap:4px;background:#f5f6f9;border:1px solid #c9ceda;border-radius:8px;padding:3px}' +
     '.mg-limba button{border:none;background:transparent;color:#6b7284;font-size:12px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;letter-spacing:.03em;font-family:inherit}' +
     '.mg-limba button.active{background:#22406b;color:#fff}' +
     '.mg-s{display:none}' +
@@ -101,7 +107,8 @@
        comutatorul de limbă sus, în dreapta */
     '@media (max-width:720px){' +
       '.mg{gap:10px;margin-bottom:16px;padding-bottom:14px;justify-content:flex-end}' +
-      '.mg-limba{order:-1;margin-left:auto}' +
+      '.mg-limba{order:-1}' +
+      '.mg-despre{order:-2;margin-left:0;margin-right:auto;font-size:12.5px}' +
       '.mg-btns{flex-basis:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;position:relative}' +
       '.mg-dd{display:block;position:static}' +
       '.mg-b{width:100%;justify-content:center;padding:9px 6px;font-size:12.5px;gap:5px;border-radius:8px}' +
@@ -142,6 +149,7 @@
         '</div>' +
         '<a class="mg-b mg-hg" data-k="hg246" id="hg246NavBtn" href="hg246.html">' + svg('hg') + lab('hg') + '</a>' +
       '</div>' +
+      '<a class="mg-despre' + (PAGINA === 'despre' ? ' activ' : '') + '" id="mgDespre" href="despre.html"' + (PAGINA === 'despre' ? ' aria-current="page"' : '') + '>' + svg('info') + '<span>' + t('despre') + '</span></a>' +
       (CU_LIMBA ? '<div class="mg-limba lang-switch" id="langSwitch"><button type="button" data-lang="ro" class="' + (ro ? 'active' : '') + '">RO</button>' +
                   '<button type="button" data-lang="en" class="' + (ro ? '' : 'active') + '">EN</button></div>' : '');
   }
@@ -222,6 +230,9 @@
   });
 
   leagaTot();
+  if (!PE_INDEX) nav.querySelectorAll('.mg-limba button').forEach(function (b) {
+    b.addEventListener('click', function () { if (window.Traducere) window.Traducere.seteaza(b.dataset.lang); });
+  });
   activ(PE_INDEX ? 'acasa' : PAGINA);
 
   window.Meniu = {
@@ -241,6 +252,8 @@
       set('#iatiSelectorBtn', 'iati');
       set('#acorduriNavBtn', 'acorduri');
       set('#hg246NavBtn', 'hg');
+      var dsp = nav.querySelector('#mgDespre span'); if (dsp) dsp.textContent = t('despre');
+      nav.querySelectorAll('.mg-limba button').forEach(function (b) { b.classList.toggle('active', b.dataset.lang === limba); });
       var o = nav.querySelectorAll('.mg-opt');
       var txt = [[t('iatiCheck'), t('iatiCheckSub')], [t('iatiDash'), t('iatiDashSub')],
                  [t('legis'), t('legisSub') + t('doarRo')], [t('mo'), t('moSub') + t('doarRo')]];

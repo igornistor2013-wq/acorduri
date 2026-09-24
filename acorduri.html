@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2322406b%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%224.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M37%2014H22a4%204%200%200%200-4%204v28a4%204%200%200%200%204%204h20a4%204%200%200%200%204-4V23z%22%2F%3E%3Cpath%20d%3D%22M37%2014v9h9%22%2F%3E%3Cpath%20d%3D%22M26%2034h12%22%2F%3E%3Cpath%20d%3D%22M26%2041h8%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <title>Acorduri — Asistență Externă, Republica Moldova</title>
+<meta name="description" content="Registrul acordurilor de împrumut, grant și asistență tehnică, act cu act, cu etapa la care a ajuns fiecare — din Monitorul Oficial, actualizat zilnic.">
+<meta property="og:title" content="Acorduri de asistență externă — Republica Moldova">
+<meta property="og:description" content="Registrul acordurilor de împrumut, grant și asistență tehnică, act cu act, cu etapa la care a ajuns fiecare — din Monitorul Oficial, actualizat zilnic.">
+<meta property="og:image" content="https://nistor.vivi.md/og.png">
+<meta property="og:url" content="https://nistor.vivi.md/acorduri.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Acorduri de asistență externă — acte noi" href="rss.xml">
+
 <style>
   :root{
     --bg:#ffffff;--panel:#ffffff;--line:#e4e7ef;--line-strong:#c9ceda;
@@ -468,7 +478,51 @@
   .footer-source{border-top:1px solid var(--line);padding-top:16px;margin-top:8px;
     font-size:12px;color:var(--ink-dim)}
   @media (prefers-reduced-motion:no-preference){.et-bar i{transition:width .5s cubic-bezier(.2,.7,.3,1)}}
+  /* analiza registrului: pâlnie, durată, pe ani */
+  .an-intro{font-size:12.5px;color:var(--ink-dim);margin:0 0 14px;max-width:110ch}
+  .an-gol{font-size:12.5px;color:var(--ink-dim)}
+  .an-sub{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-dim);margin:20px 0 8px}
+  .pal{display:grid;gap:8px}
+  .pal-r{display:grid;grid-template-columns:minmax(150px,220px) 1fr 110px;gap:12px;align-items:center}
+  .pal-l{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .pal-t{height:22px;background:#eef2f8;border-radius:5px;overflow:hidden}
+  .pal-t i{display:block;height:100%;background:#2a78d6;border-radius:0 4px 4px 0}
+  .pal-v{font-size:12px;color:var(--ink-dim);font-variant-numeric:tabular-nums}
+  .pal-v b{color:var(--navy-deep);font-size:13px}
+  .dur{display:grid;gap:8px}
+  .dur-r{display:grid;grid-template-columns:minmax(150px,260px) 1fr 170px;gap:12px;align-items:center}
+  .dur-tot .dur-l{font-weight:800}
+  .dur-l{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .dur-t{position:relative;height:18px;background:#f1f4f9;border-radius:4px}
+  .dur-iqr{position:absolute;top:3px;height:12px;background:#9dbde5;border-radius:4px}
+  .dur-tot .dur-iqr{background:#6f9dd6}
+  .dur-med{position:absolute;top:0;width:3px;height:18px;margin-left:-1.5px;background:#16294a;border-radius:2px}
+  .dur-v{display:flex;flex-direction:column;font-size:12px;line-height:1.25}
+  .dur-v b{color:var(--navy-deep);font-size:13px}
+  .dur-v small{color:var(--ink-dim);font-size:10.5px}
+  .ani-scroll{overflow-x:auto}
+  .ani-svg{display:block;max-width:none}
+  .an-leg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:var(--ink-dim);margin-top:8px}
+  .an-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .an-tab{margin-top:10px;font-size:12px}
+  .an-tab summary{cursor:pointer;color:var(--navy);font-weight:700}
+  .an-tab table{border-collapse:collapse;margin-top:8px;font-variant-numeric:tabular-nums}
+  .an-tab th,.an-tab td{border-bottom:1px solid var(--line);padding:4px 10px;text-align:right}
+  .an-tab th:first-child,.an-tab td:first-child{text-align:left}
+  .an-tipbox{position:absolute;z-index:20;pointer-events:none;background:#16294a;color:#fff;font-size:12px;line-height:1.5;padding:8px 10px;border-radius:8px;box-shadow:0 6px 18px rgba(20,30,60,.25);min-width:180px}
+  .an-tipbox .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+  @media (max-width:640px){
+    .pal-r{grid-template-columns:1fr 84px}.pal-t{grid-column:1 / -1;grid-row:2}
+    .dur-r{grid-template-columns:1fr 120px}.dur-t{grid-column:1 / -1;grid-row:2}
+  }
+  .link-acord{display:inline-flex;align-items:center;gap:6px;margin:10px 0 0 0;background:#fff;border:1px solid var(--line-strong);border-radius:7px;
+    padding:6px 11px;font-size:12px;font-weight:700;color:var(--navy);cursor:pointer}
+  .link-acord svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2}
+  .link-acord:hover{background:var(--blue-bg)}
+  .link-acord.copiat{background:#e6f4ea;border-color:#276c3e;color:#276c3e}
+  tr.acord.tinta td{background:#fff7e6}
 </style>
+<script src="traducere.js" defer></script>
 </head>
 <body>
 <div class="wrap">
@@ -506,7 +560,8 @@
     <a href="acorduri.html">Acorduri · Monitorul Oficial</a>
     <a href="hg246.html">HG 246</a>
     <a href="#" id="susBtn">↑ Începutul paginii</a>
-  </nav>
+    <a href="despre.html">Despre date</a>
+    </nav>
 
 </div>
 
@@ -715,6 +770,12 @@
   // filtre — doar felul de a le citi diferă.
   var db = null, fCat = 'all', fOrg = 'all', fAn = 'all', fEt = 'all',
       fSuport = false, seek = '', vedere = 'acorduri';
+  // #acord=… deschide direct un acord (linkul copiat din rândul lui)
+  var deepAcord = '';
+  function idAcord(g){
+    var a = g.acte[g.acte.length - 1] || {};
+    return fold((a.act || '') + ' ' + (a.data_editie || '')).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
 
   /* Partenerul și anul pot avea mai multe valori: 'all' sau o listă separată
      prin „|" („BERD|BEI", „2024|2025"). Așa rămân simple și linkul, și exportul. */
@@ -1630,6 +1691,14 @@
           '<ul class="def-list">' + contracteHtml + '</ul>' +
           '<span class="inv-ref">Excepțiile: anexa 1¹, pct. 7 și 30</span></div>' +
       '</div>' +
+      '<div class="panel" id="analiza"><div class="panel-head"><h2>' + ico('file') +
+        'Cum merg acordurile</h2>' +
+        '<div class="btns seg" id="anBtns">' +
+          '<button data-an="palnie" aria-pressed="' + (anFila==='palnie') + '">Pâlnia etapelor</button>' +
+          '<button data-an="durata" aria-pressed="' + (anFila==='durata') + '">Cât durează</button>' +
+          '<button data-an="ani" aria-pressed="' + (anFila==='ani') + '">Pe ani</button>' +
+        '</div></div>' +
+        '<div class="panel-body" id="analizaBody" style="position:relative"></div></div>' +
       '<div class="panel" id="lista"><div class="panel-head"><h2>' + ico('file') +
         '<span id="titluLista">Acorduri</span></h2>' +
         '<span class="chip" id="etChip" hidden></span>' +
@@ -1657,6 +1726,15 @@
     });
 
     bind('#catBtns button', 'cat', function(v){ fCat = v; });
+
+    renderAnaliza(grupuri);
+    app.querySelectorAll('#anBtns button').forEach(function(b){
+      b.addEventListener('click', function(){
+        anFila = b.dataset.an;
+        app.querySelectorAll('#anBtns button').forEach(function(o){ o.setAttribute('aria-pressed', String(o === b)); });
+        renderAnaliza(grupuri);
+      });
+    });
 
     /* Partenerii și anii erau câte un zid de butoane — 43 de parteneri și 35
        de ani ocupau jumătate de ecran. Acum sunt două liste derulante pe un
@@ -2004,12 +2082,191 @@
     }
   }
 
+
+  /* ------------------------------------------------ analiza registrului
+
+     Trei întrebări pe care registrul le poate lămuri și pe care nu le
+     calculează nimeni altcineva:
+       – pâlnia: din acordurile pentru care s-a publicat inițierea
+         negocierilor, câte au ajuns la semnare, ratificare, promulgare;
+       – durata: câte zile trec, la mijlocul distribuției (mediana), de la
+         o etapă la următoarea, după datele edițiilor;
+       – pe ani: câte acorduri noi apar în fiecare an, după tip.
+     Culorile tipurilor sunt primele patru sloturi validate pentru daltonism,
+     în ordine fixă; familia de culoare e aceeași cu a etichetelor de pe rânduri. */
+  var AN_TIPURI = ['Asistență tehnică', 'Împrumut', 'Grant', 'Asistență financiară'];
+  var AN_CULORI = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#a3aab8'];
+  var AN_ETAPE = [['neg','Inițierea negocierilor'], ['sem','Aprobarea semnării'], ['plg','Proiectul de lege'],
+                  ['rat','Ratificare / aprobare'], ['prm','Promulgare']];
+  var anFila = 'palnie';
+
+  function zileIntre(a, b){
+    var da = new Date(+a.slice(0,4), +a.slice(4,6)-1, +a.slice(6,8)),
+        db2 = new Date(+b.slice(0,4), +b.slice(4,6)-1, +b.slice(6,8));
+    return Math.round((db2 - da) / 864e5);
+  }
+  function cuartila(v, q){
+    if (!v.length) return 0;
+    var s = v.slice().sort(function(a,b){ return a-b; }), p = (s.length-1)*q, i = Math.floor(p);
+    return s[i] + (s[Math.min(i+1, s.length-1)] - s[i]) * (p - i);
+  }
+  // prima dată la care acordul a atins fiecare etapă
+  function dateEtape(g){
+    var d = {};
+    g.acte.forEach(function(a){
+      var o = ord(a); if (o === '0') return;
+      etapa(a).forEach(function(e){ if (!d[e] || o < d[e]) d[e] = o; });
+    });
+    return d;
+  }
+  function durataText(z){
+    if (z < 60) return Math.round(z) + ' zile';
+    var l = z / 30.44;
+    return l < 24 ? l.toFixed(l < 10 ? 1 : 0).replace('.', ',') + ' luni' : (z/365.25).toFixed(1).replace('.', ',') + ' ani';
+  }
+
+  function renderAnaliza(grupuri){
+    var box = document.getElementById('analizaBody');
+    if (!box) return;
+    var azi = new Date(), prag = new Date(azi.getFullYear()-1, azi.getMonth(), azi.getDate());
+    var pragOrd = prag.getFullYear() + String(prag.getMonth()+1).padStart(2,'0') + String(prag.getDate()).padStart(2,'0');
+    var info = grupuri.map(function(g){ return {g: g, d: dateEtape(g)}; });
+
+    if (anFila === 'palnie'){
+      // doar acordurile a căror negociere a început acum mai bine de un an: cele
+      // recente sunt încă pe drum și ar arăta, pe nedrept, ca „oprite"
+      var baza = info.filter(function(x){ return x.d.neg && x.d.neg <= pragOrd; });
+      var recente = info.filter(function(x){ return x.d.neg && x.d.neg > pragOrd; }).length;
+      if (!baza.length){ box.innerHTML = '<p class="an-gol">Registrul nu are încă acorduri cu inițierea negocierilor publicată de peste un an.</p>'; return; }
+      var h = '<p class="an-intro">Din <b>' + baza.length + '</b> acorduri pentru care inițierea negocierilor a fost publicată acum mai bine de un an, câte au ajuns la fiecare etapă. ' +
+        (recente ? 'Alte ' + recente + ' au început în ultimul an și nu sunt socotite — sunt încă pe drum. ' : '') +
+        'Proiectul de lege și promulgarea privesc doar tratatele ratificate prin lege; acordurile aprobate prin hotărâre de Guvern sar peste ele.</p><div class="pal">';
+      AN_ETAPE.forEach(function(e, i){
+        var n = baza.filter(function(x){
+          if (e[0] === 'neg') return true;
+          // o etapă ulterioară înseamnă că și cele dinainte au fost parcurse
+          var urm = AN_ETAPE.slice(i).map(function(y){ return y[0]; });
+          if (e[0] === 'plg' || e[0] === 'prm') return !!x.d[e[0]] || (e[0] === 'plg' && !!x.d.prm);
+          return urm.some(function(k){ return x.d[k]; });
+        }).length;
+        var p = Math.round(n / baza.length * 100);
+        h += '<div class="pal-r"><span class="pal-l">' + (i+1) + '. ' + e[1] + '</span>' +
+          '<span class="pal-t"><i style="width:' + Math.max(1, p) + '%"></i></span>' +
+          '<span class="pal-v"><b>' + n + '</b> · ' + p + '%</span></div>';
+      });
+      h += '</div>';
+      box.innerHTML = h;
+      return;
+    }
+
+    if (anFila === 'durata'){
+      var TR = [['neg','sem','Inițiere → aprobarea semnării'], ['sem','plg','Semnare → proiectul de lege'],
+                ['plg','rat','Proiectul de lege → ratificare'], ['rat','prm','Ratificare → promulgare'],
+                ['sem','rat','Semnare → ratificare (total)'], ['neg','rat','Inițiere → ratificare (total)']];
+      var rez = TR.map(function(t){
+        var v = info.map(function(x){ return x.d[t[0]] && x.d[t[1]] ? zileIntre(x.d[t[0]], x.d[t[1]]) : null; })
+                    .filter(function(z){ return z !== null && z >= 0 && z < 365*15; });
+        // inițierea și semnarea sunt adesea aprobate prin același act (HG 442/2015, pct. 83):
+        // aceia nu spun nimic despre durată, îi numărăm separat
+        var comune = 0;
+        if (t[0] === 'neg' && t[1] === 'sem'){ comune = v.filter(function(z){ return z === 0; }).length; v = v.filter(function(z){ return z > 0; }); }
+        return {t: t, n: v.length, comune: comune, med: cuartila(v, .5), q1: cuartila(v, .25), q3: cuartila(v, .75)};
+      });
+      var maxQ3 = Math.max.apply(null, rez.map(function(r){ return r.q3; }).concat([1]));
+      var h2 = '<p class="an-intro">Zilele dintre datele edițiilor în care au apărut actele succesive ale aceluiași acord. ' +
+        'Bara arată intervalul în care se încadrează jumătate din acorduri (de la sfertul cel mai rapid la cel mai lent), iar linia din ea — <b>mediana</b>, durata tipică.</p><div class="dur">';
+      rez.forEach(function(r, i){
+        var tot = i >= 4;
+        h2 += '<div class="dur-r' + (tot ? ' dur-tot' : '') + '"><span class="dur-l">' + r.t[2] + '</span>' +
+          (r.n ? '<span class="dur-t"><i class="dur-iqr" style="left:' + (r.q1/maxQ3*100) + '%;width:' + Math.max(0.8, (r.q3-r.q1)/maxQ3*100) + '%"></i>' +
+                 '<i class="dur-med" style="left:' + (r.med/maxQ3*100) + '%"></i></span>' +
+                 '<span class="dur-v"><b>' + durataText(r.med) + '</b><small>' + durataText(r.q1) + ' – ' + durataText(r.q3) + ' · ' + r.n + ' acorduri' +
+                 (r.comune ? ' · alte ' + r.comune + ' printr-un singur act' : '') + '</small></span>'
+               : '<span class="dur-t"></span><span class="dur-v"><small>prea puține date</small></span>') + '</div>';
+      });
+      // pe tipuri: semnare → ratificare
+      h2 += '</div><h3 class="an-sub">Semnare → ratificare, după tipul acordului</h3><div class="dur">';
+      AN_TIPURI.forEach(function(c){
+        var v = info.filter(function(x){ return x.g.categorie === c && x.d.sem && x.d.rat; })
+                    .map(function(x){ return zileIntre(x.d.sem, x.d.rat); }).filter(function(z){ return z >= 0 && z < 365*15; });
+        if (v.length < 3) return;
+        var med = cuartila(v, .5), q1 = cuartila(v, .25), q3 = cuartila(v, .75);
+        h2 += '<div class="dur-r"><span class="dur-l"><span class="tag ' + (CLS[c]||'t-alt') + '">' + esc(c) + '</span></span>' +
+          '<span class="dur-t"><i class="dur-iqr" style="left:' + (q1/maxQ3*100) + '%;width:' + Math.max(0.8,(q3-q1)/maxQ3*100) + '%"></i><i class="dur-med" style="left:' + (med/maxQ3*100) + '%"></i></span>' +
+          '<span class="dur-v"><b>' + durataText(med) + '</b><small>' + v.length + ' acorduri</small></span></div>';
+      });
+      h2 += '</div>';
+      box.innerHTML = h2;
+      return;
+    }
+
+    // pe ani: anul primului act al acordului, după tip
+    var perAn = {}, ani = [];
+    info.forEach(function(x){
+      var prim = Object.keys(x.d).map(function(k){ return x.d[k]; }).sort()[0];
+      if (!prim) return;
+      var y = +prim.slice(0,4), k = AN_TIPURI.indexOf(x.g.categorie); if (k < 0) k = 4;
+      if (!perAn[y]){ perAn[y] = [0,0,0,0,0]; }
+      perAn[y][k]++;
+    });
+    ani = Object.keys(perAn).map(Number).sort(function(a,b){ return a-b; });
+    if (!ani.length){ box.innerHTML = '<p class="an-gol">Fără date.</p>'; return; }
+    for (var y = ani[0]; y <= ani[ani.length-1]; y++) if (!perAn[y]) perAn[y] = [0,0,0,0,0];
+    ani = Object.keys(perAn).map(Number).sort(function(a,b){ return a-b; });
+    var maxT = Math.max.apply(null, ani.map(function(a){ return perAn[a].reduce(function(s,v){ return s+v; }, 0); }));
+    var W = Math.max(560, (box.clientWidth || 900) - 40), H = 250, pl = 34, pb = 22, ph = H - pb - 8, bw = (W - pl) / ani.length;
+    var svg = '<svg class="ani-svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Acorduri noi pe ani, după tip">';
+    [0, .5, 1].forEach(function(f){
+      var yy = 8 + ph - f*ph;
+      svg += '<line x1="' + pl + '" x2="' + W + '" y1="' + yy + '" y2="' + yy + '" stroke="#e3e7ef"/>' +
+             '<text x="' + (pl-6) + '" y="' + (yy+3) + '" text-anchor="end" font-size="10" fill="#6b7284">' + Math.round(f*maxT) + '</text>';
+    });
+    var pasEt = Math.max(1, Math.ceil(ani.length / Math.floor((W - pl) / 38)));
+    ani.forEach(function(a, i){
+      // bara nu trece de 56 px: cu doar trei ani, coloanele de o treime de ecran arătau ca niște ziduri
+      var w = Math.max(2, Math.min(bw - 3, 56)), x = pl + i*bw + (bw - w)/2, yb = 8 + ph, tot = 0;
+      perAn[a].forEach(function(v, k){
+        if (!v) return;
+        var hh = v / maxT * ph; yb -= hh; tot += v;
+        svg += '<rect x="' + x.toFixed(1) + '" y="' + (yb+1).toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + Math.max(0, hh-2).toFixed(1) + '" rx="2" fill="' + AN_CULORI[k] + '"/>';
+      });
+      svg += '<rect class="ani-hit" data-an="' + a + '" x="' + (pl + i*bw) + '" y="8" width="' + bw + '" height="' + ph + '" fill="transparent"/>';
+      if (i % pasEt === 0) svg += '<text x="' + (pl + i*bw + bw/2) + '" y="' + (H-6) + '" text-anchor="middle" font-size="10" fill="#6b7284">' + a + '</text>';
+    });
+    svg += '</svg>';
+    var numeTip = AN_TIPURI.concat(['Altele']);
+    box.innerHTML = '<p class="an-intro">Acorduri noi pe an — anul primului act publicat al fiecărui acord — după tipul lui.</p>' +
+      '<div class="ani-scroll">' + svg + '</div>' +
+      '<div class="an-leg">' + numeTip.map(function(n, k){ return '<span><i style="background:' + AN_CULORI[k] + '"></i>' + n + '</span>'; }).join('') + '</div>' +
+      '<details class="an-tab"><summary>Arată ca tabel</summary><table><thead><tr><th>An</th>' +
+        numeTip.map(function(n){ return '<th>' + n + '</th>'; }).join('') + '<th>Total</th></tr></thead><tbody>' +
+        ani.slice().reverse().filter(function(a){ return perAn[a].some(Boolean); }).map(function(a){
+          var r = perAn[a]; return '<tr><td>' + a + '</td>' + r.map(function(v){ return '<td>' + (v||'') + '</td>'; }).join('') +
+            '<td><b>' + r.reduce(function(s,v){ return s+v; }, 0) + '</b></td></tr>'; }).join('') +
+      '</tbody></table></details>';
+    var tip = document.createElement('div'); tip.className = 'an-tipbox'; tip.hidden = true;
+    box.querySelectorAll('.ani-hit').forEach(function(r){
+      r.addEventListener('mousemove', function(e){
+        var a = +r.dataset.an, v = perAn[a];
+        tip.innerHTML = '<b>' + a + '</b> · ' + v.reduce(function(s,x){ return s+x; }, 0) + ' acorduri<br>' +
+          v.map(function(n, k){ return n ? '<span class="sw" style="background:' + AN_CULORI[k] + '"></span>' + numeTip[k] + ': ' + n : ''; }).filter(Boolean).join('<br>');
+        tip.hidden = false;
+        var bb = box.getBoundingClientRect();
+        tip.style.left = Math.min(e.clientX - bb.left + 12, bb.width - 230) + 'px';
+        tip.style.top = (e.clientY - bb.top + 12) + 'px';
+      });
+      r.addEventListener('mouseleave', function(){ tip.hidden = true; });
+    });
+    box.appendChild(tip);
+  }
+
   function ico(t){
     var p = {
       bar:'<path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="13" y="6" width="3" height="11"/>',
       layers:'<path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
       file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
-      down:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>'
+      down:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+      link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'
     }[t];
     return '<svg viewBox="0 0 24 24">' + p + '</svg>';
   }
@@ -2052,6 +2309,7 @@
       else if (k === 'sup') fSuport = (v === '1');
       else if (k === 'v' && (v === 'acte' || v === 'acorduri')) vedere = v;
       else if (k === 'q')   seek = fold(v);
+      else if (k === 'acord') deepAcord = v;
     });
   }
 
@@ -2219,7 +2477,7 @@
           'Vezi proiectele și sumele ' + esc(principal) + ' →</a>'
         : '';
 
-      return '<tr class="acord" data-i="' + i + '" aria-expanded="false">' +
+      return '<tr class="acord" data-i="' + i + '" data-id="' + idAcord(g) + '" aria-expanded="false">' +
         '<td class="org" data-l="Partener">' + esc(g.parteneri || '—') + '</td>' +
         '<td data-l="Acordul"><div class="pname" title="' + esc(g.nume) + '">' +
           '<span class="caret">▶</span>' + esc(g.nume) +
@@ -2242,7 +2500,8 @@
           : '<span class="nil">—</span>') + '</td></tr>' +
         '<tr class="detalii hid" data-d="' + i + '"><td colspan="5">' +
           '<div class="det-nume">' + esc(g.nume) + '</div>' +
-          '<ul class="acte-list">' + lista + '</ul>' + spreSume + '</td></tr>';
+          '<ul class="acte-list">' + lista + '</ul>' + spreSume +
+          '<button type="button" class="link-acord" data-id="' + idAcord(g) + '">' + ico('link') + '<span>Copiază linkul acestui acord</span></button></td></tr>';
     }).join('');
 
     document.querySelectorAll('tr.acord').forEach(function(tr){
@@ -2262,6 +2521,27 @@
         if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); comuta(); }
       });
     });
+
+    document.querySelectorAll('.link-acord').forEach(function(b){
+      b.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        var url = location.origin + location.pathname + '#acord=' + b.dataset.id;
+        var txt = b.querySelector('span');
+        var gata = function(){ b.classList.add('copiat'); txt.textContent = 'Linkul a fost copiat'; setTimeout(function(){ b.classList.remove('copiat'); txt.textContent = 'Copiază linkul acestui acord'; }, 2500); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(gata, function(){ prompt('Linkul acordului:', url); });
+        else prompt('Linkul acordului:', url);
+      });
+    });
+    // deschiderea directă a acordului din link: rândul se deschide, pagina coboară la el
+    if (deepAcord){
+      var tinta = document.querySelector('tr.acord[data-id="' + deepAcord + '"]');
+      deepAcord = '';
+      if (tinta){
+        tinta.click();
+        tinta.classList.add('tinta');
+        setTimeout(function(){ tinta.scrollIntoView({block:'center'}); }, 60);
+      }
+    }
 
     document.getElementById('none').innerHTML = out.length ? '' :
       '<div class="empty-state"><strong>Niciun acord</strong>Nimic nu corespunde filtrelor.</div>';

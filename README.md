@@ -1,6 +1,6 @@
 # Asistență externă pentru Republica Moldova
 
-Patru pagini care arată, din surse oficiale, cine finanțează Republica Moldova
+Paginile care arată, din surse oficiale, cine finanțează Republica Moldova
 și unde au ajuns banii.
 
 **Site:** https://nistor.vivi.md
@@ -43,6 +43,11 @@ programată doar în zilele lucrătoare.
 | `acorduri.html` | Registrul acordurilor. Citește `date.json` la fiecare deschidere |
 | `hg246.html` | Comparația cu anexa HG 246. Citește `amp-arhiva.json` |
 | `meniu.js` | Bara de navigare comună, aceeași pe toate paginile (Donatori, Analize, Export, IATI, Acorduri, HG 246). Un buton nou se adaugă o singură dată, aici |
+| `traducere.js` | Engleza pentru paginile de acorduri, HG 246 și Despre: dicționar de fraze ale interfeței; denumirile oficiale ale actelor rămân în română |
+| `despre.html` | Despre date și metodologie: surse, termeni, calcule, limite, date deschise, RSS (în română și engleză) |
+| `date_deschise.py` | Scrie zilnic `date/acorduri_monitor.csv/.json`, `date/acorduri_legis.csv/.json` și `rss.xml`; rulat de `monitor.yml` |
+| `xlsx.min.js` | Biblioteca SheetJS pentru Excel, încărcată doar la descărcare (nu la fiecare deschidere a paginii) |
+| `favicon.svg`, `og.png`, `404.html` | Iconița site-ului, imaginea de previzualizare a linkurilor, pagina „nu există” |
 | `donatori.html` | Redirecționare către `index.html`, pentru linkurile vechi |
 | `date.json` | Registrul acordurilor. Actualizat automat de workflow |
 | `amp-arhiva.json` | Arhiva AMP, doar câmpurile de care are nevoie `hg246.html` |

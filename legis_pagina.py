@@ -213,6 +213,11 @@ def main(BRUT=None, OUT=None):
                 '1990–' + AN + ', apoi filtrare cu clasificatorul registrului, extins. Numărul actului deschide fișa lui pe legis.md.')
     inlocuieste("var antet = 'Acorduri de asistență externă — Monitorul Oficial al Republicii Moldova. ' +",
                 "var antet = 'Acorduri de asistență externă — Registrul de stat (legis.md). ' +")
+    # descrierea pentru motoarele de căutare și pentru previzualizarea linkului
+    inlocuieste('Registrul acordurilor de împrumut, grant și asistență tehnică, act cu act, cu etapa la care a ajuns fiecare — din Monitorul Oficial, actualizat zilnic.',
+                'Registrul acordurilor de asistență externă din 1992 până azi, din Registrul de stat al actelor juridice (legis.md), act cu act, cu etapa la care a ajuns fiecare.', 2)
+    inlocuieste('<meta property="og:url" content="https://nistor.vivi.md/acorduri.html">',
+                '<meta property="og:url" content="https://nistor.vivi.md/legis_acorduri.html">')
     # bara comună (meniu.js) marchează pagina curentă
     inlocuieste('<script src="meniu.js" data-pagina="acorduri-mo"></script>',
                 '<script src="meniu.js" data-pagina="acorduri-legis"></script>')

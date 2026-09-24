@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Despre date și metodologie — Asistență externă Republica Moldova</title>
+<meta name="description" content="De unde vin datele despre asistența externă pentru Republica Moldova, cât de des se actualizează, cum sunt calculate cifrele și cum le poți descărca.">
+<meta property="og:title" content="Despre date și metodologie — Asistență externă Republica Moldova">
+<meta property="og:description" content="Surse, termeni, metodologie, limite și date deschise (CSV, JSON, RSS).">
+<meta property="og:image" content="https://nistor.vivi.md/og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="Acorduri de asistență externă — acte noi" href="rss.xml">
+<style>
+  :root{
+    --bg:#ffffff;--panel:#ffffff;--line:#e4e7ef;--line-strong:#c9ceda;
+    --ink:#1c2230;--ink-dim:#6b7284;--navy:#22406b;--navy-deep:#16294a;
+    --blue-bg:#eaf0fb;--gold:#c8871a;--gold-bg:#fdf1dc;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,monospace;
+    --radius:10px;--shadow:0 1px 2px rgba(20,30,60,.04), 0 4px 14px rgba(20,30,60,.05);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:14.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1400px;margin:0 auto;padding:32px 24px 60px}
+  @media (max-width:720px){.wrap{padding:16px 12px 40px}}
+  .top{padding-bottom:22px;margin-bottom:24px;border-bottom:1px solid var(--line-strong)}
+  .title-row{display:flex;align-items:center;gap:13px}
+  .logo-badge{width:38px;height:38px;border-radius:9px;flex:none;
+    background:linear-gradient(135deg,var(--navy),#2f5691);display:flex;align-items:center;justify-content:center}
+  .logo-badge svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.1}
+  h1{font-weight:800;font-size:clamp(24px,3vw,34px);line-height:1.12;margin:0;color:var(--navy-deep);letter-spacing:-.015em}
+  .top-sub{margin:9px 0 0;color:var(--ink-dim);font-size:13.5px;max-width:110ch}
+  .grid{display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px;align-items:start}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .toc{position:sticky;top:16px;border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;font-size:13px}
+  @media (max-width:900px){.toc{position:static}}
+  .toc b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:6px}
+  .toc a{display:block;color:var(--navy);text-decoration:none;padding:3px 0;font-weight:600}
+  .toc a:hover{color:var(--gold)}
+  section{max-width:110ch;margin-bottom:34px}
+  h2{font-size:20px;color:var(--navy-deep);margin:0 0 10px;letter-spacing:-.01em}
+  h3{font-size:15px;color:var(--navy-deep);margin:18px 0 6px}
+  p{margin:0 0 10px}
+  a{color:var(--navy)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:6px 0 10px}
+  th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-dim)}
+  .tbl{overflow-x:auto}
+  dl{margin:0}
+  dt{font-weight:700;color:var(--navy-deep);margin-top:10px}
+  dd{margin:2px 0 0;color:var(--ink)}
+  .nota{background:var(--blue-bg);border-radius:8px;padding:10px 14px;font-size:13.5px}
+  .dl{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin:8px 0}
+  .dl a{display:block;border:1px solid var(--line-strong);border-radius:10px;padding:12px 14px;text-decoration:none;color:var(--ink)}
+  .dl a:hover{border-color:var(--navy);background:var(--blue-bg)}
+  .dl b{display:block;color:var(--navy-deep)}
+  .dl small{display:block;color:var(--ink-dim);font-size:12px}
+  .dl code{font-family:var(--mono);font-size:11.5px;color:var(--navy)}
+  code{font-family:var(--mono);font-size:12.5px}
+  .footer-nav{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px}
+  .footer-nav a{font-weight:700;text-decoration:none}
+</style>
+<script src="traducere.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+  <script src="meniu.js" data-pagina="despre"></script>
+
+<div data-bloc="ro" data-no-tr>
+  <header class="top">
+    <div class="title-row">
+      <div class="logo-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+      <h1>Despre date și metodologie</h1>
+    </div>
+    <p class="top-sub">De unde vin cifrele de pe acest site, cât de des se actualizează, ce înseamnă termenii folosiți, cum sunt calculate graficele, ce limite au datele și cum le poți descărca pentru propriile analize.</p>
+  </header>
+
+  <div class="grid">
+    <nav class="toc" aria-label="Cuprins">
+      <b>Cuprins</b>
+      <a href="#pagini">Ce găsești aici</a>
+      <a href="#surse">Surse și actualizare</a>
+      <a href="#termeni">Termeni</a>
+      <a href="#metoda">Cum sunt calculate cifrele</a>
+      <a href="#limite">Limitele datelor</a>
+      <a href="#date">Date deschise</a>
+      <a href="#rss">Abonare la acte noi</a>
+      <a href="#contact">Cod și contact</a>
+    </nav>
+
+    <main>
+      <section id="pagini">
+        <h2>Ce găsești aici</h2>
+        <div class="tbl"><table>
+          <thead><tr><th>Pagina</th><th>Ce arată</th></tr></thead>
+          <tbody>
+            <tr><td><a href="index.html">Donatori și proiecte</a></td><td>Cine finanțează, cât s-a angajat și cât s-a debursat, pe ani, sectoare, beneficiari și țări, cu harta lumii și lista proiectelor.</td></tr>
+            <tr><td><a href="index.html#analize">Analize avansate</a></td><td>Evoluția în timp, rata de execuție, fluxurile donator → sector → beneficiar, sector × donator, calendarul proiectelor active, tipul de asistență pe ani, harta raioanelor (inclusiv pe locuitor).</td></tr>
+            <tr><td><a href="index.html#export">Export</a></td><td>Descărcarea proiectelor în Excel, cu filtre și coloane alese.</td></tr>
+            <tr><td><a href="index.html#iati">IATI</a></td><td>Verificarea încrucișată a proiectelor AMP cu activitățile raportate în standardul internațional IATI și tabloul activităților IATI pentru Moldova.</td></tr>
+            <tr><td><a href="acorduri.html">Acorduri · Monitorul Oficial</a></td><td>Registrul acordurilor de asistență externă din 2024, act cu act, cu etapa la care a ajuns fiecare acord, pâlnia etapelor și durata procedurii.</td></tr>
+            <tr><td><a href="legis_acorduri.html">Acorduri · legis.md</a></td><td>Același registru, construit din Registrul de stat al actelor juridice, din 1992 până azi.</td></tr>
+            <tr><td><a href="hg246.html">HG 246</a></td><td>Compararea anexei nr. 1 la Hotărârea Guvernului nr. 246/2010 cu baza AMP: ce proiecte au expirat.</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="surse">
+        <h2>Surse și actualizare</h2>
+        <div class="tbl"><table>
+          <thead><tr><th>Sursa</th><th>Ce se ia de acolo</th><th>Cât de des</th></tr></thead>
+          <tbody>
+            <tr><td>Platforma pentru gestionarea asistenței externe (AMP) a Guvernului</td><td>Proiectele, donatorii, sumele angajate și debursate, sectoarele, beneficiarii, regiunile, datele de început și de încheiere.</td><td>La fiecare deschidere a paginii se citește raportul live; arhiva 1993–2022 e inclusă în pagină și acoperă proiectele care nu mai apar în raport.</td></tr>
+            <tr><td>IATI, prin d-portal</td><td>Activitățile raportate de donatori pentru Moldova în standardul internațional IATI.</td><td>O dată pe zi, la deschiderea paginii; între timp se folosește copia salvată în browser.</td></tr>
+            <tr><td>Monitorul Oficial al Republicii Moldova</td><td>Cuprinsurile edițiilor: legile, hotărârile, decretele și ordinele privind acordurile de asistență externă.</td><td>Automat, în fiecare zi lucrătoare dimineața. Edițiile sărite sunt recuperate la rulările următoare.</td></tr>
+            <tr><td>Registrul de stat al actelor juridice (legis.md)</td><td>Istoricul actelor privind acordurile, din 1992. Actele noi se adaugă zilnic din Monitorul Oficial.</td><td>Zilnic, împreună cu registrul din Monitor.</td></tr>
+            <tr><td>Biroul Național de Statistică — Recensământul 2024</td><td>Populația pe raioane și municipii, pentru sumele pe locuitor.</td><td>O dată; se schimbă la următorul recensământ.</td></tr>
+            <tr><td>simplemaps.com</td><td>Conturul raioanelor pe harta Moldovei.</td><td>—</td></tr>
+          </tbody>
+        </table></div>
+        <p class="nota">Registrele de acorduri arată în antet data ultimei verificări. Dacă ea e mai veche de patru zile, antetul o scrie cu roșu: înseamnă că actualizarea automată s-a oprit.</p>
+      </section>
+
+      <section id="termeni">
+        <h2>Termeni</h2>
+        <dl>
+          <dt>Angajament</dt><dd>Suma pe care donatorul s-a obligat să o ofere pentru un proiect, așa cum e înregistrată în AMP.</dd>
+          <dt>Debursare</dt><dd>Suma efectiv transferată. Diferența dintre angajament și debursare arată cât mai urmează să ajungă sau cât s-a blocat.</dd>
+          <dt>Rata de execuție</dt><dd>Debursări împărțite la angajamente. Un procent scăzut poate însemna un proiect recent sau întârzieri.</dd>
+          <dt>Grant</dt><dd>Finanțare nerambursabilă.</dd>
+          <dt>Împrumut (credit)</dt><dd>Finanțare rambursabilă; statul o întoarce, de obicei cu dobândă.</dd>
+          <dt>Asistență tehnică</dt><dd>Expertiză, instruire, consultanță, echipamente — nu bani transferați în buget.</dd>
+          <dt>Suport bugetar</dt><dd>Bani transferați direct în bugetul public, legați de reforme convenite (HG 377/2018, anexa nr. 1, pct. 9.20¹).</dd>
+          <dt>Etapele unui acord</dt><dd>Inițierea negocierilor → aprobarea semnării → aprobarea proiectului de lege → ratificarea (sau aprobarea prin hotărâre, pentru acordurile de competența Guvernului) → promulgarea. Temeiul: Legea nr. 595/1999 privind tratatele internaționale și HG 442/2015.</dd>
+          <dt>Contract de stat</dt><dd>Acord care nu e tratat internațional; urmează procedura din anexa nr. 1¹ la HG 377/2018.</dd>
+        </dl>
+      </section>
+
+      <section id="metoda">
+        <h2>Cum sunt calculate cifrele</h2>
+        <h3>Proiecte unice, fără dublare</h3>
+        <p>În AMP un proiect apare pe mai multe rânduri — câte unul pe an sau pe donator. Totalurile îl numără o singură dată. Un proiect cofinanțat de mai mulți donatori apare la fiecare donator cu suma lui integrală, dar rândul TOTAL elimină suprapunerea.</p>
+        <h3>Sectoare, beneficiari, regiuni</h3>
+        <p>Un proiect poate avea mai multe sectoare, beneficiari sau raioane; e numărat la fiecare, deci suma pe categorii poate depăși totalul general. Proiectele fără raion completat în AMP sunt socotite „la nivel național” și nu apar colorate pe hartă.</p>
+        <h3>Suma pe locuitor</h3>
+        <p>Suma raionului împărțită la populația cu reședință obișnuită din Recensământul 2024. Stînga Nistrului și Bender n-au fost recenzate, deci nu au o valoare pe locuitor.</p>
+        <h3>Tipul de asistență pe ani</h3>
+        <p>Angajamentele pe anul proiectului, după tipul de asistență din AMP. Un proiect cu două tipuri se împarte în mod egal între ele, ca suma anului să nu se dubleze.</p>
+        <h3>Calendarul proiectelor active</h3>
+        <p>Proiectele al căror început a trecut și a căror încheiere e în viitor, după datele reale de început și de încheiere din AMP.</p>
+        <h3>Registrele de acorduri</h3>
+        <p>Un act intră în registru doar dacă e despre un document încheiat cu un partener (acord, memorandum, înțelegere, protocol, contract, schimb de note) sau numește direct un împrumut, grant ori credit. Actele de cadru — de pildă modificările HG 246/2010 — sunt excluse. Actele aceluiași acord sunt grupate pe un rând.</p>
+        <p><b>Pâlnia etapelor</b> socotește doar acordurile a căror negociere a început acum mai bine de un an; cele recente sunt încă pe drum. O etapă ulterioară înseamnă că și cele dinainte au fost parcurse. <b>Durata</b> e numărul de zile dintre edițiile în care au apărut actele succesive; se arată mediana (durata tipică) și intervalul în care se încadrează jumătate din acorduri.</p>
+      </section>
+
+      <section id="limite">
+        <h2>Limitele datelor</h2>
+        <p>AMP depinde de ce raportează donatorii și instituțiile. Unele câmpuri lipsesc (raionul, datele, tipul de asistență), unele sume nu sunt actualizate, iar denumirile în engleză ale organizațiilor provin din exportul în engleză al AMP.</p>
+        <p>Registrele de acorduri sunt construite automat din titlurile actelor. Pot exista acte clasificate greșit sau scăpate; categoria (grant, împrumut) e dedusă din denumirea actului. Etapele care nu produc un act publicat — avizarea, parafarea, semnarea propriu-zisă — nu apar.</p>
+        <p>Data „în vigoare din” este cea a legii de ratificare. Acordul propriu-zis intră în vigoare după schimbul instrumentelor de ratificare; acea dată e anunțată printr-un ordin al ministrului afacerilor externe și apare în registru doar când ordinul numește acordul.</p>
+      </section>
+
+      <section id="date">
+        <h2>Date deschise</h2>
+        <p>Toate datele din spatele paginilor pot fi descărcate. Fișierele CSV se deschid direct în Excel, cu diacriticele corecte. Registrele de acorduri se regenerează zilnic, odată cu colectarea.</p>
+        <div class="dl">
+          <a href="date/acorduri_monitor.csv" download><b>Acorduri · Monitorul Oficial</b><small>toate actele, din 2024</small><code>CSV</code></a>
+          <a href="date/acorduri_monitor.json" download><b>Acorduri · Monitorul Oficial</b><small>aceleași acte, pentru programe</small><code>JSON</code></a>
+          <a href="date/acorduri_legis.csv" download><b>Acorduri · legis.md</b><small>actele din 1992 până azi</small><code>CSV</code></a>
+          <a href="date/acorduri_legis.json" download><b>Acorduri · legis.md</b><small>aceleași acte, pentru programe</small><code>JSON</code></a>
+          <a href="amp-arhiva.json" download><b>Arhiva AMP 1993–2022</b><small>proiectele din arhivă, cu datele lor</small><code>JSON</code></a>
+          <a href="date.json" download><b>Baza colectorului din Monitor</b><small>inclusiv edițiile parcurse</small><code>JSON</code></a>
+          <a href="legis_brut.json" download><b>Căutările brute pe legis.md</b><small>toate rezultatele, înainte de filtrare</small><code>JSON</code></a>
+          <a href="index.html#export"><b>Proiectele AMP (live + arhivă)</b><small>cu filtre și coloane la alegere</small><code>Excel</code></a>
+        </div>
+        <p>Coloanele fișierelor de acorduri: <code>act</code>, <code>data_editie</code>, <code>tip</code>, <code>titlu</code>, <code>categorie</code>, <code>partener</code>, <code>semnat</code>, <code>editie</code>, <code>suport_bugetar</code>, <code>link</code>.</p>
+        <p class="nota">Datele sunt preluate din surse publice oficiale. Când le folosești, citează sursa originală (Monitorul Oficial, legis.md, AMP, IATI) și acest site.</p>
+      </section>
+
+      <section id="rss">
+        <h2>Abonare la acte noi</h2>
+        <p>Fluxul <a href="rss.xml">rss.xml</a> conține ultimele 50 de acte privind acordurile de asistență externă, actualizat zilnic. Adaugă-l într-un cititor RSS (Feedly, Inoreader, Thunderbird, Outlook) și vei vedea fiecare lege, hotărâre sau decret nou fără să deschizi site-ul.</p>
+      </section>
+
+      <section id="contact">
+        <h2>Cod și contact</h2>
+        <p>Codul site-ului, scripturile de colectare și testele sunt publice pe <a href="https://github.com/igornistor2013-wq/acorduri">GitHub</a>. O greșeală în date sau o sugestie se poate semnala în secțiunea <a href="https://github.com/igornistor2013-wq/acorduri/issues">Issues</a>.</p>
+      </section>
+
+      <nav class="footer-nav">
+        <a href="index.html">← Donatori și proiecte</a>
+        <a href="index.html#iati">IATI</a>
+        <a href="legis_acorduri.html">Acorduri · legis.md</a>
+        <a href="acorduri.html">Acorduri · Monitorul Oficial</a>
+        <a href="hg246.html">HG 246</a>
+      </nav>
+    </main>
+  </div>
+</div>
+<div data-bloc="en" data-no-tr>
+  <header class="top">
+    <div class="title-row">
+      <div class="logo-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+      <h1>About the data and methodology</h1>
+    </div>
+    <p class="top-sub">Where the figures on this site come from, how often they are updated, what the terms mean, how the charts are calculated, what the limits of the data are and how to download them for your own analysis.</p>
+  </header>
+
+  <div class="grid">
+    <nav class="toc" aria-label="Contents">
+      <b>Contents</b>
+      <a href="#en-pages">What you will find here</a>
+      <a href="#en-sources">Sources and updates</a>
+      <a href="#en-terms">Terms</a>
+      <a href="#en-method">How the figures are calculated</a>
+      <a href="#en-limits">Limits of the data</a>
+      <a href="#en-data">Open data</a>
+      <a href="#en-rss">Subscribe to new acts</a>
+      <a href="#en-contact">Code and contact</a>
+    </nav>
+
+    <main>
+      <section id="en-pages">
+        <h2>What you will find here</h2>
+        <div class="tbl"><table>
+          <thead><tr><th>Page</th><th>What it shows</th></tr></thead>
+          <tbody>
+            <tr><td><a href="index.html">Donors &amp; projects</a></td><td>Who funds what, how much was committed and disbursed, by year, sector, beneficiary and country, with a world map and the project list.</td></tr>
+            <tr><td><a href="index.html#analize">Advanced analytics</a></td><td>Trends over time, execution rate, donor → sector → beneficiary flows, sector × donor, the active projects calendar, type of assistance by year, the district map (including per person).</td></tr>
+            <tr><td><a href="index.html#export">Export</a></td><td>Download projects to Excel, with filters and chosen columns.</td></tr>
+            <tr><td><a href="index.html#iati">IATI</a></td><td>Cross-check of AMP projects against activities reported to the international IATI standard, and a dashboard of IATI activities for Moldova.</td></tr>
+            <tr><td><a href="acorduri.html">Agreements · Official Gazette</a></td><td>The register of external assistance agreements since 2024, act by act, with the stage each agreement has reached, the stage funnel and procedure durations. Interface in English; official act titles stay in Romanian.</td></tr>
+            <tr><td><a href="legis_acorduri.html">Agreements · legis.md</a></td><td>The same register, built from the State Register of Legal Acts, from 1992 to date.</td></tr>
+            <tr><td><a href="hg246.html">HG 246</a></td><td>Compares annex no. 1 to Government Decision no. 246/2010 with the AMP database: which projects have expired.</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section id="en-sources">
+        <h2>Sources and updates</h2>
+        <div class="tbl"><table>
+          <thead><tr><th>Source</th><th>What is taken from it</th><th>How often</th></tr></thead>
+          <tbody>
+            <tr><td>The Government's Aid Management Platform (AMP)</td><td>Projects, donors, committed and disbursed amounts, sectors, beneficiaries, regions, start and end dates.</td><td>The live report is read every time the page opens; the 1993–2022 archive is built into the page and covers projects no longer in the report.</td></tr>
+            <tr><td>IATI, via d-portal</td><td>Activities reported by donors for Moldova in the international IATI standard.</td><td>Once a day, when the page opens; a copy saved in the browser is used in between.</td></tr>
+            <tr><td>Official Gazette of the Republic of Moldova</td><td>The tables of contents of each edition: laws, decisions, decrees and orders on external assistance agreements.</td><td>Automatically, every working-day morning. Skipped editions are recovered on later runs.</td></tr>
+            <tr><td>State Register of Legal Acts (legis.md)</td><td>The history of acts on agreements since 1992. New acts are added daily from the Official Gazette.</td><td>Daily, together with the Gazette register.</td></tr>
+            <tr><td>National Bureau of Statistics — 2024 Census</td><td>Population by district and municipality, for per-person amounts.</td><td>Once; changes with the next census.</td></tr>
+            <tr><td>simplemaps.com</td><td>District outlines on the map of Moldova.</td><td>—</td></tr>
+          </tbody>
+        </table></div>
+        <p class="nota">The agreement registers show the date of the last check in their header. If it is more than four days old, the header shows it in red: the automatic update has stopped.</p>
+      </section>
+
+      <section id="en-terms">
+        <h2>Terms</h2>
+        <dl>
+          <dt>Commitment</dt><dd>The amount a donor has undertaken to provide for a project, as recorded in AMP.</dd>
+          <dt>Disbursement</dt><dd>The amount actually transferred. The gap between commitment and disbursement shows how much is still to come, or stuck.</dd>
+          <dt>Execution rate</dt><dd>Disbursements divided by commitments. A low rate may mean a recent project or delays.</dd>
+          <dt>Grant</dt><dd>Non-reimbursable financing.</dd>
+          <dt>Loan (credit)</dt><dd>Reimbursable financing; the state repays it, usually with interest.</dd>
+          <dt>Technical assistance</dt><dd>Expertise, training, consultancy, equipment — not money transferred into the budget.</dd>
+          <dt>Budget support</dt><dd>Money transferred directly into the public budget, tied to agreed reforms (Government Decision 377/2018, annex 1, item 9.20¹).</dd>
+          <dt>Stages of an agreement</dt><dd>Start of negotiations → approval to sign → approval of the draft law → ratification (or approval by decision, for agreements within the Government's competence) → promulgation. Legal basis: Law no. 595/1999 on international treaties and Government Decision 442/2015.</dd>
+          <dt>State contract</dt><dd>An agreement that is not an international treaty; it follows the procedure in annex 1¹ to Government Decision 377/2018.</dd>
+        </dl>
+      </section>
+
+      <section id="en-method">
+        <h2>How the figures are calculated</h2>
+        <h3>Unique projects, no double counting</h3>
+        <p>In AMP a project appears on several rows — one per year or per donor. Totals count it once. A project co-financed by several donors appears under each donor with its full amount, but the TOTAL row removes the overlap.</p>
+        <h3>Sectors, beneficiaries, regions</h3>
+        <p>A project may have several sectors, beneficiaries or districts; it is counted in each, so category sums can exceed the overall total. Projects with no district recorded in AMP count as "national level" and are not coloured on the map.</p>
+        <h3>Amount per person</h3>
+        <p>The district's amount divided by its usual-resident population from the 2024 Census. The Transnistria region and Bender were not enumerated, so they have no per-person value.</p>
+        <h3>Type of assistance by year</h3>
+        <p>Commitments by project year, by the type of assistance in AMP. A project with two types is split equally between them, so the year's total is not doubled.</p>
+        <h3>Active projects calendar</h3>
+        <p>Projects whose start date has passed and whose end date is in the future, based on the actual start and end dates in AMP.</p>
+        <h3>Agreement registers</h3>
+        <p>An act enters a register only if it concerns a document concluded with a partner (agreement, memorandum, understanding, protocol, contract, exchange of notes) or directly names a loan, grant or credit. Framework acts — such as the amendments to Government Decision 246/2010 — are excluded. Acts of the same agreement are grouped on one row.</p>
+        <p><b>The stage funnel</b> counts only agreements whose negotiations started more than a year ago; recent ones are still under way. A later stage implies the earlier ones were completed. <b>Duration</b> is the number of days between the editions in which successive acts appeared; the median (typical duration) and the range covering half of the agreements are shown.</p>
+      </section>
+
+      <section id="en-limits">
+        <h2>Limits of the data</h2>
+        <p>AMP depends on what donors and institutions report. Some fields are missing (district, dates, type of assistance), some amounts are not updated, and the English names of organisations come from AMP's English export.</p>
+        <p>The agreement registers are built automatically from act titles. Some acts may be misclassified or missed; the category (grant, loan) is inferred from the act's title. Stages that produce no published act — endorsement, initialling, the signing itself — do not appear.</p>
+        <p>The "in force since" date is that of the ratification law. The agreement itself enters into force after the exchange of instruments of ratification; that date is announced by an order of the foreign minister and appears in the register only when the order names the agreement.</p>
+      </section>
+
+      <section id="en-data">
+        <h2>Open data</h2>
+        <p>All the data behind the pages can be downloaded. The CSV files open directly in Excel with correct diacritics. The agreement registers are regenerated daily, with each collection run.</p>
+        <div class="dl">
+          <a href="date/acorduri_monitor.csv" download><b>Agreements · Official Gazette</b><small>all acts, since 2024</small><code>CSV</code></a>
+          <a href="date/acorduri_monitor.json" download><b>Agreements · Official Gazette</b><small>the same acts, for software</small><code>JSON</code></a>
+          <a href="date/acorduri_legis.csv" download><b>Agreements · legis.md</b><small>acts from 1992 to date</small><code>CSV</code></a>
+          <a href="date/acorduri_legis.json" download><b>Agreements · legis.md</b><small>the same acts, for software</small><code>JSON</code></a>
+          <a href="amp-arhiva.json" download><b>AMP archive 1993–2022</b><small>archived projects with their dates</small><code>JSON</code></a>
+          <a href="date.json" download><b>Gazette collector database</b><small>including the editions read</small><code>JSON</code></a>
+          <a href="legis_brut.json" download><b>Raw legis.md searches</b><small>all results, before filtering</small><code>JSON</code></a>
+          <a href="index.html#export"><b>AMP projects (live + archive)</b><small>with filters and columns of your choice</small><code>Excel</code></a>
+        </div>
+        <p>Columns of the agreement files: <code>act</code>, <code>data_editie</code> (edition date), <code>tip</code> (type), <code>titlu</code> (title), <code>categorie</code>, <code>partener</code>, <code>semnat</code> (signed), <code>editie</code>, <code>suport_bugetar</code>, <code>link</code>. The values are in Romanian, as published.</p>
+        <p class="nota">The data come from official public sources. When you use them, cite the original source (Official Gazette, legis.md, AMP, IATI) and this site.</p>
+      </section>
+
+      <section id="en-rss">
+        <h2>Subscribe to new acts</h2>
+        <p>The <a href="rss.xml">rss.xml</a> feed contains the latest 50 acts on external assistance agreements, updated daily. Add it to an RSS reader (Feedly, Inoreader, Thunderbird, Outlook) to see each new law, decision or decree without opening the site. Act titles are in Romanian.</p>
+      </section>
+
+      <section id="en-contact">
+        <h2>Code and contact</h2>
+        <p>The site's code, collection scripts and tests are public on <a href="https://github.com/igornistor2013-wq/acorduri">GitHub</a>. A data error or a suggestion can be reported under <a href="https://github.com/igornistor2013-wq/acorduri/issues">Issues</a>.</p>
+      </section>
+
+      <nav class="footer-nav">
+        <a href="index.html">← Donors &amp; projects</a>
+        <a href="index.html#iati">IATI</a>
+        <a href="legis_acorduri.html">Agreements · legis.md</a>
+        <a href="acorduri.html">Agreements · Official Gazette</a>
+        <a href="hg246.html">HG 246</a>
+      </nav>
+    </main>
+  </div>
+</div>
+</div>
+</body>
+</html>
