@@ -50,6 +50,8 @@ jobs:
       # actele noi din Monitor (date.json). Se reconstruiește după fiecare
       # colectare, deci acordurile noi apar în ambele registre în aceeași zi.
       - name: Actualizează pagina legis
+        # dacă pagina legis nu se poate construi, actele noi din Monitor se salvează oricum
+        continue-on-error: true
         run: python legis_pagina.py
 
       - name: Salvează dacă au apărut acte noi
