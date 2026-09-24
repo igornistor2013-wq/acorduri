@@ -80,10 +80,14 @@
   /* Fără lățimi explicite, browserul dădea 191 de pixeli categoriei — pentru o
      etichetă de 60 — și tăia denumirea acordului la 450. Acum spațiul merge
      acolo unde e nevoie de el. */
-  #tabel.v-acorduri th:nth-child(1), #tabel.v-acorduri td:nth-child(1){width:104px}
-  #tabel.v-acorduri th:nth-child(3), #tabel.v-acorduri td:nth-child(3){width:128px}
-  #tabel.v-acorduri th:nth-child(4), #tabel.v-acorduri td:nth-child(4){width:376px}
-  #tabel.v-acorduri th:nth-child(5), #tabel.v-acorduri td:nth-child(5){width:116px}
+  /* Doar pe rândurile de acord: regula generală „td:nth-child(1)" prindea și
+     celula rândului deschis (colspan), care pe telefon rămânea lată de 104 px
+     — lista actelor se citea câte un cuvânt pe rând. */
+  #tabel.v-acorduri th:nth-child(1), #tabel.v-acorduri tr.acord td:nth-child(1){width:112px}
+  #tabel.v-acorduri th:nth-child(3), #tabel.v-acorduri tr.acord td:nth-child(3){width:140px}
+  #tabel.v-acorduri th:nth-child(4), #tabel.v-acorduri tr.acord td:nth-child(4){width:376px}
+  #tabel.v-acorduri th:nth-child(5), #tabel.v-acorduri tr.acord td:nth-child(5){width:116px}
+  @media (max-width:700px){#tabel.v-acorduri tr.acord td{width:auto}}
   /* Vederea „acte" are șapte coloane și altă împărțire — acolo lăsăm browserul. */
   #tabel.v-acte{table-layout:auto}
   th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;
@@ -111,7 +115,11 @@
   .t-alt{background:#eef0f4;color:var(--ink-dim)}
   .t-simpl{background:var(--green-bg);color:var(--green-ink)}
 
-  .org{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--navy-deep);white-space:nowrap}
+  /* Denumirile lungi de parteneri („Bancă comercială străină", „Siemens (Germania)")
+     treceau peste coloana acordului: celula era nowrap, dar coloana e îngustă.
+     Acum textul se rupe pe rânduri, la spații sau după „/". */
+  .org{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--navy-deep);
+    white-space:normal;overflow-wrap:anywhere;word-break:normal;min-width:64px;max-width:150px;line-height:1.35}
   .pname{font-size:14px;font-weight:700;color:var(--navy-deep);line-height:1.4;max-width:58ch}
   .pname-sub{display:block;font-size:11px;font-weight:600;color:var(--ink-dim);
     font-family:var(--mono);margin-top:3px}
@@ -336,7 +344,12 @@
   .panel-sub{padding:12px 18px;border-bottom:1px solid var(--line);background:#fbfcfe}
 
   /* rândurile din vederea „acte" refolosesc stilurile listei de acte */
-  td.a-nr{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy);white-space:nowrap}
+  /* În vederea „Acte", numărul actului („nr. 188, 24 august 2026") stătea pe un
+     singur rând și lua 240 px, iar denumirea rămânea îngustă, câte trei cuvinte
+     pe rând. Numărul se rupe acum pe două rânduri, denumirea are loc. */
+  td.a-nr{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy);white-space:normal;min-width:96px;max-width:140px}
+  #tabel.v-acte td[data-l="Denumire"]{min-width:280px}
+  @media (max-width:700px){td.a-nr{max-width:none}#tabel.v-acte td[data-l="Denumire"]{min-width:0}}
   a.spre-legis{color:inherit;text-decoration:underline dotted;text-underline-offset:2px}
   a.spre-legis:hover{text-decoration-style:solid}
   td.a-src{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);white-space:nowrap}
