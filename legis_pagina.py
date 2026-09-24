@@ -213,14 +213,9 @@ def main(BRUT=None, OUT=None):
                 '1990–' + AN + ', apoi filtrare cu clasificatorul registrului, extins. Numărul actului deschide fișa lui pe legis.md.')
     inlocuieste("var antet = 'Acorduri de asistență externă — Monitorul Oficial al Republicii Moldova. ' +",
                 "var antet = 'Acorduri de asistență externă — Registrul de stat (legis.md). ' +")
-    # butonul „Acorduri" din antet duce la registrul din Monitor
-    inlocuieste('''      <span class="navbtn here">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Acorduri
-      </span>''', '''      <a class="navbtn away" href="acorduri.html">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Acorduri (Monitor)
-      </a>''')
+    # bara comună (meniu.js) marchează pagina curentă
+    inlocuieste('<script src="meniu.js" data-pagina="acorduri-mo"></script>',
+                '<script src="meniu.js" data-pagina="acorduri-legis"></script>')
 
     open(OUT, 'w', encoding='utf-8').write(s)
     print('scris', OUT, len(s) // 1024, 'KB')

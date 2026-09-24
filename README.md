@@ -42,6 +42,7 @@ programată doar în zilele lucrătoare.
 | `index.html` | Pagina principală: donatori și proiecte. Conține arhiva AMP încorporată |
 | `acorduri.html` | Registrul acordurilor. Citește `date.json` la fiecare deschidere |
 | `hg246.html` | Comparația cu anexa HG 246. Citește `amp-arhiva.json` |
+| `meniu.js` | Bara de navigare comună, aceeași pe toate paginile (Donatori, Analize, Export, IATI, Acorduri, HG 246). Un buton nou se adaugă o singură dată, aici |
 | `donatori.html` | Redirecționare către `index.html`, pentru linkurile vechi |
 | `date.json` | Registrul acordurilor. Actualizat automat de workflow |
 | `amp-arhiva.json` | Arhiva AMP, doar câmpurile de care are nevoie `hg246.html` |
