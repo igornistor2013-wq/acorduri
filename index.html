@@ -5215,9 +5215,10 @@ function raionNume(r){
   if(r && currentLang==='en' && ({MDGA:1,MDSN:1,MDBD:1})[r.id]) return {MDGA:'ATU Gagauzia', MDSN:'Transnistria region', MDBD:'Bender'}[r.id];
   return (r && RAION_NUME[r.id]) || (r && r.name) || '';
 }
-/* Populația cu reședință obișnuită, Recensământul Populației și Locuințelor 2024
-   (BNS, date finale, tabelul 6). Stînga Nistrului și Bender nu au fost recenzate. */
-const RAION_POP_2024 = {"MDCU": 720128, "MDBA": 94546, "MDBR": 46894, "MDDO": 28108, "MDDR": 53738, "MDED": 50429, "MDFA": 56039, "MDFL": 53264, "MDGL": 35829, "MDOC": 31610, "MDRI": 43652, "MDSI": 55933, "MDSO": 58609, "MDAN": 57687, "MDCL": 43864, "MDCR": 52926, "MDDU": 21781, "MDHI": 69462, "MDIA": 74458, "MDNI": 36413, "MDOR": 79242, "MDRE": 30243, "MDST": 61362, "MDSD": 25394, "MDTE": 41452, "MDUN": 75804, "MDBS": 14914, "MDCA": 72775, "MDCT": 33181, "MDCS": 57261, "MDCM": 30986, "MDLE": 28835, "MDSV": 42285, "MDTA": 26435, "MDGA": 103668};
+/* Populația cu reședință obișnuită la 1 ianuarie 2026 (BNS, comunicat din 05.06.2026,
+   anexa, tabelul 2; date preliminare). Stînga Nistrului și Bender nu sunt acoperite.
+   Se actualizează o dată pe an, când BNS publică cifrele noi (de obicei în iunie). */
+const RAION_POP = {"MDCU": 714488, "MDBA": 91307, "MDBR": 44828, "MDDO": 27086, "MDDR": 52098, "MDED": 49199, "MDFA": 54548, "MDFL": 52343, "MDGL": 34656, "MDOC": 30881, "MDRI": 42291, "MDSI": 55221, "MDSO": 56740, "MDAN": 56391, "MDCL": 43298, "MDCR": 52612, "MDDU": 21408, "MDHI": 68929, "MDIA": 74930, "MDNI": 35729, "MDOR": 77984, "MDRE": 29436, "MDST": 60930, "MDSD": 24893, "MDTE": 40289, "MDUN": 73971, "MDBS": 14784, "MDCA": 70877, "MDCT": 32240, "MDCS": 55985, "MDCM": 30446, "MDLE": 28622, "MDSV": 41313, "MDTA": 25070, "MDGA": 99822};
 let regionPerCap = false;   // false = sumă totală, true = EUR pe locuitor
 const REGION_VB_FULL = [0, 0, 1000, 1000];
 let regionViewBox = REGION_VB_FULL.slice();
@@ -5264,7 +5265,7 @@ function renderRegionMap(totals, maxVal){
   const en = currentLang==='en';
   const vals = regionValues(totals);
   // valoarea afișată: suma totală sau suma pe locuitor (EUR/persoană)
-  const valR = (id, v) => regionPerCap ? (RAION_POP_2024[id] ? v[regionMetric] / RAION_POP_2024[id] : 0) : v[regionMetric];
+  const valR = (id, v) => regionPerCap ? (RAION_POP[id] ? v[regionMetric] / RAION_POP[id] : 0) : v[regionMetric];
   window.__valR = valR;
   const maxR = Math.max(regionPerCap ? 0.01 : 1, ...[...vals.entries()].map(([id,v])=>valR(id,v)));
 
@@ -5290,13 +5291,13 @@ function renderRegionMap(totals, maxVal){
   let selPath = null;
   MOLDOVA_REGIONS_SVG.forEach(region=>{
     const v = vals.get(region.id);
-    const fill = (v.has && !(regionPerCap && !RAION_POP_2024[region.id])) ? regionColor(valR(region.id, v)/maxR) : '#eef1f6';
+    const fill = (v.has && !(regionPerCap && !RAION_POP[region.id])) ? regionColor(valR(region.id, v)/maxR) : '#eef1f6';
     const cls = 'rpath' + (selectedRegionId ? (selectedRegionId===region.id ? ' ales' : ' stins') : '') + (v.has?'':' gol');
     const path = svgEl('path',{d:region.d, fill, class:cls, tabindex:'0', role:'button',
       'aria-label': raionNume(region) + (v.has ? `: ${v.count} ${en?'projects':'proiecte'}` : '')});
     path.addEventListener('mousemove', e=>{
       showTip(v.has
-        ? `<b>${esc(raionNume(region))}</b><br>${t('metricAng')}: ${fmtNum(v.ang)} EUR<br>${t('metricDebCap')}: ${fmtNum(v.deb)} EUR<br>${en?'Projects':'Proiecte'}: ${v.count}` + (RAION_POP_2024[region.id] ? `<br>${en?'Population 2024':'Populația 2024'}: ${fmtNum(RAION_POP_2024[region.id])} · ${fmtNum(Math.round(v[regionMetric]/RAION_POP_2024[region.id]))} EUR/${en?'person':'locuitor'}` : '')
+        ? `<b>${esc(raionNume(region))}</b><br>${t('metricAng')}: ${fmtNum(v.ang)} EUR<br>${t('metricDebCap')}: ${fmtNum(v.deb)} EUR<br>${en?'Projects':'Proiecte'}: ${v.count}` + (RAION_POP[region.id] ? `<br>${en?'Population 2024':'Populația 2024'}: ${fmtNum(RAION_POP[region.id])} · ${fmtNum(Math.round(v[regionMetric]/RAION_POP[region.id]))} EUR/${en?'person':'locuitor'}` : '')
         : `<b>${esc(raionNume(region))}</b><br>${en?'No projects for this selection':'Niciun proiect pentru această selecție'}`, e);
     });
     path.addEventListener('mouseleave', hideTip);
@@ -5332,7 +5333,7 @@ function renderRegionMap(totals, maxVal){
   mapBox.appendChild(leg);
   const credit = document.createElement('div');
   credit.className = 'rmap-credit';
-  credit.innerHTML = 'Map: simplemaps.com' + (regionPerCap ? ' · ' + (en?'Population: ':'Populația: ') + '<a href="https://statistica.gov.md/ro/rezultatele-finale-ale-recensamantului-populatiei-si-locuintelor-2024-distributi-10121_61877.html" target="_blank" rel="noopener">BNS, ' + (en?'2024 Census':'Recensământul 2024') + '</a>' : '');
+  credit.innerHTML = 'Map: simplemaps.com' + (regionPerCap ? ' · ' + (en?'Population: ':'Populația: ') + '<a href="https://statistica.gov.md/ro/numarul-populatiei-cu-resedinta-obisnuita-pe-sexe-grupe-de-9578_62481.html" target="_blank" rel="noopener">BNS, ' + (en?'1 January 2026':'1 ianuarie 2026') + '</a>' : '');
   mapBox.appendChild(credit);
   wrap.appendChild(mapBox);
 
@@ -5359,7 +5360,7 @@ function regionSideHtml(vals, en){
   const fmtM = v => regionPerCap ? fmtNum(Math.round(v)) + ' EUR/' + (en?'pers.':'loc.') : fmtCompact(v) + ' EUR';
   if(!selectedRegionId){
     // clasamentul raioanelor
-    const top = MOLDOVA_REGIONS_SVG.map(r=>({r, v:vals.get(r.id)})).filter(x=>x.v.has && (!regionPerCap || RAION_POP_2024[x.r.id]))
+    const top = MOLDOVA_REGIONS_SVG.map(r=>({r, v:vals.get(r.id)})).filter(x=>x.v.has && (!regionPerCap || RAION_POP[x.r.id]))
       .sort((a,b)=>valR(b.r.id,b.v)-valR(a.r.id,a.v)).slice(0, 12);
     if(!top.length) return `<div class="rs-gol">${t('emptyCurrentSelection')}</div>`;
     const mx = valR(top[0].r.id, top[0].v) || 1;
@@ -5386,7 +5387,7 @@ function regionSideHtml(vals, en){
     `<div class="rs-kpi"><div><b>${v.count}</b><span>${en?'projects':'proiecte'}</span></div>` +
     `<div><b>${fmtCompact(v.ang)}</b><span>${t('metricAng').toLowerCase()}, EUR</span></div>` +
     `<div><b>${fmtCompact(v.deb)}</b><span>${t('metricDeb')}, EUR</span></div></div>` +
-    (RAION_POP_2024[selectedRegionId] ? `<div class="rs-pop">${en?'Population (2024 census)':'Populația (recensământul 2024)'}: <b>${fmtNum(RAION_POP_2024[selectedRegionId])}</b> · <b>${fmtNum(Math.round(v[regionMetric]/RAION_POP_2024[selectedRegionId]))} EUR</b> ${en?'per person':'pe locuitor'}</div>` : `<div class="rs-pop">${en?'Not covered by the 2024 census':'Neinclus în recensământul din 2024'}</div>`) +
+    (RAION_POP[selectedRegionId] ? `<div class="rs-pop">${en?'Population (1 Jan 2026)':'Populația (1 ian. 2026)'}: <b>${fmtNum(RAION_POP[selectedRegionId])}</b> · <b>${fmtNum(Math.round(v[regionMetric]/RAION_POP[selectedRegionId]))} EUR</b> ${en?'per person':'pe locuitor'}</div>` : `<div class="rs-pop">${en?'Not covered by BNS population data':'Neacoperit de datele BNS privind populația'}</div>`) +
     `<div class="rs-sub">${en?'Development partners':'Parteneri de dezvoltare'} (${lista.length})</div>` +
     (lista.length ? lista.map(([d,o])=>`<div class="rs-p"><span>${esc(donorLabel(d))}</span><b>${fmtCompact(o[regionMetric])}</b></div>`).join('')
                   : `<div class="rs-gol">${en?'No projects for this selection':'Niciun proiect pentru această selecție'}</div>`);
