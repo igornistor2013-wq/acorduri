@@ -5297,7 +5297,7 @@ function renderRegionMap(totals, maxVal){
       'aria-label': raionNume(region) + (v.has ? `: ${v.count} ${en?'projects':'proiecte'}` : '')});
     path.addEventListener('mousemove', e=>{
       showTip(v.has
-        ? `<b>${esc(raionNume(region))}</b><br>${t('metricAng')}: ${fmtNum(v.ang)} EUR<br>${t('metricDebCap')}: ${fmtNum(v.deb)} EUR<br>${en?'Projects':'Proiecte'}: ${v.count}` + (RAION_POP[region.id] ? `<br>${en?'Population 2024':'Populația 2024'}: ${fmtNum(RAION_POP[region.id])} · ${fmtNum(Math.round(v[regionMetric]/RAION_POP[region.id]))} EUR/${en?'person':'locuitor'}` : '')
+        ? `<b>${esc(raionNume(region))}</b><br>${t('metricAng')}: ${fmtNum(v.ang)} EUR<br>${t('metricDebCap')}: ${fmtNum(v.deb)} EUR<br>${en?'Projects':'Proiecte'}: ${v.count}` + (RAION_POP[region.id] ? `<br>${en?'Population (1 Jan 2026)':'Populația (1 ian. 2026)'}: ${fmtNum(RAION_POP[region.id])} · ${fmtNum(Math.round(v[regionMetric]/RAION_POP[region.id]))} EUR/${en?'person':'locuitor'}` : '')
         : `<b>${esc(raionNume(region))}</b><br>${en?'No projects for this selection':'Niciun proiect pentru această selecție'}`, e);
     });
     path.addEventListener('mouseleave', hideTip);
