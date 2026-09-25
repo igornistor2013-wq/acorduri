@@ -4228,7 +4228,26 @@ function augmentEnglish(roRecords, enRecords){
 /* ---------- Reconstruiește tot & re-randează ---------- */
 let ALL_RECORDS = [];
 
+/* Corecții manuale ale debursărilor. La proiectele de mai jos AMP are angajamentele,
+   dar nu și debursările, deși banii au fost debursați integral. Debursările fiecărui an
+   se completează cu suma angajată în acel an. Se aplică după contopirea cu raportul
+   live, deci o valoare live mai mare nu e micșorată. */
+const DEBURSARI_EGALE_CU_ANGAJAMENTELE = {
+  'idea_2675': 'Proiectul de reabilitare a drumurilor Moldova III (BEI)',
+  '87211314585': 'Aprovizionare cu apă și canalizare, mun. Chișinău (BEI)',
+  '87211272682': 'Programul Cadru de suport al acordurilor RM–UE (PNA 2012)'
+};
+function aplicaCorectiiDebursari(records){
+  records.forEach(function(r){
+    if(!r || !DEBURSARI_EGALE_CU_ANGAJAMENTELE[r.id] || !r.y) return;
+    Object.keys(r.y).forEach(function(k){
+      const v = r.y[k];
+      if(v && (v[0] || 0) > (v[1] || 0)) v[1] = v[0];
+    });
+  });
+}
 function rebuildAll(records){
+  try { aplicaCorectiiDebursari(records); } catch(e){ console.warn('corectii debursari', e); }
   try { if(typeof __normalizeDonors==='function') records.forEach(function(r){ if(r && r.d) r.d = __normalizeDonors(r.d); }); } catch(e){ console.warn('normalizeDonors',e); }
   // Proiectele fără niciun donator declarat sunt excluse complet (nu doar ascunse):
   // în AMP sunt 97 de asemenea înregistrări, toate cu 0 angajamente și 0 debursări.
