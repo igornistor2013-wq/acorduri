@@ -4014,8 +4014,10 @@ function mergeRecords(archive, live){
         aniLive: aniLive.sort().join(' '),
         aniArhiva: aniArhiva.sort().join(' '),
         aniPastrati: pastrati.sort().join(' '),
-        sumaPastrata: Math.round(pastrati.reduce(
-          (s, a) => s + (old.y[a][0] || 0) + (old.y[a][1] || 0), 0))
+        sumaPastrata: Math.round(pastrati.reduce((s, a) => {
+          const la = aniLive.some(k => r.y[k] && r.y[k][0]), ld = aniLive.some(k => r.y[k] && r.y[k][1]);
+          return s + (la ? 0 : (old.y[a][0] || 0)) + (ld ? 0 : (old.y[a][1] || 0));
+        }, 0))
       });
     }
     if(old){
@@ -4027,10 +4029,20 @@ function mergeRecords(archive, live){
          totalul afișat scădea — cu atât mai mult cu cât raportul acoperea mai
          multe proiecte. Un raport care chiar corectează o sumă aduce anul
          respectiv cu valoarea lui nouă, deci corecțiile trec în continuare. */
+      /* Dar numai pentru indicatorul pe care live-ul nu-l are deloc. Dacă raportul
+         live are angajamente pentru proiect (în orice an), ele sunt suma curentă, iar
+         angajamentele arhivei din alți ani nu se mai adună peste ele — altfel aceeași
+         sumă, mutată de AMP în alt an sau majorată, se numără de două ori. Exemplu:
+         8721179314481 (Drumuri Moldova IV, BERD) avea 150 mil. în 2013 în arhivă și
+         250 mil. în 2022 în live, iar pagina arăta 400 mil. La fel pentru debursări. */
+      const liveAng = Object.keys(r.y).some(k => r.y[k] && r.y[k][0]);
+      const liveDeb = Object.keys(r.y).some(k => r.y[k] && r.y[k][1]);
       Object.keys(old.y).forEach(k => {
         if(r.y[k]) return;
         const ov = old.y[k];
-        if(ov && (ov[0] || ov[1])) r.y[k] = ov.slice();
+        if(!ov) return;
+        const a = liveAng ? 0 : (ov[0] || 0), d = liveDeb ? 0 : (ov[1] || 0);
+        if(a || d){ const nv = ov.slice(); nv[0] = a; nv[1] = d; r.y[k] = nv; }
       });
       Object.keys(old.y).forEach(k => {
         const ov = old.y[k];
