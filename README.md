@@ -47,7 +47,7 @@ programată doar în zilele lucrătoare.
 | `despre.html` | Despre date și metodologie: surse, termeni, calcule, limite, date deschise, RSS (în română și engleză) |
 | `date_deschise.py` | Scrie zilnic `date/acorduri_monitor.csv/.json`, `date/acorduri_legis.csv/.json` și `rss.xml`; rulat de `monitor.yml` |
 | `xlsx.min.js` | Biblioteca SheetJS pentru Excel, încărcată doar la descărcare (nu la fiecare deschidere a paginii) |
-| `favicon.svg`, `og.png`, `404.html` | Iconița site-ului, imaginea de previzualizare a linkurilor, pagina „nu există” |
+| `favicon.svg`, `apple-touch-icon.png`, `og.png`, `404.html` | Iconița site-ului (logoul: harta Moldovei cu cele trei fluxuri), iconița pentru ecranul telefonului, imaginea de previzualizare a linkurilor, pagina „nu există” |
 | `donatori.html` | Redirecționare către `index.html`, pentru linkurile vechi |
 | `date.json` | Registrul acordurilor. Actualizat automat de workflow |
 | `amp-arhiva.json` | Arhiva AMP, doar câmpurile de care are nevoie `hg246.html` |

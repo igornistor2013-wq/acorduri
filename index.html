@@ -4,7 +4,6 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <meta name="description" content="Asistență externă pentru Republica Moldova — proiecte, donatori, sectoare, pe ani. Date din platforma AMP și din standardul internațional IATI."/>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='-1.2%20-1.2%2012.6%2011.5'%3E%3Crect%20x='-1.2'%20y='-1.2'%20width='12.6'%20height='11.5'%20rx='2.2'%20fill='%2322406b'/%3E%3Cpath%20d='M0.600,1.250L1.229,0.860L2.994,0.600L4.939,1.425L6.036,1.523L7.228,2.236L7.037,3.133L8.000,3.568L8.382,4.675L9.307,5.348L9.126,5.743L9.622,6.012L8.916,6.209L7.352,6.128L7.094,5.765L6.541,5.976L6.732,6.451L6.007,7.294L5.540,8.204L4.872,8.491L4.395,7.280L4.682,6.151L4.596,4.989L3.070,3.411L2.221,2.295L1.401,1.510Z'%20fill='%23f2b632'%20stroke='%23fff'%20stroke-width='0.35'%20stroke-linejoin='round'/%3E%3C/svg%3E"/>
 <title>Asistență Externă — Republica Moldova</title>
 <meta name="description" content="Cine finanțează Republica Moldova, cât și unde: donatori, proiecte, sume angajate și debursate, pe ani, sectoare și raioane — din platforma AMP și IATI.">
 <meta property="og:title" content="Asistență externă pentru Republica Moldova">
@@ -14,6 +13,7 @@
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="alternate" type="application/rss+xml" title="Acorduri de asistență externă — acte noi" href="rss.xml">
 
 <style>
@@ -594,6 +594,80 @@
   #mapProjTable tbody tr:hover td{background:var(--dk-panel-alt);}
   #mapProjTable tfoot td{background:var(--dk-panel-alt);color:var(--amber);border-top-color:var(--amber-dim);}
   #mapProjTable .proj-name,#mapProjTable .years-cell{color:var(--dk-ink);}
+
+  /* ============ Hărțile globale, în limbajul hărții raioanelor ============
+     Aceeași scală de albastru, aceleași contururi albe, aceeași selecție
+     (contur închis + umbră, restul estompat), fișă cu cifre în lateral și
+     buton de revenire pe hartă. Fluxurile spre Moldova apar doar pentru țara
+     aleasă sau cea de sub mouse — toate deodată făceau harta greu de citit. */
+  #mapPanel{border-color:var(--line);}
+  #mapPanel .panel-head{background:var(--blue-bg);border-bottom-color:var(--line);}
+  #mapPanel .panel-head h2{color:var(--navy);font-family:inherit;letter-spacing:.03em;}
+  .map-svg-wrap{background:#f6f8fc;}
+  .land-path{fill:#e6eaf1;stroke:#fff;stroke-width:.6;}
+  .country-path{stroke:#fff;stroke-width:.8;transition:opacity .35s ease,filter .2s ease;}
+  .country-path.gol{cursor:default;}
+  .country-path:hover{stroke:var(--navy-deep);stroke-width:1.6;filter:brightness(1.1) saturate(1.1);}
+  /* umbra e în unitățile hărții, deci se mărește odată cu zoom-ul: o ținem mică */
+  .country-path.aleasa,.country-path.aleasa:hover{stroke:var(--navy-deep);stroke-width:2.4;filter:drop-shadow(0 .6px 1px rgba(22,41,74,.45));}
+  .country-path.dimmed{opacity:.3;}
+  .country-path.dimmed:hover{opacity:.65;stroke-width:1.4;}
+  .moldova-path{fill:#e0a545;stroke:#16294a;stroke-width:1.4;filter:drop-shadow(0 0 1.2px rgba(224,165,69,.9));}
+  .flow-arrow{opacity:0;stroke-dasharray:7 6;vector-effect:non-scaling-stroke;transition:opacity .25s ease;}
+  .flow-arrow.on{opacity:.9 !important;}
+  .flow-arrow.hov{opacity:.7 !important;}
+  .map-zoom-controls button{color:var(--navy);border-color:var(--line-strong);font-family:inherit;}
+  .map-zoom-controls button:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .scala-bara{background:linear-gradient(90deg,#dce8f7,#8fb3e2,#3f75bd,#15386e);border:none;}
+  .map-legend{font-family:inherit;color:var(--ink-dim);}
+  .scala-min,.scala-max{font-family:inherit;}
+  .sw.moldova{background:#e0a545;box-shadow:0 0 0 1px #16294a inset;}
+  .map-side-head{color:var(--navy);font-family:inherit;background:var(--blue-bg);}
+  .map-side-head button{font-family:inherit;color:var(--navy);border-color:var(--line-strong);}
+  .map-side-head button:hover{color:#fff;background:var(--navy);border-color:var(--navy);}
+  .map-row{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:4px 8px;align-items:center;padding:8px 14px;}
+  .map-row .dot{display:none;}
+  .map-row .rank{font-family:inherit;}
+  .map-row .ct{color:var(--navy);font-family:inherit;font-variant-numeric:tabular-nums;}
+  .map-row .bar{grid-column:2 / -1;height:5px;background:#e7edf7;border-radius:3px;overflow:hidden;}
+  .map-row .bar i{display:block;height:100%;background:#3f75bd;border-radius:3px;}
+  .map-row.aleasa{background:var(--blue-bg);}
+  .map-row.aleasa .nm{font-weight:700;color:var(--navy-deep);}
+  .map-row.aleasa .bar i{background:#15386e;}
+  .map-mod{position:absolute;top:18px;left:18px;z-index:5;display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 2px 8px rgba(20,30,60,.12);}
+  .map-mod button{border:none;background:#fff;color:var(--navy);font-size:11.5px;font-weight:700;padding:7px 10px;cursor:pointer;}
+  .map-mod button+button{border-left:1px solid var(--line);}
+  .map-mod button[aria-pressed="true"]{background:var(--navy);color:#fff;}
+  .map-back{position:absolute;left:18px;bottom:18px;z-index:5;background:#fff;color:var(--navy);border:1px solid var(--line-strong);border-radius:8px;
+    padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(20,30,60,.12);}
+  .map-back:hover{background:var(--blue-bg);}
+  .map-back[hidden],.map-card[hidden]{display:none;}
+  .map-card{padding:14px;border-bottom:1px solid var(--line);background:#fff;flex:none;}
+  .mc-tit{font-size:18px;font-weight:800;color:var(--navy-deep);letter-spacing:-.01em;margin-bottom:8px;line-height:1.2;}
+  .mc-kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:10px;}
+  .mc-kpi div{background:var(--blue-bg);border-radius:8px;padding:7px;}
+  .mc-kpi b{display:block;font-size:14px;color:var(--navy-deep);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .mc-kpi span{font-size:10px;color:var(--ink-dim);}
+  .mc-sub{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);margin:2px 0 4px;}
+  .mc-p{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:12px;}
+  .mc-p span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mc-p b{color:var(--navy);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .geo-tip{position:fixed;z-index:9999;pointer-events:none;background:#fff;border:1px solid var(--line-strong);border-radius:10px;padding:9px 12px;
+    font-size:12px;color:var(--ink);box-shadow:0 8px 24px rgba(20,30,60,.18);max-width:270px;line-height:1.5;display:none;}
+  .geo-tip b{color:var(--navy-deep);font-size:13px;}
+  .geo-tip .gt-r{color:var(--ink-dim);font-size:11px;}
+  #mapProjTable th{background:var(--blue-bg);color:var(--navy);}
+  #mapProjTable th:hover{color:var(--navy-deep);}
+  #mapProjTable tfoot td{background:var(--blue-bg);color:var(--navy-deep);border-top-color:var(--line-strong);}
+  /* Pe o singură coloană lista nu mai are harta alături ca să-i dea înălțimea:
+     cu „flex:1 1 0" ieșea de 0 px și clasamentul dispărea pe telefon. */
+  @media (max-width:900px){
+    #mapSide .map-list,#dpMapSide .map-list{flex:none;max-height:360px;}
+  }
+  @media (max-width:640px){
+    .map-mod{top:10px;left:10px;} .map-mod button{padding:6px 8px;font-size:10.5px;}
+    .map-back{left:10px;bottom:10px;}
+  }
   #projectsPanel.dk-table-scroll{}
   .bar-row{display:flex;align-items:center;gap:10px;padding:6px 0;}
   .bar-row .bname{
@@ -1211,7 +1285,7 @@
           <svg id="mapSvg" viewBox="0 0 960 460" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <marker id="arrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/>
+                <path d="M0,0 L10,5 L0,10 z" fill="#22549c"/>
               </marker>
             </defs>
             <g id="mapZoomGroup">
@@ -1221,6 +1295,8 @@
               <path class="moldova-path" id="moldovaPath" d="M550.52,93.84L551.149,93.45L552.914,93.19L554.859,94.015L555.956,94.113L557.148,94.826L556.957,95.723L557.92,96.158L558.302,97.265L559.227,97.938L559.046,98.333L559.542,98.602L558.836,98.799L557.272,98.718L557.014,98.355L556.461,98.566L556.652,99.041L555.927,99.884L555.46,100.794L554.792,101.081L554.315,99.87L554.602,98.741L554.516,97.579L552.99,96.001L552.141,94.885L551.321,94.1Z"></path>
             </g>
           </svg>
+          <div class="map-mod" id="mapMod" role="group"></div>
+          <button type="button" class="map-back" id="mapBack" hidden></button>
           <div class="map-zoom-controls">
             <button id="mapZoomIn" title="Mărește" data-i18n-title="zoomIn">+</button>
             <button id="mapZoomOut" title="Micșorează" data-i18n-title="zoomOut">–</button>
@@ -1230,7 +1306,7 @@
           </div>
         </div>
         <div class="map-legend">
-          <span class="scala"><span data-i18n="mapLegendIntensity">proiecte pe țară</span>
+          <span class="scala"><span id="mapScalaLbl">proiecte pe țară</span>
             <span class="scala-min" id="mapScalaMin">0</span>
             <span class="scala-bara" id="mapScalaBara"></span>
             <span class="scala-max" id="mapScalaMax">—</span></span>
@@ -1245,6 +1321,7 @@
       </div>
       <div class="map-side" id="mapSide">
         <div class="map-side-head"><span style="display:flex;align-items:center;gap:6px;"><svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/></svg><span data-i18n="mapRankingTitle">Clasament donatori</span></span><button id="mapResetSelection" data-i18n="resetSelectionBtn">Resetează selecția</button></div>
+        <div class="map-card" id="mapCard" hidden></div>
         <div class="map-list" id="mapList"></div>
       </div>
     </div>
@@ -1579,7 +1656,7 @@
                 <svg id="dpMapSvg" viewBox="0 0 960 460" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
                   <defs>
                     <marker id="dpArrowHead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                      <path d="M0,0 L10,5 L0,10 z" fill="var(--amber)"/>
+                      <path d="M0,0 L10,5 L0,10 z" fill="#22549c"/>
                     </marker>
                   </defs>
                   <g id="dpMapZoomGroup">
@@ -1589,6 +1666,8 @@
                     <path class="moldova-path" id="dpMoldovaPath"></path>
                   </g>
                 </svg>
+                <div class="map-mod" id="dpMapMod" role="group"></div>
+                <button type="button" class="map-back" id="dpMapBack" hidden></button>
                 <div class="map-zoom-controls">
                   <button id="dpMapZoomIn" title="Mărește" data-i18n-title="zoomIn">+</button>
                   <button id="dpMapZoomOut" title="Micșorează" data-i18n-title="zoomOut">–</button>
@@ -1598,7 +1677,7 @@
                 </div>
               </div>
               <div class="map-legend">
-                <span class="scala"><span data-i18n="dpMapLegend">activități pe țară</span>
+                <span class="scala"><span id="dpScalaLbl">activități pe țară</span>
                   <span class="scala-min">0</span>
                   <span class="scala-bara"></span>
                   <span class="scala-max" id="dpScalaMax">—</span></span>
@@ -1609,6 +1688,7 @@
             </div>
             <div class="map-side" id="dpMapSide">
               <div class="map-side-head"><span style="display:flex;align-items:center;gap:6px;"><svg class="ico" viewBox="0 0 24 24" style="width:13px;height:13px;"><path d="M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"/></svg><span data-i18n="mapRankingTitle">Clasament donatori</span></span><button id="dpMapResetSelection" data-i18n="resetSelectionBtn">Resetează selecția</button></div>
+              <div class="map-card" id="dpMapCard" hidden></div>
               <div class="map-list" id="dpMapList"></div>
             </div>
           </div>
@@ -2816,7 +2896,7 @@ function projectLonLat(lon, lat){
   const y = MAP_TRANSLATE[1] - MAP_SCALE * (lat * Math.PI/180);
   return [x,y];
 }
-const mapState = { selected: null /* null = all active; else Set of active labels */, projSortKey:'deb', projSortDir:'desc' };
+const mapState = { selected: null /* null = all active; else Set of active labels */, projSortKey:'deb', projSortDir:'desc', metric:'proiecte' };
 
 function aggregateByCountry(rows){
   const map = new Map();
@@ -2837,30 +2917,111 @@ function aggregateByCountry(rows){
 }
 
 // color interpolation: light gold -> deep red, by intensity 0..1
+/* Scala hărților globale: aceleași șapte trepte de albastru ca harta raioanelor,
+   interpolate continuu. Rădăcina pătrată rămâne: distribuția e foarte inegală
+   (vârful are peste o mie de proiecte, mediana câteva zeci), iar fără ea
+   aproape toate țările ar ieși în aceeași nuanță deschisă. */
+const WORLD_BLUES = [[220,232,247],[185,208,238],[143,179,226],[100,148,210],[63,117,189],[34,84,156],[21,56,110]];
 function choroplethColor(t){
-  /* Scala era liniară, iar distribuția e foarte inegală: vârful are 315 de
-     proiecte, mediana 12. Împărțind la maxim, jumătate din țări cădeau sub 4%
-     din scală și ieșeau toate aceeași nuanță de crem — harta părea uniformă
-     deși diferențele sunt mari. Rădăcina pătrată desface capătul de jos:
-     12 proiecte din 315 urcă de la 4% la 20% din scală.
-
-     Gama merge mai departe în chihlimbar, ca extremele să se distingă între
-     ele, dar rămâne deschisă — roșul Moldovei trebuie să iasă în evidență. */
-  t = Math.max(0, Math.min(1, t));
-  t = Math.sqrt(t);
-  const c1 = [253,243,222], c2 = [232,142,28];
-  const r = Math.round(c1[0]+(c2[0]-c1[0])*t);
-  const g = Math.round(c1[1]+(c2[1]-c1[1])*t);
-  const b = Math.round(c1[2]+(c2[2]-c1[2])*t);
-  return `rgb(${r},${g},${b})`;
+  t = Math.sqrt(Math.max(0, Math.min(1, t)));
+  const x = t * (WORLD_BLUES.length - 1), i = Math.min(WORLD_BLUES.length - 2, Math.floor(x)), f = x - i;
+  const a = WORLD_BLUES[i], b = WORLD_BLUES[i + 1];
+  return 'rgb(' + a.map((v, k) => Math.round(v + (b[k] - v) * f)).join(',') + ')';
 }
+
+/* ---------- elemente comune ale hărților globale ---------- */
+function geoBani(v){
+  const en = currentLang === 'en', a = Math.abs(v || 0);
+  if(a >= 999500000) return (v/1e9).toFixed(2).replace(/\.?0+$/,'') + (en ? ' bn' : ' mld');
+  if(a >= 999500)    return (v/1e6).toFixed(1).replace(/\.0$/,'') + (en ? ' M' : ' mil');
+  if(a >= 999.5)     return Math.round(v/1e3) + (en ? ' K' : ' mii');
+  return fmtNum(v || 0);
+}
+let __geoTip = null;
+function geoTipShow(html, e){
+  if(!__geoTip){ __geoTip = document.createElement('div'); __geoTip.className = 'geo-tip'; __geoTip.setAttribute('role','tooltip'); document.body.appendChild(__geoTip); }
+  __geoTip.innerHTML = html; __geoTip.style.display = 'block';
+  const w = __geoTip.offsetWidth, h = __geoTip.offsetHeight;
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if(x + w > window.innerWidth - 8) x = e.clientX - w - 14;
+  if(y + h > window.innerHeight - 8) y = e.clientY - h - 14;
+  __geoTip.style.left = Math.max(8, x) + 'px'; __geoTip.style.top = Math.max(8, y) + 'px';
+}
+function geoTipHide(){ if(__geoTip) __geoTip.style.display = 'none'; }
+/* Butoanele de metrică de pe hartă (ca „Sumă totală / Pe locuitor" la raioane). */
+function geoMetricButtons(el, metrics, current, onPick){
+  if(!el) return;
+  const en = currentLang === 'en';
+  el.__pick = onPick;
+  /* Butoanele se refac doar când se schimbă limba. Harta se redesenează des
+     (animația de pornire o face de câteva ori pe secundă), iar un buton înlocuit
+     între apăsarea și eliberarea mouse-ului pierde clicul. */
+  const sig = (en ? 'en:' : 'ro:') + metrics.map(m => m.k).join(',');
+  if(el.dataset.sig !== sig){
+    el.dataset.sig = sig;
+    el.setAttribute('aria-label', en ? 'Map measure' : 'Ce arată harta');
+    el.innerHTML = metrics.map(m => `<button type="button" data-m="${m.k}">${en ? m.en : m.ro}</button>`).join('');
+    el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => el.__pick(b.dataset.m)));
+  }
+  el.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === current)));
+}
+/* Leagă evenimentele de hover ale unei țări: fișa plutitoare și fluxul ei spre Moldova. */
+function geoHover(path, arcsEl, htmlFn){
+  const label = path.dataset.label;
+  const arc = () => arcsEl ? [...arcsEl.children].find(a => a.dataset.label === label) : null;
+  path.addEventListener('mouseenter', e => { const a = arc(); if(a) a.classList.add('hov'); const h = htmlFn(); if(h) geoTipShow(h, e); });
+  path.addEventListener('mousemove', e => { if(__geoTip && __geoTip.style.display === 'block') geoTipShow(__geoTip.innerHTML, e); });
+  path.addEventListener('mouseleave', () => { const a = arc(); if(a) a.classList.remove('hov'); geoTipHide(); });
+}
+function geoArc(label, val, max, on){
+  const g = COUNTRY_PATHS[label]; if(!g) return '';
+  const tx = MOLDOVA.cx, ty = MOLDOVA.cy;
+  const mx = (g.cx+tx)/2, my = (g.cy+ty)/2, dx = tx-g.cx, dy = ty-g.cy;
+  const nx = -dy, ny = dx, len = Math.max(1, Math.hypot(nx,ny));
+  const bend = Math.min(60, Math.hypot(dx,dy)*0.14);
+  const cx = mx+(nx/len)*bend, cy = my+(ny/len)*bend;
+  // grosime în pixeli de ecran (non-scaling-stroke), de la 1,5 la 4 px după valoare
+  const w = 1.5 + Math.sqrt(val/Math.max(1,max))*2.5;
+  return `<path class="flow-arrow${on?' on':''}" data-label="${esc(label)}" d="M${g.cx.toFixed(1)},${g.cy.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${tx.toFixed(1)},${ty.toFixed(1)}" stroke="#22549c" stroke-width="${w.toFixed(2)}" stroke-linecap="round"></path>`;
+}
+function geoListRow(label, i, val, max, active, chosen, fmt){
+  const pct = max > 0 ? Math.max(2, Math.round(100 * val / max)) : 0;
+  return `<div class="map-row${active?'':' inactive'}${chosen?' aleasa':''}" data-label="${esc(label)}" role="button" tabindex="0">
+      <div class="rank">${i+1}</div>
+      <div class="nm" title="${esc(geoLabel(label))}">${esc(geoLabel(label))}</div>
+      <div class="ct">${fmt(val)}</div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+    </div>`;
+}
+function geoCardHtml(title, kpis, subTitle, items){
+  return `<div class="mc-tit">${esc(title)}</div>
+    <div class="mc-kpi">${kpis.map(k => `<div><b>${k.v}</b><span>${esc(k.l)}</span></div>`).join('')}</div>
+    ${items.length ? `<div class="mc-sub">${esc(subTitle)}</div>` + items.map(it => `<div class="mc-p"><span title="${esc(it.n)}">${esc(it.n)}</span><b>${it.v}</b></div>`).join('') : ''}`;
+}
+const MAP_METRICS = [
+  {k:'proiecte', ro:'Proiecte', en:'Projects'},
+  {k:'ang', ro:'Angajamente', en:'Commitments'},
+  {k:'deb', ro:'Debursări', en:'Disbursements'}
+];
+function mapResetAll(){
+  mapState.selected = null;
+  renderMap(aggregateByCountry(getFilteredProjects()));
+  if(window.__mapHome) window.__mapHome();
+}
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape' || /INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'')) return;
+  if(mapState.selected && mapState.selected.size) mapResetAll();
+  if(typeof dpState !== 'undefined' && dpState.mapSelected && typeof dpToggleCountry === 'function'){
+    dpState.mapSelected = null; if(typeof dpRender === 'function') dpRender(); if(window.__dpMapHome) window.__dpMapHome();
+  }
+});
 
 function toggleMapCountry(label, allLabels){
   if(mapState.selected===null){
     mapState.selected = new Set([label]);
   } else if(mapState.selected.has(label)){
     mapState.selected.delete(label);
-    if(mapState.selected.size===0) mapState.selected = new Set(); // stays empty = none active
+    if(mapState.selected.size===0) mapState.selected = null;   // ultima țară debifată: toată harta redevine activă
   } else {
     mapState.selected.add(label);
   }
@@ -2868,11 +3029,8 @@ function toggleMapCountry(label, allLabels){
   if(mapState.selected && mapState.selected.has(label)){ if(window.__mapFlyTo) window.__mapFlyTo(label); }
   else if(window.__mapHome) window.__mapHome();
 }
-document.getElementById('mapResetSelection').addEventListener('click',()=>{
-  mapState.selected = null;
-  renderMap(aggregateByCountry(getFilteredProjects()));
-  if(window.__mapHome) window.__mapHome();
-});
+document.getElementById('mapResetSelection').addEventListener('click', mapResetAll);
+document.getElementById('mapBack').addEventListener('click', mapResetAll);
 document.getElementById('mapSelectAllBtn').addEventListener('click',()=>{
   mapState.selected = new Set(Object.keys(COUNTRY_META));
   renderMap(aggregateByCountry(getFilteredProjects()));
@@ -2900,68 +3058,91 @@ function updateMapProjSortIndicator(){
 updateMapProjSortIndicator();
 
 function renderMap(countryData){
-  const maxProj = Math.max(1, ...countryData.map(d=>d.proiecte));
-  // Capătul scalei din legendă, luat din date, nu scris de mână.
+  const en = currentLang === 'en';
+  const metric = mapState.metric || 'proiecte';
+  const val = d => (d ? (d[metric] || 0) : 0);
+  const fmtV = v => metric === 'proiecte' ? fmtNum(v) : geoBani(v);
+  const maxV = Math.max(1, ...countryData.map(val));
   const scalaMax = document.getElementById('mapScalaMax');
-  if (scalaMax) scalaMax.textContent = fmtNum(maxProj);
-  const isActive = (label)=> mapState.selected===null || mapState.selected.has(label);
-  const byLabel = new Map(countryData.map(d=>[d.nume,d]));
+  if (scalaMax) scalaMax.textContent = metric === 'proiecte' ? fmtNum(maxV) : geoBani(maxV) + ' EUR';
+  const lbl = document.getElementById('mapScalaLbl');
+  if (lbl) lbl.textContent = ({proiecte: en?'projects per country':'proiecte pe țară', ang: en?'commitments per country':'angajamente pe țară', deb: en?'disbursements per country':'debursări pe țară'})[metric];
+  geoMetricButtons(document.getElementById('mapMod'), MAP_METRICS, metric, m => { mapState.metric = m; renderMap(aggregateByCountry(getFilteredProjects())); });
 
-  // 1) choropleth country polygons
+  const hasSel = mapState.selected && mapState.selected.size > 0;
+  const isActive = (label)=> !hasSel || mapState.selected.has(label);
+  const byLabel = new Map(countryData.map(d=>[d.nume,d]));
+  const sorted = [...countryData].sort((a,b)=>val(b)-val(a));
+  const rankOf = new Map(sorted.map((d,i)=>[d.nume,i+1]));
+
+  // 1) țările
   const cpEl = document.getElementById('countryPaths');
+  const faEl = document.getElementById('flowArrows');
   cpEl.innerHTML = Object.entries(COUNTRY_PATHS).map(([label, geo])=>{
     const d = byLabel.get(label);
-    const proiecte = d ? d.proiecte : 0;
-    const active = isActive(label);
-    const fill = proiecte>0 ? choroplethColor(proiecte/maxProj) : '#e3e7f0';
-    const debTxt = d ? fmtNum(d.deb) : '0';
-    const aleasa = mapState.selected && mapState.selected.has(label);
-    return `<path class="country-path${active?'':' dimmed'}${aleasa?' aleasa':''}" data-label="${esc(label)}" d="${geo.d}" fill="${fill}">
-      <title>${esc(geoLabel(label))}\n${proiecte} ${currentLang==='en'?'projects':'proiecte'}\n${debTxt} EUR ${currentLang==='en'?'disbursements':'debursări'}</title>
-    </path>`;
+    const v = val(d);
+    const fill = d && d.proiecte > 0 ? choroplethColor(v/maxV) : '#e6eaf1';
+    const aleasa = hasSel && mapState.selected.has(label);
+    return `<path class="country-path${isActive(label)?'':' dimmed'}${aleasa?' aleasa':''}${d?'':' gol'}" data-label="${esc(label)}" d="${geo.d}" fill="${fill}"></path>`;
   }).join('');
+  // țara aleasă se desenează ultima, ca umbra și conturul ei să nu fie acoperite de vecini
+  cpEl.querySelectorAll('.country-path.aleasa').forEach(el => cpEl.appendChild(el));
+
+  // 2) fluxurile spre Moldova — vizibile doar pentru țara aleasă sau cea de sub mouse
+  faEl.innerHTML = countryData.filter(d=>COUNTRY_PATHS[d.nume])
+    .map(d => geoArc(d.nume, val(d), maxV, hasSel && mapState.selected.has(d.nume)).replace('MARKER','arrowHead')).join('');
+
   cpEl.querySelectorAll('.country-path').forEach(el=>{
-    el.addEventListener('click', ()=> toggleMapCountry(el.dataset.label));
+    const label = el.dataset.label, d = byLabel.get(label);
+    geoHover(el, faEl, () => {
+      if(!d) return `<b>${esc(geoLabel(label))}</b><br><span class="gt-r">${en?'No projects in the current selection':'Niciun proiect în selecția curentă'}</span>`;
+      return `<b>${esc(geoLabel(label))}</b><br>${en?'Projects':'Proiecte'}: ${fmtNum(d.proiecte)}<br>${en?'Commitments':'Angajamente'}: ${fmtNum(d.ang)} EUR<br>${en?'Disbursements':'Debursări'}: ${fmtNum(d.deb)} EUR<br><span class="gt-r">${en?'Rank':'Locul'} ${rankOf.get(label)} ${en?'of':'din'} ${sorted.length}</span>`;
+    });
+    if(d) el.addEventListener('click', ()=> { geoTipHide(); toggleMapCountry(label); });
   });
 
-  // 2) flow arrows from every active country (with its own polygon) towards Moldova
-  const faEl = document.getElementById('flowArrows');
-  const withPolygon = countryData.filter(d=>COUNTRY_PATHS[d.nume]);
-  faEl.innerHTML = withPolygon.map(d=>{
-    const sx=COUNTRY_PATHS[d.nume].cx, sy=COUNTRY_PATHS[d.nume].cy;
-    const tx = MOLDOVA.cx, ty = MOLDOVA.cy;
-    const mx = (sx+tx)/2, my = (sy+ty)/2;
-    const dx = tx-sx, dy = ty-sy;
-    const nx = -dy, ny = dx;
-    const len = Math.max(1, Math.hypot(nx,ny));
-    const bend = Math.min(60, Math.hypot(dx,dy)*0.12);
-    const cx = mx + (nx/len)*bend, cy = my + (ny/len)*bend;
-    const w = Math.max(.4, Math.sqrt(d.proiecte/maxProj)*2.4);
-    const active = isActive(d.nume);
-    return `<path class="flow-arrow${active?'':' dimmed'}" d="M${sx.toFixed(1)},${sy.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${tx.toFixed(1)},${ty.toFixed(1)}"
-      stroke="var(--amber)" stroke-width="${w.toFixed(2)}" opacity="0.55" marker-end="url(#arrowHead)"></path>`;
-  }).join('');
+  // 3) butonul de revenire și fișa țării alese
+  const back = document.getElementById('mapBack');
+  if(back){ back.hidden = !hasSel; back.textContent = en ? '← Whole map' : '← Toată harta'; }
+  const card = document.getElementById('mapCard');
+  if(card){
+    if(!hasSel){ card.hidden = true; card.innerHTML = ''; }
+    else {
+      const sel = [...mapState.selected];
+      const rows = getFilteredProjects().filter(p => (p.tari||[]).some(t => mapState.selected.has(t)));
+      const seen = new Set(); let n = 0, ang = 0, deb = 0; const byDonor = new Map();
+      rows.forEach(p => {
+        const key = p.id || ('nm:'+p.denumire+'|'+p.donator);
+        if(!seen.has(key)){ seen.add(key); n++; }
+        ang += p.ang||0; deb += p.deb||0;
+        const dn = (typeof donorLabelList === 'function' ? donorLabelList(p.donator) : p.donator) || '—';
+        if(!byDonor.has(dn)) byDonor.set(dn, {n:new Set(), ang:0, deb:0});
+        const o = byDonor.get(dn); o.n.add(key); o.ang += p.ang||0; o.deb += p.deb||0;
+      });
+      const dv = o => metric === 'proiecte' ? o.n.size : o[metric];
+      const top = [...byDonor.entries()].sort((a,b)=>dv(b[1])-dv(a[1])).slice(0,6)
+        .map(([nm,o]) => ({n:nm, v: metric === 'proiecte' ? fmtNum(o.n.size) : geoBani(o[metric]) + ' EUR'}));
+      const title = sel.length === 1 ? geoLabel(sel[0]) : (en ? sel.length + ' countries' : sel.length + ' țări');
+      card.innerHTML = geoCardHtml(title,
+        [{v:fmtNum(n), l:en?'projects':'proiecte'}, {v:geoBani(ang), l:en?'commitments, EUR':'angajamente, EUR'}, {v:geoBani(deb), l:en?'disbursed, EUR':'debursări, EUR'}],
+        en ? 'Main donor agencies' : 'Principalele agenții donatoare', top);
+      card.hidden = false;
+    }
+  }
 
-  // 3) side ranked list
-  const sorted = [...countryData].sort((a,b)=>b.proiecte-a.proiecte);
-
-  // 4) side ranked list
+  // 4) clasamentul din dreapta
   const list = document.getElementById('mapList');
   if(sorted.length===0){
     list.innerHTML = `<div class="empty-state">${t('emptyCurrentSelection')}</div>`;
+    renderMapProjects();
     return;
   }
-  list.innerHTML = sorted.map((d,i)=>{
-    const active = isActive(d.nume);
-    return `<div class="map-row${active?'':' inactive'}" data-label="${esc(d.nume)}">
-      <div class="rank">${i+1}</div>
-      <div class="dot" style="background:${choroplethColor(0.3+0.7*(d.proiecte/maxProj))}"></div>
-      <div class="nm" title="${esc(geoLabel(d.nume))}">${esc(geoLabel(d.nume))}</div>
-      <div class="ct">${fmtNum(d.proiecte)}</div>
-    </div>`;
-  }).join('');
+  list.innerHTML = sorted.map((d,i)=> geoListRow(d.nume, i, val(d), val(sorted[0]), isActive(d.nume), hasSel && mapState.selected.has(d.nume), fmtV)).join('');
   list.querySelectorAll('.map-row').forEach(el=>{
     el.addEventListener('click', ()=> toggleMapCountry(el.dataset.label));
+    el.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleMapCountry(el.dataset.label); } });
+    el.addEventListener('mouseenter', ()=>{ const a=[...faEl.children].find(x=>x.dataset.label===el.dataset.label); if(a) a.classList.add('hov'); });
+    el.addEventListener('mouseleave', ()=>{ const a=[...faEl.children].find(x=>x.dataset.label===el.dataset.label); if(a) a.classList.remove('hov'); });
   });
 
   renderMapProjects();
@@ -3028,7 +3209,7 @@ function renderMapProjects(){
   const sumDeb = rows.reduce((s,p)=>s+p.deb,0);
   foot.innerHTML = `
     <tr>
-      <td></td><td>TOTAL (${rows.length} proiecte)</td><td></td><td></td>
+      <td></td><td>TOTAL (${rows.length} ${currentLang==='en'?'projects':'proiecte'})</td><td></td><td></td>
       <td class="num">${fmtNum(sumAng)}</td>
       <td class="num">${fmtNum(sumDeb)}</td>
     </tr>`;
@@ -3136,7 +3317,13 @@ function renderMapProjects(){
     const el = [...g.querySelectorAll('[data-label]')].find(x=>x.getAttribute('data-label')===label);
     if(!el || typeof el.getBBox !== 'function') return;
     const b = el.getBBox();
-    const ns = Math.max(2, Math.min(8, Math.min(960*0.42/Math.max(b.width,1), 460*0.42/Math.max(b.height,1))));
+    /* Cu „slice", pe ecrane înguste se vede doar o fâșie din cele 960×460 ale
+       hărții. Potrivim țara în partea VIZIBILĂ, altfel pe telefon zoom-ul o
+       tăia pe margini. */
+    const r = svg.getBoundingClientRect();
+    const k = Math.max((r.width||960)/960, (r.height||460)/460);
+    const vw = (r.width||960)/k, vh = (r.height||460)/k;
+    const ns = Math.max(1.5, Math.min(8, Math.min(vw*0.5/Math.max(b.width,1), vh*0.5/Math.max(b.height,1))));
     const cx = b.x+b.width/2, cy = b.y+b.height/2;
     animTo(ns, 480-ns*cx, 230-ns*cy);
   }
@@ -6644,6 +6831,7 @@ const dpState = {
   search: '',
   metric: 'deb',
   mapSelected: null,        // null = toate țările
+  mapMetric: 'n',           // n = activități, ang = angajamente, deb = debursări
   expandedGroups: new Set(),
   // sortare la clic pe antet — același tipar ca pagina principală: primul clic
   // pe o coloană sortează descrescător (cel mai mare/recent primul = „ierarhie"),
@@ -7032,61 +7220,92 @@ function dpInitMap(){
    pe pagina principală. */
 function dpRenderMap(){
   dpInitMap();
+  const en = currentLang === 'en';
   const rows = dpFiltered(true);
   const cpEl = document.getElementById('dpCountryPaths');
   const faEl = document.getElementById('dpFlowArrows');
   const listEl = document.getElementById('dpMapList');
   if(!cpEl || !listEl) return;
+  const metric = dpState.mapMetric || 'n';
+  const fmtV = v => metric === 'n' ? fmtNum(v) : geoBani(v);
 
-  // agregare pe țara donatorului, din TOATE activitățile (ca harta să rămână stabilă),
-  // dar numărul afișat reflectă selecția curentă
   const agg = new Map();
   rows.forEach(a => {
     const c = dpCountryOf(a);
-    if(!agg.has(c)) agg.set(c, {n:0, deb:0});
-    agg.get(c).n++; agg.get(c).deb += a.spend_eur||0;
+    if(!agg.has(c)) agg.set(c, {n:0, ang:0, deb:0});
+    const o = agg.get(c); o.n++; o.ang += a.commitment_eur||0; o.deb += a.spend_eur||0;
   });
-  const max = Math.max(1, ...[...agg.values()].map(o=>o.n));
+  const val = o => o ? (o[metric] || 0) : 0;
+  const max = Math.max(1, ...[...agg.values()].map(val));
   const scalaMaxDp = document.getElementById('dpScalaMax');
-  if (scalaMaxDp) scalaMaxDp.textContent = fmtNum(max);
-  const isActive = label => dpState.mapSelected === null || dpState.mapSelected.has(label);
+  if (scalaMaxDp) scalaMaxDp.textContent = metric === 'n' ? fmtNum(max) : geoBani(max) + ' EUR';
+  const lbl = document.getElementById('dpScalaLbl');
+  if (lbl) lbl.textContent = ({n: en?'activities per country':'activități pe țară', ang: en?'commitments per country':'angajamente pe țară', deb: en?'disbursements per country':'debursări pe țară'})[metric];
+  geoMetricButtons(document.getElementById('dpMapMod'),
+    [{k:'n', ro:'Activități', en:'Activities'}, {k:'ang', ro:'Angajamente', en:'Commitments'}, {k:'deb', ro:'Debursări', en:'Disbursements'}],
+    metric, m => { dpState.mapMetric = m; dpRenderMap(); });
+
+  const hasSel = dpState.mapSelected && dpState.mapSelected.size > 0;
+  const isActive = label => !hasSel || dpState.mapSelected.has(label);
+  const sorted = [...agg.entries()].sort((a,b)=>val(b[1])-val(a[1]));
+  const rankOf = new Map(sorted.map(([l],i)=>[l,i+1]));
 
   cpEl.innerHTML = Object.entries(COUNTRY_PATHS).map(([label, geo]) => {
     const o = agg.get(label);
-    const n = o ? o.n : 0;
-    const fill = n>0 ? choroplethColor(n/max) : '#e3e7f0';
-    const aleasa = dpState.mapSelected && dpState.mapSelected.has(label);
-    return `<path class="country-path${isActive(label)?'':' dimmed'}${aleasa?' aleasa':''}" data-label="${esc(label)}" d="${geo.d}" fill="${fill}">
-      <title>${esc(geoLabel(label))}\n${n} ${currentLang==='en'?'activities':'activități'}\n${o?fmtNum(o.deb):'0'} EUR ${currentLang==='en'?'disbursements':'debursări'}</title></path>`;
+    const fill = o && o.n>0 ? choroplethColor(val(o)/max) : '#e6eaf1';
+    const aleasa = hasSel && dpState.mapSelected.has(label);
+    return `<path class="country-path${isActive(label)?'':' dimmed'}${aleasa?' aleasa':''}${o?'':' gol'}" data-label="${esc(label)}" d="${geo.d}" fill="${fill}"></path>`;
   }).join('');
-  cpEl.querySelectorAll('.country-path').forEach(el => {
-    el.addEventListener('click', () => dpToggleCountry(el.dataset.label));
-  });
+  cpEl.querySelectorAll('.country-path.aleasa').forEach(el => cpEl.appendChild(el));
 
   if(faEl){
-    faEl.innerHTML = [...agg.entries()].filter(([label]) => COUNTRY_PATHS[label]).map(([label,o]) => {
-      const g = COUNTRY_PATHS[label];
-      const tx = MOLDOVA.cx, ty = MOLDOVA.cy;
-      const mx=(g.cx+tx)/2, my=(g.cy+ty)/2, dx=tx-g.cx, dy=ty-g.cy;
-      const nx=-dy, ny=dx, len=Math.max(1,Math.hypot(nx,ny));
-      const bend=Math.min(60, Math.hypot(dx,dy)*0.12);
-      const cx=mx+(nx/len)*bend, cy=my+(ny/len)*bend;
-      const w=Math.max(.4, Math.sqrt(o.n/max)*2.4);
-      return `<path class="flow-arrow${isActive(label)?'':' dimmed'}" d="M${g.cx.toFixed(1)},${g.cy.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${tx.toFixed(1)},${ty.toFixed(1)}" stroke="var(--amber)" stroke-width="${w.toFixed(2)}" opacity="0.55" marker-end="url(#dpArrowHead)"></path>`;
-    }).join('');
+    faEl.innerHTML = [...agg.entries()].filter(([label]) => COUNTRY_PATHS[label])
+      .map(([label,o]) => geoArc(label, val(o), max, hasSel && dpState.mapSelected.has(label)).replace('MARKER','dpArrowHead')).join('');
+  }
+  cpEl.querySelectorAll('.country-path').forEach(el => {
+    const label = el.dataset.label, o = agg.get(label);
+    geoHover(el, faEl, () => {
+      if(!o) return `<b>${esc(geoLabel(label))}</b><br><span class="gt-r">${en?'No IATI activities in the current selection':'Nicio activitate IATI în selecția curentă'}</span>`;
+      return `<b>${esc(geoLabel(label))}</b><br>${en?'Activities':'Activități'}: ${fmtNum(o.n)}<br>${en?'Commitments':'Angajamente'}: ${fmtNum(o.ang)} EUR<br>${en?'Disbursements':'Debursări'}: ${fmtNum(o.deb)} EUR<br><span class="gt-r">${en?'Rank':'Locul'} ${rankOf.get(label)} ${en?'of':'din'} ${sorted.length}</span>`;
+    });
+    if(o) el.addEventListener('click', () => { geoTipHide(); dpToggleCountry(label); });
+  });
+
+  const back = document.getElementById('dpMapBack');
+  if(back){ back.hidden = !hasSel; back.textContent = en ? '← Whole map' : '← Toată harta'; }
+  const card = document.getElementById('dpMapCard');
+  if(card){
+    if(!hasSel){ card.hidden = true; card.innerHTML = ''; }
+    else {
+      const sel = [...dpState.mapSelected];
+      const mine = rows.filter(a => dpState.mapSelected.has(dpCountryOf(a)));
+      let ang = 0, deb = 0; const byPub = new Map();
+      mine.forEach(a => {
+        ang += a.commitment_eur||0; deb += a.spend_eur||0;
+        const nm = (typeof iatiDonorLabel === 'function' ? iatiDonorLabel(a.reporting) : a.reporting) || '—';
+        if(!byPub.has(nm)) byPub.set(nm, {n:0, ang:0, deb:0});
+        const o = byPub.get(nm); o.n++; o.ang += a.commitment_eur||0; o.deb += a.spend_eur||0;
+      });
+      const top = [...byPub.entries()].sort((a,b)=>val(b[1])-val(a[1])).slice(0,6)
+        .map(([nm,o]) => ({n:nm, v: metric === 'n' ? fmtNum(o.n) : geoBani(o[metric]) + ' EUR'}));
+      const title = sel.length === 1 ? geoLabel(sel[0]) : (en ? sel.length + ' countries' : sel.length + ' țări');
+      card.innerHTML = geoCardHtml(title,
+        [{v:fmtNum(mine.length), l:en?'activities':'activități'}, {v:geoBani(ang), l:en?'commitments, EUR':'angajamente, EUR'}, {v:geoBani(deb), l:en?'disbursed, EUR':'debursări, EUR'}],
+        en ? 'Main publishers' : 'Principalii publicatori', top);
+      card.hidden = false;
+    }
   }
 
-  const sorted = [...agg.entries()].sort((a,b)=>b[1].n-a[1].n);
   if(!sorted.length){ listEl.innerHTML = '<div class="empty-state">' + t('dpNoActivities') + '</div>'; return; }
-  listEl.innerHTML = sorted.map(([label,o],i) => `<div class="map-row${isActive(label)?'':' inactive'}" data-label="${esc(label)}">
-    <div class="rank">${i+1}</div>
-    <div class="dot" style="background:${choroplethColor(0.3+0.7*(o.n/max))}"></div>
-    <div class="nm" title="${esc(geoLabel(label))}">${esc(geoLabel(label))}</div>
-    <div class="ct">${fmtNum(o.n)}</div></div>`).join('');
+  listEl.innerHTML = sorted.map(([label,o],i) => geoListRow(label, i, val(o), val(sorted[0][1]), isActive(label), hasSel && dpState.mapSelected.has(label), fmtV)).join('');
   listEl.querySelectorAll('.map-row').forEach(el => {
     el.addEventListener('click', () => dpToggleCountry(el.dataset.label));
+    el.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); dpToggleCountry(el.dataset.label); } });
+    el.addEventListener('mouseenter', ()=>{ const a=faEl&&[...faEl.children].find(x=>x.dataset.label===el.dataset.label); if(a) a.classList.add('hov'); });
+    el.addEventListener('mouseleave', ()=>{ const a=faEl&&[...faEl.children].find(x=>x.dataset.label===el.dataset.label); if(a) a.classList.remove('hov'); });
   });
 }
+
 function dpToggleCountry(label){
   if(dpState.mapSelected === null) dpState.mapSelected = new Set([label]);
   else if(dpState.mapSelected.has(label)){
@@ -7097,6 +7316,11 @@ function dpToggleCountry(label){
   if(dpState.mapSelected && dpState.mapSelected.has(label)){ if(window.__dpMapFlyTo) window.__dpMapFlyTo(label); }
   else if(window.__dpMapHome) window.__dpMapHome();
 }
+
+(function(){
+  const b = document.getElementById('dpMapBack');
+  if(b) b.addEventListener('click', () => { dpState.mapSelected = null; dpRender(); if(window.__dpMapHome) window.__dpMapHome(); });
+})();
 
 /* ---------- randare completă ---------- */
 function dpRender(){
@@ -7247,7 +7471,13 @@ function dpRender(){
     const el = [...g.querySelectorAll('[data-label]')].find(x=>x.getAttribute('data-label')===label);
     if(!el || typeof el.getBBox !== 'function') return;
     const b = el.getBBox();
-    const ns = Math.max(2, Math.min(8, Math.min(960*0.42/Math.max(b.width,1), 460*0.42/Math.max(b.height,1))));
+    /* Cu „slice", pe ecrane înguste se vede doar o fâșie din cele 960×460 ale
+       hărții. Potrivim țara în partea VIZIBILĂ, altfel pe telefon zoom-ul o
+       tăia pe margini. */
+    const r = svg.getBoundingClientRect();
+    const k = Math.max((r.width||960)/960, (r.height||460)/460);
+    const vw = (r.width||960)/k, vh = (r.height||460)/k;
+    const ns = Math.max(1.5, Math.min(8, Math.min(vw*0.5/Math.max(b.width,1), vh*0.5/Math.max(b.height,1))));
     const cx = b.x+b.width/2, cy = b.y+b.height/2;
     animTo(ns, 480-ns*cx, 230-ns*cy);
   }
