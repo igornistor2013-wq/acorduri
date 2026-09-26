@@ -45,6 +45,7 @@ programată doar în zilele lucrătoare.
 | `fisa-donator.js` | Fișa donatorului: clic pe un nume de donator sau link `index.html#fisa=<nume>` |
 | `cautare.js` | Căutarea globală din bara de navigare (lupă, tasta / sau Ctrl+K), încărcată la prima folosire |
 | `amp-logo.png` | Sigla AMP din subsolul paginii principale |
+| `amp-linkuri.js` | Face din fiecare AMP ID un link spre fișa proiectului pe amp.gov.md. Corespondența AMP ID → identificator intern vine din raportul public AMP, prin proxy-ul amp.vivi.md, și se ține în browser o zi |
 | `acorduri.html` | Registrul acordurilor. Citește `date.json` la fiecare deschidere |
 | `hg246.html` | Comparația cu anexa HG 246. Citește `amp-arhiva.json` |
 | `meniu.js` | Bara de navigare comună, aceeași pe toate paginile (Donatori, Analize, Export, IATI, Acorduri, HG 246). Un buton nou se adaugă o singură dată, aici |

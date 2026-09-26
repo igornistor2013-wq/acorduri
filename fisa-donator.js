@@ -179,7 +179,7 @@
             var d = g.id && typeof REAL_DATES_LOOKUP !== 'undefined' ? REAL_DATES_LOOKUP[g.id] : null;
             var pp = d && d.s ? String(d.s).slice(-4) + (d.e ? '–' + String(d.e).slice(-4) : '') : (g.min === g.max ? g.min : g.min + '–' + g.max);
             var nm = typeof projectLabel === 'function' ? projectLabel(g.p) : g.p.denumire;
-            return '<tr><td class="id hide-m">' + esc(g.id || '—') + '</td><td>' + esc(nm) + '</td><td class="num">' + esc(String(pp)) + '</td><td class="num">' + fmtNum(g.ang) + '</td><td class="num hide-m">' + fmtNum(g.deb) + '</td></tr>';
+            return '<tr><td class="id hide-m">' + (typeof ampIdHtml === 'function' ? ampIdHtml(g.id) : esc(g.id || '—')) + '</td><td>' + esc(nm) + '</td><td class="num">' + esc(String(pp)) + '</td><td class="num">' + fmtNum(g.ang) + '</td><td class="num hide-m">' + fmtNum(g.deb) + '</td></tr>';
           }).join('') + '</tbody></table></div>' : '<div class="fd-gol">' + T('Niciun proiect.', 'No projects.') + '</div>') +
         '<div class="fd-act">' +
           '<button type="button" class="pr" data-a="filtru">' + T('Arată pe pagină doar acest donator', 'Show only this donor on the page') + '</button>' +

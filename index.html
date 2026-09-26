@@ -2802,7 +2802,7 @@ function renderProjects(){
     const span = p.minYear==='NA' ? '—' : (p.minYear===p.maxYear ? p.minYear : (p.minYear+' – '+p.maxYear));
     return `
     <tr>
-      <td class="years-cell" style="font-family:Consolas,monospace;font-size:11.5px;">${esc(p.id||'—')}</td>
+      <td class="years-cell" style="font-family:Consolas,monospace;font-size:11.5px;">${ampIdHtml(p.id)}</td>
       <td class="proj-name" title="${esc(projectLabel(p))}">${esc(projectLabel(p))}</td>
       <td class="years-cell">${esc(donorLabelList(p.donator))}</td>
       <td class="num" style="white-space:nowrap;">${span}</td>
@@ -3221,7 +3221,7 @@ function renderMapProjects(){
     const span = p.minYear==='NA' ? '—' : (p.minYear===p.maxYear ? p.minYear : (p.minYear+' – '+p.maxYear));
     return `
     <tr>
-      <td class="years-cell" style="font-family:Consolas,monospace;font-size:11.5px;">${esc(p.id||'—')}</td>
+      <td class="years-cell" style="font-family:Consolas,monospace;font-size:11.5px;">${ampIdHtml(p.id)}</td>
       <td class="proj-name" title="${esc(projectLabel(p))}">${esc(projectLabel(p))}</td>
       <td class="years-cell">${esc(donorLabelList(p.donator))}</td>
       <td class="num" style="white-space:nowrap;">${span}</td>
@@ -3485,6 +3485,12 @@ function updateDynamicYearRanges(){
 Object.assign(I18N.ro, { mapWholeWorld: 'Toată lumea' });
 Object.assign(I18N.ro, {"iatiDifTitle": "Diferențe AMP – IATI, pe donator", "iatiDifNote": "stânga: câte din proiectele fiecărui donator din AMP au fost găsite în IATI. Dreapta: activitățile raportate în IATI pentru Moldova care nu au corespondent în AMP, pe organizația care le raportează."});
 Object.assign(I18N.en, {"iatiDifTitle": "AMP – IATI differences by donor", "iatiDifNote": "left: how many of each donor's AMP projects were found in IATI. Right: activities reported to IATI for Moldova with no match in AMP, by reporting organisation."});
+/* AMP ID-ul într-un <span data-ampid>: amp-linkuri.js îl face link spre fișa
+   proiectului în AMP, când cunoaște corespondența cu identificatorul intern. */
+function ampIdHtml(id){
+  if(!id) return '—';
+  return '<span data-ampid="' + esc(id) + '">' + esc(id) + '</span>';
+}
 /* Nume accesibile pentru câmpurile fără etichetă vizibilă: cititoarele de ecran
    anunțau doar „listă derulantă" sau „câmp de editare", fără să spună la ce folosesc. */
 const ETICHETE_CONTROALE = {
@@ -5171,7 +5177,7 @@ function renderTopProjects(){
   top.forEach((p,i)=>{
     const tr = document.createElement('tr');
     tr.innerHTML = `<td><span class="rank-badge">${i+1}</span></td>
-      <td style="font-family:var(--mono,monospace);font-size:11.5px;color:var(--ink-dim);white-space:nowrap;">${p.id || '—'}</td>
+      <td style="font-family:var(--mono,monospace);font-size:11.5px;color:var(--ink-dim);white-space:nowrap;">${ampIdHtml(p.id)}</td>
       <td style="max-width:320px;" title="${esc(projectLabel(p))}">${esc(projectLabel(p).length>60?projectLabel(p).slice(0,58)+'…':projectLabel(p))}</td>
       <td style="max-width:180px;" title="${esc(donorLabelList(p.donator))}">${esc(donorLabelList(p.donator).length>30?donorLabelList(p.donator).slice(0,28)+'…':donorLabelList(p.donator))}</td>
       <td class="num">${p.an}</td>
@@ -5356,7 +5362,7 @@ function renderOngoingProjects(){
   rows.forEach(p=>{
     const tr = document.createElement('tr');
     const span = p.minYear===p.maxYear ? p.minYear : (p.minYear+' – '+p.maxYear);
-    tr.innerHTML = `<td style="font-family:var(--mono,monospace);font-size:11.5px;color:var(--ink-dim);white-space:nowrap;">${p.id||'—'}</td>
+    tr.innerHTML = `<td style="font-family:var(--mono,monospace);font-size:11.5px;color:var(--ink-dim);white-space:nowrap;">${ampIdHtml(p.id)}</td>
       <td style="max-width:320px;" title="${esc(projectLabel(p))}">${esc(projectLabel(p).length>60?projectLabel(p).slice(0,58)+'…':projectLabel(p))}</td>
       <td style="max-width:180px;" title="${esc(donorLabelList(p.donator))}">${esc(donorLabelList(p.donator).length>30?donorLabelList(p.donator).slice(0,28)+'…':donorLabelList(p.donator))}</td>
       <td class="num" style="white-space:nowrap;">${span}</td>
@@ -5827,7 +5833,7 @@ function renderRegionProjectsList(consideredProjects, matchedProjects){
   rows.slice(0,500).forEach(p=>{
     const tr = document.createElement('tr');
     const span = p.minYear===p.maxYear ? p.minYear : (p.minYear+' – '+p.maxYear);
-    tr.innerHTML = `<td style="font-family:var(--mono,monospace);font-size:11.5px;color:var(--ink-dim);white-space:nowrap;">${p.id||'—'}</td>
+    tr.innerHTML = `<td style="font-family:var(--mono,monospace);font-size:11.5px;color:var(--ink-dim);white-space:nowrap;">${ampIdHtml(p.id)}</td>
       <td style="max-width:300px;" title="${esc(projectLabel(p))}">${esc(projectLabel(p).length>55?projectLabel(p).slice(0,53)+'…':projectLabel(p))}</td>
       <td style="max-width:170px;" title="${esc(donorLabelList(p.donator))}">${esc(donorLabelList(p.donator).length>28?donorLabelList(p.donator).slice(0,26)+'…':donorLabelList(p.donator))}</td>
       <td class="num" style="white-space:nowrap;">${span}</td>
@@ -6383,7 +6389,7 @@ function iatiRenderList(){
     }
 
     tr.innerHTML = `
-      <td style="padding:7px 10px;white-space:nowrap;font-family:var(--mono);font-size:11px;color:var(--ink-dim);">${esc(p.id || '')}</td>
+      <td style="padding:7px 10px;white-space:nowrap;font-family:var(--mono);font-size:11px;color:var(--ink-dim);">${ampIdHtml(p.id)}</td>
       <td style="padding:7px 10px;max-width:340px;">${esc(projectLabel(p))}</td>
       <td style="padding:7px 10px;max-width:340px;">${matchCell}</td>
       <td style="padding:7px 10px;max-width:200px;">${publisherCell}</td>
@@ -7566,6 +7572,7 @@ function buildExportRows(filters){
     return {
       'AMP ID': p.id || '',
       'An': p.an,
+      'Link AMP': (typeof ampProjectUrl === 'function' && ampProjectUrl(p.id)) || '',
       'Denumirea proiectului (RO)': p.denumire,
       'Project Title (EN)': (p.id && PROJECT_TITLE_EN[p.id]) || p.denumire,
       'Donator (RO)': p.donator,
@@ -7686,7 +7693,7 @@ function exportAllColumns(){
 }
 /* Denumirile coloanelor rămân cheile interne în română; în EN se afișează (și se
    scriu în Excel) traduse. */
-const EXPORT_COL_EN = {"An": "Year", "Denumirea proiectului (RO)": "Project title (RO)", "Donator (RO)": "Donor (RO)", "Donator — denumire completă": "Donor — full name", "Data început": "Start date", "Data finalizare": "End date", "Sectoare": "Sectors", "Tip de asistență": "Type of assistance", "Regiune": "Region", "Organizația implementatoare": "Implementing organisation", "Beneficiari": "Beneficiaries", "Țări": "Countries", "Strategia Națională de Dezvoltare": "National Development Strategy", "Grup beneficiar": "Beneficiary group", "Buget": "Budget", "Valoarea propusă a proiectului (EUR)": "Proposed project value (EUR)", "Sursă": "Source", "Angajamente (EUR)": "Commitments (EUR)", "Debursări (EUR)": "Disbursements (EUR)", "Debursări planificate (EUR)": "Planned disbursements (EUR)", "Angajamente totale (EUR)": "Total commitments (EUR)", "Angajamente planificate (EUR)": "Planned commitments (EUR)"};
+const EXPORT_COL_EN = {"An": "Year", "Link AMP": "AMP link", "Denumirea proiectului (RO)": "Project title (RO)", "Donator (RO)": "Donor (RO)", "Donator — denumire completă": "Donor — full name", "Data început": "Start date", "Data finalizare": "End date", "Sectoare": "Sectors", "Tip de asistență": "Type of assistance", "Regiune": "Region", "Organizația implementatoare": "Implementing organisation", "Beneficiari": "Beneficiaries", "Țări": "Countries", "Strategia Națională de Dezvoltare": "National Development Strategy", "Grup beneficiar": "Beneficiary group", "Buget": "Budget", "Valoarea propusă a proiectului (EUR)": "Proposed project value (EUR)", "Sursă": "Source", "Angajamente (EUR)": "Commitments (EUR)", "Debursări (EUR)": "Disbursements (EUR)", "Debursări planificate (EUR)": "Planned disbursements (EUR)", "Angajamente totale (EUR)": "Total commitments (EUR)", "Angajamente planificate (EUR)": "Planned commitments (EUR)"};
 function colLabel(c){ return currentLang === 'en' ? (EXPORT_COL_EN[c] || c) : c; }
 function exportRenderColumnPicker(){
   const el = document.getElementById('exportColumnPicker');
@@ -7766,7 +7773,8 @@ function exportRenderPreview(){
       const numeric = typeof v === 'number';
       // anul e un număr, dar nu o sumă: „1993", nu „1.993"
       const isYear = c === 'An' || c === 'Year' || /^(an|year)$/i.test(c);
-      const text = numeric ? (isYear ? String(v) : fmtNum(v)) : esc(v == null ? '' : String(v));
+      let text = numeric ? (isYear ? String(v) : fmtNum(v)) : esc(v == null ? '' : String(v));
+      if((c === 'Link AMP') && v) text = `<a class="amp-link" href="${esc(v)}" target="_blank" rel="noopener">amp.gov.md</a>`;
       return `<td${numeric?' class="num"':''}>${text}</td>`;
     }).join('');
     frag.appendChild(tr);
@@ -8540,5 +8548,6 @@ loadLiveData();
 
 </script>
 <script src="fisa-donator.js"></script>
+<script src="amp-linkuri.js"></script>
 </body>
 </html>
