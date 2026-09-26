@@ -218,6 +218,8 @@ def main(BRUT=None, OUT=None):
                 'Registrul acordurilor de asistență externă din 1992 până azi, din Registrul de stat al actelor juridice (legis.md), act cu act, cu etapa la care a ajuns fiecare.', 2)
     inlocuieste('<meta property="og:url" content="https://nistor.vivi.md/acorduri.html">',
                 '<meta property="og:url" content="https://nistor.vivi.md/legis_acorduri.html">')
+    inlocuieste('<link rel="canonical" href="https://nistor.vivi.md/acorduri.html">',
+                '<link rel="canonical" href="https://nistor.vivi.md/legis_acorduri.html">')
     # bara comună (meniu.js) marchează pagina curentă
     inlocuieste('<script src="meniu.js" data-pagina="acorduri-mo"></script>',
                 '<script src="meniu.js" data-pagina="acorduri-legis"></script>')

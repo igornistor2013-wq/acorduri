@@ -39,13 +39,19 @@ programată doar în zilele lucrătoare.
 
 | Fișier | Rol |
 |---|---|
-| `index.html` | Pagina principală: donatori și proiecte. Conține arhiva AMP încorporată |
+| `index.html` | Pagina principală: donatori și proiecte, analize, export, IATI |
+| `arhiva.js` | Arhiva AMP (1993–2022), încărcată de `index.html`. Separată ca s-o țină browserul în cache |
+| `traduceri-en.js` | Dicționarele EN mari (titluri de proiecte, beneficiari), încărcate de `index.html` |
+| `fisa-donator.js` | Fișa donatorului: clic pe un nume de donator sau link `index.html#fisa=<nume>` |
+| `cautare.js` | Căutarea globală din bara de navigare (lupă, tasta / sau Ctrl+K), încărcată la prima folosire |
+| `amp-logo.png` | Sigla AMP din subsolul paginii principale |
 | `acorduri.html` | Registrul acordurilor. Citește `date.json` la fiecare deschidere |
 | `hg246.html` | Comparația cu anexa HG 246. Citește `amp-arhiva.json` |
 | `meniu.js` | Bara de navigare comună, aceeași pe toate paginile (Donatori, Analize, Export, IATI, Acorduri, HG 246). Un buton nou se adaugă o singură dată, aici |
 | `traducere.js` | Engleza pentru paginile de acorduri, HG 246 și Despre: dicționar de fraze ale interfeței; denumirile oficiale ale actelor rămân în română |
 | `despre.html` | Despre date și metodologie: surse, termeni, calcule, limite, date deschise, RSS (în română și engleză) |
-| `date_deschise.py` | Scrie zilnic `date/acorduri_monitor.csv/.json`, `date/acorduri_legis.csv/.json` și `rss.xml`; rulat de `monitor.yml` |
+| `date_deschise.py` | Scrie zilnic `date/acorduri_monitor.csv/.json`, `date/acorduri_legis.csv/.json`, `date/cautare.json` (indexul căutării), `rss.xml` și `sitemap.xml`; rulat de `monitor.yml` |
+| `robots.txt` | Indică motoarelor de căutare harta site-ului (`sitemap.xml`) |
 | `xlsx.min.js` | Biblioteca SheetJS pentru Excel, încărcată doar la descărcare (nu la fiecare deschidere a paginii) |
 | `favicon.svg`, `apple-touch-icon.png`, `og.png`, `404.html` | Iconița site-ului (logoul: harta Moldovei cu cele trei fluxuri), iconița pentru ecranul telefonului, imaginea de previzualizare a linkurilor, pagina „nu există” |
 | `donatori.html` | Redirecționare către `index.html`, pentru linkurile vechi |

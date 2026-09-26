@@ -9,6 +9,7 @@
 <meta property="og:description" content="Registrul acordurilor de împrumut, grant și asistență tehnică, act cu act, cu etapa la care a ajuns fiecare — din Monitorul Oficial, actualizat zilnic.">
 <meta property="og:image" content="https://nistor.vivi.md/og.png">
 <meta property="og:url" content="https://nistor.vivi.md/acorduri.html">
+<link rel="canonical" href="https://nistor.vivi.md/acorduri.html">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -19,7 +20,7 @@
   :root{
     --bg:#ffffff;--panel:#ffffff;--line:#e4e7ef;--line-strong:#c9ceda;
     --ink:#1c2230;--ink-dim:#6b7284;--navy:#22406b;--navy-deep:#16294a;
-    --blue-bg:#eaf0fb;--gold:#c8871a;--gold-bg:#fdf1dc;--red:#c0402c;--red-bg:#fbe8e3;
+    --blue-bg:#eaf0fb;--gold:#c8871a;--gold-bg:#fdf1dc;--red:#a3311e;--red-bg:#fbe8e3;
     --green-bg:#e6f4ea;--green-ink:#276c3e;--purple:#6b4a85;--purple-bg:#f1ebf6;
     --teal-ink:#155a52;--teal-bg:#e0f2f0;
     --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,'Courier New',monospace;
@@ -80,7 +81,7 @@
   .btns button:hover{background:var(--blue-bg)}
   .btns button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
   .btns button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
-  .btns button .n{font-family:var(--mono);opacity:.72;font-size:10.5px}
+  .btns button .n{font-family:var(--mono);opacity:.85;font-size:10.5px}
   .seek{border:1px solid var(--line-strong);border-radius:6px;padding:7px 12px;font-family:inherit;
     font-size:12px;color:var(--ink);min-width:200px;flex:1;max-width:320px}
   .seek:focus{outline:2px solid var(--gold);outline-offset:1px}
@@ -154,7 +155,7 @@
   .step.necunoscut .cap{color:var(--ink-dim)}
   /* etapă care nu se aplică pe traseul guvernamental */
   .step.nu .bead{background:#f2f4f8;border-color:var(--line);color:var(--line-strong);cursor:help}
-  .step.nu .cap{color:var(--line-strong)}
+  .step.nu .cap{color:#6b7284}   /* etapa neparcursă: gri, dar lizibil (contrast 4,8:1) */
   .step.last .bead{background:var(--gold);border-color:var(--gold);color:#fff;
     box-shadow:0 0 0 3px rgba(200,135,26,.2)}
   /* „Proiect de lege" se rupea pe două rânduri și înălța tot blocul. Cu 78 px
@@ -169,7 +170,7 @@
   .vig-note{margin-top:7px;font-size:10.5px;font-weight:700;color:var(--green-ink);
     background:var(--green-bg);display:inline-block;padding:3px 8px;border-radius:5px;
     font-family:var(--mono);cursor:help}
-  .vig-note span{font-weight:400;opacity:.75}
+  .vig-note span{font-weight:400}
 
   /* 7. denumirile lungi: două rânduri în listă, textul întreg la deschidere */
   .pname{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -521,6 +522,10 @@
   .link-acord:hover{background:var(--blue-bg)}
   .link-acord.copiat{background:#e6f4ea;border-color:#276c3e;color:#276c3e}
   tr.acord.tinta td{background:#fff7e6}
+    .mai-mult{display:flex;align-items:center;justify-content:center;gap:14px;padding:18px 12px 22px;flex-wrap:wrap}
+    .mai-mult button{background:var(--navy,#22406b);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer}
+    .mai-mult button:hover{filter:brightness(1.15)}
+    .mai-mult span{font-size:12px;color:#5f6679}
 </style>
 <script src="traducere.js" defer></script>
 </head>
@@ -2313,8 +2318,32 @@
     });
   }
 
+  /* Lista se desenează câte 50 de rânduri. Registrul legis.md are sute de
+     acorduri și aproape două mii de acte: desenate toate deodată, pagina avea
+     50.000 de pixeli pe ecran lat și peste 200.000 pe telefon. Limita revine
+     la 50 ori de câte ori se schimbă un filtru sau căutarea. */
+  var PAS = 50, limita = PAS, semnFiltre = '', ultimeleDate = null;
+  function butonMaiMult(total){
+    if (total <= limita) return '';
+    var rest = total - limita, n = Math.min(PAS, rest);
+    return '<div class="mai-mult"><button type="button" id="maiMult">Arată încă ' + n + '</button>' +
+      '<span>' + limita + ' din ' + total + ' afișate</span></div>';
+  }
+  function legaMaiMult(){
+    var b = document.getElementById('maiMult');
+    if (b) b.onclick = function(){
+      limita += PAS;
+      var y = window.scrollY;
+      rows(ultimeleDate[0], ultimeleDate[1]);
+      window.scrollTo(0, y);
+    };
+  }
+
   function rows(grupuri, acte){
     scrieURL();
+    ultimeleDate = [grupuri, acte];
+    var semn = [vedere, fAn, fOrg, fCat, fEt, fSuport, seek].join('|');
+    if (semn !== semnFiltre){ semnFiltre = semn; limita = PAS; }
     /* Filtrul pe etapă se aplică dintr-un alt panou, aflat mai sus pe pagină.
        Fără un indicator lângă listă, cine derulează direct la tabel vede 38 de
        rânduri în loc de 73 și n-are cum să înțeleagă de ce. */
@@ -2404,7 +2433,7 @@
       '<th>Act</th><th>Categorie</th><th>Partener</th><th>Etapa</th>' +
       '<th>Denumire</th><th>Semnat</th><th>Ediția</th></tr>';
 
-    document.getElementById('rows').innerHTML = out.map(function(a){
+    document.getElementById('rows').innerHTML = out.slice(0, limita).map(function(a){
       var caps = etapa(a).map(function(k){
         var s = STEPS.filter(function(x){ return x.k === k; })[0];
         return s ? '<span class="et-mic">' + s.n + '. ' + esc(s.cap) + '</span>'
@@ -2428,8 +2457,9 @@
           '<br>' + esc(a.data_editie) + '</td></tr>';
     }).join('');
 
-    document.getElementById('none').innerHTML = out.length ? '' :
+    document.getElementById('none').innerHTML = out.length ? butonMaiMult(out.length) :
       '<div class="empty-state"><strong>Niciun act</strong>Nimic nu corespunde filtrelor.</div>';
+    legaMaiMult();
   }
 
   function randAcorduri(grupuri){
@@ -2455,7 +2485,13 @@
       return true;
     });
 
-    document.getElementById('rows').innerHTML = out.map(function(g, i){
+    // acordul deschis dintr-un link trebuie să fie printre rândurile desenate
+    if (deepAcord){
+      var poz = -1;
+      out.forEach(function(g, k){ if (poz < 0 && idAcord(g) === deepAcord) poz = k; });
+      if (poz >= limita) limita = Math.ceil((poz + 1) / PAS) * PAS;
+    }
+    document.getElementById('rows').innerHTML = out.slice(0, limita).map(function(g, i){
       var lista = g.acte.map(function(a){
         var u = linkSigur(a.url);
         return '<li><div class="a-nr">' + nrAct(a.act) + '</div>' +
@@ -2543,8 +2579,9 @@
       }
     }
 
-    document.getElementById('none').innerHTML = out.length ? '' :
+    document.getElementById('none').innerHTML = out.length ? butonMaiMult(out.length) :
       '<div class="empty-state"><strong>Niciun acord</strong>Nimic nu corespunde filtrelor.</div>';
+    legaMaiMult();
   }
 
   fetch(DATA_URL + (DATA_URL.indexOf('?')>-1?'&':'?') + '_=' + Date.now(), {cache:'no-store'})

@@ -197,6 +197,8 @@
   function durata(x){ return x.replace(/(\d+(?:,\d+)?) zile/g, '$1 days').replace(/(\d+(?:,\d+)?) luni/g, '$1 months').replace(/(\d+(?:,\d+)?) ani/g, '$1 years'); }
   var TIPARE = [
     [/^(\d+) acorduri$/, '$1 agreements'],
+    [/^Arată încă (\d+)$/, 'Show $1 more'],
+    [/^(\d+) din (\d+) afișate$/, '$1 of $2 shown'],
     [/^(\d+) acorduri · (\d+) acte$/, '$1 agreements · $2 acts'],
     [new RegExp('^(\\d+) act · ultimul: ' + DATA + '$'), '$1 act · latest: $2'],
     [new RegExp('^(\\d+) acte · ultimul: ' + DATA + '$'), '$1 acts · latest: $2'],
