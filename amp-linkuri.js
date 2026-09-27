@@ -13,25 +13,40 @@
 (function () {
   'use strict';
   var URL_FISA = 'https://amp.gov.md/aim/viewActivityPreview.do~activityId=';
+  /* Proiectele care nu mai sunt în AMP-ul de azi (o mare parte din arhiva
+     1993–2022) au încă o pagină publică pe serverul vechi al platformei. Lista
+     AMP ID → activityId de acolo e în amp-vechi.json (serverul vechi nu are o
+     listă publică: a fost construită o singură dată, deschizând paginile). */
+  var URL_VECHI = 'http://87.255.68.120:8888/aim/viewActivityPreview.do~public=true~pageId=2~activityId=';
+  var vechi = null, hartaTerminata = false;   // true după ce lista AMP de azi a sosit sau a eșuat
   var CHEIE = 'ampActivityIds', VALABIL_MS = 24 * 3600 * 1000;
   var harta = null;
 
   function en() { return typeof currentLang !== 'undefined' && currentLang === 'en'; }
 
   window.ampActivityId = function (ampId) { return harta && ampId ? harta[String(ampId)] || null : null; };
-  window.ampProjectUrl = function (ampId) { var a = window.ampActivityId(ampId); return a ? URL_FISA + a : ''; };
+  window.ampProjectUrl = function (ampId) {
+    var a = window.ampActivityId(ampId); if (a) return URL_FISA + a;
+    var v = vechi && ampId ? vechi[String(ampId)] : null; return v ? URL_VECHI + v : '';
+  };
 
   function aplica(root) {
-    if (!harta) return;
+    if (!harta && !vechi) return;
     var noduri = (root && root.querySelectorAll ? root : document).querySelectorAll('[data-ampid]:not([data-amp-ok])');
     for (var i = 0; i < noduri.length; i++) {
-      var el = noduri[i], id = el.getAttribute('data-ampid'), act = harta[id];
+      var el = noduri[i], id = el.getAttribute('data-ampid');
+      var act = harta && harta[id], vec = !act && vechi && vechi[id];
+      // AMP-ul de azi are prioritate: până nu știm dacă proiectul e acolo, nu punem linkul vechi
+      if (!act && vec && !hartaTerminata) continue;
+      // fără corespondență încă: lăsăm nodul neprocesat dacă una din liste n-a sosit
+      if (!act && !vec) { if (hartaTerminata && vechi) el.setAttribute('data-amp-ok', '1'); continue; }
       el.setAttribute('data-amp-ok', '1');
-      if (!act) continue;
       var a = document.createElement('a');
-      a.href = URL_FISA + act; a.target = '_blank'; a.rel = 'noopener';
-      a.className = 'amp-link';
-      a.title = en() ? 'Open the project page in AMP (amp.gov.md)' : 'Deschide fișa proiectului în AMP (amp.gov.md)';
+      a.href = act ? URL_FISA + act : URL_VECHI + vec; a.target = '_blank'; a.rel = 'noopener';
+      a.className = 'amp-link' + (act ? '' : ' amp-vechi');
+      a.title = act
+        ? (en() ? 'Open the project page in AMP (amp.gov.md)' : 'Deschide fișa proiectului în AMP (amp.gov.md)')
+        : (en() ? 'Open the project page on the old AMP server (archive)' : 'Deschide fișa proiectului pe serverul vechi AMP (arhivă)');
       a.textContent = el.textContent;
       a.addEventListener('click', function (e) { e.stopPropagation(); });   // rândurile care se deschid la clic nu reacționează
       el.textContent = '';
@@ -48,7 +63,7 @@
 
   // tabelele se redesenează des (filtre, sortare, limbă): legăm tot ce apare nou
   new MutationObserver(function (muts) {
-    if (!harta) return;
+    if (!harta && !vechi) return;
     for (var i = 0; i < muts.length; i++) {
       var m = muts[i];
       for (var j = 0; j < m.addedNodes.length; j++) {
@@ -61,10 +76,15 @@
   }).observe(document.body, { childList: true, subtree: true });
 
   function gata(h) {
-    harta = h;
+    harta = h; hartaTerminata = true;
     aplica(document);
     try { if (typeof exportRenderColumnPicker === 'function' && document.getElementById('updateView').style.display !== 'none') { exportRenderColumnPicker(); exportRenderPreview(); } } catch (e) {}
   }
+
+  // lista statică a serverului vechi
+  fetch('amp-vechi.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+    if (j && typeof j === 'object') { vechi = j; aplica(document); }
+  }).catch(function () {});
 
   // din cache, dacă e proaspăt
   try {
@@ -89,9 +109,9 @@
         if (ampId && act > 0) h[ampId] = act;
       });
       if (p && p.totalPageCount && n < p.totalPageCount && n < 20) return urm(n + 1);
-      if (!Object.keys(h).length) return;
+      if (!Object.keys(h).length) { hartaTerminata = true; aplica(document); return; }
       try { localStorage.setItem(CHEIE, JSON.stringify({ t: Date.now(), m: h })); } catch (e) {}
       gata(h);
-    }).catch(function (e) { console.warn('linkuri AMP:', e); });
+    }).catch(function (e) { console.warn('linkuri AMP:', e); hartaTerminata = true; aplica(document); });
   })(1);
 })();

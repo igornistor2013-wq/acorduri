@@ -46,6 +46,7 @@ programată doar în zilele lucrătoare.
 | `cautare.js` | Căutarea globală din bara de navigare (lupă, tasta / sau Ctrl+K), încărcată la prima folosire |
 | `amp-logo.png` | Sigla AMP din subsolul paginii principale |
 | `amp-linkuri.js` | Face din fiecare AMP ID un link spre fișa proiectului pe amp.gov.md. Corespondența AMP ID → identificator intern vine din raportul public AMP, prin proxy-ul amp.vivi.md, și se ține în browser o zi |
+| `amp-vechi.json` | AMP ID → activityId pe serverul vechi AMP (87.255.68.120:8888), pentru cele 3.008 proiecte ale arhivei. Construit o singură dată, deschizând paginile publice ale serverului vechi |
 | `acorduri.html` | Registrul acordurilor. Citește `date.json` la fiecare deschidere |
 | `hg246.html` | Comparația cu anexa HG 246. Citește `amp-arhiva.json` |
 | `meniu.js` | Bara de navigare comună, aceeași pe toate paginile (Donatori, Analize, Export, IATI, Acorduri, HG 246). Un buton nou se adaugă o singură dată, aici |
