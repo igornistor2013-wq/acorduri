@@ -4302,6 +4302,18 @@
       "editie_id": "3336",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3336"
+    },
+    "nr. 546, 30 septembrie 2026|3353": {
+      "act": "nr. 546, 30 septembrie 2026",
+      "titlu": "Hotărâre cu privire la aprobarea proiectului de lege pentru ratificarea Amendamentului, semnat la 7 septembrie 2026, la Acordurile de finanțare dintre Republica Moldova și Asociația Internațională pentru Dezvoltare privind Proiectul de dezvoltare a sistemului electroenergetic, semnate la 26 septembrie 2019",
+      "categorie": "Împrumut",
+      "partener": "AID",
+      "semnat": "07.09.2026",
+      "editie": "490-493",
+      "data_editie": "01.10.2026",
+      "editie_id": "3353",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3353"
     }
   },
   "editii_vazute": [
@@ -4344,9 +4356,10 @@
     "3349",
     "3350",
     "3351",
-    "3352"
+    "3352",
+    "3353"
   ],
-  "ultima_rulare": "30.09.2026 12:07",
+  "ultima_rulare": "01.10.2026 12:40",
   "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5
