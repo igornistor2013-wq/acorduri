@@ -1,23 +1,25 @@
-name: Sumele acordurilor (legis.md)
+name: Sumele acordurilor (notele Guvernului)
 
-# Citește textul integral (PDF) al actelor de acord de pe legis.md și scoate
-# sumele (legis_sume.py → date/legis_sume.json), apoi reconstruiește pagina
-# legis_acorduri.html. Prima dată sunt ~1.300 de acte: fiecare rulare citește
-# cât poate în 45 de minute și continuă la rularea următoare.
+# Citește, de pe gov.md, ordinea de zi a fiecărei ședințe de Guvern și, pentru
+# punctele despre acorduri de asistență externă, nota de argumentare (PDF), unde
+# ministerul scrie suma acordului. Rezultatul: date/gov_sume.json, pe care pagina
+# Acorduri îl citește la deschidere (coloana „Suma", cu semnul G).
 #
-# Pornire manuală: Actions → „Sumele acordurilor (legis.md)" → Run workflow.
+# Ședința de Guvern are loc înainte ca hotărârea să apară în Monitorul Oficial,
+# deci un acord nou găsit de monitor are deja suma.
+#
+# Prima rulare citește istoricul ședințelor (cât încape în 45 de minute); rulările
+# următoare continuă istoricul, apoi citesc doar ședințele noi.
+# Pornire manuală: Actions → „Sumele acordurilor (notele Guvernului)" → Run workflow.
 
-# Doar pornire manuală: prima rulare (02.10.2026) a arătat că legis.md (Cloudflare)
-# blochează serverele GitHub. Sumele se citesc de pe calculator, cu dosarul
-# „citeste-sumele" (citeste_sumele.bat), iar fișierul rezultat se urcă în date/.
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "45 7 * * 1-5"      # 07:45 UTC, luni–vineri
 
 permissions:
   contents: write
 
-# Același grup ca monitor.yml: cele două scriu legis_acorduri.html, deci nu
-# rulează niciodată în același timp.
 concurrency:
   group: monitor
   cancel-in-progress: false
@@ -25,7 +27,7 @@ concurrency:
 jobs:
   sume:
     runs-on: ubuntu-latest
-    timeout-minutes: 70
+    timeout-minutes: 60
 
     steps:
       - name: Descarcă repository-ul
@@ -41,48 +43,38 @@ jobs:
       - name: Instalează bibliotecile
         run: pip install --quiet requests beautifulsoup4 pypdf
 
-      - name: Citește sumele din textele actelor
+      - name: Citește notele Guvernului de pe gov.md
         run: |
           set +e
-          python legis_sume.py --fara-browser --limita-min 45
+          python gov_sume.py --limita-min 45
           cod=$?
-          if [ "$cod" = "3" ]; then
-            echo "Fără browser, legis.md (Cloudflare) cere verificarea. Încerc cu un browser invizibil."
-            pip install --quiet playwright && python -m playwright install --with-deps chromium > /dev/null
-            python legis_sume.py --limita-min 40 --asteapta-cf 90
-            cod=$?
-          fi
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-          import json, os
+          import json
           try:
-              acte = json.load(open('date/legis_sume.json', encoding='utf-8')).get('acte', {})
+              d = json.load(open('date/gov_sume.json', encoding='utf-8'))
           except Exception:
-              acte = {}
-          cu = sum(1 for a in acte.values() if a.get('sume'))
-          er = sum(1 for a in acte.values() if a.get('eroare'))
-          print('### Sumele acordurilor')
-          print(f'- acte citite până acum: **{len(acte)}** din ~1.300')
-          print(f'- cu sumă găsită: **{cu}** · erori: {er}')
+              d = {}
+          p = d.get('puncte', {})
+          cu = sum(1 for x in p.values() if x.get('sume') and not x.get('modificare'))
+          print('### Sumele acordurilor din notele Guvernului')
+          print(f"- ședințe citite: **{len(d.get('sedinte', {}))}** · istoric complet: {'da' if d.get('istoric_complet') else 'încă nu'}")
+          print(f'- puncte despre acorduri: **{len(p)}** · cu sumă (fără modificări): **{cu}**')
           PY
-          if [ "$cod" = "3" ]; then
-            echo "- ⚠️ legis.md (Cloudflare) a blocat rularea de pe GitHub. Sumele se pot citi de pe calculator, cu legis_local.bat." >> "$GITHUB_STEP_SUMMARY"
+          if [ "$cod" != "0" ]; then
+            echo "- ⚠️ gov.md nu a răspuns la această rulare." >> "$GITHUB_STEP_SUMMARY"
           fi
           exit 0
 
-      - name: Reconstruiește pagina acordurilor
-        continue-on-error: true
-        run: python legis_pagina.py
-
       - name: Salvează
         run: |
-          if [ -z "$(git status --porcelain date/legis_sume.json legis_acorduri.html)" ]; then
+          if [ -z "$(git status --porcelain date/gov_sume.json)" ]; then
             echo "Nimic nou — nu fac commit."
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add date/legis_sume.json legis_acorduri.html
-          git commit -m "Sumele acordurilor din legis.md — $(date +%d.%m.%Y)"
+          git add date/gov_sume.json
+          git commit -m "Sumele acordurilor din notele Guvernului — $(date +%d.%m.%Y)"
           for incercare in 1 2 3; do
             if git push; then
               echo "Publicat."
