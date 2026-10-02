@@ -142,6 +142,24 @@ def main(BRUT=None, OUT=None):
     # mai citească legis.md. Ce există deja în baza legis nu se dublează.
     din_mo = adauga_din_monitor(acte, ids)
 
+    # Sumele citite din textul integral al actelor (legis_sume.py → date/legis_sume.json).
+    # Fiecare act primește cel mult două sume, cu fragmentul de text din care vin,
+    # ca pagina să poată arăta de unde e cifra. Doar actele legis.md au doc_id.
+    try:
+        sume = json.load(open(AICI / 'date' / 'legis_sume.json', encoding='utf-8')).get('acte', {})
+    except Exception:
+        sume = {}
+    cu_suma = 0
+    for a in acte.values():
+        if a.get('editie') != 'legis.md':
+            continue
+        r = sume.get(str(a.get('editie_id', '')))
+        if r and r.get('sume'):
+            a['sume'] = [[s['v'], s['val'], s.get('f', '')[:180]] for s in r['sume'][:2]]
+            cu_suma += 1
+    if sume:
+        print(cu_suma, 'acte cu sumă găsită în textul integral (din', len(sume), 'citite)')
+
     # data afișată = ultima colectare din Monitor, nu ziua de azi: altfel pagina
     # s-ar schimba (și s-ar face commit) în fiecare zi, fără nimic nou
     azi = datetime.date.today().strftime('%d.%m.%Y')

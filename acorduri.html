@@ -135,6 +135,8 @@
   .pname-sub{display:block;font-size:11px;font-weight:600;color:var(--ink-dim);
     font-family:var(--mono);margin-top:3px}
   .pmeta{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-top:5px}
+  .pmeta .psuma{color:var(--navy, #1E4B8C);font-weight:700}
+  .pmeta .psuma-text{border-bottom:1px dotted currentColor;cursor:help}
   .semnat{font-family:var(--mono);font-size:11.5px;font-weight:700;background:var(--gold-bg);
     color:#8a5c0d;padding:3px 8px;border-radius:5px;white-space:nowrap}
   .nil{color:var(--line-strong)}
@@ -967,10 +969,53 @@
       .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
   }
 
+  /* Suma din titlul unui act („în sumă de 20 de milioane de euro", „în valoare de
+     13,1 milioane de euro", „5 400 000 EUR", „5.800.000 DST"). Aceeași sumă e scrisă
+     diferit de la o etapă la alta — „20 de milioane", „20 milioane", „20,0 mil." —
+     iar în cheie fiecare variantă dădea alt rând pentru același acord: împrumutul
+     Poloniei de 20 mil. EUR apărea pe trei rânduri, cel al AFD de 60 mil. tot pe trei.
+     O aducem la o formă unică („suma 20000000 eur"). */
+  var RX_SUMA = /(?:,?\s*(?:in|pentru)\s+(?:suma|valoare)\s+(?:totala\s+)?de\s+|,\s*)?(\d{1,3}(?:[ .]\d{3})+|\d+(?:,\d+)?)\s*(?:de\s+)?(miliarde|miliard|milioane|milion|mil\.?|mii)?\s*(?:de\s+)?(euro|eur|ecu|usd|dolari(?:\s+sua)?|dst|dts|lei romanesti|marci germane|yuani)\b/g;
+  var VALUTA = {euro:'EUR', eur:'EUR', ecu:'ECU', usd:'USD', dolari:'USD', 'dolari sua':'USD', dst:'DST', dts:'DST',
+                'lei romanesti':'ROL', 'marci germane':'DEM', yuani:'CNY'};
+  function valoareSuma(n, mult){
+    var v = /^\d{1,3}(?:[ .]\d{3})+$/.test(n) ? +n.replace(/[ .]/g, '') : parseFloat(n.replace(',', '.'));
+    return Math.round(v * ({miliarde:1e9, miliard:1e9, milioane:1e6, milion:1e6, mil:1e6, 'mil.':1e6, mii:1e3}[mult] || 1));
+  }
+  function sumaCanonica(f){
+    return f.replace(RX_SUMA, function(tot, n, mult, val){
+      var v = valoareSuma(n, mult);
+      return v >= 1000 ? ' suma ' + v + ' ' + VALUTA[val].toLowerCase() + ' ' : tot;
+    });
+  }
+  /* Prima sumă (de cel puțin 1.000) din titlul actului: { v: 20000000, val: 'EUR' } sau null. */
+  function sumaAct(titlu){
+    var f = fold(titlu || ''), m;
+    RX_SUMA.lastIndex = 0;
+    while ((m = RX_SUMA.exec(f))){
+      var v = valoareSuma(m[1], m[2]);
+      if (v >= 1000){ RX_SUMA.lastIndex = 0; return { v: v, val: VALUTA[m[3]] }; }
+    }
+    RX_SUMA.lastIndex = 0;
+    return null;
+  }
+  function fmtSuma(s){
+    if (!s) return '';
+    var n = s.v >= 1e9 ? (s.v / 1e9).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' mld.'
+          : s.v >= 1e6 ? (s.v / 1e6).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' mil.'
+          : String(s.v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return n + ' ' + s.val;
+  }
+
+
   function cheie(nume){
-    var k = fold(nume);
+    var k = sumaCanonica(fold(nume));
     k = k.replace(/^amendament\S*[\s\S]*?\bla\s+(?=acord|contract|conventi|memorandum)/, '');
-    k = k.replace(/\b(acordului|acordul)\b/g, 'acord')
+    /* La fel protocoalele adiționale și addendumurile: „Protocolul adițional … la
+       Acordul …" ține de acordul de bază. Acordul României de 100 mil. EUR și cele
+       cinci protocoale ale lui apăreau pe șase rânduri. */
+    k = k.replace(/^(?:proiectului\s+)?(?:celui de-al\s+\S+\s+|al\s+\S+\s+)?(?:protocol\S*\s+aditional\S*|addendum\S*)[\s\S]*?\bla\s+(?=acord|contract|conventi|memorandum)/, '');
+    k = k.replace(/\b(acordurilor|acordurile|acordului|acordul)\b/g, 'acord')
          .replace(/\b(contractului|contractul)\b/g, 'contract')
          .replace(/\b(conventiei|conventia)\b/g, 'conventie')
          .replace(/\b(memorandumului|memorandumul)\b/g, 'memorandum')
@@ -1100,6 +1145,9 @@
       '<sheetData>' +
       randuri.map(function(r, ri){
         return '<row r="' + (ri + 1) + '">' + r.map(function(v, ci){
+          // numerele (sumele) rămân numere în Excel, ca să poată fi adunate și sortate
+          if (typeof v === 'number' && isFinite(v))
+            return '<c r="' + coloana(ci) + (ri + 1) + '"><v>' + v + '</v></c>';
           return '<c r="' + coloana(ci) + (ri + 1) + '" t="inlineStr"><is><t xml:space="preserve">' +
             xmlEsc(v) + '</t></is></c>';
         }).join('') + '</row>';
@@ -1160,6 +1208,11 @@
     function inclus(a, b){
       return Object.keys(a).every(function(w){ return b[w]; });
     }
+    function distinctiv(k){
+      return k.split('\u0001')[0].split(' ').filter(function(w){
+        return /^(aditional\w*|suplimentar\w*|faza|ii|iii|iv|vi|vii|viii|doua|treia|patra|cincea|doilea|treilea|patrulea)$/.test(w);
+      });
+    }
     var alias = {};
     chei.forEach(function(x){
       chei.forEach(function(y){
@@ -1167,6 +1220,12 @@
         var A = x.split('\u0001'), B = y.split('\u0001');
         if (A[1] !== B[1] || A[2] !== B[2] || A[3] !== B[3]) return;   // alt finanțator, instrument sau fond
         var ca = cuvinte(x), cb = cuvinte(y);
+        /* „Răspuns de urgență la COVID-19" și „Răspuns de urgență la COVID-19 – finanțare
+           adițională" sunt două acorduri, cu legi de ratificare și sume diferite (52,9 mil.
+           EUR primul). Toate cuvintele primului se regăsesc în al doilea, așa că se contopeau,
+           iar rândul „finanțare adițională" arăta suma acordului inițial. Nu contopim când
+           denumirea mai lungă are un cuvânt care deosebește o finanțare de alta. */
+        if (distinctiv(y).some(function(w){ return distinctiv(x).indexOf(w) < 0; })) return;
         if (Object.keys(ca).length < Object.keys(cb).length && inclus(ca, cb)) alias[x] = y;
       });
     });
@@ -1218,8 +1277,66 @@
        e același acord. */
     map = contopeste(map);
 
+    /* Suma din TEXTUL INTEGRAL al actelor (legis_sume.py citește PDF-ul fiecărui act de
+     pe legis.md). Legea de ratificare o spune în art. 1 („Se ratifică Acordul … în sumă
+     de 25 de milioane de euro"), chiar când titlul nu o spune; după ea, hotărârea care
+     aprobă proiectul de lege, apoi cea care aprobă semnarea. La aceeași etapă, actul cel
+     mai vechi — acordul de bază, nu amendamentele care adaugă sume ulterior. */
+  var PRIO_SUMA = ['rat', 'plg', 'sem', 'neg', 'vig', 'prm'];
+  function sumaDinText(g){
+    var cu = g.acte.filter(function(a){ return a.sume && a.sume.length; });
+    if (!cu.length) return null;
+    function prio(a){
+      var p = etapa(a).map(function(e){ var i = PRIO_SUMA.indexOf(e); return i < 0 ? 9 : i; });
+      return p.length ? Math.min.apply(null, p) : 9;
+    }
+    cu.sort(function(x, y){ return prio(x) - prio(y) || ord(x).localeCompare(ord(y)); });
+    var a = cu[0], s = a.sume[0], alte = {};
+    cu.forEach(function(b){
+      var t = b.sume[0], c = t[0] + ' ' + t[1];
+      if (c !== s[0] + ' ' + s[1] && !alte[c]) alte[c] = b.act + ': ' + fmtSuma({v: t[0], val: t[1]});
+    });
+    return { v: s[0], val: s[1], act: a.act, f: s[2] || '', alte: Object.keys(alte).map(function(k){ return alte[k]; }) };
+  }
+
+  /* Un rând = un acord. Când sub aceeași denumire, același finanțator și același
+       instrument stau acte cu SUME DIFERITE, sunt acorduri diferite: la „Deșeuri
+       solide în Republica Moldova" (BERD, grant) erau patru granturi distincte —
+       5,6 mil., 5,4 mil., 4,34 mil. și 600 000 EUR — pe un singur rând, cu etapele
+       amestecate. Le despărțim după sumă. Actele fără sumă în titlu rămân pe un
+       rând al lor, fiindcă din titlu nu se poate spune cărui acord îi aparțin. */
+    var despartite = {};
+    Object.keys(map).forEach(function(k){
+      var g = map[k], dupaSuma = {}, n = 0;
+      g.acte.forEach(function(a){
+        var s = sumaAct(a.titlu), cs = s ? s.v + ' ' + s.val : '';
+        if (!dupaSuma[cs]){ dupaSuma[cs] = []; if (cs) n++; }
+        dupaSuma[cs].push(a);
+      });
+      if (n < 2){
+        var unica = Object.keys(dupaSuma).filter(Boolean)[0];
+        g.suma = unica ? sumaAct(dupaSuma[unica][0].titlu) : null;
+        despartite[k] = g;
+        return;
+      }
+      Object.keys(dupaSuma).forEach(function(cs){
+        var sub = {nume: g.nume, acte: dupaSuma[cs], et: {}, orgs: {}, cats: {}, semnat: '',
+                   suma: cs ? sumaAct(dupaSuma[cs][0].titlu) : null};
+        sub.acte.forEach(function(a){
+          etapa(a).forEach(function(e){ sub.et[e] = true; });
+          if (a.suport) sub.suport = true;
+          if (a.semnat && !sub.semnat) sub.semnat = a.semnat;
+          if (a.categorie) sub.cats[a.categorie] = true;
+          (a.partener||'').split(' / ').forEach(function(o){ o = o.trim(); if (o) sub.orgs[o] = true; });
+        });
+        despartite[k + '\u0002' + cs] = sub;
+      });
+    });
+    map = despartite;
+
     return Object.keys(map).map(function(k){
       var g = map[k];
+      g.sumaT = sumaDinText(g);
       g.acte.sort(function(x,y){ return ord(y).localeCompare(ord(x)); });
       g.ultim = g.acte[0];
       g.parteneri = Object.keys(g.orgs).join(' / ');
@@ -1361,7 +1478,7 @@
                     'Prima publicare','Ultima publicare','Etape parcurse',
                     'Etapa atinsă','Semnat'].concat(STEPS.map(function(s){
                       return s.n + '. ' + s.cap; }))
-                      .concat(['În vigoare din', 'Temeiul datei']));
+                      .concat(['În vigoare din', 'Temeiul datei', 'Suma', 'Valuta', 'Sursa sumei', 'Fragmentul din act']));
       grupuri.filter(function(g){
         if (!trece_grup(g)) return false;
         if (seek){
@@ -1382,7 +1499,10 @@
           atinse.length + ' din ' + STEPS.length,
           ultima ? ultima.n + '. ' + ultima.cap : '', g.semnat || ''
         ].concat(STEPS.map(function(s){ return g.et[s.k] ? 'da' : ''; }))
-         .concat([v ? v.data : '', v ? v.ce : '']));
+         .concat([v ? v.data : '', v ? v.ce : ''])
+         .concat(g.suma ? [g.suma.v, g.suma.val, 'titlul actului', '']
+               : g.sumaT ? [g.sumaT.v, g.sumaT.val, 'textul ' + g.sumaT.act, g.sumaT.f]
+               : ['', '', '', '']));
       });
     }
 
@@ -2522,7 +2642,13 @@
               (g.parteneri ? ' · ' + esc(g.parteneri) : '') + '</span>'
             : '') + '</div>' +
           '<div class="pmeta">' + g.acte.length + (g.acte.length === 1 ? ' act' : ' acte') +
-          ' · ultimul: ' + esc(g.ultim.data_editie) + '</div></td>' +
+          ' · ultimul: ' + esc(g.ultim.data_editie) +
+          (g.suma ? ' · <b class="psuma" title="Suma scrisă în titlul actului oficial">' + esc(fmtSuma(g.suma)) + '</b>'
+           : g.sumaT ? ' · <b class="psuma psuma-text" title="' + esc('Din textul integral al actului ' + g.sumaT.act + ': ' +
+               g.sumaT.f + (g.sumaT.alte.length ? '\n\nAlte sume în actele acordului: ' + g.sumaT.alte.join('; ') : '')) + '">' +
+               esc(fmtSuma(g.sumaT)) + '</b>'
+           : '') +
+          '</div></td>' +
         '<td data-l="Categorie"><span class="tag ' + (CLS[g.categorie]||'t-alt') + '">' +
           esc(g.categorie) + '</span>' +
           (g.suport ? '<span class="tag t-suport" title="Asistență transferată direct ' +

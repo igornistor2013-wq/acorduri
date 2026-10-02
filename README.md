@@ -73,6 +73,7 @@ programată doar în zilele lucrătoare.
 | `legis_pagina.py` | Construiește `legis_acorduri.html` din `acorduri.html` + istoric + `date.json`; rulat de `monitor.yml` |
 | `teste_legis.py` | Testele verificării legis.md |
 | `legis_local.bat` | Aceeași verificare, rulată de pe calculatorul tău (Windows) |
+| `legis_sume.py` | Sumele acordurilor, din textul integral al actelor: descarcă PDF-ul fiecărui act de pe legis.md (legi, hotărâri, ordine; fără decrete), caută „în sumă de…”, „în valoare de…” și scrie rezultatul, cu fragmentul de text, în `date/legis_sume.json`. Rulat de `legis_local.bat`; continuă de unde a rămas |
 | `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi |
 | `CNAME` | Domeniul propriu |
 
