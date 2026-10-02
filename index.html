@@ -1187,7 +1187,14 @@
         <h1><span data-i18n="mainTitle">Asistență externă pentru</span> <span data-i18n="countryName" class="md-flag-text">Republica Moldova</span></h1>
       </div>
     </div>
-    <div class="top-meta" id="topMeta"></div>
+    <div class="top-dreapta">
+      <div class="top-meta" id="topMeta"></div>
+      <div class="unelte-sus">
+        <span class="prospetime" id="prospetime" role="status" aria-live="polite"></span>
+        <button type="button" class="unealta" id="btnLinkSelectie"></button>
+        <button type="button" class="unealta" id="btnRaportPdf"></button>
+      </div>
+    </div>
   </header>
 
   <div class="data-status loading" id="dataStatus" style="display:none;"></div>
@@ -1751,6 +1758,20 @@
 
   
 
+  <div class="panel" id="cmpPanel">
+    <div class="panel-head">
+      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg><span id="cmpTitlu">Comparație între perioade</span></h2>
+      <div class="btns seg" id="cmpMetrica"><button type="button" data-m="ang"></button><button type="button" data-m="deb"></button></div>
+    </div>
+    <div class="cmp-ctrl">
+      <div class="cmp-per cmp-a"><b id="cmpEtA">Perioada A</b> <select id="cmpA1"></select><span>–</span><select id="cmpA2"></select></div>
+      <div class="cmp-per cmp-b"><b id="cmpEtB">Perioada B</b> <select id="cmpB1"></select><span>–</span><select id="cmpB2"></select></div>
+      <div class="btns seg" id="cmpDim"><button type="button" data-d="donor"></button><button type="button" data-d="sector"></button><button type="button" data-d="benef"></button></div>
+    </div>
+    <div class="panel-body" id="cmpBody"></div>
+    <div class="panel-note" id="cmpNota"></div>
+  </div>
+
   <div class="panel">
     <div class="panel-head">
       <h2><svg class="ico" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg><span data-i18n="advLineTitle">Evoluție în timp · Angajamente vs. Debursări pe ani</span></h2>
@@ -1901,8 +1922,17 @@
 <script>
 
 // ---------- Helpers ----------
+/* Limba curentă, fără să depindem de ordinea scripturilor: currentLang e declarată
+   mai jos cu `let`, iar o citire înainte de declarare ar arunca o eroare. */
+function __limbaEn(){ try{ return currentLang === 'en'; }catch(e){ return false; } }
+/* În engleză, „7.571.335.798" se citea ca un număr zecimal, iar „1.09 mld" lăsa
+   unitățile în română. Formatăm după limba aleasă (en-GB: 7,571,335,798 · bn/M/K). */
+const __NF = {
+  ro: new Intl.NumberFormat('ro-RO',{maximumFractionDigits:0}),
+  en: new Intl.NumberFormat('en-GB',{maximumFractionDigits:0})
+};
 function fmtNum(n){
-  return new Intl.NumberFormat('ro-RO',{maximumFractionDigits:0}).format(Math.round(n));
+  return __NF[__limbaEn() ? 'en' : 'ro'].format(Math.round(n));
 }
 function fmtCompact(n){
   const abs = Math.abs(n);
@@ -1910,9 +1940,10 @@ function fmtCompact(n){
      "1000 mil" în loc să treacă la unitatea următoare, chiar sub pragul exact
      (999.999 → rotunjit la "1000", nu "1"). Pragurile de mai jos sunt puse cu
      0.5 unități mai devreme, exact cât ar rotunji în sus la unitatea următoare. */
-  if(abs >= 999500000) return (n/1e9).toFixed(2).replace(/\.?0+$/,'')+' mld';
-  if(abs >= 999500)    return (n/1e6).toFixed(1).replace(/\.0$/,'')+' mil';
-  if(abs >= 999.5)     return Math.round(n/1e3)+' mii';
+  const en = __limbaEn();
+  if(abs >= 999500000) return (n/1e9).toFixed(2).replace(/\.?0+$/,'')+(en ? ' bn' : ' mld');
+  if(abs >= 999500)    return (n/1e6).toFixed(1).replace(/\.0$/,'')+(en ? ' M' : ' mil');
+  if(abs >= 999.5)     return Math.round(n/1e3)+(en ? ' K' : ' mii');
   return fmtNum(n);
 }
 /* Atenție: varianta veche folosea textContent -> innerHTML, care escapează <, > și &
@@ -1927,6 +1958,19 @@ function esc(s){
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+/* ---------- Datele din spatele fiecărei diagrame (pentru butonul „CSV") ----------
+   Fiecare funcție de desenare lasă pe panoul ei datele exacte, nerotunjite, pe care
+   le-a desenat. Butonul CSV le descarcă de acolo; nu reconstruiește nimic din ecran,
+   unde sumele sunt deja prescurtate („1.09 mld"). */
+function __L(ro, en){ return __limbaEn() ? en : ro; }
+function __csvInreg(el, cols, rows){
+  try{
+    const node = typeof el === 'string' ? document.getElementById(el) : el;
+    const panel = node && node.closest ? node.closest('.panel') : null;
+    if(panel) panel.__dateCsv = { cols: cols, rows: rows || [] };
+  }catch(e){}
 }
 
 
@@ -2083,6 +2127,7 @@ function handleYearPick(y, shiftKey, ctrlKey){
      rescria selecția la următorul cadru și clicul părea ignorat. */
   if(window.__introRunning && typeof finishIntro === 'function') finishIntro();
   window.__aniAlesi = true;
+  window.__filtreLinkAtinse = true;
   const toti = state.selectedYears.size === ALL_KEYS.size;
   if(shiftKey && lastYearClicked!==null){
     const lo = Math.min(lastYearClicked,y), hi = Math.max(lastYearClicked,y);
@@ -2139,11 +2184,13 @@ function buildYearUI(){
 document.getElementById('resetYears').addEventListener('click', ()=>{
   if(window.__introRunning && typeof finishIntro === 'function') finishIntro();
   window.__aniAlesi = false;
+  window.__filtreLinkAtinse = true;
   state.selectedYears = new Set(ALL_KEYS);
   render();
 });
 document.getElementById('naYearRow').addEventListener('click', ()=>{
   if(!HAS_NA) return;
+  window.__filtreLinkAtinse = true;
   if(state.selectedYears.has('NA') && state.selectedYears.size===1){
     state.selectedYears = new Set(ALL_KEYS);
   } else if(state.selectedYears.has('NA')){
@@ -2436,6 +2483,7 @@ function aplicaDonatori(set){
   if(window.__introRunning && typeof finishIntro === 'function') finishIntro();
   state.selectedDonors = set.size ? set : new Set(DONORS);
   window.__donatoriAlesi = !donoriToti();
+  window.__filtreLinkAtinse = true;
   const sc = donorList.scrollTop;
   renderDonorList();
   donorList.scrollTop = sc;
@@ -2616,6 +2664,7 @@ document.getElementById('deselectAllDonors').addEventListener('click',()=>{
   if(window.__introRunning && typeof finishIntro === 'function') finishIntro();
   state.selectedDonors = new Set();
   window.__donatoriAlesi = true;
+  window.__filtreLinkAtinse = true;
   renderDonorList();
   render();
 });
@@ -2668,6 +2717,8 @@ function renderChart(byDonor){
   const top = [...byDonor].sort((a,b)=>b[metric]-a[metric]).slice(0,12);
   const max = Math.max(1,...top.map(d=>d[metric]));
   const body = document.getElementById('chartBody');
+  __csvInreg(body, [t('colDonor'), t('colCommitments'), t('colDisbursements'), t('colProjects')],
+    [...byDonor].sort((a,b)=>b[metric]-a[metric]).map(d=>[donorLabel(d.donator), Math.round(d.Angajamente), Math.round(d.Debursari), d.Proiecte]));
   if(top.length===0){ body.innerHTML = `<div class="empty-state">${t('emptyCurrentSelection')}</div>`; return; }
   body.innerHTML = top.map(d=>{
     const w = Math.max(1,(d[metric]/max)*100);
@@ -2693,12 +2744,17 @@ function renderTable(byDonor, trueTotals){
     return (a[state.sortKey]-b[state.sortKey])*dir;
   });
   const tbody = document.getElementById('tableBody');
+  __csvInreg(tbody, [t('colDonor'), t('colPeriod'), t('colProjects'), t('colCommitments'), t('colDisbursements'), t('colPctTotal')],
+    rows.map(r=>[donorLabel(r.donator),
+      r.anMin==='NA' ? (currentLang==='en' ? 'unspecified' : 'nespecificat') : (r.anMin===r.anMax ? r.anMin : r.anMin+'–'+r.anMax),
+      r.Proiecte, Math.round(r.Angajamente), Math.round(r.Debursari), Math.round(r.pct*10)/10])
+    .concat(rows.length ? [[t('totalUniqueRow'), '', trueTotals.proj, Math.round(trueTotals.ang), Math.round(trueTotals.deb), 100]] : []));
   if(rows.length===0){
     tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">${t('emptyAdjustFilters')}</div></td></tr>`;
   } else {
     tbody.innerHTML = rows.map(r=>{
       let perioada;
-      if(r.anMin==='NA') perioada = 'nespecificat';
+      if(r.anMin==='NA') perioada = currentLang==='en' ? 'unspecified' : 'nespecificat';
       else if(r.anMin===r.anMax) perioada = r.anMin;
       else perioada = r.anMin+'–'+r.anMax;
       return `
@@ -2779,6 +2835,10 @@ function renderProjects(){
   });
   document.getElementById('projCount').textContent = rows.length;
   const tbody = document.getElementById('projectsBody');
+  __csvInreg(tbody, ['AMP ID', t('colProjectName'), t('colDonor'), t('colPeriod'), t('colCommitments'), t('colDisbursements')],
+    rows.map(p=>[p.id || '', projectLabel(p), donorLabelList(p.donator),
+      p.minYear==='NA' ? '' : (p.minYear===p.maxYear ? p.minYear : p.minYear+'–'+p.maxYear),
+      Math.round(p.ang), Math.round(p.deb)]));
   if(state.selectedDonors.size===0){
     tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">${t('emptySelectDonor')}</div></td></tr>`;
     return;
@@ -2881,6 +2941,12 @@ function renderMiniBarChart(containerId, items, metric, n){
   const top = [...items].sort((a,b)=>b[metric]-a[metric]).slice(0,n);
   const max = Math.max(1,...top.map(d=>d[metric]));
   const body = document.getElementById(containerId);
+  {
+    const eSector = containerId==='sectorChartBody', eBenef = containerId==='beneficiaryChartBody';
+    const lab = d => eSector ? sectorLabel(d.nume) : (eBenef ? beneficiaryLabel(d.nume) : d.nume);
+    __csvInreg(body, [eSector ? 'Sector' : __L('Beneficiar', 'Beneficiary'), t('colCommitments'), t('colDisbursements'), t('colProjects')],
+      [...items].sort((a,b)=>b[metric]-a[metric]).map(d=>[lab(d), Math.round(d.ang), Math.round(d.deb), d.proiecte]));
+  }
   if(top.length===0){ body.innerHTML = `<div class="empty-state">${t('emptyCurrentSelection')}</div>`; return; }
   body.innerHTML = top.map(d=>{
     const w = Math.max(1,(d[metric]/max)*100);
@@ -3084,6 +3150,8 @@ function renderMap(countryData){
   const en = currentLang === 'en';
   const metric = mapState.metric || 'proiecte';
   const val = d => (d ? (d[metric] || 0) : 0);
+  __csvInreg('mapPanel', [__L('Țară / organizație', 'Country / organisation'), t('colProjects'), t('colCommitments'), t('colDisbursements')],
+    [...countryData].sort((a,b)=>val(b)-val(a)).map(d=>[geoLabel(d.nume), d.proiecte, Math.round(d.ang), Math.round(d.deb)]));
   const fmtV = v => metric === 'proiecte' ? fmtNum(v) : geoBani(v);
   const maxV = Math.max(1, ...countryData.map(val));
   const scalaMax = document.getElementById('mapScalaMax');
@@ -3448,6 +3516,7 @@ function render(){
     row.classList.toggle('checked', isChecked);
     row.querySelector('input').checked = isChecked;
   });
+  if(typeof __programeazaLink === 'function') __programeazaLink();
 }
 
 const I18N = {"ro": {"mainTitle": "Asistență externă pentru", "countryName": "Republica Moldova", "yearFilterTitle": "Filtru · Ani", "allYears": "Toți anii", "yearSelectedLabel": "An(i) selectat(ți)", "yearHint": "clic = un an · Ctrl+clic = mai mulți · Shift+clic = interval", "yearUnspecified": "An nespecificat în sursă", "donorFilterTitle": "Filtru · Donatori", "allDonorsBtn": "Toți", "noneDonorsBtn": "Niciunul", "donorSearchPlaceholder": "Caută donator…", "topDonorsTitle": "Top donatori · sumă totală", "metricDeb": "debursări", "metricAng": "Angajamente", "sectorsTitle": "Distribuție pe sectoare", "metricDebCap": "Debursări", "sectorNote": "un proiect poate acoperi mai multe sectoare — suma pe sectoare poate depăși totalul general", "beneficiariesTitle": "Distribuție pe beneficiari", "beneficiaryNote": "un proiect poate avea mai mulți beneficiari — fiecare beneficiar este numărat separat, cu suma integrală a proiectului", "donorTableTitle": "Donatori grupați · sume totale", "donorTableNote": "fiecare donator își arată suma integrală a proiectelor la care participă; pentru proiectele co-finanțate (mai mulți donatori), aceeași sumă apare la fiecare donator implicat — rândul TOTAL de mai jos elimină această suprapunere și arată suma reală, fără duplicare", "colDonor": "Donator", "colPeriod": "Perioadă", "colProjects": "Proiecte", "colCommitments": "Angajamente (EUR)", "colDisbursements": "Debursări (EUR)", "colPctTotal": "% din total", "colProjectName": "Denumire proiect", "colYear": "An", "projectsListTitle": "Lista proiectelor", "projSearchPlaceholder": "Caută după denumire sau AMP ID...", "mapTitle": "Hartă globală · număr de proiecte pe donator", "zoomIn": "Mărește", "zoomOut": "Micșorează", "zoomReset": "Resetează",
@@ -3907,6 +3976,15 @@ function splitOrgList(rawCell, vocab){
     for(let j = parts.length; j > i; j--){
       const k = foldOrg(parts.slice(i, j).join(','));
       if(vocab.has(k)){ hit = [vocab.get(k), j]; break; }
+      /* O denumire cu virgulă cunoscută doar în ALTĂ coloană (de ex. „Fondul Global
+         pentru Combaterea SIDA, Tuberculozei și Malariei" apare în arhivă doar ca
+         donator) era ruptă în bucăți când apărea ca beneficiar sau implementator.
+         O căutăm și în celelalte vocabulare — doar pentru bucăți care conțin
+         virgulă (j - i ≥ 2), ca tăierea organizațiilor simple să rămână neschimbată. */
+      if(j - i >= 2){
+        const alt = [DONOR_VOCAB, BENEF_VOCAB, IMPL_VOCAB].find(v => v !== vocab && v.has(k));
+        if(alt){ hit = [alt.get(k), j]; break; }
+      }
     }
     // 2) potrivire aproximativă pe bucăți de ≥2 fragmente (deci doar reunește)
     if(!hit && parts.length - i >= 2){
@@ -4593,6 +4671,12 @@ function rebuildAll(records){
     ? new Set(DONORS.filter(d => donatoriVechi.has(d))) : null;
   state.selectedDonors = (pastratiD && pastratiD.size) ? pastratiD
     : (cerutDinLink && cerutDinLink.length) ? new Set(cerutDinLink) : new Set(DONORS);
+  /* Selecția venită dintr-un link (?ani=…&don=…) se reaplică la fiecare
+     reconstrucție: anii 2023+ există abia după sosirea datelor live, deci la
+     prima randare (doar arhiva) unii ani ceruți încă lipsesc. */
+  if(window.__filtreLink && !window.__filtreLinkAtinse){
+    try{ __aplicaFiltreLink(); }catch(e){ console.warn('filtre din link', e); }
+  }
   mapState.selected = null;
 
   buildYearUI();
@@ -4630,6 +4714,25 @@ function rebuildAll(records){
 /* ---------- Banner de stare ---------- */
 let lastStatus = null;   // {kind, key, params}
 
+/* „azi, 14:32" / „30.09.2026, 14:32" — când au fost preluate datele live */
+function __oraScurta(d){
+  if(!d) return '';
+  const en = currentLang === 'en';
+  const hh = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  const azi = new Date();
+  if(d.toDateString() === azi.toDateString()) return (en ? 'today, ' : 'azi, ') + hh;
+  return String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear() + ', ' + hh;
+}
+/* Când AMP nu răspunde, spunem măcar când a mers ultima oară în acest browser. */
+function __ultimaReusita(){
+  let s = null;
+  try{ s = localStorage.getItem('ampLiveOk'); }catch(e){}
+  const d = s ? new Date(s) : null;
+  if(!d || isNaN(d)) return '';
+  return currentLang === 'en'
+    ? ' Last successful load in this browser: ' + __oraScurta(d) + '.'
+    : ' Ultima încărcare reușită în acest browser: ' + __oraScurta(d) + '.';
+}
 function setDataStatus(kind, key, params){
   lastStatus = { kind, key, params: params || {} };
   renderDataStatus();
@@ -4649,8 +4752,14 @@ function renderDataStatus(){
     btn.addEventListener('click', loadLiveData);
     el.appendChild(btn);
   }
+  if(typeof renderProspetime === 'function') renderProspetime();
 }
-function onLanguageChanged(){ renderDataStatus(); }
+function onLanguageChanged(){
+  if(lastStatus && lastStatus.kind === 'ok' && window.__liveLaOra) lastStatus.params.ora = __oraScurta(window.__liveLaOra);
+  if(lastStatus && lastStatus.kind === 'error') lastStatus.params.ultima = __ultimaReusita();
+  renderDataStatus();
+  if(typeof window.__unelteLimba === 'function') window.__unelteLimba();
+}
 function setLiveProgress(pct){
   const el = document.getElementById('dataStatus');
   if(!el) return;
@@ -4682,7 +4791,7 @@ async function loadLiveData(){
     window.__liveFetchPending = false;
     if(window.__introOnLiveSettled) window.__introOnLiveSettled();
     console.warn('AMP live:', err);
-    setDataStatus('error', 'statusError', { err: esc(String((err && err.message) || err)) });
+    setDataStatus('error', 'statusError', { err: esc(String((err && err.message) || err)), ultima: __ultimaReusita() });
     startIatiAfterAmp();
     return;
   }
@@ -4716,7 +4825,10 @@ async function loadLiveData(){
     if(window.__coloaneFinantare === 0 && liveRo.length){
       setDataStatus('warn', 'statusFaraSume', {});
     } else {
+      window.__liveLaOra = new Date();
+      try{ localStorage.setItem('ampLiveOk', window.__liveLaOra.toISOString()); }catch(e){}
       setDataStatus('ok', 'statusOk', {
+        ora:   __oraScurta(window.__liveLaOra),
         live:  fmtNum(liveRo.length),
         upd:   fmtNum(updated),
         new:   fmtNum(added),
@@ -4726,7 +4838,7 @@ async function loadLiveData(){
     startIatiAfterAmp();
   }catch(err){
     console.warn('AMP live:', err);
-    setDataStatus('error', 'statusError', { err: esc(String((err && err.message) || err)) });
+    setDataStatus('error', 'statusError', { err: esc(String((err && err.message) || err)), ultima: __ultimaReusita() });
     startIatiAfterAmp();
   }
 }
@@ -4735,14 +4847,9 @@ async function loadLiveData(){
 <script>
 let TOA_LABELS_RO = {}, TOA_LABELS_EN = {};
 (function(){
-const fmtCompact = n => {
-  const a = Math.abs(n);
-  if(a>=1e9) return (n/1e9).toFixed(2)+' mld';
-  if(a>=1e6) return (n/1e6).toFixed(1)+' mil';
-  if(a>=1e3) return (n/1e3).toFixed(0)+' mii';
-  return String(Math.round(n));
-};
-const fmtNum = n => Math.round(n).toLocaleString('ro-RO');
+// aceleași formatoare ca restul paginii — inclusiv unitățile și separatorii în engleză
+const fmtCompact = n => window.fmtCompact(n);
+const fmtNum = n => window.fmtNum(n);
 
 const tooltip = document.getElementById('advTooltip');
 function showTip(html, evt){
@@ -4774,6 +4881,8 @@ function renderLineChart(){
   });
   const years = [...byYear.keys()].sort((a,b)=>a-b);
   const maxVal = Math.max(...years.map(y=>Math.max(byYear.get(y).ang, byYear.get(y).deb)));
+  __csvInreg('lineChartBody', [t('colYear'), t('colCommitments'), t('colDisbursements')],
+    years.map(y=>[y, Math.round(byYear.get(y).ang), Math.round(byYear.get(y).deb)]));
 
   const W = Math.max(900, years.length*34), H = 340;
   const padL = 70, padR = 20, padT = 20, padB = 40;
@@ -4852,6 +4961,9 @@ function renderExecRate(){
     .filter(([,v])=>v.ang>0)
     .sort((a,b)=>b[1].ang-a[1].ang)
     .slice(0,20);
+  __csvInreg('execRateBody', [t('colDonor'), t('colCommitments'), t('colDisbursements'), __L('Execuție (%)', 'Execution (%)')],
+    [...byDonor.entries()].filter(([,v])=>v.ang>0).sort((a,b)=>b[1].ang-a[1].ang)
+      .map(([d,v])=>[donorLabel(d), Math.round(v.ang), Math.round(v.deb), Math.round(v.deb/v.ang*1000)/10]));
 
   const body = document.getElementById('execRateBody');
   body.innerHTML = '';
@@ -4931,6 +5043,12 @@ function renderSankey(){
     const v = s===OTHER_SECTOR ? 0 : (sbFlow.get(s+'|||'+b)||0);
     if(v>0) sbLinks.push({source:s, target:b, value:v});
   }));
+  {
+    const sec = s => s===OTHER_SECTOR ? s : sectorLabel(s);
+    __csvInreg('sankeyBody', [__L('Flux', 'Flow'), __L('De la', 'From'), __L('Către', 'To'), t('colCommitments')],
+      dsLinks.map(l=>[__L('Donator → Sector', 'Donor → Sector'), donorLabel(l.source), sec(l.target), Math.round(l.value)])
+      .concat(sbLinks.map(l=>[__L('Sector → Beneficiar', 'Sector → Beneficiary'), sec(l.source), beneficiaryLabel(l.target), Math.round(l.value)])));
+  }
 
   const donorNodeTotal = new Map(topDonors.map(d=>[d, dsLinks.filter(l=>l.source===d).reduce((s,l)=>s+l.value,0)]));
   const sectorNodeTotalIn = new Map(topSectors.map(s=>[s, dsLinks.filter(l=>l.target===s).reduce((s2,l)=>s2+l.value,0)]));
@@ -5032,6 +5150,12 @@ function renderTreemap(){
   }));
   const items = [...bySector.entries()].filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,16);
   const total = items.reduce((s,[,v])=>s+v,0);
+  {
+    const toate = [...bySector.entries()].filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+    const sum = toate.reduce((s,[,v])=>s+v,0) || 1;
+    __csvInreg('treemapBody', ['Sector', t('colCommitments'), __L('% din total', '% of total')],
+      toate.map(([n,v])=>[sectorLabel(n), Math.round(v), Math.round(v/sum*1000)/10]));
+  }
 
   const W = 700, H = 420;
   const palette = ['#22406b','#c8871a','#2dd4bf','#c0402c','#6b7284','#155a52','#7a5a1a','#16294a',
@@ -5169,6 +5293,8 @@ function renderTreemap(){
    ============================================================ */
 function renderTopProjects(){
   const top = [...PROJECTS].sort((a,b)=>b.ang-a.ang).slice(0,20);
+  __csvInreg('topProjectsBody', ['#', 'AMP ID', t('advColProject'), t('colDonor'), t('colYear'), t('colCommitments')],
+    top.map((p,i)=>[i+1, p.id || '', projectLabel(p), donorLabelList(p.donator), p.an==='NA' ? '' : p.an, Math.round(p.ang)]));
   const wrap = document.createElement('div');
   wrap.className = 'table-scroll';
   const table = document.createElement('table');
@@ -5209,6 +5335,8 @@ function renderHeatmap(){
   const donors = [...donorTotal.entries()].sort((a,b)=>b[1]-a[1]).slice(0,25).map(x=>x[0]);
   const years = [...new Set(PROJECTS.filter(p=>p.an!=='NA').map(p=>p.an))].sort((a,b)=>a-b);
   const maxVal = Math.max(1, ...donors.flatMap(d=>years.map(y=>donorYear.get(d+'|||'+y)||0)));
+  __csvInreg('heatmapBody', [t('colDonor')].concat(years.map(String)).concat(['Total']),
+    donors.map(d=>[donorLabel(d)].concat(years.map(y=>Math.round(donorYear.get(d+'|||'+y)||0))).concat([Math.round(donorTotal.get(d)||0)])));
 
   const cellW = 22, cellH = 20, labelW = 220;
   const W = labelW + years.length*cellW + 10, H = 26 + donors.length*cellH;
@@ -5224,7 +5352,8 @@ function renderHeatmap(){
 
   donors.forEach((d,ri)=>{
     const t = svgEl('text',{x:labelW-8, y:26+ri*cellH+cellH/2+4, 'text-anchor':'end', 'font-size':'11', fill:'var(--ink)'});
-    t.textContent = d.length>32 ? d.slice(0,30)+'…' : d;
+    const dl = donorLabel(d);   // era denumirea brută, în română și în versiunea engleză
+    t.textContent = dl.length>32 ? dl.slice(0,30)+'…' : dl;
     svg.appendChild(t);
     years.forEach((y,ci)=>{
       const v = donorYear.get(d+'|||'+y)||0;
@@ -5232,7 +5361,7 @@ function renderHeatmap(){
       const rect = svgEl('rect',{class:'hm-cell', x:labelW+ci*cellW, y:26+ri*cellH, width:cellW, height:cellH,
         fill: v>0 ? `rgba(34,64,107,${alpha.toFixed(3)})` : 'var(--blue-bg)', style:'cursor:pointer;'});
       if(v>0){
-        rect.addEventListener('mousemove', e=>showTip(`<b>${d}</b><br>${y}: ${fmtNum(v)} EUR`, e));
+        rect.addEventListener('mousemove', e=>showTip(`<b>${esc(donorLabel(d))}</b><br>${y}: ${fmtNum(v)} EUR`, e));
         rect.addEventListener('mouseleave', hideTip);
       }
       svg.appendChild(rect);
@@ -5432,6 +5561,8 @@ function renderTypeOfAssistance(){
   const maxVal = Math.max(1, ...rows.map(([,v])=>v[toaMetric]));
 
   const body = document.getElementById('toaBody');
+  __csvInreg(body, [__L('Tipul de asistență', 'Type of assistance'), t('colCommitments'), t('colDisbursements'), t('colProjects')],
+    rows.map(([label, v])=>[toaLabel(label), Math.round(v.ang), Math.round(v.deb), v.count]));
   body.innerHTML = '';
   const note = document.createElement('div');
   note.style.cssText = 'font-size:11.5px;color:var(--ink-dim);margin-bottom:10px;';
@@ -5759,6 +5890,8 @@ function renderRegionChart(){
     return b[1][regionMetric]-a[1][regionMetric];
   });
   const maxVal = Math.max(1, ...rows.filter(([k])=>k!==NATIONAL_LEVEL_KEY).map(([,v])=>v[regionMetric]), 1);
+  __csvInreg('regionBody', [__L('Regiune', 'Region'), t('colCommitments'), t('colDisbursements'), t('colProjects')],
+    rows.map(([k,v])=>[regionLabel(k), Math.round(v.ang), Math.round(v.deb), v.count]));
 
   renderRegionMap(totals, maxVal);
   renderRegionProjectsList(consideredProjects, matchedProjects);
@@ -5919,6 +6052,8 @@ function renderSectorDonor(){
   let max = 1;
   donors.forEach(d=>sectors.forEach(s=>{ max = Math.max(max, cell.get(d+'\u0001'+s)||0); }));
   const secLab = s => (typeof sectorLabel==='function' ? sectorLabel(s) : s);
+  __csvInreg(body, [en ? 'Donor \\ sector' : 'Donator \\ sector'].concat(sectors.map(secLab)).concat([en ? 'Total (all sectors)' : 'Total (toate sectoarele)']),
+    donors.map(d=>[donorLabel(d)].concat(sectors.map(s=>Math.round(cell.get(d+'\u0001'+s)||0))).concat([Math.round(perDonor.get(d)||0)])));
   let h = '<div class="sd-wrap"><table class="sd-tab"><colgroup><col class="c-don">' + sectors.map(()=>'<col>').join('') + '<col class="c-tot"></colgroup><thead><tr><th class="sd-corner">' +
     (en?'Donor \\ sector':'Donator \\ sector') + '</th>' +
     sectors.map(s=>`<th class="sd-col"><span title="${esc(secLab(s))}">${esc(secLab(s))}</span></th>`).join('') +
@@ -5972,6 +6107,8 @@ function renderTipPeAni(){
     perAn.set(p.an, o);
   });
   const ani = [...perAn.keys()].sort((a,b)=>a-b);
+  __csvInreg(body, [t('colYear')].concat(TIPURI.map(numeTip)).concat(['Total']),
+    ani.map(a=>[a].concat(TIPURI.map(k=>Math.round(perAn.get(a).v[k]||0))).concat([Math.round(perAn.get(a).tot)])));
   if(!ani.length){ body.innerHTML = `<div class="panel-note">${t('emptyCurrentSelection')}</div>`; return; }
   const maxTot = Math.max(...ani.map(a=>perAn.get(a).tot));
   // lățimea reală a panoului, ca textul axelor să rămână la 10–11 px
@@ -6032,6 +6169,7 @@ document.querySelectorAll('#tyMod button').forEach(b=>b.addEventListener('click'
 window.__initAdvancedView = function(){ ongoingProjectsIndex = null; regionFiltersPopulated = false; selectedRegionId = null; renderLineChart(); renderExecRate(); renderSankey(); renderTreemap(); renderTopProjects(); renderHeatmap(); renderOngoing(); renderTypeOfAssistance(); renderRegionChart();
   try{ renderSectorDonor(); }catch(e){ console.warn('sector×donator', e); }
   try{ renderTipPeAni(); }catch(e){ console.warn('tip pe ani', e); }
+  try{ if(typeof renderComparatie === 'function') renderComparatie(); }catch(e){ console.warn('comparație', e); }
   try{ etichetaControale(); }catch(e){}
 };
 window.findSvgRegionExport = findSvgRegion;
@@ -7060,6 +7198,8 @@ function dpRenderPublishers(rows){
     map.get(k).deb += a.spend_eur || 0;
   });
   const top = [...map.entries()].sort((a,b)=>b[1][dpState.metric]-a[1][dpState.metric]).slice(0,12);
+  __csvInreg(body, [__L('Organizație raportoare', 'Reporting organisation'), t('colCommitments'), t('colDisbursements')],
+    [...map.entries()].sort((a,b)=>b[1][dpState.metric]-a[1][dpState.metric]).map(([n,o])=>[n, Math.round(o.ang), Math.round(o.deb)]));
   if(!top.length){ body.innerHTML = '<div class="empty-state">' + t('dpNoActivities') + '</div>'; return; }
   const max = Math.max(1, ...top.map(d=>d[1][dpState.metric]));
   body.innerHTML = top.map(([name,o]) => {
@@ -7081,6 +7221,7 @@ function dpRenderStatus(rows){
     map.set(k, (map.get(k)||0)+1);
   });
   const list = [...map.entries()].sort((a,b)=>b[1]-a[1]);
+  __csvInreg(body, [__L('Stadiu', 'Status'), __L('Activități', 'Activities')], list.map(([k,v])=>[k, v]));
   if(!list.length){ body.innerHTML = '<div class="empty-state">' + t('dpNoActivities') + '</div>'; return; }
   const max = Math.max(1, ...list.map(d=>d[1]));
   body.innerHTML = list.map(([k,v]) => `<div class="bar-row">
@@ -7094,6 +7235,7 @@ function dpRenderYearChart(rows){
   const map = new Map();
   rows.forEach(a => { const y = dpDayToYear(a.day_start); if(y!==null) map.set(y,(map.get(y)||0)+1); });
   const years = [...map.keys()].sort((a,b)=>a-b).slice(-14);
+  __csvInreg(body, [t('colYear'), __L('Activități', 'Activities')], [...map.keys()].sort((a,b)=>a-b).map(y=>[y, map.get(y)]));
   if(!years.length){ body.innerHTML = '<div class="empty-state">' + t('dpNoYears') + '</div>'; return; }
   const max = Math.max(1, ...years.map(y=>map.get(y)));
   body.innerHTML = years.map(y => `<div class="bar-row">
@@ -7119,6 +7261,8 @@ function dpRenderSectors(rows){
     });
   });
   const top = [...map.entries()].sort((a,b)=>b[1][dpState.metric]-a[1][dpState.metric]).slice(0,12);
+  __csvInreg(body, ['Sector', t('colCommitments'), t('colDisbursements'), __L('Activități', 'Activities')],
+    [...map.entries()].sort((a,b)=>b[1][dpState.metric]-a[1][dpState.metric]).map(([n,o])=>[n, Math.round(o.ang), Math.round(o.deb), o.n]));
   if(!top.length){ body.innerHTML = '<div class="empty-state">' + t('dpNoActivities') + '</div>'; return; }
   const max = Math.max(1, ...top.map(d=>d[1][dpState.metric]));
   body.innerHTML = top.map(([name,o]) => {
@@ -7267,6 +7411,8 @@ function dpRenderMap(){
   });
   const val = o => o ? (o[metric] || 0) : 0;
   const max = Math.max(1, ...[...agg.values()].map(val));
+  __csvInreg('dpMapPanel', [__L('Țară / organizație', 'Country / organisation'), __L('Activități', 'Activities'), t('colCommitments'), t('colDisbursements')],
+    [...agg.entries()].sort((a,b)=>val(b[1])-val(a[1])).map(([c,o])=>[geoLabel(c), o.n, Math.round(o.ang), Math.round(o.deb)]));
   const scalaMaxDp = document.getElementById('dpScalaMax');
   if (scalaMaxDp) scalaMaxDp.textContent = metric === 'n' ? fmtNum(max) : geoBani(max) + ' EUR';
   const lbl = document.getElementById('dpScalaLbl');
@@ -8127,8 +8273,8 @@ Object.assign(I18N.ro, {
   dpAmpMatchNone: 'fără potrivire',
   pageTitle: 'Asistență Externă — Republica Moldova',
   introWaitingLive: 'se așteaptă datele actualizate din raportul live…',
-  statusOk: '<b>Date actualizate.</b> {live} proiecte din AMP (live) — {upd} actualizate față de arhivă, {new} noi. Total afișat: <b>{total}</b> proiecte.',
-  statusError: '<b>Datele live nu au putut fi încărcate.</b> Se afișează doar arhiva (1993–2022). Detalii: {err}',
+  statusOk: '<b>Date actualizate</b> ({ora}). {live} proiecte din AMP (live) — {upd} actualizate față de arhivă, {new} noi. Total afișat: <b>{total}</b> proiecte.',
+  statusError: '<b>Datele live nu au putut fi încărcate.</b> Se afișează doar arhiva (1993–2022). Detalii: {err}.{ultima}',
   statusFaraSume: '<b>Raportul live nu are coloane de sume recunoscute.</b> Proiectele s-au preluat, dar angajamentele și debursările rămân cele din arhivă. Probabil platforma a redenumit coloanele de finanțare.',
   statusRetry: 'Reîncearcă',
   footerSource: 'Sursă: platforma AMP (Aid Management Platform) a Republicii Moldova — arhivă 1993–2022 + raport live 2008–2026 · sume în EUR',
@@ -8148,8 +8294,8 @@ Object.assign(I18N.en, {
   dpAmpMatchNone: 'no match',
   pageTitle: 'External Assistance — Republic of Moldova',
   introWaitingLive: 'waiting for the updated live report…',
-  statusOk: '<b>Data updated.</b> {live} projects from AMP (live) — {upd} updated over the archive, {new} new. Total shown: <b>{total}</b> projects.',
-  statusError: '<b>Live data could not be loaded.</b> Showing the archive only (1993–2022). Details: {err}',
+  statusOk: '<b>Data updated</b> ({ora}). {live} projects from AMP (live) — {upd} updated over the archive, {new} new. Total shown: <b>{total}</b> projects.',
+  statusError: '<b>Live data could not be loaded.</b> Showing the archive only (1993–2022). Details: {err}.{ultima}',
   statusFaraSume: '<b>The live report has no recognisable funding columns.</b> Projects were loaded, but commitments and disbursements remain those of the archive. The platform has probably renamed the funding columns.',
   statusRetry: 'Retry',
   footerSource: 'Source: the Republic of Moldova AMP (Aid Management Platform) — 1993–2022 archive + live 2008–2026 report · amounts in EUR',
@@ -8428,6 +8574,105 @@ function canonicalToa(t){var f=__toaFold(t);if(__TOA_CANON[f])return __TOA_CANON
  if(typeof DONOR_BILINGUAL_EN!=='undefined'&&typeof enLookup==='function'){Object.keys(ADD).forEach(function(k){if(enLookup(DONOR_BILINGUAL_EN,k)===undefined)DONOR_BILINGUAL_EN[k]=ADD[k];});}}catch(e){console.warn('bil',e);}})();
 
 /* ---------- Pornire: mai întâi arhiva, apoi datele live ---------- */
+/* ---------- Link care păstrează filtrele ----------
+   ?ani=2019-2021,2023  ani (intervale, „NA" = an nespecificat)
+   ?don=A|B|C           doar acești donatori
+   ?fara=A|B            toți donatorii, în afară de aceștia (mai scurt când lipsesc puțini)
+   ?lang=en             limba
+   Adresa se rescrie (fără intrări noi în istoric) la fiecare schimbare făcută de
+   utilizator, deci linkul din bara de adrese e oricând exact vederea de pe ecran. */
+function __aniLaText(set){
+  if(!set || set.size === ALL_KEYS.size) return null;
+  const nums = [...set].filter(y => y !== 'NA').map(Number).sort((a,b)=>a-b);
+  const parts = [];
+  for(let i = 0; i < nums.length; ){
+    let j = i;
+    while(j + 1 < nums.length && nums[j+1] === nums[j] + 1) j++;
+    parts.push(i === j ? String(nums[i]) : nums[i] + '-' + nums[j]);
+    i = j + 1;
+  }
+  if(set.has('NA')) parts.push('NA');
+  return parts.join(',');
+}
+function __textLaAni(s){
+  const out = new Set();
+  String(s || '').split(',').forEach(p => {
+    p = p.trim();
+    if(!p) return;
+    if(/^na$/i.test(p)){ out.add('NA'); return; }
+    const m = p.match(/^(\d{4})(?:-(\d{4}))?$/);
+    if(!m) return;
+    let a = +m[1], b = m[2] ? +m[2] : a;
+    if(a > b){ const x = a; a = b; b = x; }
+    for(let y = a; y <= b && y - a < 300; y++) out.add(y);
+  });
+  return out;
+}
+function __donatoriDinText(s){
+  const cerute = String(s || '').split('|').map(x => x.trim()).filter(Boolean);
+  const dupaCheie = new Map(DONORS.map(d => [foldOrg(d), d]));
+  const gasiti = new Set();
+  cerute.forEach(c => {
+    if(DONORS.includes(c)) gasiti.add(c);
+    else { const d = dupaCheie.get(foldOrg(c)); if(d) gasiti.add(d); }
+  });
+  return gasiti;
+}
+function __aplicaFiltreLink(){
+  const L = window.__filtreLink;
+  if(!L) return;
+  if(L.ani){
+    const ani = new Set([...__textLaAni(L.ani)].filter(y => ALL_KEYS.has(y)));
+    if(ani.size){ state.selectedYears = ani; window.__aniAlesi = true; }
+  }
+  if(L.don !== null){
+    const d = __donatoriDinText(L.don);
+    if(d.size || L.don === ''){ state.selectedDonors = d; window.__donatoriAlesi = true; }
+  } else if(L.fara){
+    const fara = __donatoriDinText(L.fara);
+    const d = new Set(DONORS.filter(x => !fara.has(x)));
+    if(d.size){ state.selectedDonors = d; window.__donatoriAlesi = true; }
+  }
+}
+function linkSelectie(){
+  const q = new URLSearchParams(location.search);
+  ['ani', 'don', 'fara', 'donator', 'lang'].forEach(k => q.delete(k));
+  const ani = __aniLaText(state.selectedYears);
+  if(ani) q.set('ani', ani);
+  const n = state.selectedDonors.size;
+  if(n !== DONORS.length){
+    const alesi = DONORS.filter(d => state.selectedDonors.has(d));
+    const lipsa = DONORS.filter(d => !state.selectedDonors.has(d));
+    if(n > 0 && lipsa.length < alesi.length) q.set('fara', lipsa.join('|'));
+    else q.set('don', alesi.join('|'));
+  }
+  if(currentLang === 'en') q.set('lang', 'en');
+  const qs = q.toString();
+  return location.origin + location.pathname + (qs ? '?' + qs : '') + location.hash;
+}
+let __linkTimer = null;
+function __programeazaLink(){
+  // până la prima alegere a utilizatorului, adresa rămâne exact linkul cu care a venit
+  if(!window.__filtreLinkAtinse || window.__introRunning) return;
+  clearTimeout(__linkTimer);
+  __linkTimer = setTimeout(function(){
+    try{
+      const nou = linkSelectie();
+      if(nou !== location.href) history.replaceState(history.state, '', nou);
+    }catch(e){ /* fișier local fără istoric — nu e motiv să cadă pagina */ }
+  }, 250);
+}
+(function(){
+  try{
+    const q = new URLSearchParams(location.search);
+    const L = { ani: q.get('ani'), don: q.get('don'), fara: q.get('fara') };
+    if(L.ani === null && L.don === null && L.fara === null) return;
+    window.__filtreLink = L;
+    // vederea trimisă se arată direct, fără animația de deschidere care ar rescrie anii
+    introState.played = true;
+  }catch(e){ console.warn('filtre din link', e); }
+})();
+
 rebuildAll(archiveRecords());
 
 /* Adresa poate cere o vedere anume: cineva a trimis linkul, sau utilizatorul a
@@ -8451,7 +8696,7 @@ rebuildAll(archiveRecords());
 (function(){
   try{
     var cerut = new URLSearchParams(location.search).get('donator');
-    if(!cerut) return;
+    if(!cerut || (window.__filtreLink && (window.__filtreLink.don !== null || window.__filtreLink.fara))) return;
     window.__donatorCerut = cerut;
     var potriviri = DONORS.filter(function(d){
       var a = String(d).toLowerCase(), b = cerut.toLowerCase();
@@ -8549,121 +8794,7 @@ loadLiveData();
 </script>
 <script src="fisa-donator.js"></script>
 <script src="amp-linkuri.js"></script>
-<!-- ---------- Buton „Copiază" pe fiecare diagramă ----------
-     Pune în clipboard imaginea întregului panou (titlu, diagramă, legendă, notă),
-     ca PNG, gata de lipit în Word, PowerPoint sau e-mail. Biblioteca html2canvas
-     se încarcă abia la primul clic, la fel ca xlsx.min.js. Dacă browserul nu
-     permite scrierea imaginii în clipboard, imaginea se descarcă drept fișier. -->
-<style>
-  .panel-head .copy-diagram{white-space:nowrap;}
-  .panel-head .copy-diagram.ok{background:#16794f;color:#fff;border-color:#16794f;}
-</style>
-<script>
-(function(){
-  // panouri care nu sunt diagrame: filtre, export, antetul verificării IATI
-  const EXCLUSE = ['mapCountryProjectsTitle','yearFilterTitle','donorFilterTitle','exportTitle','exportColumnsTitle','exportPreviewTitle','iatiCheckTitle'];
-  const en = () => (typeof currentLang !== 'undefined' && currentLang === 'en');
-  const L = {
-    copy: () => en() ? '📋 Copy' : '📋 Copiază',
-    ok:   () => en() ? '✓ Copied' : '✓ Copiat',
-    dl:   () => en() ? '⬇ Downloaded' : '⬇ Descărcat',
-    err:  () => en() ? '✗ Error' : '✗ Eroare',
-    tip:  () => en() ? 'Copy this chart as an image' : 'Copiază diagrama ca imagine'
-  };
-
-  let lib = null;
-  function incarcaLib(){
-    if(window.html2canvas) return Promise.resolve();
-    if(!lib) lib = new Promise((ok, fail) => {
-      const s = document.createElement('script');
-      s.src = 'html2canvas.min.js';
-      s.onload = ok; s.onerror = () => { lib = null; fail(new Error('html2canvas nu s-a încărcat')); };
-      document.head.appendChild(s);
-    });
-    return lib;
-  }
-
-  function numeFisier(panel){
-    const h = panel.querySelector('.panel-head h2');
-    const t = (h ? h.textContent : 'diagrama').trim().replace(/[\\/:*?"<>|·]+/g, ' ').replace(/\s+/g, ' ').trim();
-    return (t || 'diagrama').slice(0, 80) + '.png';
-  }
-
-  function imaginePanou(panel){
-    return incarcaLib().then(() => {
-      const bg = getComputedStyle(panel).backgroundColor;
-      /* Un panou poate avea sub diagramă un al doilea antet cu tabelul lui (harta are
-         dedesubt „Proiectele țării selectate"); copiem doar partea de sus. */
-      const ascunse = new Set(), capete = [...panel.children].filter(c => c.classList.contains('panel-head'));
-      if(capete.length > 1){
-        let n = capete[1];
-        while(n){ ascunse.add(n); n = n.nextElementSibling; }
-      }
-      return window.html2canvas(panel, {
-        backgroundColor: (bg && bg !== 'rgba(0, 0, 0, 0)') ? bg : '#ffffff',
-        scale: Math.max(2, window.devicePixelRatio || 1),
-        useCORS: true, logging: false,
-        // butoanele de copiere nu apar în imagine
-        ignoreElements: el => ascunse.has(el) || (el.classList && el.classList.contains('copy-diagram'))
-      });
-    }).then(c => new Promise((ok, fail) => c.toBlob(b => b ? ok(b) : fail(new Error('imagine goală')), 'image/png')));
-  }
-
-  function eticheta(btn, text){
-    btn.textContent = text;
-    btn.classList.toggle('ok', text !== L.copy());
-    clearTimeout(btn._t);
-    if(text !== L.copy()) btn._t = setTimeout(() => eticheta(btn, L.copy()), 2000);
-  }
-
-  function descarca(blob, nume){
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = nume;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  }
-
-  async function laClic(e){
-    e.stopPropagation();
-    const btn = e.currentTarget, panel = btn.closest('.panel');
-    btn.disabled = true;
-    // promisiunea se dă direct lui ClipboardItem, în același clic — altfel
-    // Safari refuză scrierea, pentru că randarea durează peste limita „gestului".
-    const blob = imaginePanou(panel);
-    try{
-      if(!navigator.clipboard || !window.ClipboardItem) throw new Error('fără clipboard');
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-      eticheta(btn, L.ok());
-    }catch(err){
-      try{ descarca(await blob, numeFisier(panel)); eticheta(btn, L.dl()); }
-      catch(e2){ console.warn('copiere diagramă:', err, e2); eticheta(btn, L.err()); }
-    }finally{ btn.disabled = false; }
-  }
-
-  function adaugaButoane(){
-    document.querySelectorAll('.panel > .panel-head').forEach(head => {
-      const h2 = head.querySelector('h2');
-      if(!h2 || head.querySelector('.copy-diagram')) return;
-      const cheie = (h2.querySelector('[data-i18n]') || h2).getAttribute('data-i18n');
-      if(EXCLUSE.includes(cheie)) return;
-      let btns = head.querySelector('.btns');
-      if(!btns){ btns = document.createElement('div'); btns.className = 'btns'; head.appendChild(btns); }
-      const b = document.createElement('button');
-      b.type = 'button'; b.className = 'copy-diagram';
-      b.textContent = L.copy(); b.title = L.tip();
-      b.addEventListener('click', laClic);
-      btns.appendChild(b);
-    });
-  }
-  // la schimbarea limbii, reetichetăm butoanele
-  document.addEventListener('click', e => {
-    if(e.target.closest && e.target.closest('[data-lang], .lang-switch, #langToggle'))
-      setTimeout(() => document.querySelectorAll('.copy-diagram').forEach(b => { if(!b.classList.contains('ok')){ b.textContent = L.copy(); b.title = L.tip(); } }), 50);
-  });
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', adaugaButoane);
-  else adaugaButoane();
-})();
-</script>
+<script src="unelte.js"></script>
 
 </body>
 </html>
