@@ -1,0 +1,96 @@
+name: Sumele acordurilor (legis.md)
+
+# Citește textul integral (PDF) al actelor de acord de pe legis.md și scoate
+# sumele (legis_sume.py → date/legis_sume.json), apoi reconstruiește pagina
+# legis_acorduri.html. Prima dată sunt ~1.300 de acte: fiecare rulare citește
+# cât poate în 45 de minute și continuă la rularea următoare.
+#
+# Pornire manuală: Actions → „Sumele acordurilor (legis.md)" → Run workflow.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 07:30 UTC, luni–vineri, după colectarea din Monitor (monitor.yml)
+    - cron: "30 7 * * 1-5"
+
+permissions:
+  contents: write
+
+# Același grup ca monitor.yml: cele două scriu legis_acorduri.html, deci nu
+# rulează niciodată în același timp.
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  sume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+
+    steps:
+      - name: Descarcă repository-ul
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Pregătește Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalează bibliotecile
+        run: pip install --quiet requests beautifulsoup4 pypdf
+
+      - name: Citește sumele din textele actelor
+        run: |
+          set +e
+          python legis_sume.py --fara-browser --limita-min 45
+          cod=$?
+          if [ "$cod" = "3" ]; then
+            echo "Fără browser, legis.md (Cloudflare) cere verificarea. Încerc cu un browser invizibil."
+            pip install --quiet playwright && python -m playwright install --with-deps chromium > /dev/null
+            python legis_sume.py --limita-min 40 --asteapta-cf 90
+            cod=$?
+          fi
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, os
+          try:
+              acte = json.load(open('date/legis_sume.json', encoding='utf-8')).get('acte', {})
+          except Exception:
+              acte = {}
+          cu = sum(1 for a in acte.values() if a.get('sume'))
+          er = sum(1 for a in acte.values() if a.get('eroare'))
+          print('### Sumele acordurilor')
+          print(f'- acte citite până acum: **{len(acte)}** din ~1.300')
+          print(f'- cu sumă găsită: **{cu}** · erori: {er}')
+          PY
+          if [ "$cod" = "3" ]; then
+            echo "- ⚠️ legis.md (Cloudflare) a blocat rularea de pe GitHub. Sumele se pot citi de pe calculator, cu legis_local.bat." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit 0
+
+      - name: Reconstruiește pagina acordurilor
+        continue-on-error: true
+        run: python legis_pagina.py
+
+      - name: Salvează
+        run: |
+          if [ -z "$(git status --porcelain date/legis_sume.json legis_acorduri.html)" ]; then
+            echo "Nimic nou — nu fac commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add date/legis_sume.json legis_acorduri.html
+          git commit -m "Sumele acordurilor din legis.md — $(date +%d.%m.%Y)"
+          for incercare in 1 2 3; do
+            if git push; then
+              echo "Publicat."
+              exit 0
+            fi
+            echo "Push respins (încercarea $incercare) — reîmprospătez și reîncerc."
+            git pull --rebase origin main || exit 1
+            sleep 3
+          done
+          echo "Nu am reușit să public după 3 încercări."
+          exit 1
