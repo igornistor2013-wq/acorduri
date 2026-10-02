@@ -1767,6 +1767,7 @@
       <div class="cmp-per cmp-a"><b id="cmpEtA">Perioada A</b> <select id="cmpA1"></select><span>–</span><select id="cmpA2"></select></div>
       <div class="cmp-per cmp-b"><b id="cmpEtB">Perioada B</b> <select id="cmpB1"></select><span>–</span><select id="cmpB2"></select></div>
       <div class="btns seg" id="cmpDim"><button type="button" data-d="donor"></button><button type="button" data-d="sector"></button><button type="button" data-d="benef"></button></div>
+      <div class="btns seg" id="cmpBaza"><button type="button" data-b="fin"></button><button type="button" data-b="start"></button></div>
     </div>
     <div class="panel-body" id="cmpBody"></div>
     <div class="panel-note" id="cmpNota"></div>
@@ -2736,7 +2737,7 @@ function renderTable(byDonor, trueTotals){
   rows.forEach(r=>r.pct = trueTotals.deb>0 ? (r.Debursari/trueTotals.deb)*100 : 0);
   rows.sort((a,b)=>{
     const dir = state.sortDir==='asc'?1:-1;
-    if(state.sortKey==='donator') return a.donator.localeCompare(b.donator)*dir;
+    if(state.sortKey==='donator') return donorLabel(a.donator).localeCompare(donorLabel(b.donator), currentLang==='en' ? 'en' : 'ro')*dir;
     if(state.sortKey==='anMin'){
       const av = a.anMin==='NA'?-1:a.anMin, bv = b.anMin==='NA'?-1:b.anMin;
       return (av-bv)*dir;
@@ -4377,11 +4378,20 @@ function mergeRecords(archive, live){
       const liveAng = Object.keys(r.y).some(k => r.y[k] && r.y[k][0]);
       const liveDeb = Object.keys(r.y).some(k => r.y[k] && r.y[k][1]);
       Object.keys(old.y).forEach(k => {
-        if(r.y[k]) return;
         const ov = old.y[k];
         if(!ov) return;
         const a = liveAng ? 0 : (ov[0] || 0), d = liveDeb ? 0 : (ov[1] || 0);
-        if(a || d){ const nv = ov.slice(); nv[0] = a; nv[1] = d; r.y[k] = nv; }
+        if(!(a || d)) return;
+        /* Și când anul există deja în live: dacă live-ul are acolo doar debursări (și
+           niciun angajament, în niciun an), angajamentele arhivei pentru acel an se
+           păstrează. Înainte, simpla prezență a anului în live le ștergea — de ex. un
+           proiect cu 35,7 mil. angajate în 2020 (arhivă) și doar debursări în 2020
+           (live) ajungea la 0 angajamente. */
+        const nv = (r.y[k] || ov).slice();
+        while(nv.length < 2) nv.push(0);
+        if(r.y[k]){ if(a && !nv[0]) nv[0] = a; if(d && !nv[1]) nv[1] = d; }
+        else { nv[0] = a; nv[1] = d; }
+        r.y[k] = nv;
       });
       Object.keys(old.y).forEach(k => {
         const ov = old.y[k];
@@ -8794,7 +8804,9 @@ loadLiveData();
 </script>
 <script src="fisa-donator.js"></script>
 <script src="amp-linkuri.js"></script>
-<script src="unelte.js"></script>
+<!-- ?v= se schimbă la fiecare modificare a lui unelte.js, ca browserele să nu folosească
+     versiunea veche din memoria cache (GitHub Pages o păstrează până la 10 minute) -->
+<script src="unelte.js?v=2026-10-02b"></script>
 
 </body>
 </html>
