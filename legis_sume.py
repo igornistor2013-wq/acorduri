@@ -10,6 +10,7 @@ aprobă proiectul de lege sau acordul însuși, anexat la act.
                                                 # rularea următoare continuă de unde a rămas
     python legis_sume.py --doar 135636 121528   # doar actele cu aceste doc_id (test)
     python legis_sume.py --reincearca           # reia și actele care au dat eroare
+    python legis_sume.py --fara-browser         # descarcă direct, fără browser (pe GitHub Actions)
 
 Pentru fiecare act din registru (legi, hotărâri, ordine, acorduri publicate —
 nu și decretele, care nu conțin sume) descarcă PDF-ul de pe
@@ -19,6 +20,7 @@ de text din care vine fiecare sumă, se scrie în date/legis_sume.json. Un act
 deja citit nu se mai descarcă.
 
 Are nevoie de:  pip install playwright pypdf     (sau pdfplumber în loc de pypdf)
+                --fara-browser are nevoie doar de:  pip install requests pypdf
 
 Coduri de ieșire: 0 = a mers, 3 = blocat de Cloudflare, 1 = altă eroare.
 """
@@ -223,6 +225,7 @@ def main():
     ap.add_argument('--pauza', type=float, default=0.6, help='secunde între două descărcări')
     ap.add_argument('--doar', nargs='*', help='doar aceste doc_id')
     ap.add_argument('--reincearca', action='store_true', help='reia și actele cu eroare')
+    ap.add_argument('--fara-browser', action='store_true', help='descarcă direct (requests), fără browser')
     ap.add_argument('--url', default='https://www.legis.md/', help=argparse.SUPPRESS)   # pentru teste
     a = ap.parse_args()
 
@@ -240,80 +243,124 @@ def main():
     if not de_citit:
         return 0
 
-    from playwright.sync_api import sync_playwright
     baza_url = a.url.rstrip('/')
     termen_total = time.time() + a.limita_min * 60 if a.limita_min else None
-    citite = cu_suma = erori = 0
-    with sync_playwright() as p:
-        opt = dict(headless=not a.headed, locale='ro-RO', viewport={'width': 1280, 'height': 900})
-        if a.browser:
-            opt['channel'] = a.browser
-        if a.profil:
-            ctx = p.chromium.launch_persistent_context(str(a.profil), **opt)
-            page = ctx.pages[0] if ctx.pages else ctx.new_page()
-            browser = None
-        else:
-            browser = p.chromium.launch(headless=not a.headed, **({'channel': a.browser} if a.browser else {}))
-            ctx = browser.new_context(locale='ro-RO', viewport=opt['viewport'])
-            page = ctx.new_page()
-        try:
-            page.goto(baza_url + '/', wait_until='domcontentloaded', timeout=90000)
-            termen = time.time() + a.asteapta_cf
-            while True:
-                try:
-                    text = page.inner_text('body', timeout=10000)[:2000]
-                except Exception:
-                    text = ''
-                if text and not BLOCAT.search(text):
-                    break
-                if time.time() > termen:
-                    print('Blocat de Cloudflare: bifa „nu sunt robot" nu a fost bifată la timp.')
-                    return 3
-                page.wait_for_timeout(3000)
+    stare = {'citite': 0, 'cu_suma': 0, 'erori': 0}
 
-            for i, doc in enumerate(de_citit, 1):
-                if termen_total and time.time() > termen_total:
-                    print(f'Limita de {a.limita_min:g} minute: continuă la rularea următoare.')
-                    break
-                rez = page.evaluate(JS_DESCARCA, f'{baza_url}/cautare/downloadpdf/{doc}')
-                azi = datetime.date.today().isoformat()
-                if rez.get('mare'):
-                    acte[doc] = {'act': toate.get(doc, ''), 'eroare': f"PDF prea mare ({rez['mare'] // 1048576} MB)", 'citit': azi}
-                    erori += 1
-                    continue
-                octeti = base64.b64decode(rez.get('b64') or '')
-                if not octeti.startswith(b'%PDF'):
-                    inceput = octeti[:3000].decode('utf-8', 'ignore')
-                    if BLOCAT.search(inceput):
-                        print('Cloudflare a cerut din nou verificarea; mă opresc și salvez ce am citit.')
-                        salveaza(baza)
-                        return 3
-                    acte[doc] = {'act': toate.get(doc, ''), 'eroare': f"HTTP {rez.get('status')}, nu e PDF", 'citit': azi}
-                    erori += 1
-                    continue
+    def citeste(descarca):
+        """Bucla comună: descarcă(doc) → {'status', 'tip', 'octeti' | 'mare'}. Întoarce 0 sau 3."""
+        for i, doc in enumerate(de_citit, 1):
+            if termen_total and time.time() > termen_total:
+                print(f'Limita de {a.limita_min:g} minute: continuă la rularea următoare.')
+                return 0
+            rez = descarca(f'{baza_url}/cautare/downloadpdf/{doc}')
+            azi = datetime.date.today().isoformat()
+            if rez.get('mare'):
+                acte[doc] = {'act': toate.get(doc, ''), 'eroare': f"PDF prea mare ({rez['mare'] // 1048576} MB)", 'citit': azi}
+                stare['erori'] += 1
+                continue
+            octeti = rez.get('octeti') or b''
+            if not octeti.startswith(b'%PDF'):
+                inceput = octeti[:3000].decode('utf-8', 'ignore')
+                if BLOCAT.search(inceput) or rez.get('status') in (403, 503) and 'cloudflare' in inceput.lower():
+                    print('Cloudflare a cerut verificarea; mă opresc și salvez ce am citit.')
+                    return 3
+                acte[doc] = {'act': toate.get(doc, ''), 'eroare': f"HTTP {rez.get('status')}, nu e PDF", 'citit': azi}
+                stare['erori'] += 1
+                continue
+            try:
+                text, pagini = text_din_pdf(octeti)
+            except SystemExit:
+                raise
+            except Exception as e:
+                acte[doc] = {'act': toate.get(doc, ''), 'eroare': 'PDF necitibil: ' + str(e)[:120], 'citit': azi}
+                stare['erori'] += 1
+                continue
+            sume = sume_din_text(text)
+            acte[doc] = {'act': toate.get(doc, ''), 'sume': sume, 'pagini': pagini, 'citit': azi}
+            if not text.strip():
+                acte[doc]['nota'] = 'PDF fără text (scanat)'
+            stare['citite'] += 1
+            stare['cu_suma'] += bool(sume)
+            if i % 20 == 0:
+                salveaza(baza)
+                print(f"  {i}/{len(de_citit)} · cu sumă: {stare['cu_suma']} · erori: {stare['erori']}", flush=True)
+            time.sleep(a.pauza)
+        return 0
+
+    if a.fara_browser:
+        # Fără browser: o sesiune HTTP obișnuită. Merge doar dacă Cloudflare nu cere
+        # verificarea pentru adresa de pe care rulăm; dacă o cere, codul 3 spune asta.
+        import requests
+        ses = requests.Session()
+        ses.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                                          '(KHTML, like Gecko) Chrome/126.0 Safari/537.36',
+                            'Accept-Language': 'ro-RO,ro;q=0.9,en;q=0.8'})
+        try:
+            r = ses.get(baza_url + '/', timeout=60)
+            if BLOCAT.search(r.text[:5000]):
+                print('Cloudflare cere verificarea pentru această adresă (fără browser nu trec).')
+                return 3
+        except Exception as e:
+            print('legis.md nu răspunde:', e)
+            return 1
+
+        def descarca(url):
+            for incercare in range(3):
                 try:
-                    text, pagini = text_din_pdf(octeti)
-                except SystemExit:
-                    raise
+                    r = ses.get(url, timeout=90)
+                    return {'status': r.status_code, 'tip': r.headers.get('content-type', ''), 'octeti': r.content[:MAX_OCTETI + 1]}
                 except Exception as e:
-                    acte[doc] = {'act': toate.get(doc, ''), 'eroare': 'PDF necitibil: ' + str(e)[:120], 'citit': azi}
-                    erori += 1
-                    continue
-                sume = sume_din_text(text)
-                acte[doc] = {'act': toate.get(doc, ''), 'sume': sume, 'pagini': pagini, 'citit': azi}
-                if not text.strip():
-                    acte[doc]['nota'] = 'PDF fără text (scanat)'
-                citite += 1
-                cu_suma += bool(sume)
-                if i % 20 == 0:
-                    salveaza(baza)
-                    print(f'  {i}/{len(de_citit)} · cu sumă: {cu_suma} · erori: {erori}')
-                time.sleep(a.pauza)
+                    eroare = str(e)[:100]
+                    time.sleep(5 * (incercare + 1))
+            return {'status': 0, 'octeti': ('eroare de rețea: ' + eroare).encode()}
+        try:
+            cod = citeste(descarca)
         finally:
             salveaza(baza)
-            ctx.close()
-            if browser:
-                browser.close()
+    else:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            opt = dict(headless=not a.headed, locale='ro-RO', viewport={'width': 1280, 'height': 900})
+            if a.browser:
+                opt['channel'] = a.browser
+            if a.profil:
+                ctx = p.chromium.launch_persistent_context(str(a.profil), **opt)
+                page = ctx.pages[0] if ctx.pages else ctx.new_page()
+                browser = None
+            else:
+                browser = p.chromium.launch(headless=not a.headed, **({'channel': a.browser} if a.browser else {}))
+                ctx = browser.new_context(locale='ro-RO', viewport=opt['viewport'])
+                page = ctx.new_page()
+            try:
+                page.goto(baza_url + '/', wait_until='domcontentloaded', timeout=90000)
+                termen = time.time() + a.asteapta_cf
+                while True:
+                    try:
+                        text = page.inner_text('body', timeout=10000)[:2000]
+                    except Exception:
+                        text = ''
+                    if text and not BLOCAT.search(text):
+                        break
+                    if time.time() > termen:
+                        print('Blocat de Cloudflare: bifa „nu sunt robot" nu a fost bifată la timp.')
+                        return 3
+                    page.wait_for_timeout(3000)
+
+                def descarca(url):
+                    rez = page.evaluate(JS_DESCARCA, url)
+                    if rez.get('b64') is not None:
+                        rez['octeti'] = base64.b64decode(rez.pop('b64'))
+                    return rez
+                cod = citeste(descarca)
+            finally:
+                salveaza(baza)
+                ctx.close()
+                if browser:
+                    browser.close()
+    citite, cu_suma, erori = stare['citite'], stare['cu_suma'], stare['erori']
+    if cod == 3:
+        return 3
     print(f'Gata: {citite} acte citite, {cu_suma} cu sumă, {erori} erori. Rezultatul: {IESIRE.relative_to(AICI)}')
     return 0
 

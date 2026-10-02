@@ -230,6 +230,21 @@ if '--browser' in sys.argv:
         p = subprocess.run([sys.executable, str(tmp / 'legis_sume.py'), '--url', url, '--asteapta-cf', '5', '--reincearca'],
                            capture_output=True, text=True, timeout=120, env=env_test)
         verifica('blocat de Cloudflare → cod 3', p.returncode == 3, p.stdout[-300:])
+
+        # fără browser (cum rulează pe GitHub Actions): aceleași rezultate, același cod la blocaj
+        Legis.blocat = False
+        (tmp / 'date' / 'legis_sume.json').unlink()
+        p = subprocess.run([sys.executable, str(tmp / 'legis_sume.py'), '--url', url, '--fara-browser', '--pauza', '0'],
+                           capture_output=True, text=True, timeout=120, env=env_test)
+        rez = json.load(open(tmp / 'date' / 'legis_sume.json', encoding='utf-8')).get('acte', {}) \
+              if (tmp / 'date' / 'legis_sume.json').exists() else {}
+        s = (rez.get('135636') or {}).get('sume') or []
+        verifica('fără browser: LP14/2023 = 25 de milioane EUR', p.returncode == 0 and bool(s) and s[0]['v'] == 25000000,
+                 p.stdout[-500:] + p.stderr[-500:])
+        Legis.blocat = True
+        p = subprocess.run([sys.executable, str(tmp / 'legis_sume.py'), '--url', url, '--fara-browser', '--reincearca'],
+                           capture_output=True, text=True, timeout=120, env=env_test)
+        verifica('fără browser, blocat → cod 3', p.returncode == 3, p.stdout[-300:])
     finally:
         srv.shutdown()
         shutil.rmtree(tmp, ignore_errors=True)

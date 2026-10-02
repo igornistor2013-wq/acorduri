@@ -1277,7 +1277,75 @@
        e același acord. */
     map = contopeste(map);
 
-    /* Suma din TEXTUL INTEGRAL al actelor (legis_sume.py citește PDF-ul fiecărui act de
+    /* Denumirea scurtă, pentru rândul din tabel: numele proiectului sau al programului,
+     fără „Acordul de grant dintre Republica Moldova și Banca …", fără „semnat la …",
+     fără învelișul amendamentului. 412 din 612 denumiri treceau de 80 de caractere.
+     Denumirea completă rămâne în fișa acordului, în indiciul de pe titlu și în export. */
+  var SCURT_ORG = [
+    [/Banca Europeană pentru Reconstrucți[ei] (?:și|şi) Dezvoltare/gi, 'BERD'],
+    [/Banca Europeană (?:de|pentru) Investiții|Banca Europeană (?:de|pentru) Investiţii/gi, 'BEI'],
+    [/Banca Internațional[ăa] pentru Reconstrucți[ei] (?:și|şi) Dezvoltare|Banca Internaţională pentru Reconstrucţie şi Dezvoltare/gi, 'BIRD'],
+    [/Asocia[țţ]ia Interna[țţ]ional[ăa] (?:pentru|de) Dezvoltare/gi, 'AID'],
+    [/Banca (?:de|pentru) Dezvoltare a Consiliului Europei/gi, 'CEB'],
+    [/Fondul Interna[țţ]ional pentru Dezvoltare(?:a)? Agricol[ăa]|Fondul Interna[țţ]ional pentru Dezvoltarea Agriculturii/gi, 'FIDA'],
+    [/Agen[țţ]ia Francez[ăa] (?:pentru|de) Dezvoltare/gi, 'AFD'],
+    [/Agen[țţ]ia Japonez[ăa] (?:pentru|de) Cooperare Interna[țţ]ional[ăa]/gi, 'JICA'],
+    [/Uniunea European[ăa]/g, 'UE'],
+    [/Guvernul Japoniei/g, 'Japonia'], [/Guvernul Rom[âî]niei/g, 'România'],
+    [/Guvernul Republicii Polone|Guvernul Republicii Polonia/g, 'Polonia'],
+    [/Guvernul Statelor Unite ale Americii/g, 'SUA']
+  ];
+  function numeScurt(nume){
+    var s = String(nume || '').replace(/\s+/g, ' ').trim(), m;
+    // ghilimelele vechi: ,,Livada Moldovei'' → „Livada Moldovei”
+    s = s.replace(/,,\s*/g, '„').replace(/\s*(?:''|’’)/g, '”');
+    // 0. dacă titlul are un nume între ghilimele (și nu e o instituție), acela e numele proiectului
+    var ghil = [], rx = /[„“"«]\s*([^„“”"«»]{6,200}?)\s*[”"»“]/g, q;
+    while ((q = rx.exec(s))) if (!INSTITUTIE.test(q[1])) ghil.push(q[1].trim());
+    if (ghil.length){
+      var cel = ghil.sort(function(a, b){ return b.length - a.length; })[0];
+      if (cel.length >= 8) return cel.charAt(0).toUpperCase() + cel.slice(1);
+    }
+    // „proiectului Acordului / Înțelegerii …" = proiectul (ciorna) actului, nu un proiect finanțat
+    s = s.replace(/^proiectul(?:ui)?\s+(?=(?:Acord|Înțeleger|Înţeleger|Contract|Memorand|Protocol|Amendament|Addendum))/i, '');
+    // 1. „Hotărâre cu privire la inițierea negocierilor și aprobarea semnării …", „Despre ratificarea …"
+    s = s.replace(/^(?:(?:Hotărâre|Hotărîre|Decret|Lege|Ordin)\s+)?(?:cu privire la|privind|pentru|despre)\s+(?:inițierea negocierilor(?:\s+(?:și|şi)\s+aprobarea semnării)?|iniţierea negocierilor(?:\s+şi\s+aprobarea semnării)?|aprobarea semnării|aprobarea|ratificarea|promulgarea Legii pentru ratificarea|încheierea)\s+(?:asupra\s+proiectului\s+)?/i, '');
+    s = s.replace(/^proiectul(?:ui)?\s+(?=(?:Acord|Înțeleger|Înţeleger|Contract|Memorand|Protocol|Amendament|Addendum))/i, '');
+    s = s.replace(/^(Acord|Contract|Memorandum|Amendament|Protocol|Addendum)ului\b/, '$1ul').replace(/^Acordului-cadru/, 'Acordul-cadru')
+         .replace(/^(?:Înțelegerii|Înţelegerii)\b/, 'Înțelegerea');
+    // 2. învelișul amendamentului/protocolului: rămâne acordul de bază
+    s = s.replace(/^(?:proiectului\s+)?(?:celui de-al\s+\S+\s+|al\s+\S+\s+)?(?:Amendament\w*|Addendum\w*|Protocol\w*(?:\s+adi[țţ]ional\w*)?|Acordul(?:ui)? de modificare(?: și de reformulare)?|Scrisoar\w+ de modificare)(?:\s+(?:nr\.?\s*)?[\dIVX]+\b)?[^„"]*?\bla\s+(?=Acord|Contract|Conven|Memorand|acord|contract)/i, '');
+    // 3. „întocmit prin schimb de note", „reprezentată de … în calitate de …"
+    s = s.replace(/,?\s*(?:întocmit|întocmită|încheiat|încheiată|convenit)\w*\s+prin\s+schimb\s+de\s+(?:note|scrisori),?/gi, '')
+         .replace(/,?\s*reprezentat[ăa]?\s+de\s+[^,]+?\s+în calitate de\s+\S+,?/gi, ' ')
+         .replace(/,?\s*acționând (?:prin intermediul|în nume propriu)[^,]*,?/gi, ' ');
+    // 4. coada: „, semnat la Chișinău la 4 ianuarie 2023", „, în sumă de 25 de milioane de euro"
+    s = s.replace(/,?\s*(?:semnat|semnate|semnată|încheiat|încheiate|întocmit|întocmită|întocmite|convenit|convenite)\s+la\s[\s\S]*?\d{4}\s*$/i, '')
+         .replace(/,?\s*(?:în|in) (?:sumă|valoare|mărime) (?:totală )?de [\s\S]*$/i, '');
+    // 5. numele proiectului sau al programului, dacă titlul îl are
+    m = s.match(/\b(Proiectul(?:ui)?|Programul(?:ui)?|proiectul(?:ui)?|programul(?:ui)?|Operațiunii?|Operaţiunii?)\s+(.{6,})$/);
+    if (m){
+      var rest = m[2];
+      // „(Proiectul energetic) dintre Republica Moldova și BIRD": se oprește la paranteza închisă
+      var inainte = s.slice(0, m.index);
+      if ((inainte.match(/\(/g) || []).length > (inainte.match(/\)/g) || []).length ||
+          (rest.indexOf(')') > -1 && (rest.indexOf('(') < 0 || rest.indexOf(')') < rest.indexOf('(')))) rest = rest.split(')')[0];
+      var intreGhilimele = /^(?:de\s+|privind\s+)?[„"”]/.test(rest);
+      rest = rest.replace(/^(?:de\s+|privind\s+)?[„"”]\s*/, '').replace(/[”"]\s*$/, '').trim();
+      var cuv = /^proiect/i.test(m[1]) ? 'Proiectul' : /^program/i.test(m[1]) ? 'Programul' : 'Operațiunea';
+      if (rest.length >= 6) s = intreGhilimele ? rest : cuv + ' ' + rest;
+    } else {
+      s = s.replace(/\s(?:dintre|între|intre)\s+(?:Guvernul\s+)?Republic(?:a|ii) Moldova\s+(?:și|şi)\s+/i, ' cu ');
+    }
+    SCURT_ORG.forEach(function(r){ s = s.replace(r[0], r[1]); });
+    s = s.replace(/\s+/g, ' ').replace(/^[\s,.;–-]+|[\s,.;–-]+$/g, '');
+    s = s.charAt(0).toUpperCase() + s.slice(1);
+    if (s.length > 130){ s = s.slice(0, 128).replace(/\s+\S*$/, '') + '…'; }
+    return s || String(nume || '');
+  }
+
+
+  /* Suma din TEXTUL INTEGRAL al actelor (legis_sume.py citește PDF-ul fiecărui act de
      pe legis.md). Legea de ratificare o spune în art. 1 („Se ratifică Acordul … în sumă
      de 25 de milioane de euro"), chiar când titlul nu o spune; după ea, hotărârea care
      aprobă proiectul de lege, apoi cea care aprobă semnarea. La aceeași etapă, actul cel
@@ -1337,6 +1405,7 @@
     return Object.keys(map).map(function(k){
       var g = map[k];
       g.sumaT = sumaDinText(g);
+      g.numeScurt = numeScurt(g.nume);
       g.acte.sort(function(x,y){ return ord(y).localeCompare(ord(x)); });
       g.ultim = g.acte[0];
       g.parteneri = Object.keys(g.orgs).join(' / ');
@@ -1478,7 +1547,8 @@
                     'Prima publicare','Ultima publicare','Etape parcurse',
                     'Etapa atinsă','Semnat'].concat(STEPS.map(function(s){
                       return s.n + '. ' + s.cap; }))
-                      .concat(['În vigoare din', 'Temeiul datei', 'Suma', 'Valuta', 'Sursa sumei', 'Fragmentul din act']));
+                      .concat(['În vigoare din', 'Temeiul datei', 'Suma', 'Valuta', 'Sursa sumei', 'Fragmentul din act',
+                               'Denumirea completă']));
       grupuri.filter(function(g){
         if (!trece_grup(g)) return false;
         if (seek){
@@ -1493,7 +1563,7 @@
         var ultima = atinse.length ? atinse[atinse.length - 1] : null;
         var dt = g.acte.map(ord).sort();
         function frumos(v){ return v && v !== '0' ? v.slice(6,8)+'.'+v.slice(4,6)+'.'+v.slice(0,4) : ''; }
-        randuri.push([g.nume, g.parteneri || '', g.categorie, g.suport ? 'da' : '',
+        randuri.push([g.numeScurt || g.nume, g.parteneri || '', g.categorie, g.suport ? 'da' : '',
           aniGrup(g).join(', '),
           String(g.acte.length), frumos(dt[0]), frumos(dt[dt.length-1]),
           atinse.length + ' din ' + STEPS.length,
@@ -1502,7 +1572,8 @@
          .concat([v ? v.data : '', v ? v.ce : ''])
          .concat(g.suma ? [g.suma.v, g.suma.val, 'titlul actului', '']
                : g.sumaT ? [g.sumaT.v, g.sumaT.val, 'textul ' + g.sumaT.act, g.sumaT.f]
-               : ['', '', '', '']));
+               : ['', '', '', ''])
+         .concat([g.nume]));
       });
     }
 
@@ -2588,7 +2659,7 @@
        diferite, corect separate, dar cu aceeași denumire arată a dublură.
        Unde numele se repetă, adăugăm dedesubt instrumentul și finanțatorul. */
     var deCateOri = {};
-    grupuri.forEach(function(g){ deCateOri[g.nume] = (deCateOri[g.nume] || 0) + 1; });
+    grupuri.forEach(function(g){ var n = g.numeScurt || g.nume; deCateOri[n] = (deCateOri[n] || 0) + 1; });
 
     document.getElementById('tabel').className = 'v-acorduri';
     document.getElementById('cap').innerHTML = '<tr>' +
@@ -2636,8 +2707,8 @@
       return '<tr class="acord" data-i="' + i + '" data-id="' + idAcord(g) + '" aria-expanded="false">' +
         '<td class="org" data-l="Partener">' + esc(g.parteneri || '—') + '</td>' +
         '<td data-l="Acordul"><div class="pname" title="' + esc(g.nume) + '">' +
-          '<span class="caret">▶</span>' + esc(g.nume) +
-          (deCateOri[g.nume] > 1
+          '<span class="caret">▶</span>' + esc(g.numeScurt || g.nume) +
+          (deCateOri[g.numeScurt || g.nume] > 1
             ? '<span class="pname-sub">' + esc(g.categorie) +
               (g.parteneri ? ' · ' + esc(g.parteneri) : '') + '</span>'
             : '') + '</div>' +
