@@ -239,13 +239,20 @@ def main():
         de_citit = [d for d in toate if d not in acte or (a.reincearca and acte[d].get('eroare'))]
     # cele mai noi întâi: doc_id-urile mari sunt actele recente
     de_citit.sort(key=lambda d: -int(d) if d.isdigit() else 0)
-    print(f'{len(toate)} acte de acord în registru · {len(toate) - len(de_citit)} citite deja · {len(de_citit)} de citit')
+    if a.doar:
+        print(f'{len(de_citit)} acte cerute cu --doar')
+    else:
+        print(f'{len(toate)} acte de acord în registru · {len(toate) - len(de_citit)} citite deja · {len(de_citit)} de citit')
     if not de_citit:
         return 0
 
     baza_url = a.url.rstrip('/')
     termen_total = time.time() + a.limita_min * 60 if a.limita_min else None
     stare = {'citite': 0, 'cu_suma': 0, 'erori': 0}
+
+    def salveaza_daca():
+        if stare['citite'] or stare['erori']:
+            salveaza(baza)
 
     def citeste(descarca):
         """Bucla comună: descarcă(doc) → {'status', 'tip', 'octeti' | 'mare'}. Întoarce 0 sau 3."""
@@ -317,7 +324,7 @@ def main():
         try:
             cod = citeste(descarca)
         finally:
-            salveaza(baza)
+            salveaza_daca()
     else:
         from playwright.sync_api import sync_playwright
         with sync_playwright() as p:
@@ -354,7 +361,7 @@ def main():
                     return rez
                 cod = citeste(descarca)
             finally:
-                salveaza(baza)
+                salveaza_daca()
                 ctx.close()
                 if browser:
                     browser.close()

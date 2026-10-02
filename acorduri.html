@@ -95,9 +95,16 @@
      celula rândului deschis (colspan), care pe telefon rămânea lată de 104 px
      — lista actelor se citea câte un cuvânt pe rând. */
   #tabel.v-acorduri th:nth-child(1), #tabel.v-acorduri tr.acord td:nth-child(1){width:112px}
-  #tabel.v-acorduri th:nth-child(3), #tabel.v-acorduri tr.acord td:nth-child(3){width:140px}
-  #tabel.v-acorduri th:nth-child(4), #tabel.v-acorduri tr.acord td:nth-child(4){width:376px}
-  #tabel.v-acorduri th:nth-child(5), #tabel.v-acorduri tr.acord td:nth-child(5){width:116px}
+  #tabel.v-acorduri th:nth-child(3), #tabel.v-acorduri tr.acord td:nth-child(3){width:130px}
+  #tabel.v-acorduri th:nth-child(4), #tabel.v-acorduri tr.acord td:nth-child(4){width:120px}
+  #tabel.v-acorduri th:nth-child(5), #tabel.v-acorduri tr.acord td:nth-child(5){width:376px}
+  #tabel.v-acorduri th:nth-child(6), #tabel.v-acorduri tr.acord td:nth-child(6){width:116px}
+  .c-suma{font-family:var(--mono);font-weight:700;color:var(--navy, #1E4B8C);white-space:nowrap}
+  .c-suma .din-text{border-bottom:1px dotted currentColor;cursor:help}
+  .c-suma .nil{font-weight:400}
+  .det-suma{margin:6px 0 10px;font-size:13px}
+  .det-suma b{font-family:var(--mono);color:var(--navy, #1E4B8C)}
+  .det-suma q{color:var(--ink-dim);font-style:italic}
   @media (max-width:700px){#tabel.v-acorduri tr.acord td{width:auto}}
   /* Vederea „acte" are șapte coloane și altă împărțire — acolo lăsăm browserul. */
   #tabel.v-acte{table-layout:auto}
@@ -2664,6 +2671,7 @@
     document.getElementById('tabel').className = 'v-acorduri';
     document.getElementById('cap').innerHTML = '<tr>' +
       '<th>Partener</th><th>Acordul</th><th>Categorie</th>' +
+      '<th title="Suma acordului: din titlul actului oficial sau din textul lui integral (legea de ratificare, hotărârea de aprobare). Clic pe rând pentru fragmentul din act.">Suma</th>' +
       '<th>Etape parcurse</th><th>Semnat</th></tr>';
 
     var out = grupuri.filter(function(g){
@@ -2713,13 +2721,7 @@
               (g.parteneri ? ' · ' + esc(g.parteneri) : '') + '</span>'
             : '') + '</div>' +
           '<div class="pmeta">' + g.acte.length + (g.acte.length === 1 ? ' act' : ' acte') +
-          ' · ultimul: ' + esc(g.ultim.data_editie) +
-          (g.suma ? ' · <b class="psuma" title="Suma scrisă în titlul actului oficial">' + esc(fmtSuma(g.suma)) + '</b>'
-           : g.sumaT ? ' · <b class="psuma psuma-text" title="' + esc('Din textul integral al actului ' + g.sumaT.act + ': ' +
-               g.sumaT.f + (g.sumaT.alte.length ? '\n\nAlte sume în actele acordului: ' + g.sumaT.alte.join('; ') : '')) + '">' +
-               esc(fmtSuma(g.sumaT)) + '</b>'
-           : '') +
-          '</div></td>' +
+          ' · ultimul: ' + esc(g.ultim.data_editie) + '</div></td>' +
         '<td data-l="Categorie"><span class="tag ' + (CLS[g.categorie]||'t-alt') + '">' +
           esc(g.categorie) + '</span>' +
           (g.suport ? '<span class="tag t-suport" title="Asistență transferată direct ' +
@@ -2728,11 +2730,21 @@
             'aparte: poate fi grant, ca la Contractul de performanță pentru reforma ' +
             'sectorială, sau împrumut, ca la Facilitatea de reformă și creștere.">' +
             'suport bugetar</span>' : '') + '</td>' +
+        '<td data-l="Suma" class="c-suma">' +
+          (g.suma ? '<span title="Suma scrisă în titlul actului oficial">' + esc(fmtSuma(g.suma)) + '</span>'
+           : g.sumaT ? '<span class="din-text" title="' + esc('Din textul integral al actului ' + g.sumaT.act + ': ' + g.sumaT.f) + '">' +
+               esc(fmtSuma(g.sumaT)) + '</span>'
+           : '<span class="nil" title="Suma nu e încă citită din textul actelor">—</span>') + '</td>' +
         '<td data-l="Etape parcurse">' + steps(g) + '</td>' +
         '<td data-l="Semnat">' + (g.semnat ? '<span class="semnat">' + esc(g.semnat) + '</span>'
           : '<span class="nil">—</span>') + '</td></tr>' +
-        '<tr class="detalii hid" data-d="' + i + '"><td colspan="5">' +
+        '<tr class="detalii hid" data-d="' + i + '"><td colspan="6">' +
           '<div class="det-nume">' + esc(g.nume) + '</div>' +
+          (g.suma ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.suma)) + '</b> — scrisă în titlul actului oficial.</div>'
+           : g.sumaT ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.sumaT)) + '</b> — din textul actului ' + esc(g.sumaT.act) +
+               ': <q>' + esc(g.sumaT.f) + '</q>' +
+               (g.sumaT.alte.length ? '<br>Alte sume în actele acordului: ' + esc(g.sumaT.alte.join('; ')) : '') + '</div>'
+           : '') +
           '<ul class="acte-list">' + lista + '</ul>' + spreSume +
           '<button type="button" class="link-acord" data-id="' + idAcord(g) + '">' + ico('link') + '<span>Copiază linkul acestui acord</span></button></td></tr>';
     }).join('');
@@ -2780,6 +2792,30 @@
       '<div class="empty-state"><strong>Niciun acord</strong>Nimic nu corespunde filtrelor.</div>';
     legaMaiMult();
   }
+
+  /* Sumele citite din textul integral al actelor (date/legis_sume.json, scris de
+     legis_sume.py). Le citim la fiecare deschidere a paginii, nu doar când se
+     reconstruiește: ajunge să urci fișierul pe GitHub și sumele apar. */
+  function adaugaSume(){
+    fetch('date/legis_sume.json?_=' + Date.now(), {cache: 'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j){
+        if (!j || !j.acte || !db || !db.acte) return;
+        var n = 0;
+        Object.keys(db.acte).forEach(function(k){
+          var a = db.acte[k];
+          if (a.editie !== 'legis.md') return;
+          var r = j.acte[String(a.editie_id)];
+          if (r && r.sume && r.sume.length){
+            a.sume = r.sume.slice(0, 2).map(function(s){ return [s.v, s.val, String(s.f || '').slice(0, 180)]; });
+            n++;
+          }
+        });
+        if (n) paint();
+      })
+      .catch(function(){});
+  }
+  window.addEventListener('load', function(){ setTimeout(adaugaSume, 0); });
 
   fetch(DATA_URL + (DATA_URL.indexOf('?')>-1?'&':'?') + '_=' + Date.now(), {cache:'no-store'})
     .then(function(r){ if(!r.ok) throw new Error('serverul a răspuns ' + r.status); return r.json(); })
