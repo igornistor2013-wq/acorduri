@@ -7,11 +7,11 @@ name: Sumele acordurilor (legis.md)
 #
 # Pornire manuală: Actions → „Sumele acordurilor (legis.md)" → Run workflow.
 
+# Doar pornire manuală: prima rulare (02.10.2026) a arătat că legis.md (Cloudflare)
+# blochează serverele GitHub. Sumele se citesc de pe calculator, cu dosarul
+# „citeste-sumele" (citeste_sumele.bat), iar fișierul rezultat se urcă în date/.
 on:
   workflow_dispatch:
-  schedule:
-    # 07:30 UTC, luni–vineri, după colectarea din Monitor (monitor.yml)
-    - cron: "30 7 * * 1-5"
 
 permissions:
   contents: write
