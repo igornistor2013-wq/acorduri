@@ -120,6 +120,27 @@ verifica('anii unui program nu sunt sume', ls.sume_din_text('Programul Interreg 
 for s, v in [('25 000 000', 25e6), ('25.000.000,00', 25e6), ('25,000,000', 25e6), ('52,9', 52.9), ('13.1', 13.1)]:
     verifica(f'numărul „{s}" = {v:g}', ls.numar(s) == v, ls.numar(s))
 
+print()
+print('Notele Guvernului (gov_sume.py)')
+import gov_sume as gs
+verifica('titlul punctului devine titlul hotărârii',
+         gs.curata_titlu('(HG-PL) – Proiect de hotărâre a Guvernului cu privire la aprobarea proiectului de lege pentru ratificarea '
+                         'Acordului de împrumut (număr unic 664/MIDR/2026) UE')
+         == 'Hotărâre cu privire la aprobarea proiectului de lege pentru ratificarea Acordului de împrumut')
+_pag = ('<a href="/sites/default/files/media/documents/sedinte-de-guvern/2026-07/30-Actele.pdf">Actele adoptate</a>'
+        '<table><tr><td>1.</td><td>Cu privire la resursele umane</td></tr>'
+        '<tr><td>2.</td><td><a href="/sites/default/files/media/documents/sedinte-de-guvern/2026-07/NU-301-MEC-2026.pdf">'
+        '(HG) – Proiect de hotărâre a Guvernului cu privire la aprobarea semnării Acordului de împrumut (număr unic 301/MEC/2026)</a></td></tr></table>')
+_p = gs.puncte_din_pagina(_pag, 'https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-22-iulie-2026-ora-1300')
+verifica('ordinea de zi: doar punctele cu număr unic și PDF', len(_p) == 1 and _p[0][1] == '301/MEC/2026'
+         and _p[0][2].endswith('NU-301-MEC-2026.pdf'), _p)
+_s = gs.sedinte_din_lista('<a href="/ro/sedinte-de-guvern/sedinta-guvernului-din-22-iulie-2026-ora-1300">x</a>'
+                          '<a href="https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-7-ianuarie-2025-ora-1000">y</a>')
+verifica('lista ședințelor, cu data din adresă', [x[1] for x in _s] == ['2026-07-22', '2025-01-07'], _s)
+verifica('modificările se recunosc (suma lor nu e a acordului)',
+         bool(gs.RX_MODIFICARE.search('ratificarea Scrisorii de modificare la Acordul de împrumut'))
+         and not gs.RX_MODIFICARE.search('aprobarea semnării Acordului de împrumut'))
+
 if '--browser' in sys.argv:
     print('Browser, pe legis.md simulat')
 

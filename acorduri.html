@@ -1006,6 +1006,7 @@
     RX_SUMA.lastIndex = 0;
     return null;
   }
+  function dataRo(iso){ var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? m[3] + '.' + m[2] + '.' + m[1] : (iso || ''); }
   function fmtSuma(s){
     if (!s) return '';
     var n = s.v >= 1e9 ? (s.v / 1e9).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' mld.'
@@ -1409,7 +1410,7 @@
     });
     map = despartite;
 
-    return Object.keys(map).map(function(k){
+    var grupuri = Object.keys(map).map(function(k){
       var g = map[k];
       g.sumaT = sumaDinText(g);
       g.numeScurt = numeScurt(g.nume);
@@ -1419,6 +1420,43 @@
       g.categorie = Object.keys(g.cats)[0] || '—';
       return g;
     }).sort(function(x,y){ return ord(y.ultim).localeCompare(ord(x.ultim)); });
+    adaugaSumeGuvern(grupuri);
+    return grupuri;
+  }
+
+  /* Suma din NOTA DE ARGUMENTARE a Guvernului (gov_sume.py → date/gov_sume.json).
+     Pentru acordurile al căror text oficial nu spune suma: ministerul o scrie în nota
+     depusă la ședința Guvernului. Punctul de pe ordinea de zi are același titlu ca
+     hotărârea din Monitor, deci îl legăm de acord cu aceeași cheie ca pe acte:
+     denumire + finanțator + instrument + fond. Notele modificărilor (scrisori de
+     modificare, amendamente) au sumele modificării, nu ale acordului — le sărim. */
+  var SUME_GUV = null;
+  function cheieAct(a){
+    return cheie(denumire(a.titlu)) + '\u0001' + (a.partener || '').split(' / ')[0].trim() +
+           '\u0001' + (a.categorie || '') + '\u0001' + sursa(a.titlu);
+  }
+  function adaugaSumeGuvern(grupuri){
+    if (!SUME_GUV) return;
+    var idx = {}, dupaNume = {};
+    grupuri.forEach(function(g){
+      g.acte.forEach(function(a){
+        idx[cheieAct(a)] = g;
+        var kn = cheie(denumire(a.titlu)) + '\u0001' + (a.partener || '').split(' / ')[0].trim();
+        (dupaNume[kn] = dupaNume[kn] || []).indexOf(g) < 0 && dupaNume[kn].push(g);
+      });
+    });
+    Object.keys(SUME_GUV).forEach(function(nr){
+      var p = SUME_GUV[nr];
+      if (!p || p.modificare || !p.sume || !p.sume.length) return;
+      var g = idx[cheieAct(p)];
+      if (!g){
+        var c = dupaNume[cheie(denumire(p.titlu)) + '\u0001' + (p.partener || '').split(' / ')[0].trim()];
+        if (c && c.length === 1) g = c[0];
+      }
+      if (!g || g.sumaG) return;
+      var s = p.sume[0];
+      g.sumaG = { v: s.v, val: s.val, f: s.f || '', data: p.data || '', pdf: p.pdf || '', nr: nr };
+    });
   }
 
   /* „În vigoare din" — data pe care o putem afirma cu temei.
@@ -1579,6 +1617,7 @@
          .concat([v ? v.data : '', v ? v.ce : ''])
          .concat(g.suma ? [g.suma.v, g.suma.val, 'titlul actului', '']
                : g.sumaT ? [g.sumaT.v, g.sumaT.val, 'textul ' + g.sumaT.act, g.sumaT.f]
+               : g.sumaG ? [g.sumaG.v, g.sumaG.val, 'nota Guvernului, ședința din ' + dataRo(g.sumaG.data) + ' (' + g.sumaG.nr + ')', g.sumaG.f]
                : ['', '', '', ''])
          .concat([g.nume]));
       });
@@ -2734,7 +2773,9 @@
           (g.suma ? '<span title="Suma scrisă în titlul actului oficial">' + esc(fmtSuma(g.suma)) + '</span>'
            : g.sumaT ? '<span class="din-text" title="' + esc('Din textul integral al actului ' + g.sumaT.act + ': ' + g.sumaT.f) + '">' +
                esc(fmtSuma(g.sumaT)) + '</span>'
-           : '<span class="nil" title="Suma nu e încă citită din textul actelor">—</span>') + '</td>' +
+           : g.sumaG ? '<span class="din-text" title="' + esc('Din nota de argumentare a Guvernului (ședința din ' + dataRo(g.sumaG.data) + '): ' + g.sumaG.f) + '">' +
+               esc(fmtSuma(g.sumaG)) + ' <sup>G</sup></span>'
+           : '<span class="nil" title="Suma nu apare nici în actele publicate, nici în notele Guvernului citite până acum">—</span>') + '</td>' +
         '<td data-l="Etape parcurse">' + steps(g) + '</td>' +
         '<td data-l="Semnat">' + (g.semnat ? '<span class="semnat">' + esc(g.semnat) + '</span>'
           : '<span class="nil">—</span>') + '</td></tr>' +
@@ -2744,6 +2785,9 @@
            : g.sumaT ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.sumaT)) + '</b> — din textul actului ' + esc(g.sumaT.act) +
                ': <q>' + esc(g.sumaT.f) + '</q>' +
                (g.sumaT.alte.length ? '<br>Alte sume în actele acordului: ' + esc(g.sumaT.alte.join('; ')) : '') + '</div>'
+           : g.sumaG ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.sumaG)) + '</b> — din nota de argumentare depusă la ședința Guvernului din ' +
+               esc(dataRo(g.sumaG.data)) + ' (număr unic ' + esc(g.sumaG.nr) + '): <q>' + esc(g.sumaG.f) + '</q> · ' +
+               '<a href="' + esc(g.sumaG.pdf) + '" target="_blank" rel="noopener">nota (PDF, gov.md)</a></div>'
            : '') +
           '<ul class="acte-list">' + lista + '</ul>' + spreSume +
           '<button type="button" class="link-acord" data-id="' + idAcord(g) + '">' + ico('link') + '<span>Copiază linkul acestui acord</span></button></td></tr>';
@@ -2816,6 +2860,12 @@
       .catch(function(){});
   }
   window.addEventListener('load', function(){ setTimeout(adaugaSume, 0); });
+  window.addEventListener('load', function(){
+    fetch('date/gov_sume.json?_=' + Date.now(), {cache: 'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j){ if (j && j.puncte){ SUME_GUV = j.puncte; if (db) paint(); } })
+      .catch(function(){});
+  });
 
   fetch(DATA_URL + (DATA_URL.indexOf('?')>-1?'&':'?') + '_=' + Date.now(), {cache:'no-store'})
     .then(function(r){ if(!r.ok) throw new Error('serverul a răspuns ' + r.status); return r.json(); })
