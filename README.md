@@ -55,7 +55,7 @@ programată doar în zilele lucrătoare.
 | `date_deschise.py` | Scrie zilnic `date/acorduri_monitor.csv/.json`, `date/acorduri_legis.csv/.json`, `date/cautare.json` (indexul căutării), `rss.xml` și `sitemap.xml`; rulat de `monitor.yml` |
 | `robots.txt` | Indică motoarelor de căutare harta site-ului (`sitemap.xml`) |
 | `xlsx.min.js` | Biblioteca SheetJS pentru Excel, încărcată doar la descărcare (nu la fiecare deschidere a paginii) |
-| `unelte.js` | Butoanele „📋 Copiază" și „⬇ CSV" de pe fiecare panou, linkul care păstrează filtrele (`?ani=…&don=…`), raportul PDF pe o pagină, indicatorul de prospețime a datelor și comparația între perioade din „Analize avansate" |
+| `unelte.js` | Roata dințată de pe fiecare panou (meniu cu „Copiază ca imagine" și „Descarcă datele (CSV)"), linkul care păstrează filtrele (`?ani=…&don=…`), raportul PDF pe o pagină, indicatorul de prospețime a datelor și comparația între perioade din „Analize avansate" |
 | `html2canvas.min.js` | Biblioteca html2canvas, care transformă un panou în imagine; încărcată doar la primul „Copiază" sau „Raport PDF" |
 | `favicon.svg`, `apple-touch-icon.png`, `og.png`, `404.html` | Iconița site-ului (logoul: harta Moldovei cu cele trei fluxuri), iconița pentru ecranul telefonului, imaginea de previzualizare a linkurilor, pagina „nu există” |
 | `donatori.html` | Redirecționare către `index.html`, pentru linkurile vechi |

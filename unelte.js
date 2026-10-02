@@ -18,6 +18,21 @@ css.textContent = `
   .panel-head{gap:8px;}
   .panel-head > h2{margin-right:auto;}
   .panel-head .unealta-panou{white-space:nowrap;}
+  .panel-head .roata-panou{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:34px;line-height:1;}
+  .panel-head .roata-panou svg{display:block;transition:transform .25s ease;}
+  .panel-head .roata-panou:hover svg, .panel-head .roata-panou.activ svg{transform:rotate(45deg);}
+  .panel-head .roata-panou.activ{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .meniu-panou{position:fixed;z-index:10000;display:none;min-width:250px;padding:6px;background:var(--panel, #fff);
+    border:1px solid var(--line-strong);border-radius:10px;box-shadow:0 12px 32px rgba(20,35,60,.18);}
+  .meniu-panou.deschis{display:block;}
+  .meniu-panou button{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;background:none;border:none;
+    border-radius:7px;padding:9px 11px;font:inherit;color:var(--ink);cursor:pointer;}
+  .meniu-panou button:hover, .meniu-panou button:focus-visible{background:var(--blue-bg);outline:none;}
+  .meniu-panou button + button{margin-top:2px;}
+  .meniu-panou .mp-ico{font-size:15px;line-height:1.25;width:18px;text-align:center;flex:none;}
+  .meniu-panou b{display:block;font-size:13px;font-weight:700;color:var(--navy);}
+  .meniu-panou small{display:block;font-size:11.5px;color:var(--ink-dim);margin-top:2px;}
+  @media (prefers-reduced-motion: reduce){.panel-head .roata-panou svg{transition:none;}}
   .panel-head .unealta-panou.ok, .unealta.ok{background:#16794f;color:#fff;border-color:#16794f;}
   .top-dreapta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
   .unelte-sus{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:flex-end;}
@@ -112,16 +127,35 @@ function titluPanou(panel){
 const EXCLUSE = ['mapCountryProjectsTitle', 'yearFilterTitle', 'donorFilterTitle', 'exportTitle',
                  'exportColumnsTitle', 'exportPreviewTitle', 'iatiCheckTitle'];
 const ET = {
-  copy:  () => L('📋 Copiază', '📋 Copy'),
-  csv:   () => '⬇ CSV',
   ok:    () => L('✓ Copiat', '✓ Copied'),
-  dl:    () => L('⬇ Descărcat', '⬇ Downloaded'),
+  dl:    () => L('✓ Descărcat', '✓ Downloaded'),
   err:   () => L('✗ Eroare', '✗ Error'),
   gol:   () => L('Fără date', 'No data'),
-  tipCopy: () => L('Copiază panoul ca imagine', 'Copy this panel as an image'),
-  tipCsv:  () => L('Descarcă datele din spatele diagramei (CSV, se deschide în Excel)',
-                   'Download the data behind this chart (CSV, opens in Excel)')
+  lucru: () => '⏳',
+  roata: () => L('Opțiuni: copiază imaginea sau descarcă datele (CSV)', 'Options: copy the image or download the data (CSV)'),
+  copy:  () => L('Copiază ca imagine', 'Copy as image'),
+  copySub: () => L('PNG, gata de lipit în Word sau e-mail', 'PNG, ready to paste into Word or email'),
+  csv:   () => L('Descarcă datele (CSV)', 'Download the data (CSV)'),
+  csvSub:  () => L('sumele exacte · se deschide în Excel', 'exact amounts · opens in Excel')
 };
+/* Roata dințată (contur simplu, desenat cu stroke ca restul iconițelor din pagină) */
+const ROATA = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" ' +
+  'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/>' +
+  '<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 ' +
+  '1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 ' +
+  '0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 ' +
+  '2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 ' +
+  '1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 ' +
+  '1.65 0 0 0-1.51 1z"/></svg>';
+
+/* Pe roată arătăm pe scurt rezultatul („✓ Copiat"), apoi revine singură la iconiță. */
+function rezultat(btn, text){
+  clearTimeout(btn._t);
+  btn.textContent = text;
+  btn.classList.toggle('ok', text !== ET.lucru() && text !== ET.err());
+  if(text === ET.lucru()) return;
+  btn._t = setTimeout(() => { btn.innerHTML = ROATA; btn.classList.remove('ok'); }, 2200);
+}
 
 function imaginePanou(panel){
   return incarcaHtml2canvas().then(() => {
@@ -138,20 +172,19 @@ function imaginePanou(panel){
   }).then(c => new Promise((ok, fail) => c.toBlob(b => b ? ok(b) : fail(new Error('imagine goală')), 'image/png')));
 }
 
-async function laCopiere(e){
-  e.stopPropagation();
-  const btn = e.currentTarget, panel = btn.closest('.panel');
+async function copiazaPanou(panel, btn){
   btn.disabled = true;
+  rezultat(btn, ET.lucru());
   // promisiunea se dă direct lui ClipboardItem, în același clic — altfel Safari
   // refuză scrierea, pentru că randarea durează peste limita „gestului".
   const blob = imaginePanou(panel);
   try{
     if(!navigator.clipboard || !window.ClipboardItem) throw new Error('fără clipboard');
     await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-    eticheta(btn, ET.ok(), ET.copy);
+    rezultat(btn, ET.ok());
   }catch(err){
-    try{ descarca(await blob, slug(titluPanou(panel)) + '.png'); eticheta(btn, ET.dl(), ET.copy); }
-    catch(e2){ console.warn('copiere panou:', err, e2); eticheta(btn, ET.err(), ET.copy); }
+    try{ descarca(await blob, slug(titluPanou(panel)) + '.png'); rezultat(btn, ET.dl()); }
+    catch(e2){ console.warn('copiere panou:', err, e2); rezultat(btn, ET.err()); }
   }finally{ btn.disabled = false; }
 }
 
@@ -216,17 +249,86 @@ function dateCsv(panel){
   if(bare.length) return dinBare(bare);
   return null;
 }
-function laCsv(e){
-  e.stopPropagation();
-  const btn = e.currentTarget, panel = btn.closest('.panel');
+function csvPanou(panel, btn){
   if(window.__introRunning && typeof finishIntro === 'function') finishIntro();
   try{
     const d = dateCsv(panel);
-    if(!d || !d.rows.length){ eticheta(btn, ET.gol(), ET.csv); return; }
+    if(!d || !d.rows.length){ rezultat(btn, ET.gol()); return; }
     const blob = new Blob([textCsv(d.cols, d.rows)], { type: 'text/csv;charset=utf-8' });
     descarca(blob, slug(titluPanou(panel)) + '-' + dataAzi() + '.csv');
-    eticheta(btn, ET.dl(), ET.csv);
-  }catch(err){ console.warn('CSV:', err); eticheta(btn, ET.err(), ET.csv); }
+    rezultat(btn, ET.dl());
+  }catch(err){ console.warn('CSV:', err); rezultat(btn, ET.err()); }
+}
+
+/* --- Meniul roții: unul singur pentru toată pagina, așezat în <body> cu poziție
+   fixă, ca să nu fie tăiat de marginile rotunjite (overflow) ale panoului. */
+let meniu = null, roataDeschisa = null;
+function construiesteMeniu(){
+  meniu = document.createElement('div');
+  meniu.className = 'meniu-panou';
+  meniu.setAttribute('role', 'menu');
+  meniu.addEventListener('click', e => {
+    const item = e.target.closest('[data-actiune]');
+    if(!item || !roataDeschisa) return;
+    const btn = roataDeschisa, panel = btn.closest('.panel');
+    inchideMeniu(false);
+    btn.focus();
+    if(item.dataset.actiune === 'copiaza') copiazaPanou(panel, btn);
+    else csvPanou(panel, btn);
+  });
+  meniu.addEventListener('keydown', e => {
+    const iteme = [...meniu.querySelectorAll('[data-actiune]')];
+    const i = iteme.indexOf(document.activeElement);
+    if(e.key === 'ArrowDown'){ e.preventDefault(); iteme[(i + 1) % iteme.length].focus(); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); iteme[(i - 1 + iteme.length) % iteme.length].focus(); }
+    else if(e.key === 'Tab'){ inchideMeniu(false); }
+  });
+  document.body.appendChild(meniu);
+  // se închide la clic în afară, la Escape, la derulare sau la redimensionare
+  document.addEventListener('click', e => {
+    if(roataDeschisa && !meniu.contains(e.target) && !roataDeschisa.contains(e.target)) inchideMeniu(false);
+  }, true);
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && roataDeschisa) inchideMeniu(true); });
+  window.addEventListener('scroll', () => { if(roataDeschisa) inchideMeniu(false); }, true);
+  window.addEventListener('resize', () => { if(roataDeschisa) inchideMeniu(false); });
+}
+function deschideMeniu(btn, dinTastatura){
+  if(!meniu) construiesteMeniu();
+  const item = (act, ico, titlu, sub) =>
+    '<button type="button" role="menuitem" data-actiune="' + act + '"><span class="mp-ico" aria-hidden="true">' + ico + '</span>' +
+    '<span><b>' + esc(titlu) + '</b><small>' + esc(sub) + '</small></span></button>';
+  meniu.innerHTML = item('copiaza', '📋', ET.copy(), ET.copySub()) + item('csv', '⬇', ET.csv(), ET.csvSub());
+  meniu.classList.add('deschis');
+  roataDeschisa = btn;
+  btn.setAttribute('aria-expanded', 'true');
+  btn.classList.add('activ');
+  // sub roată, aliniat la dreapta ei; deasupra, dacă jos nu mai e loc
+  const r = btn.getBoundingClientRect(), w = meniu.offsetWidth, hM = meniu.offsetHeight;
+  let left = Math.min(r.right - w, window.innerWidth - w - 8);
+  left = Math.max(8, left);
+  let top = r.bottom + 6;
+  if(top + hM > window.innerHeight - 8 && r.top - hM - 6 > 8) top = r.top - hM - 6;
+  meniu.style.left = left + 'px';
+  meniu.style.top = top + 'px';
+  if(dinTastatura) meniu.querySelector('[data-actiune]').focus();
+}
+function inchideMeniu(focusPeRoata){
+  if(!meniu || !roataDeschisa) return;
+  const btn = roataDeschisa;
+  meniu.classList.remove('deschis');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.classList.remove('activ');
+  roataDeschisa = null;
+  if(focusPeRoata) btn.focus();
+}
+function laRoata(e){
+  e.stopPropagation();
+  const btn = e.currentTarget;
+  if(btn.disabled) return;
+  if(roataDeschisa === btn){ inchideMeniu(false); return; }
+  if(roataDeschisa) inchideMeniu(false);
+  // detail === 0: clic venit din tastatură (Enter / Space), deci mutăm focusul în meniu
+  deschideMeniu(btn, e.detail === 0);
 }
 
 function butoanePanouri(){
@@ -238,15 +340,16 @@ function butoanePanouri(){
     // nu în grupurile segmentate (Angajamente | Debursări), ci într-un grup propriu
     let btns = [...head.children].find(c => c.classList.contains('btns') && !c.classList.contains('seg'));
     if(!btns){ btns = document.createElement('div'); btns.className = 'btns'; head.appendChild(btns); }
-    const fa = (cls, text, tip, fn) => {
-      const b = document.createElement('button');
-      b.type = 'button'; b.className = 'unealta-panou ' + cls;
-      b.textContent = text; b.title = tip;
-      b.addEventListener('click', fn);
-      btns.appendChild(b);
-    };
-    fa('panou-copiaza', ET.copy(), ET.tipCopy(), laCopiere);
-    fa('panou-csv', ET.csv(), ET.tipCsv(), laCsv);
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'unealta-panou roata-panou';
+    b.innerHTML = ROATA;
+    b.title = ET.roata();
+    b.setAttribute('aria-label', ET.roata());
+    b.setAttribute('aria-haspopup', 'menu');
+    b.setAttribute('aria-expanded', 'false');
+    b.addEventListener('click', laRoata);
+    btns.appendChild(b);
   });
 }
 
@@ -630,8 +733,8 @@ function legaComparatia(){
 
 /* ============================================================ pornire + limba */
 window.__unelteLimba = function(){
-  document.querySelectorAll('.panou-copiaza').forEach(b => { if(!b.classList.contains('ok')){ b.textContent = ET.copy(); } b.title = ET.tipCopy(); });
-  document.querySelectorAll('.panou-csv').forEach(b => { b.title = ET.tipCsv(); });
+  document.querySelectorAll('.roata-panou').forEach(b => { b.title = ET.roata(); b.setAttribute('aria-label', ET.roata()); });
+  if(roataDeschisa) inchideMeniu(false);
   const bl = document.getElementById('btnLinkSelectie'), bp = document.getElementById('btnRaportPdf');
   if(bl && !bl.classList.contains('ok')){ bl.textContent = textLink(); }
   if(bl) bl.title = L('Copiază un link care deschide pagina cu exact aceiași ani și donatori', 'Copy a link that opens the page with exactly these years and donors');
