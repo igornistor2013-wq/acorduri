@@ -157,6 +157,12 @@ def main(BRUT=None, OUT=None):
         if r and r.get('sume'):
             a['sume'] = [[s['v'], s['val'], s.get('f', '')[:180]] for s in r['sume'][:2]]
             cu_suma += 1
+        # documentul atașat: suma acordului și costul total al proiectului (legis_sume.py / scriptul din browser)
+        for x in (r or {}).get('atas') or []:
+            if x.get('suma') and 'acord' not in a:
+                a['acord'] = {'v': x['suma']['v'], 'val': x['suma']['val'], 'f': x['suma'].get('f', '')[:220], 'u': x.get('u', '')}
+            if x.get('cost') and 'cost' not in a:
+                a['cost'] = {'v': x['cost']['v'], 'val': x['cost']['val'], 'f': x['cost'].get('f', '')[:220], 'u': x.get('u', '')}
     if sume:
         print(cu_suma, 'acte cu sumă găsită în textul integral (din', len(sume), 'citite)')
 

@@ -121,6 +121,27 @@ for s, v in [('25 000 000', 25e6), ('25.000.000,00', 25e6), ('25,000,000', 25e6)
     verifica(f'numărul „{s}" = {v:g}', ls.numar(s) == v, ls.numar(s))
 
 print()
+print('Suma ACORDULUI din documentul atașat (suma_acord)')
+_msl = open(AICI / 'teste_date_msl.txt', encoding='utf-8').read() if (AICI / 'teste_date_msl.txt').exists() else ''
+if _msl:
+    _r = ls.suma_acord(_msl, 'grant')
+    verifica('Moldova Solidarity Lanes: suma acordului 12.000.000 EUR (nu împrumutul de 41,2 mil. din alt acord)',
+             _r['suma'] and (_r['suma']['v'], _r['suma']['val']) == (12000000, 'EUR'), _r['suma'])
+    verifica('Moldova Solidarity Lanes: costul total al proiectului 119.000.000 EUR, separat',
+             _r['cost'] and (_r['cost']['v'], _r['cost']['val']) == (119000000, 'EUR'), _r['cost'])
+for _t, _i, _s, _c in [
+    ('Banca acordă Împrumutatului un credit în valoare de 25 000 000 EUR în temeiul prezentului Contract. '
+     '1.2. Costul total estimat al Proiectului este de 60 000 000 EUR.', 'imprumut', (25000000, 'EUR'), (60000000, 'EUR')),
+    ('The Bank hereby agrees to lend to the Borrower an amount equal to EUR 30,000,000. The total cost of the Project is '
+     'estimated at EUR 75,000,000. A front-end fee of EUR 75,000 shall be paid.', 'imprumut', (30000000, 'EUR'), (75000000, 'EUR')),
+    ('Whereas the Borrower has received a loan of EUR 40,000,000 under a separate finance contract. The Bank shall make '
+     'available to the Beneficiary a grant in an amount not exceeding EUR 5,000,000 under this Agreement.', 'grant', (5000000, 'EUR'), None)]:
+    _r = ls.suma_acord(_t, _i)
+    verifica(f'{_i}: suma {_s[0]:,} {_s[1]}'.replace(',', ' ') + (f', cost {_c[0]:,}'.replace(',', ' ') if _c else ''),
+             _r['suma'] and (_r['suma']['v'], _r['suma']['val']) == _s and
+             ((_r['cost']['v'], _r['cost']['val']) if _r['cost'] else None) == _c, _r)
+
+print()
 print('Notele Guvernului (gov_sume.py)')
 import gov_sume as gs
 verifica('titlul punctului devine titlul hotărârii',

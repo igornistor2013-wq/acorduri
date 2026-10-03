@@ -102,6 +102,7 @@
   .c-suma{font-family:var(--mono);font-weight:700;color:var(--navy, #1E4B8C);white-space:nowrap}
   .c-suma .din-text{border-bottom:1px dotted currentColor;cursor:help}
   .c-suma .nil{font-weight:400}
+  .c-suma .c-cost{font-weight:400;font-size:10.5px;color:var(--ink-dim);margin-top:3px;white-space:normal}
   .det-suma{margin:6px 0 10px;font-size:13px}
   .det-suma b{font-family:var(--mono);color:var(--navy, #1E4B8C)}
   .det-suma q{color:var(--ink-dim);font-style:italic}
@@ -1414,6 +1415,13 @@
       var g = map[k];
       g.sumaT = sumaDinText(g);
       g.numeScurt = numeScurt(g.nume);
+      // textul acordului semnat (atașat la lege): cea mai sigură sursă a sumei
+      var cuAcord = g.acte.filter(function(a){ return a.acord; }), cuCost = g.acte.filter(function(a){ return a.cost; });
+      var prioA = function(a){ return /^LP|^HP/.test(a.act || '') ? 0 : 1; };
+      cuAcord.sort(function(x, y){ return prioA(x) - prioA(y) || ord(x).localeCompare(ord(y)); });
+      cuCost.sort(function(x, y){ return prioA(x) - prioA(y) || ord(x).localeCompare(ord(y)); });
+      g.sumaA = cuAcord.length ? Object.assign({act: cuAcord[0].act}, cuAcord[0].acord) : null;
+      g.cost = cuCost.length ? Object.assign({act: cuCost[0].act}, cuCost[0].cost) : null;
       g.acte.sort(function(x,y){ return ord(y).localeCompare(ord(x)); });
       g.ultim = g.acte[0];
       g.parteneri = Object.keys(g.orgs).join(' / ');
@@ -1593,7 +1601,7 @@
                     'Etapa atinsă','Semnat'].concat(STEPS.map(function(s){
                       return s.n + '. ' + s.cap; }))
                       .concat(['În vigoare din', 'Temeiul datei', 'Suma', 'Valuta', 'Sursa sumei', 'Fragmentul din act',
-                               'Denumirea completă']));
+                               'Denumirea completă', 'Costul total al proiectului', 'Valuta costului']));
       grupuri.filter(function(g){
         if (!trece_grup(g)) return false;
         if (seek){
@@ -1615,11 +1623,12 @@
           ultima ? ultima.n + '. ' + ultima.cap : '', g.semnat || ''
         ].concat(STEPS.map(function(s){ return g.et[s.k] ? 'da' : ''; }))
          .concat([v ? v.data : '', v ? v.ce : ''])
-         .concat(g.suma ? [g.suma.v, g.suma.val, 'titlul actului', '']
+         .concat(g.sumaA ? [g.sumaA.v, g.sumaA.val, 'textul acordului (atașat la ' + g.sumaA.act + ')', g.sumaA.f]
+               : g.suma ? [g.suma.v, g.suma.val, 'titlul actului', '']
                : g.sumaT ? [g.sumaT.v, g.sumaT.val, 'textul ' + g.sumaT.act, g.sumaT.f]
                : g.sumaG ? [g.sumaG.v, g.sumaG.val, 'nota Guvernului, ședința din ' + dataRo(g.sumaG.data) + ' (' + g.sumaG.nr + ')', g.sumaG.f]
                : ['', '', '', ''])
-         .concat([g.nume]));
+         .concat([g.nume, g.cost ? g.cost.v : '', g.cost ? g.cost.val : '']));
       });
     }
 
@@ -2770,18 +2779,24 @@
             'sectorială, sau împrumut, ca la Facilitatea de reformă și creștere.">' +
             'suport bugetar</span>' : '') + '</td>' +
         '<td data-l="Suma" class="c-suma">' +
-          (g.suma ? '<span title="Suma scrisă în titlul actului oficial">' + esc(fmtSuma(g.suma)) + '</span>'
+          (g.sumaA ? '<span class="din-text" title="' + esc('Din textul acordului, atașat la ' + g.sumaA.act + ': ' + g.sumaA.f) + '">' +
+               esc(fmtSuma(g.sumaA)) + '</span>'
+           : g.suma ? '<span title="Suma scrisă în titlul actului oficial">' + esc(fmtSuma(g.suma)) + '</span>'
            : g.sumaT ? '<span class="din-text" title="' + esc('Din textul integral al actului ' + g.sumaT.act + ': ' + g.sumaT.f) + '">' +
                esc(fmtSuma(g.sumaT)) + '</span>'
            : g.sumaG ? '<span class="din-text" title="' + esc('Din nota de argumentare a Guvernului (ședința din ' + dataRo(g.sumaG.data) + '): ' + g.sumaG.f) + '">' +
                esc(fmtSuma(g.sumaG)) + ' <sup>G</sup></span>'
-           : '<span class="nil" title="Suma nu apare nici în actele publicate, nici în notele Guvernului citite până acum">—</span>') + '</td>' +
+           : '<span class="nil" title="Suma nu apare nici în actele publicate, nici în notele Guvernului citite până acum">—</span>') +
+          (g.cost ? '<div class="c-cost" title="' + esc('Costul total al proiectului, din textul acordului atașat la ' + g.cost.act + ': ' + g.cost.f) + '">' +
+               'cost proiect: ' + esc(fmtSuma(g.cost)) + '</div>' : '') + '</td>' +
         '<td data-l="Etape parcurse">' + steps(g) + '</td>' +
         '<td data-l="Semnat">' + (g.semnat ? '<span class="semnat">' + esc(g.semnat) + '</span>'
           : '<span class="nil">—</span>') + '</td></tr>' +
         '<tr class="detalii hid" data-d="' + i + '"><td colspan="6">' +
           '<div class="det-nume">' + esc(g.nume) + '</div>' +
-          (g.suma ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.suma)) + '</b> — scrisă în titlul actului oficial.</div>'
+          (g.sumaA ? '<div class="det-suma">Suma acordului: <b>' + esc(fmtSuma(g.sumaA)) + '</b> — din textul acordului atașat la ' + esc(g.sumaA.act) +
+               ': <q>' + esc(g.sumaA.f) + '</q> · <a href="' + esc(g.sumaA.u) + '" target="_blank" rel="noopener">documentul (PDF, legis.md)</a></div>'
+           : g.suma ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.suma)) + '</b> — scrisă în titlul actului oficial.</div>'
            : g.sumaT ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.sumaT)) + '</b> — din textul actului ' + esc(g.sumaT.act) +
                ': <q>' + esc(g.sumaT.f) + '</q>' +
                (g.sumaT.alte.length ? '<br>Alte sume în actele acordului: ' + esc(g.sumaT.alte.join('; ')) : '') + '</div>'
@@ -2789,6 +2804,8 @@
                esc(dataRo(g.sumaG.data)) + ' (număr unic ' + esc(g.sumaG.nr) + '): <q>' + esc(g.sumaG.f) + '</q> · ' +
                '<a href="' + esc(g.sumaG.pdf) + '" target="_blank" rel="noopener">nota (PDF, gov.md)</a></div>'
            : '') +
+          (g.cost ? '<div class="det-suma">Costul total al proiectului: <b>' + esc(fmtSuma(g.cost)) + '</b> — din textul acordului: <q>' +
+               esc(g.cost.f) + '</q></div>' : '') +
           '<ul class="acte-list">' + lista + '</ul>' + spreSume +
           '<button type="button" class="link-acord" data-id="' + idAcord(g) + '">' + ico('link') + '<span>Copiază linkul acestui acord</span></button></td></tr>';
     }).join('');
@@ -2854,6 +2871,11 @@
             a.sume = r.sume.slice(0, 2).map(function(s){ return [s.v, s.val, String(s.f || '').slice(0, 180)]; });
             n++;
           }
+          // documentul atașat (textul acordului): suma acordului și costul total al proiectului
+          (r && r.atas || []).forEach(function(x){
+            if (x.suma && !a.acord){ a.acord = {v: x.suma.v, val: x.suma.val, f: String(x.suma.f || '').slice(0, 220), u: x.u}; n++; }
+            if (x.cost && !a.cost){ a.cost = {v: x.cost.v, val: x.cost.val, f: String(x.cost.f || '').slice(0, 220), u: x.u}; n++; }
+          });
         });
         if (n) paint();
       })

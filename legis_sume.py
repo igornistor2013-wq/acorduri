@@ -154,6 +154,112 @@ def sume_din_text(text, maxim=5):
     return rez
 
 
+# ------------------------------------------------- suma ACORDULUI din textul lui
+
+# Textul unui acord (documentul atașat la lege) are multe sume. La „Moldova Solidarity
+# Lanes" (LP295/2024): 41.205.000 EUR = împrumutul din ALT acord (considerentul A),
+# 12.000.000 EUR = grantul din acest acord (D), 12.400.000 = grant + comisioanele
+# băncii, 119.000.000 EUR = costul total al proiectului (art. 4.1), 5.000.000 EUR =
+# o limită pentru tranșe (art. 7.3). Prima sumă din text ar fi fost greșită. Alegem
+# suma care ține de ACEST acord și de instrumentul lui, iar costul total al
+# proiectului îl păstrăm separat.
+_GRANT = r'grant|subventi|nerambursabil|contributi|donati|ajutor'
+_IMPR = r'imprumut|credit|loan|lend|facilitat'
+_COST = (r'cost(?:ul|urile)?\s+(?:total|totale|estimat|final)|total(?:\s+project)?\s+cost|estimated\s+(?:total\s+)?cost|'
+         r'valoarea\s+totala\s+a\s+proiectului|bugetul\s+(?:total\s+)?(?:al\s+)?proiectului')
+_PROPRIU = r'prezent(?:ul|ului)\s+(?:acord|contract)|acest(?:ui)?\s+acord|this\s+agreement|hereunder|hereby'
+_EXPLICIT = r'reprezentat[aă]?\s+de\s+prezentul\s+acord|valoarea\s+grantului|suma\s+(?:grantului|imprumutului|creditului)|amount\s+of\s+the\s+(?:grant|loan|credit)'
+_MAXIM = (r'valoare(?:a)?\s+(?:principala\s+)?maxima|suma\s+maxima|maximum\s+amount|pana\s+la|up\s+to|not\s+exceeding|'
+          r'in\s+valoare(?:\s+totala)?\s+de|in\s+suma\s+de|amount\s+of|in\s+cuantum\s+de|in\s+marime\s+de')
+_DEFINITIE = r'valoarea\s+maxima\s+a\s+(?:grantului|subventiei|imprumutului|creditului)'
+_LIMITA = r'nu\s+va\s+depasi\s+cu\s+mai\s+mult|transe?i?\b|tranche|cumulat'
+_COMISION = r'comision|\bfees?\b'
+_ALT_ACORD = r'in\s+temeiul\s+unui\s+contract|contract(?:ul)?\s+de\s+finantare\s+din\s+data\s+de|finance\s+contract\s+dated'
+
+
+def _fold_ocr(s):
+    # OCR-ul pune „T" în loc de „î" la început de cuvânt: „Tn" = „în", „Tmprumut" = „împrumut"
+    return re.sub(r'\bt(?=[mn])', 'i', _fara_diacritice(s))
+
+
+def _candidati(t):
+    for m in RX_DUPA.finditer(t):
+        v = numar(m.group(1)); mult = (m.group(2) or '').lower()
+        if mult and v < 1e5:
+            v *= MULT.get(mult, 1)
+        yield m.start(), m.end(), v, valuta(m.group(3))
+    for m in RX_INAINTE.finditer(t):
+        v = numar(m.group(2)); mult = (m.group(3) or '').lower()
+        if mult and v < 1e5:
+            v *= MULT.get(mult, 1)
+        sym = m.group(1).lower()
+        yield m.start(), m.end(), v, {'€': 'EUR', '$': 'USD', 'sdr': 'DST', 'xdr': 'DST'}.get(sym, sym.upper())
+
+
+def _propozitie(t, start, end):
+    """Propoziția în care stă suma: nu tăiem la punctele din numere („119.000.000")."""
+    inainte = t[max(0, start - 260):start]
+    m = None
+    for m in re.finditer(r'(?<!\d)[.;]\s+(?=[A-ZĂÂÎȘȚ„"(])|\n\s*[A-Z]\.\s|\b\d{1,2}\.\d{1,2}\.\s', inainte):
+        pass
+    if m:
+        inainte = inainte[m.end():]
+    dupa = t[end:end + 200]
+    m2 = re.search(r'(?<!\d)\.\s+(?=[A-ZĂÂÎȘȚ])|\n\s*[A-Z]\.\s|\b\d{1,2}\.\d{1,2}\.\s', dupa)
+    if m2:
+        dupa = dupa[:m2.start()]
+    return inainte, dupa
+
+
+def suma_acord(text, instrument):
+    """Suma acordului și costul total al proiectului, din textul acordului.
+    instrument: 'grant' sau 'imprumut' (din categoria acordului).
+    Întoarce {'suma': {v, val, f, s} | None, 'cost': {v, val, f} | None}."""
+    t = re.sub(r'-\s*\n\s*', '', text or '')
+    t = re.sub(r'[ \t]+', ' ', t)
+    propriu_rx = _GRANT if instrument == 'grant' else _IMPR
+    altul_rx = _IMPR if instrument == 'grant' else _GRANT
+    sume, costuri = {}, {}
+    for start, end, v, cod in _candidati(t):
+        if not cod or v < 1000 or cod == 'MDL':
+            continue
+        inainte, dupa = _propozitie(t, start, end)
+        fi, fd = _fold_ocr(inainte), _fold_ocr(dupa)
+        prop = fi + ' ' + fd
+        frag = re.sub(r'\s+', ' ', (inainte[-150:] + t[start:end] + dupa[:70])).strip()
+        if re.search(_COMISION, fd[:70]) or re.search(_COMISION, fi[-50:]):
+            continue                                            # suma e chiar un comision
+        if re.search(_COST, fi[-140:]):
+            k = (v, cod)
+            if k not in costuri:
+                costuri[k] = {'v': v, 'val': cod, 'f': frag[:230], 'poz': start}
+            continue
+        s = 0
+        s += 4 if re.search(_PROPRIU, prop) else 0
+        are_propriu, are_altul = bool(re.search(propriu_rx, prop)), bool(re.search(altul_rx, prop))
+        s += 4 if are_propriu else 0
+        s -= 4 if (are_altul and not are_propriu) else 0
+        s += 3 if re.search(_MAXIM, fi[-90:]) else 0
+        s += 3 if re.search(_DEFINITIE, fi[-140:]) else 0
+        s += 2 if re.search(_EXPLICIT, prop) else 0
+        s -= 3 if re.search(_LIMITA, fi[-130:]) else 0
+        s -= 3 if re.search(_COMISION, prop) else 0
+        s -= 3 if re.search(_ALT_ACORD, prop) else 0
+        s += 1 if v >= 1e6 else 0
+        k = (v, cod)
+        if k not in sume or sume[k]['s'] < s:
+            sume[k] = {'v': v, 'val': cod, 'f': frag[:230], 's': s, 'poz': start}
+    alese = sorted(sume.values(), key=lambda x: (-x['s'], x['poz']))
+    suma = alese[0] if alese and alese[0]['s'] >= 6 else None
+    cost = sorted(costuri.values(), key=lambda x: (-x['v'], x['poz']))[0] if costuri else None
+    for x in (suma, cost):
+        if x:
+            x.pop('poz', None)
+            if x['v'] == int(x['v']):
+                x['v'] = int(x['v'])
+    return {'suma': suma, 'cost': cost}
+
+
 # ------------------------------------------------------------------ actele
 
 def tinte(brut):
