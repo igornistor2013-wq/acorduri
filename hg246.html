@@ -744,13 +744,15 @@ function deseneaza(){
     if(!alese.length) return;
     const set = new Set(alese.map(p => p.id));
     const dupaId = new Map(alese.map(p => [p.id, p.deText]));
-    try{
-      descarcaWord(CTX.xml, id => set.has(id), id => dupaId.get(id) || '',
-                   CTX.numeFisier, numeDePerioada());
-    }catch(e){
-      stare.className = 'stare err';
-      stare.textContent = 'Documentul nu a putut fi generat: ' + e.message;
-    }
+    /* descarcaWord e asincronă: o eroare din ea respinge promisiunea, nu aruncă
+       aici. Un try/catch fără await n-o prindea niciodată, iar butonul părea
+       că nu face nimic. O prindem pe promisiune. */
+    descarcaWord(CTX.xml, id => set.has(id), id => dupaId.get(id) || '',
+                 CTX.numeFisier, numeDePerioada())
+      .catch(e => {
+        stare.className = 'stare err';
+        stare.textContent = 'Documentul nu a putut fi generat: ' + ((e && e.message) || e);
+      });
   });
 }
 

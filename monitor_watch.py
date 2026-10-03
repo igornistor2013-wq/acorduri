@@ -483,6 +483,21 @@ def parse_edition(eid, label):
     return True, found
 
 
+def acum():
+    """Ora Chișinăului, indiferent unde rulează scriptul.
+
+    Pe GitHub Actions ceasul e în UTC, iar „Ultima verificare" de pe pagină
+    apărea cu trei ore în urmă vara și cu două iarna, fără nimic care să spună
+    că e alt fus orar. Dacă lista fusurilor orare lipsește (Windows fără
+    pachetul tzdata), rămânem la ora calculatorului — care, la rularea locală,
+    e oricum ora Chișinăului."""
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.now(ZoneInfo("Europe/Chisinau"))
+    except Exception:
+        return datetime.now()
+
+
 def load():
     if not os.path.exists(DATA):
         return {"acte": {}, "editii_vazute": [],
@@ -584,7 +599,7 @@ def main():
             if ok and eid not in db["editii_vazute"]:
                 db["editii_vazute"].append(eid)
             time.sleep(1)
-        db["ultima_rulare"] = datetime.now().strftime("%d.%m.%Y %H:%M")
+        db["ultima_rulare"] = acum().strftime("%d.%m.%Y %H:%M")
         save(db)
         print(f"\n{noi} acte noi. Total în registru: {len(db['acte'])}.")
         return
@@ -652,7 +667,7 @@ def main():
         db["editii_vazute"] = sorted(set(db["editii_vazute"]),
                                      key=lambda x: int(x) if x.isdigit() else 0)
 
-    db["ultima_rulare"] = datetime.now().strftime("%d.%m.%Y %H:%M")
+    db["ultima_rulare"] = acum().strftime("%d.%m.%Y %H:%M")
 
     # Golurile rămase se calculează ÎNAINTE de salvare. Erau calculate după, așa
     # că valoarea proaspătă nu ajungea niciodată în fișier: date.json păstra o
