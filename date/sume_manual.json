@@ -1,0 +1,158 @@
+{
+ "_cum_se_foloseste": "Sume puse de mână, pe codul actului din registrul legis.md. {\"v\": suma, \"val\": \"EUR\", \"nota\": \"de unde e\"} pune suma acordului; cu \"unde\": \"text\" o pune ca sumă din textul actului. {\"ascunde\": true} ascunde suma citită greșit din atașament; {\"fara_text\": true} pe cea citită greșit din textul actului. Ce e aici bate citirea automată. Cheile care încep cu _ sunt ignorate.",
+ "OMDED182/2025": {
+  "v": 184297.33,
+  "val": "EUR",
+  "nota": "Introdus manual: partea Republicii Moldova din grantul proiectului REC4SMEs este de 184 297,33 EUR. Citirea automată luase drept sumă numărul contului bancar din acord."
+ },
+ "LP203/2022": {
+  "v": 17700000,
+  "val": "EUR",
+  "u": "https://www.legis.md/UserFiles/Image/RO/2022/mo230-234md/acord%20203%20ro.pdf",
+  "nota": "Introdus manual: împrumut BIRD de 17 700 000 EUR, potrivit textului acordului (PDF necitit automat); aceeași sumă în documentul de evaluare al Băncii Mondiale (PAD4824)."
+ },
+ "LP53/2024": {
+  "v": 150000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după textul acordului: împrumut de până la 150 000 000 EUR, din care Tranșa 1 de 90 000 000 EUR și Tranșa 2 de 60 000 000 EUR. Citirea automată luase doar Tranșa 1."
+ },
+ "LP103/2020": {
+  "v": 35700000,
+  "val": "EUR",
+  "nota": "Introdus manual, după textul acordului: treizeci și cinci milioane șapte sute mii euro. Citirea automată luase 3,57 mil. dintr-un număr scris greșit în PDF („35.700.00 EUR”)."
+ },
+ "OMMPS73/2026": {
+  "ascunde": true,
+  "nota": "Suma citită automat (2 500 CHF) era plafonul pentru achiziții dintr-o singură sursă, nu suma acordului."
+ },
+ "LP275/2024": {
+  "ascunde": true,
+  "nota": "Suma citită automat (36 000 USD) era plafonul unui subproiect școlar, nu suma grantului."
+ },
+ "LP152/2019": {
+  "ascunde": true,
+  "nota": "Suma citită automat (250 000 EUR) era cofinanțarea UN Women, nu contribuția UE."
+ },
+ "LP115/2025": {
+  "ascunde": true,
+  "nota": "Suma citită automat (493 103 338 EUR) era bugetul total al programului Interreg Europe, pentru toate țările."
+ },
+ "LP68/2025": {
+  "ascunde": true,
+  "nota": "Suma citită automat (65 mil. EUR) era o tranșă, cu numărul rupt în PDF („1 65 de milioane”)."
+ },
+ "LP177/2024": {
+  "ascunde": true,
+  "nota": "Suma citită automat (92,4 mil. EUR) era a acordului de împrumut BIRD la care textul face trimitere, nu a acestui acord cu AID."
+ },
+ "LP378/2023": {
+  "ascunde": true,
+  "nota": "Suma citită automat (18 mil. EUR) era plafonul de 15 % din împrumutul BEI, nu suma împrumutului."
+ },
+ "LP309/2023": {
+  "ascunde": true,
+  "nota": "Suma citită automat (7 227 514 EUR) era contribuția națională a țărilor participante la program."
+ },
+ "LP307/2023": {
+  "ascunde": true,
+  "nota": "Suma citită automat (7 526 403 EUR) era doar o parte din contribuția UE de 77 290 439 EUR la program."
+ },
+ "LP308/2023": {
+  "ascunde": true,
+  "nota": "Suma citită automat (15 929 469 EUR) era doar o parte din contribuția UE de 215 047 857 EUR la program."
+ },
+ "AMAEIE482/2016": {
+  "v": 52600000,
+  "val": "EUR",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: Uniunea Europeană finanțează o sumă maximă de 52,6 milioane euro. Citirea automată luase 5,26 miliarde dintr-un număr scris greșit („52,600.000.00”)."
+ },
+ "HP696/1995": {
+  "v": 4710000,
+  "val": "USD",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: 4,710 milioane dolari SUA și 7,735 milioane mărci germane. Citirea automată luase 4,71 miliarde."
+ },
+ "HP1212/1997": {
+  "fara_text": true,
+  "nota": "Suma citită automat (3,075 miliarde USD) era de fapt 3,075 milioane transmise S.A. „Tirex-Petrol”, nu suma unui acord."
+ },
+ "LP423/2004": {
+  "v": 20000000000,
+  "val": "ROL",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: împrumut de 20 miliarde lei românești. Citirea automată îi trecuse drept lei moldovenești."
+ },
+ "LP1444/2002": {
+  "v": 20000000000,
+  "val": "ROL",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: împrumut de 20 miliarde lei românești. Citirea automată îi trecuse drept lei moldovenești."
+ },
+ "HP1443/2002": {
+  "v": 20000000000,
+  "val": "ROL",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: împrumut de 20 miliarde lei românești. Citirea automată îi trecuse drept lei moldovenești."
+ },
+ "LP1201/2000": {
+  "v": 20000000000,
+  "val": "ROL",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: împrumut de 20 miliarde lei românești. Citirea automată îi trecuse drept lei moldovenești."
+ },
+ "HP1200/2000": {
+  "v": 20000000000,
+  "val": "ROL",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: împrumut de 20 miliarde lei românești. Citirea automată îi trecuse drept lei moldovenești."
+ },
+ "HG1298/2002": {
+  "v": 20000000000,
+  "val": "ROL",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: împrumut de 20 miliarde lei românești. Citirea automată îi trecuse drept lei moldovenești."
+ },
+ "HG1336/2004": {
+  "v": 20000000000,
+  "val": "ROL",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: împrumut de 20 miliarde lei românești. Citirea automată îi trecuse drept lei moldovenești."
+ },
+ "HG636/2000": {
+  "v": 20000000000,
+  "val": "ROL",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: împrumut de 20 miliarde lei românești. Citirea automată îi trecuse drept lei moldovenești."
+ },
+ "LP717/2001": {
+  "v": 4000000,
+  "val": "DST",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: 4 000 000 D.S.T. (circa 5 milioane dolari SUA). Citirea automată luase echivalentul aproximativ în dolari."
+ },
+ "HP551/1999": {
+  "v": 29600000,
+  "val": "DST",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: 29 600 000 D.S.T. (circa 40 milioane dolari SUA). Citirea automată luase echivalentul aproximativ în dolari."
+ },
+ "HP550/1999": {
+  "v": 8200000,
+  "val": "DST",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: 8 200 000 D.S.T. (circa 11,1 milioane dolari SUA). Citirea automată luase echivalentul aproximativ în dolari."
+ },
+ "LP1175/2002": {
+  "v": 24100000,
+  "val": "DST",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: 24 100 000 D.S.T. (circa 30 milioane dolari SUA). Citirea automată luase echivalentul aproximativ în dolari."
+ },
+ "LP1274/2002": {
+  "v": 8300000,
+  "val": "DST",
+  "unde": "text",
+  "nota": "Introdus manual, după textul actului: 8 300 000 D.S.T. (circa 10,5 milioane dolari SUA). Citirea automată luase echivalentul aproximativ în dolari."
+ }
+}
