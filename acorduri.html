@@ -1012,7 +1012,7 @@
     if (!s) return '';
     var n = s.v >= 1e9 ? (s.v / 1e9).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' mld.'
           : s.v >= 1e6 ? (s.v / 1e6).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' mil.'
-          : String(s.v).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+          : String(s.v).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     return n + ' ' + s.val;
   }
 
@@ -1417,7 +1417,8 @@
       g.numeScurt = numeScurt(g.nume);
       // textul acordului semnat (atașat la lege): cea mai sigură sursă a sumei
       var cuAcord = g.acte.filter(function(a){ return a.acord; }), cuCost = g.acte.filter(function(a){ return a.cost; });
-      var prioA = function(a){ return /^LP|^HP/.test(a.act || '') ? 0 : 1; };
+      // o sumă pusă de mână (date/sume_manual.json) trece înaintea oricărei sume citite automat
+      var prioA = function(a){ return (a.acord && a.acord.manual) ? -1 : /^LP|^HP/.test(a.act || '') ? 0 : 1; };
       cuAcord.sort(function(x, y){ return prioA(x) - prioA(y) || ord(x).localeCompare(ord(y)); });
       cuCost.sort(function(x, y){ return prioA(x) - prioA(y) || ord(x).localeCompare(ord(y)); });
       g.sumaA = cuAcord.length ? Object.assign({act: cuAcord[0].act}, cuAcord[0].acord) : null;
@@ -2858,24 +2859,46 @@
      legis_sume.py). Le citim la fiecare deschidere a paginii, nu doar când se
      reconstruiește: ajunge să urci fișierul pe GitHub și sumele apar. */
   function adaugaSume(){
-    fetch('date/legis_sume.json?_=' + Date.now(), {cache: 'no-store'})
-      .then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(j){
-        if (!j || !j.acte || !db || !db.acte) return;
+    var cere = function(u){
+      return fetch(u + '?_=' + Date.now(), {cache: 'no-store'})
+        .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+    };
+    /* date/sume_manual.json: sume puse de mână, pe codul actului (ex. „LP203/2022").
+       Citirea automată a acordurilor atașate greșește uneori — ia o tranșă drept
+       sumă întreagă, bugetul unui program întreg drept partea Moldovei, o dată a
+       luat chiar un cont bancar. Ce scrie aici bate orice sumă citită automat:
+       {"v": 184297.33, "val": "EUR", "nota": "…"} pune suma acordului; cu
+       "unde": "text" o pune ca sumă din textul actului; {"ascunde": true} ascunde
+       suma citită din atașament, {"fara_text": true} pe cea din textul actului. */
+    Promise.all([cere('date/legis_sume.json'), cere('date/sume_manual.json')]).then(function(rez){
+        var j = rez[0], manual = rez[1] || {};
+        if (!db || !db.acte) return;
         var n = 0;
         Object.keys(db.acte).forEach(function(k){
           var a = db.acte[k];
           if (a.editie !== 'legis.md') return;
-          var r = j.acte[String(a.editie_id)];
+          var r = j && j.acte ? j.acte[String(a.editie_id)] : null;
           if (r && r.sume && r.sume.length){
             a.sume = r.sume.slice(0, 2).map(function(s){ return [s.v, s.val, String(s.f || '').slice(0, 180)]; });
             n++;
           }
-          // documentul atașat (textul acordului): suma acordului și costul total al proiectului
-          (r && r.atas || []).forEach(function(x){
-            if (x.suma && !a.acord){ a.acord = {v: x.suma.v, val: x.suma.val, f: String(x.suma.f || '').slice(0, 220), u: x.u}; n++; }
-            if (x.cost && !a.cost){ a.cost = {v: x.cost.v, val: x.cost.val, f: String(x.cost.f || '').slice(0, 220), u: x.u}; n++; }
-          });
+          // documentul atașat (textul acordului): suma acordului și costul total al proiectului.
+          // Fișierul de pe site e mai nou decât ce e încrustat în pagină: îl credem pe el,
+          // inclusiv când o sumă greșită a fost scoasă între timp.
+          if (r && r.atas){
+            var cuS = r.atas.filter(function(x){ return x.suma && x.suma.v < 1e12; })[0];
+            var cuC = r.atas.filter(function(x){ return x.cost && x.cost.v < 1e12; })[0];
+            if (cuS){ a.acord = {v: cuS.suma.v, val: cuS.suma.val, f: String(cuS.suma.f || '').slice(0, 220), u: cuS.u, manual: !!cuS.suma.manual}; n++; }
+            else if (a.acord){ delete a.acord; n++; }
+            if (cuC){ a.cost = {v: cuC.cost.v, val: cuC.cost.val, f: String(cuC.cost.f || '').slice(0, 220), u: cuC.u}; n++; }
+          }
+          var m = manual[a.act];
+          if (m && typeof m === 'object'){
+            if (m.fara_text && a.sume){ delete a.sume; n++; }
+            if (m.v > 0 && m.unde === 'text'){ a.sume = [[m.v, m.val || 'EUR', String(m.nota || 'Sumă introdusă de mână.').slice(0, 180)]]; n++; }
+            else if (m.v > 0){ a.acord = {v: m.v, val: m.val || 'EUR', f: String(m.nota || 'Sumă introdusă de mână.').slice(0, 220), u: m.u || a.url || '', manual: true}; n++; }
+            else if (m.ascunde && a.acord){ delete a.acord; n++; }
+          }
         });
         if (n) paint();
       })

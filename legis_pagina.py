@@ -149,6 +149,10 @@ def main(BRUT=None, OUT=None):
         sume = json.load(open(AICI / 'date' / 'legis_sume.json', encoding='utf-8')).get('acte', {})
     except Exception:
         sume = {}
+    try:
+        manual = json.load(open(AICI / 'date' / 'sume_manual.json', encoding='utf-8'))
+    except Exception:
+        manual = {}
     cu_suma = 0
     for a in acte.values():
         if a.get('editie') != 'legis.md':
@@ -159,10 +163,24 @@ def main(BRUT=None, OUT=None):
             cu_suma += 1
         # documentul atașat: suma acordului și costul total al proiectului (legis_sume.py / scriptul din browser)
         for x in (r or {}).get('atas') or []:
-            if x.get('suma') and 'acord' not in a:
+            if x.get('suma') and x['suma']['v'] < 1e12 and 'acord' not in a:
                 a['acord'] = {'v': x['suma']['v'], 'val': x['suma']['val'], 'f': x['suma'].get('f', '')[:220], 'u': x.get('u', '')}
-            if x.get('cost') and 'cost' not in a:
+                if x['suma'].get('manual'):
+                    a['acord']['manual'] = True
+            if x.get('cost') and x['cost']['v'] < 1e12 and 'cost' not in a:
                 a['cost'] = {'v': x['cost']['v'], 'val': x['cost']['val'], 'f': x['cost'].get('f', '')[:220], 'u': x.get('u', '')}
+        # sumele puse de mână (date/sume_manual.json) bat orice sumă citită automat
+        m = manual.get(a.get('act'))
+        if isinstance(m, dict):
+            nota = str(m.get('nota') or 'Sumă introdusă de mână.')
+            if m.get('fara_text'):
+                a.pop('sume', None)
+            if (m.get('v') or 0) > 0 and m.get('unde') == 'text':
+                a['sume'] = [[m['v'], m.get('val', 'EUR'), nota[:180]]]
+            elif (m.get('v') or 0) > 0:
+                a['acord'] = {'v': m['v'], 'val': m.get('val', 'EUR'), 'f': nota[:220], 'u': m.get('u') or a.get('url', ''), 'manual': True}
+            elif m.get('ascunde'):
+                a.pop('acord', None)
     if sume:
         print(cu_suma, 'acte cu sumă găsită în textul integral (din', len(sume), 'citite)')
 

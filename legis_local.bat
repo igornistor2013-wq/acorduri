@@ -36,11 +36,19 @@ REM aceeasi fereastra. Prima rulare are ~1300 de acte de citit; se opreste dupa
 REM 20 de minute si continua la rularea urmatoare. Un esec aici nu opreste
 REM publicarea actelor noi.
 echo [3/4] Citesc sumele din textele actelor (prima data dureaza mai mult)...
-%PY% -m pip install --quiet --disable-pip-version-check pypdf >> "%JURNAL%" 2>&1
+%PY% -m pip install --quiet --disable-pip-version-check pypdf pypdfium2 pytesseract >> "%JURNAL%" 2>&1
 %PY% legis_sume.py --headed --profil .legis_profil --browser msedge --limita-min 20
 set COD=%errorlevel%
 if "%COD%"=="3" (echo Cloudflare a cerut din nou verificarea; sumele se citesc data viitoare. & echo sume: blocat >> "%JURNAL%")
 if not "%COD%"=="0" if not "%COD%"=="3" (echo Citirea sumelor a esuat, cod %COD%. Continui fara ele. & echo sume: eroare cod %COD% >> "%JURNAL%")
+REM Acordurile atasate la acte (PDF-urile din fisa actului pe legis.md): acolo sta
+REM suma de cele mai multe ori. PDF-urile scanate se citesc cu OCR, daca programul
+REM Tesseract e instalat. Se opreste dupa 20 de minute si continua data viitoare.
+echo       Citesc acordurile atasate la acte...
+%PY% legis_atasamente.py --headed --profil .legis_profil --browser msedge --limita-min 20
+set COD=%errorlevel%
+if "%COD%"=="3" (echo Cloudflare a cerut din nou verificarea; atasamentele se citesc data viitoare. & echo atasamente: blocat >> "%JURNAL%")
+if not "%COD%"=="0" if not "%COD%"=="3" (echo Citirea atasamentelor a esuat, cod %COD%. Continui fara ele. & echo atasamente: eroare cod %COD% >> "%JURNAL%")
 %PY% legis_pagina.py >> "%JURNAL%" 2>&1
 
 echo [4/4] Public pe GitHub, daca e ceva nou...

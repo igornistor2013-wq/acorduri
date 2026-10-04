@@ -44,22 +44,23 @@ def _fara_diacritice(s):
 VALUTE = [
     (r'euro|eur\b|€', 'EUR'),
     (r'dolari(?:\s+(?:sua|s\.u\.a\.?|ai\s+sua|americani))?|usd\b|\$', 'USD'),
-    (r'drepturi\s+speciale\s+de\s+tragere|dst\b|dts\b|sdr\b|xdr\b', 'DST'),
+    (r'drepturi\s+speciale\s+de\s+tragere|d\.\s?s\.\s?t\.?|dst\b|dts\b|sdr\b|xdr\b', 'DST'),
     (r'yeni(?:\s+japonezi)?|yen\b|jpy\b', 'JPY'),
-    (r'franci\s+elvetieni|chf\b', 'CHF'),
+    (r'franci\s+elve\S{0,2}ieni|chf\b', 'CHF'),
     (r'lire\s+sterline|gbp\b', 'GBP'),
     (r'coroane\s+suedeze|sek\b', 'SEK'),
     (r'coroane\s+daneze|dkk\b', 'DKK'),
     (r'zloti|pln\b', 'PLN'),
     (r'yuani|cny\b|rmb\b', 'CNY'),
     (r'ecu\b', 'ECU'),
-    (r'marci\s+germane|dem\b', 'DEM'),
-    (r'lei\s+romanesti', 'ROL'),
+    (r'm[aă]rci\s+germane|dem\b', 'DEM'),
+    (r'lei\s+rom\S{0,4}ne\S{0,2}ti', 'ROL'),
     (r'lei(?:\s+moldovenesti)?|mdl\b', 'MDL'),
 ]
 _VAL = '|'.join('(?:%s)' % p for p, _ in VALUTE)
 _NUM = r'\d{1,3}(?:[ .,]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d+)?'
-_MULT = r'miliarde|miliard|milioane|milion|mil\.?|mln\.?|mii|millions?|billions?'
+# „million" stă înaintea lui „mil": altfel „1,500 million" era prins drept „mil" românesc
+_MULT = r'miliarde|miliard|milioane|milion|millions?|billions?|mil\.?|mln\.?|mii'
 # „25 de milioane de euro", „25 000 000 (douăzeci și cinci milioane) euro", „52,9 milioane EUR"
 RX_DUPA = re.compile(r'(?<![\d.,])(' + _NUM + r')(?![\d])\s*(?:\([^)]{2,160}\)\s*)?(?:de\s+)?(' + _MULT + r')?\s*(?:de\s+)?(' + _VAL + r')', re.I)
 # „EUR 25,000,000", „USD 15 million", „€ 4 340 000"
@@ -87,6 +88,8 @@ def numar(s):
         return float(re.sub(r'[ .,]', '', m.group(1)) + '.' + m.group(2))
     if re.fullmatch(r'\d+[.,]\d+', s):
         return float(s.replace(',', '.'))
+    if re.search(r'[ .,]', s):
+        return 0.0      # „35.700.00": număr rupt în PDF; mai bine fără sumă decât cu una greșită
     return float(re.sub(r'\D', '', s) or 0)
 
 
@@ -131,20 +134,11 @@ def sume_din_text(text, maxim=5):
         if k not in gasite or gasite[k]['s'] < s:
             gasite[k] = {'v': round(v, 2), 'val': cod, 'f': f[:220], 's': s, 'poz': start}
 
-    for m in RX_DUPA.finditer(t):
-        v = numar(m.group(1))
-        mult = (m.group(2) or '').lower()
-        if mult and v < 1e5:                  # „25.000.000 mil. EUR" (greșeală de tipar) rămâne 25 de milioane
-            v *= MULT.get(mult, 1)
-        adauga(m.start(), m.end(), v, valuta(m.group(3)))
-    for m in RX_INAINTE.finditer(t):
-        v = numar(m.group(2))
-        mult = (m.group(3) or '').lower()
-        if mult and v < 1e5:
-            v *= MULT.get(mult, 1)
-        sym = m.group(1).lower()
-        cod = {'€': 'EUR', '$': 'USD', 'sdr': 'DST', 'xdr': 'DST'}.get(sym, sym.upper())
-        adauga(m.start(), m.end(), v, cod)
+    # aceiași candidați ca la suma acordului: fără conturi bancare, fără numere rupte,
+    # cu „3,075 milioane" citit drept 3,075 mil. („25.000.000 mil. EUR", greșeală de
+    # tipar, rămâne 25 de milioane)
+    for start, end, v, cod in _candidati(t):
+        adauga(start, end, v, cod)
 
     rez = sorted(gasite.values(), key=lambda x: (-x['s'], x['poz']))[:maxim]
     for r in rez:
@@ -166,15 +160,28 @@ def sume_din_text(text, maxim=5):
 _GRANT = r'grant|subventi|nerambursabil|contributi|donati|ajutor'
 _IMPR = r'imprumut|credit|loan|lend|facilitat'
 _COST = (r'cost(?:ul|urile)?\s+(?:total|totale|estimat|final)|total(?:\s+project)?\s+cost|estimated\s+(?:total\s+)?cost|'
-         r'valoarea\s+totala\s+a\s+proiectului|bugetul\s+(?:total\s+)?(?:al\s+)?proiectului')
+         r'valoarea\s+totala\s+a\s+proiectului|bugetul\s+(?:total\s+)?(?:al\s+)?proiectului|'
+         # bugetul unui program întreg (Interreg), pentru toate țările: e cost, nu suma acordului
+         r'buget\w{0,2}\s+total\s+al\s+programului|total\s+budget\s+of\s+the\s+programme')
 _PROPRIU = r'prezent(?:ul|ului)\s+(?:acord|contract)|acest(?:ui)?\s+acord|this\s+agreement|hereunder|hereby'
 _EXPLICIT = r'reprezentat[aă]?\s+de\s+prezentul\s+acord|valoarea\s+grantului|suma\s+(?:grantului|imprumutului|creditului)|amount\s+of\s+the\s+(?:grant|loan|credit)'
 _MAXIM = (r'valoare(?:a)?\s+(?:principala\s+)?maxima|suma\s+maxima|maximum\s+amount|pana\s+la|up\s+to|not\s+exceeding|'
           r'in\s+valoare(?:\s+totala)?\s+de|in\s+suma\s+de|amount\s+of|in\s+cuantum\s+de|in\s+marime\s+de')
 _DEFINITIE = r'valoarea\s+maxima\s+a\s+(?:grantului|subventiei|imprumutului|creditului)'
-_LIMITA = r'nu\s+va\s+depasi\s+cu\s+mai\s+mult|transe?i?\b|tranche|cumulat'
+# „transa" lipsea: „Tranșa 1, în valoare de până la 90.000.000 EUR" trecea drept suma întreagă
+_LIMITA = r'nu\s+va\s+depasi\s+cu\s+mai\s+mult|trans(?:a|e|ei|elor)?\b|tranche|cumulat'
 _COMISION = r'comision|\bfees?\b'
-_ALT_ACORD = r'in\s+temeiul\s+unui\s+contract|contract(?:ul)?\s+de\s+finantare\s+din\s+data\s+de|finance\s+contract\s+dated'
+_ALT_ACORD = (r'in\s+temeiul\s+unui\s+contract|contract(?:ul)?\s+de\s+finantare\s+din\s+data\s+de|finance\s+contract\s+dated|'
+              # trimitere la celălalt acord al aceluiași proiect: („Acord de împrumut") din data semnării
+              r'acord(?:ul)?\s+de\s+(?:imprumut|finantare|grant)\W{0,8}din\s+data|(?:loan|financing|grant)\s+agreement\W{0,8}(?:of\s+(?:even|the\s+same)\s+date|dated)')
+# Greșeli văzute în sumele publicate: o cotă dintr-o sumă mai mare („7 526 403 din
+# 77 290 439", „15 % din împrumut (adică până la 18 milioane)"), cofinanțarea altcuiva,
+# un plafon de achiziții, un cont bancar.
+_PARTE_DUPA = r'^\W{0,3}(?:out\s+of|din\s+(?:contributia|totalul|imprumutul|credit|grant|cei|cele))'
+_PARTE_INAINTE = r'\d\s*%\s+(?:din|of)\b|adica\s+pana\s+la|approximately|aproximativ'
+_COFIN = r'contributi[ae]\s+national|cofinanta|co-?financ|contributi[ae]\s+proprie'
+_ACHIZ = r'procurement|achiziti'
+_CONT = r'cont(?:ul)?\s+bancar|\biban\b|\bswift\b|\bbic\b|bank\s+account'
 
 
 def _fold_ocr(s):
@@ -182,16 +189,36 @@ def _fold_ocr(s):
     return re.sub(r'\bt(?=[mn])', 'i', _fara_diacritice(s))
 
 
+_MULT_RO = ('miliarde', 'miliard', 'milioane', 'milion', 'mil', 'mil.', 'mln', 'mln.')
+
+
+def _valoare(cifre, mult):
+    v = numar(cifre)
+    # „3,075 milioane dolari" înseamnă 3,075 mil. (virgula e zecimală în română), nu
+    # 3 075 mil.: așa apăreau în registru împrumuturi de 3 și 4,7 miliarde de dolari.
+    if mult in _MULT_RO and re.fullmatch(r'\d{1,3},\d{3}', cifre.strip()):
+        v = float(cifre.strip().replace(',', '.'))
+    if mult and v < 1e5:
+        v *= MULT.get(mult, 1)
+    return v
+
+
 def _candidati(t):
+    # Un cont bancar nu e o sumă: „MD04VI022240300000368EUR" a fost citit drept
+    # 22 240 300 000 368 EUR. Sărim cifrele lipite de o literă și valorile imposibile.
     for m in RX_DUPA.finditer(t):
-        v = numar(m.group(1)); mult = (m.group(2) or '').lower()
-        if mult and v < 1e5:
-            v *= MULT.get(mult, 1)
+        if m.start() and t[m.start() - 1].isalpha():
+            continue
+        mult = (m.group(2) or '').lower()
+        v = _valoare(m.group(1), mult)
+        if v >= 1e12:
+            continue
         yield m.start(), m.end(), v, valuta(m.group(3))
     for m in RX_INAINTE.finditer(t):
-        v = numar(m.group(2)); mult = (m.group(3) or '').lower()
-        if mult and v < 1e5:
-            v *= MULT.get(mult, 1)
+        mult = (m.group(3) or '').lower()
+        v = _valoare(m.group(2), mult)
+        if v >= 1e12:
+            continue
         sym = m.group(1).lower()
         yield m.start(), m.end(), v, {'€': 'EUR', '$': 'USD', 'sdr': 'DST', 'xdr': 'DST'}.get(sym, sym.upper())
 
@@ -229,6 +256,8 @@ def suma_acord(text, instrument):
         frag = re.sub(r'\s+', ' ', (inainte[-150:] + t[start:end] + dupa[:70])).strip()
         if re.search(_COMISION, fd[:70]) or re.search(_COMISION, fi[-50:]):
             continue                                            # suma e chiar un comision
+        if re.search(_CONT, fi[-80:]):
+            continue                                            # număr de cont, nu sumă
         if re.search(_COST, fi[-140:]):
             k = (v, cod)
             if k not in costuri:
@@ -245,19 +274,52 @@ def suma_acord(text, instrument):
         s -= 3 if re.search(_LIMITA, fi[-130:]) else 0
         s -= 3 if re.search(_COMISION, prop) else 0
         s -= 3 if re.search(_ALT_ACORD, prop) else 0
+        s -= 4 if (re.search(_PARTE_DUPA, fd[:45]) or re.search(_PARTE_INAINTE, fi[-60:])) else 0
+        s -= 4 if re.search(_COFIN, fi[-120:]) else 0
+        s -= 4 if re.search(_ACHIZ, prop) else 0
         s += 1 if v >= 1e6 else 0
         k = (v, cod)
         if k not in sume or sume[k]['s'] < s:
             sume[k] = {'v': v, 'val': cod, 'f': frag[:230], 's': s, 'poz': start}
     alese = sorted(sume.values(), key=lambda x: (-x['s'], x['poz']))
-    suma = alese[0] if alese and alese[0]['s'] >= 6 else None
+    # un acord sub 10 000 nu există în registru: o asemenea sumă e un plafon sau o taxă
+    suma = alese[0] if alese and alese[0]['s'] >= 6 and alese[0]['v'] >= 10000 else None
+    # Sub prag nu publicăm nimic, dar cea mai probabilă sumă rămâne la vedere
+    # („candidat"), ca omul care verifică să nu pornească de la zero.
+    candidat = alese[0] if alese and not suma and alese[0]['s'] >= 3 else None
     cost = sorted(costuri.values(), key=lambda x: (-x['v'], x['poz']))[0] if costuri else None
-    for x in (suma, cost):
+    for x in (suma, cost, candidat):
         if x:
             x.pop('poz', None)
             if x['v'] == int(x['v']):
                 x['v'] = int(x['v'])
-    return {'suma': suma, 'cost': cost}
+    return {'suma': suma, 'cost': cost, 'candidat': candidat}
+
+
+# ------------------------------------------- sumele vechi, la regulile de azi
+
+REGULI = 2      # crește când se schimbă regulile de alegere a sumei
+
+
+def sume_tin(r):
+    """Suma din textul actului, ținută în bază, mai rezistă regulilor de azi?
+    O reverificăm pe fragmentul păstrat lângă ea; dacă nu mai iese aceeași sumă
+    (un „3,075 milioane" citit drept 3 miliarde, lei românești trecuți drept lei
+    moldovenești), actul se recitește."""
+    if r.get('v') == REGULI or not r.get('sume'):
+        return True
+    s = r['sume'][0]
+    top = sume_din_text(s.get('f', ''))
+    return bool(top) and top[0]['v'] == s['v'] and top[0]['val'] == s['val']
+
+
+def suma_atas_tine(x, instrument):
+    """La fel pentru suma citită dintr-un acord atașat. Cele puse de mână rămân."""
+    s = x.get('suma')
+    if not s or s.get('manual') or x.get('v') == REGULI:
+        return True
+    n = suma_acord(s.get('f', ''), instrument)['suma']
+    return bool(n) and n['v'] == s['v'] and n['val'] == s['val']
 
 
 # ------------------------------------------------------------------ actele
@@ -342,7 +404,8 @@ def main():
     if a.doar:
         de_citit = [d for d in a.doar if d in toate] or list(a.doar)
     else:
-        de_citit = [d for d in toate if d not in acte or (a.reincearca and acte[d].get('eroare'))]
+        de_citit = [d for d in toate if d not in acte or (a.reincearca and acte[d].get('eroare'))
+                    or not sume_tin(acte[d])]
     # cele mai noi întâi: doc_id-urile mari sunt actele recente
     de_citit.sort(key=lambda d: -int(d) if d.isdigit() else 0)
     if a.doar:
@@ -360,6 +423,17 @@ def main():
         if stare['citite'] or stare['erori']:
             salveaza(baza)
 
+    def pune(doc, nou):
+        """Scrie actul recitit fără să piardă ce s-a citit din atașamentele lui; o
+        eroare la recitire nu șterge un act citit bine înainte."""
+        vechi = acte.get(doc) or {}
+        if nou.get('eroare') and vechi and not vechi.get('eroare'):
+            return
+        for k in ('atas', 'instr', 'atas_citit', 'atas_eroare'):
+            if k in vechi:
+                nou[k] = vechi[k]
+        acte[doc] = nou
+
     def citeste(descarca):
         """Bucla comună: descarcă(doc) → {'status', 'tip', 'octeti' | 'mare'}. Întoarce 0 sau 3."""
         for i, doc in enumerate(de_citit, 1):
@@ -369,7 +443,7 @@ def main():
             rez = descarca(f'{baza_url}/cautare/downloadpdf/{doc}')
             azi = datetime.date.today().isoformat()
             if rez.get('mare'):
-                acte[doc] = {'act': toate.get(doc, ''), 'eroare': f"PDF prea mare ({rez['mare'] // 1048576} MB)", 'citit': azi}
+                pune(doc, {'act': toate.get(doc, ''), 'eroare': f"PDF prea mare ({rez['mare'] // 1048576} MB)", 'citit': azi})
                 stare['erori'] += 1
                 continue
             octeti = rez.get('octeti') or b''
@@ -378,7 +452,7 @@ def main():
                 if BLOCAT.search(inceput) or rez.get('status') in (403, 503) and 'cloudflare' in inceput.lower():
                     print('Cloudflare a cerut verificarea; mă opresc și salvez ce am citit.')
                     return 3
-                acte[doc] = {'act': toate.get(doc, ''), 'eroare': f"HTTP {rez.get('status')}, nu e PDF", 'citit': azi}
+                pune(doc, {'act': toate.get(doc, ''), 'eroare': f"HTTP {rez.get('status')}, nu e PDF", 'citit': azi})
                 stare['erori'] += 1
                 continue
             try:
@@ -386,11 +460,11 @@ def main():
             except SystemExit:
                 raise
             except Exception as e:
-                acte[doc] = {'act': toate.get(doc, ''), 'eroare': 'PDF necitibil: ' + str(e)[:120], 'citit': azi}
+                pune(doc, {'act': toate.get(doc, ''), 'eroare': 'PDF necitibil: ' + str(e)[:120], 'citit': azi})
                 stare['erori'] += 1
                 continue
             sume = sume_din_text(text)
-            acte[doc] = {'act': toate.get(doc, ''), 'sume': sume, 'pagini': pagini, 'citit': azi}
+            pune(doc, {'act': toate.get(doc, ''), 'sume': sume, 'pagini': pagini, 'citit': azi, 'v': REGULI})
             if not text.strip():
                 acte[doc]['nota'] = 'PDF fără text (scanat)'
             stare['citite'] += 1

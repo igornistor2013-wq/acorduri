@@ -4,7 +4,7 @@
     python teste_legis.py --browser  # plus un test complet cu Playwright pe un
                                      # legis.md simulat local (inclusiv blocajul Cloudflare)
 """
-import json, shutil, subprocess, sys, tempfile, threading
+import json, re, shutil, subprocess, sys, tempfile, threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
@@ -140,6 +140,80 @@ for _t, _i, _s, _c in [
     verifica(f'{_i}: suma {_s[0]:,} {_s[1]}'.replace(',', ' ') + (f', cost {_c[0]:,}'.replace(',', ' ') if _c else ''),
              _r['suma'] and (_r['suma']['v'], _r['suma']['val']) == _s and
              ((_r['cost']['v'], _r['cost']['val']) if _r['cost'] else None) == _c, _r)
+
+print()
+print('Acordurile atașate la acte (legis_atasamente.py)')
+import legis_atasamente as la
+_l = la.linkuri_din_html('<a href="/UserFiles/Image/RO/2022/mo230-234md/acord 203 ro.pdf">a</a>'
+                         "<a href='https://www.legis.md/UserFiles/Image/x.PDF'>b</a><a href=\"/UserFiles/Image/x.PDF\">dublură</a>"
+                         '<a href="/cautare/downloadpdf/1">actul</a><img src="/UserFiles/Image/sigla.png">',
+                         'https://www.legis.md/cautare/getResults?doc_id=132350&lang=ro')
+verifica('atașamentele din fișa actului: doar PDF-urile din UserFiles, fără dubluri, cu spațiile codate',
+         _l == ['https://www.legis.md/UserFiles/Image/RO/2022/mo230-234md/acord%20203%20ro.pdf', 'https://www.legis.md/UserFiles/Image/x.PDF'], _l)
+_u = la.uneste([{'u': 'https://x/a%20b.pdf', 'suma': {'v': 1, 'val': 'EUR', 'manual': True}}, {'u': 'https://x/c.pdf', 'suma': {'v': 5, 'val': 'EUR'}},
+                {'u': 'https://x/vechi.pdf', 'suma': None}],
+               [{'u': 'https://x/a b.pdf', 'suma': {'v': 2, 'val': 'EUR'}}, {'u': 'https://x/c.pdf', 'suma': None}, {'u': 'https://x/d.pdf', 'suma': {'v': 9, 'val': 'USD'}}])
+verifica('suma pusă de mână nu e înlocuită', _u[0]['suma']['v'] == 1, _u[0])
+verifica('o sumă deja găsită nu e ștearsă de o recitire fără rezultat', _u[1]['suma'] and _u[1]['suma']['v'] == 5, _u[1])
+verifica('atașamentele noi se adaugă, cele vechi rămân', [x['u'][-5:] for x in _u[2:]] == ['d.pdf', 'i.pdf'], _u)
+verifica('actul neparcurs se deschide; cel parcurs, nu', la.are_nevoie({'sume': []}) and not la.are_nevoie({'sume': [], 'atas': [], 'atas_citit': 'x'})
+         and not la.are_nevoie(None))
+verifica('--reincearca reia PDF-urile scanate rămase fără text',
+         la.are_nevoie({'atas_citit': 'x', 'atas': [{'u': 'u', 'suma': None, 'metoda': 'fara-text'}]}, reincearca=True)
+         and not la.are_nevoie({'atas_citit': 'x', 'atas': [{'u': 'u', 'suma': None, 'metoda': 'text'}]}, reincearca=True))
+_r = ls.suma_acord('2.01. Banca este de acord să acorde Împrumutatului suma de 17.700.000 Euro. 2.02. Împrumutatul poate retrage mijloacele.', 'imprumut')
+verifica('sub prag: nicio sumă publicată, dar candidatul rămâne la vedere', _r['suma'] is None and _r['candidat'] and _r['candidat']['v'] == 17700000, _r)
+
+print()
+print('Sume luate greșit, văzute pe site (regulile din octombrie 2026)')
+_s = lambda t, i='grant': (ls.suma_acord(t, i)['suma'] or {}).get('v')
+_t = lambda t: [(x['v'], x['val']) for x in ls.sume_din_text(t)][:1]
+verifica('un cont bancar nu e o sumă (REC4SMEs: MD04VI022240300000368EUR)',
+         _s('90 % din valoarea maximă a grantului. Contul bancar pentru plăți: MD04VI022240300000368EUR VICBMD2XXXX') is None
+         and not _t('Contul bancar pentru plăți: MD04VI022240300000368EUR'))
+verifica('suma întreagă, nu prima tranșă',
+         _s('Banca acordă, în temeiul prezentului Acord, un împrumut în valoare de până la 150.000.000 EUR, constând în: (i) Tranșa 1, '
+            'în valoare de până la 90.000.000 EUR și (ii) Tranșa 2, în valoare de până la 60.000.000 EUR.', 'imprumut') == 150000000)
+verifica('o cotă dintr-o sumă mai mare nu e suma acordului',
+         _s('a maximum amount of EUR 7 526 403 out of the EUR 77 290 439 of the financial contribution under this Agreement for the grant') != 7526403)
+verifica('plafonul de achiziții (2 500 CHF) nu e suma acordului',
+         _s('under this Agreement the Ministry may undertake single-source procurement for a maximum value of up to 50,000 MDL (approximately 2,500 CHF) of the grant') is None)
+verifica('un număr rupt în PDF („35.700.00 EUR") nu se ghicește',
+         _s('Asociația acordă, în temeiul prezentului Acord, un credit în sumă de 35.700.00 EUR', 'imprumut') is None)
+verifica('„3,075 milioane dolari" = 3,075 mil., nu 3 miliarde', _t('mijloace financiare în valoare de 3,075 milioane dolari S.U.A.') == [(3075000, 'USD')],
+         _t('mijloace financiare în valoare de 3,075 milioane dolari S.U.A.'))
+verifica('„5 926,0 milioane de yeni" rămâne 5,9 miliarde', _t('Se ratifică Acordul de împrumut în sumă de 5 926,0 milioane de yeni japonezi') == [(5926000000, 'JPY')])
+verifica('D.S.T. înaintea echivalentului aproximativ în dolari',
+         _t('Se ratifică Acordul de credit în sumă de 4.000.000 D.S.T. (circa 5 milioane dolari S.U.A.).') == [(4000000, 'DST')])
+verifica('leii românești nu sunt lei moldovenești', _t('împrumutul pe termen lung în valoare de 20 miliarde lei româneşti, semnat') == [(20000000000, 'ROL')])
+verifica('suma veche greșită e trimisă la recitit; cea bună și cea pusă de mână, nu',
+         not ls.sume_tin({'sume': [{'v': 3075000000, 'val': 'USD', 'f': 'în valoare de 3,075 milioane dolari S.U.A. din'}]})
+         and ls.sume_tin({'sume': [{'v': 600000, 'val': 'EUR', 'f': 'Se ratifică Acordul de grant, în sumă de 600000 de euro, semnat'}]})
+         and not ls.suma_atas_tine({'suma': {'v': 22240300000368, 'val': 'EUR', 'f': 'valoarea maximă a grantului Contul bancar pentru plăți: MD04VI022240300000368EUR'}}, 'grant')
+         and ls.suma_atas_tine({'suma': {'v': 1, 'val': 'EUR', 'f': 'x', 'manual': True}}, 'grant'))
+_tmp = Path(tempfile.mkdtemp())
+try:
+    for _f in ('acorduri.html', 'legis_pagina.py', 'legis_clasifica.py', 'monitor_watch.py'):
+        shutil.copy(AICI / _f, _tmp / _f)
+    (_tmp / 'date').mkdir()
+    json.dump([{'id': '9', 'c': 'OMDED182/2025', 'pub': '26-12-2025', 'kw': [],
+                't': 'cu privire la intrarea în vigoare a Acordului de grant dintre Organizația pentru Dezvoltarea Antreprenoriatului și Agenția Executivă pentru Consiliul European pentru Inovare'},
+               {'id': '8', 'c': 'LP115/2025', 'pub': '01-06-2025', 'kw': [], 't': 'pentru ratificarea Acordului de finanțare dintre Republica Moldova și Comisia Europeană pentru Programul Interreg Europe'}],
+              open(_tmp / 'legis_brut.json', 'w', encoding='utf-8'))
+    json.dump({'acte': {'9': {'act': 'OMDED182/2025', 'sume': [], 'atas': [{'u': 'u', 'suma': {'v': 22240300000368, 'val': 'EUR', 'f': 'cont'}, 'cost': None}]},
+                        '8': {'act': 'LP115/2025', 'sume': [], 'atas': [{'u': 'u', 'suma': {'v': 493103338, 'val': 'EUR', 'f': 'buget'}, 'cost': None}]}}},
+              open(_tmp / 'date' / 'legis_sume.json', 'w', encoding='utf-8'))
+    json.dump({'_nota': 'x', 'OMDED182/2025': {'v': 184297.33, 'val': 'EUR', 'nota': 'partea Moldovei'}, 'LP115/2025': {'ascunde': True}},
+              open(_tmp / 'date' / 'sume_manual.json', 'w', encoding='utf-8'))
+    _p = subprocess.run([sys.executable, str(_tmp / 'legis_pagina.py')], capture_output=True, text=True, timeout=120)
+    _pag = (_tmp / 'legis_acorduri.html').read_text(encoding='utf-8') if (_tmp / 'legis_acorduri.html').exists() else ''
+    _m = re.search(r'window\.__LEGIS__ = (\{.*?\});</script>', _pag, re.S)
+    _a = {x['act']: x for x in json.loads(_m.group(1))['acte'].values()} if _m else {}
+    verifica('suma pusă de mână (date/sume_manual.json) înlocuiește suma citită greșit',
+             (_a.get('OMDED182/2025', {}).get('acord') or {}).get('v') == 184297.33, _p.stdout[-300:] + _p.stderr[-300:])
+    verifica('„ascunde" scoate suma greșită din pagină', 'acord' not in _a.get('LP115/2025', {'acord': 1}))
+finally:
+    shutil.rmtree(_tmp, ignore_errors=True)
 
 print()
 print('Notele Guvernului (gov_sume.py)')
