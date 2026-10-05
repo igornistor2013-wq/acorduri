@@ -162,14 +162,14 @@ _IMPR = r'imprumut|credit|loan|lend|facilitat'
 _COST = (r'cost(?:ul|urile)?\s+(?:total|totale|estimat|final)|total(?:\s+project)?\s+cost|estimated\s+(?:total\s+)?cost|'
          r'valoarea\s+totala\s+a\s+proiectului|bugetul\s+(?:total\s+)?(?:al\s+)?proiectului|'
          # bugetul unui program întreg (Interreg), pentru toate țările: e cost, nu suma acordului
-         r'buget\w{0,2}\s+total\s+al\s+programului|total\s+budget\s+of\s+the\s+programme')
+         r'buget\w{0,2}\s+total\s+al\s+programului|total\s+budget\s+of\s+the\s+programme|fonduri(?:lor)?\s+interreg|alocar\w+\s+financiar\w+\s+total\w+\s+a\s+ue\s+pentru\s+program|out\s+of\s+the')
 _PROPRIU = r'prezent(?:ul|ului)\s+(?:acord|contract)|acest(?:ui)?\s+acord|this\s+agreement|hereunder|hereby'
 _EXPLICIT = r'reprezentat[aă]?\s+de\s+prezentul\s+acord|valoarea\s+grantului|suma\s+(?:grantului|imprumutului|creditului)|amount\s+of\s+the\s+(?:grant|loan|credit)'
-_MAXIM = (r'valoare(?:a)?\s+(?:principala\s+)?maxima|suma\s+maxima|maximum\s+amount|pana\s+la|up\s+to|not\s+exceeding|'
+_MAXIM = (r'valoare(?:a)?\s+(?:principala\s+)?maxima|suma\s+maxima|maximum\s+amount|pana\s+la|up\s+to|not\s+exceeding|not\s+to\s+exceed|sa\s+nu\s+depaseasca|ce\s+nu\s+depaseste|'
           r'in\s+valoare(?:\s+totala)?\s+de|in\s+suma\s+de|amount\s+of|in\s+cuantum\s+de|in\s+marime\s+de')
 _DEFINITIE = r'valoarea\s+maxima\s+a\s+(?:grantului|subventiei|imprumutului|creditului)'
 # „transa" lipsea: „Tranșa 1, în valoare de până la 90.000.000 EUR" trecea drept suma întreagă
-_LIMITA = r'nu\s+va\s+depasi\s+cu\s+mai\s+mult|trans(?:a|e|ei|elor)?\b|tranche|cumulat'
+_LIMITA = r'nu\s+va\s+depasi\s+cu\s+mai\s+mult|tran\w{0,2}(?:a|e|ei|elor)\b|trans\b|tranche|instal?l?ments?|first\s+transfer|prefinant|pre-?financ|cumulat'
 _COMISION = r'comision|\bfees?\b'
 _ALT_ACORD = (r'in\s+temeiul\s+unui\s+contract|contract(?:ul)?\s+de\s+finantare\s+din\s+data\s+de|finance\s+contract\s+dated|'
               # trimitere la celălalt acord al aceluiași proiect: („Acord de împrumut") din data semnării
@@ -177,7 +177,7 @@ _ALT_ACORD = (r'in\s+temeiul\s+unui\s+contract|contract(?:ul)?\s+de\s+finantare\
 # Greșeli văzute în sumele publicate: o cotă dintr-o sumă mai mare („7 526 403 din
 # 77 290 439", „15 % din împrumut (adică până la 18 milioane)"), cofinanțarea altcuiva,
 # un plafon de achiziții, un cont bancar.
-_PARTE_DUPA = r'^\W{0,3}(?:out\s+of|din\s+(?:contributia|totalul|imprumutul|credit|grant|cei|cele))'
+_PARTE_DUPA = r'^\W{0,3}(?:out\s+of|to\s+each|pentru\s+fiecare|fiecar(?:ui|ei)|din\s+(?:contributia|totalul|imprumutul|credit|grant|cei|cele))'
 _PARTE_INAINTE = r'\d\s*%\s+(?:din|of)\b|adica\s+pana\s+la|approximately|aproximativ'
 _COFIN = r'contributi[ae]\s+national|cofinanta|co-?financ|contributi[ae]\s+proprie'
 _ACHIZ = r'procurement|achiziti'
@@ -258,6 +258,8 @@ def suma_acord(text, instrument):
             continue                                            # suma e chiar un comision
         if re.search(_CONT, fi[-80:]):
             continue                                            # număr de cont, nu sumă
+        if re.search(_PARTE_DUPA, fd[:45]):
+            continue                                            # o cotă: „X out of the Y", „X to each School"
         if re.search(_COST, fi[-140:]):
             k = (v, cod)
             if k not in costuri:
@@ -271,17 +273,38 @@ def suma_acord(text, instrument):
         s += 3 if re.search(_MAXIM, fi[-90:]) else 0
         s += 3 if re.search(_DEFINITIE, fi[-140:]) else 0
         s += 2 if re.search(_EXPLICIT, prop) else 0
-        s -= 3 if re.search(_LIMITA, fi[-130:]) else 0
+        transa = bool(re.search(_LIMITA, fi[-130:]))
+        s -= 3 if transa else 0
         s -= 3 if re.search(_COMISION, prop) else 0
         s -= 3 if re.search(_ALT_ACORD, prop) else 0
-        s -= 4 if (re.search(_PARTE_DUPA, fd[:45]) or re.search(_PARTE_INAINTE, fi[-60:])) else 0
+        s -= 4 if re.search(_PARTE_INAINTE, fi[-60:]) else 0
         s -= 4 if re.search(_COFIN, fi[-120:]) else 0
         s -= 4 if re.search(_ACHIZ, prop) else 0
         s += 1 if v >= 1e6 else 0
         k = (v, cod)
         if k not in sume or sume[k]['s'] < s:
-            sume[k] = {'v': v, 'val': cod, 'f': frag[:230], 's': s, 'poz': start}
+            sume[k] = {'v': v, 'val': cod, 'f': frag[:230], 's': s, 'poz': start, 'tr': transa}
+    # Totalul și tranșele lui: când lângă două sume stă și suma lor („până la 150.000.000 EUR,
+    # constând în Tranșa 1 de 90.000.000 și Tranșa 2 de 60.000.000"), acordul e totalul. Doar
+    # pentru tranșe: la „12 400 000 din care (i) 12 000 000 și (ii) 400 000" părțile sunt
+    # lucruri diferite și una dintre ele poate fi chiar suma acordului.
+    dupa = {(round(x['v'], 2), x['val']): x for x in sume.values()}
+    totaluri, parti = set(), set()
+    for a in sume.values():
+        for b in sume.values():
+            if b['val'] != a['val'] or b['v'] <= a['v'] or not (a['tr'] or b['tr']):
+                continue
+            t = dupa.get((round(a['v'] + b['v'], 2), a['val']))
+            if t and max(a['poz'], b['poz'], t['poz']) - min(a['poz'], b['poz'], t['poz']) <= 1500:
+                totaluri.add(id(t)); parti.add(id(a)); parti.add(id(b))
+    for x in sume.values():
+        if id(x) in totaluri and id(x) not in parti:
+            x['s'] += 3
+        elif id(x) in parti:
+            x['s'] -= 4
     alese = sorted(sume.values(), key=lambda x: (-x['s'], x['poz']))
+    for x in alese:
+        x.pop('tr', None)
     # un acord sub 10 000 nu există în registru: o asemenea sumă e un plafon sau o taxă
     suma = alese[0] if alese and alese[0]['s'] >= 6 and alese[0]['v'] >= 10000 else None
     # Sub prag nu publicăm nimic, dar cea mai probabilă sumă rămâne la vedere
@@ -298,7 +321,7 @@ def suma_acord(text, instrument):
 
 # ------------------------------------------- sumele vechi, la regulile de azi
 
-REGULI = 2      # crește când se schimbă regulile de alegere a sumei
+REGULI = 3      # crește când se schimbă regulile de alegere a sumei
 
 
 def sume_tin(r):
