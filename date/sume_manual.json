@@ -990,5 +990,62 @@
   "u": "https://www.legis.md/cautare/getResults?doc_id=60506&lang=ro",
   "nota": "Introdus manual: împrumut BIRD de 35 mil. USD pentru primul proiect de dezvoltare a sectorului privat, semnat la Washington la 17 aprilie 1996, potrivit textului Hotărârii Parlamentului nr. 880/1996. Împrumutul e numărat deja la HP880/1996, deci rândul acesta nu intră în totaluri.",
   "fara_total": true
+ },
+ "HG384/2026": {
+  "v": 102900000,
+  "val": "EUR",
+  "u": "https://www.ebrd.com/home/work-with-us/projects/psd/55907.html",
+  "nota": "Introdus manual: împrumut suveran BERD de 102 900 000 EUR pentru „Moldova – Proiect de alimentare durabilă cu apă (irigații)”, potrivit fișei BERD a proiectului (nr. 55907, actualizată la 11 septembrie 2026): 49,8 mil. EUR angajate și 53,1 mil. EUR neangajate. Acordul era în negociere."
+ },
+ "DPRM371/2017": {
+  "v": 12400000,
+  "val": "USD",
+  "u": "https://www.worldbank.org/en/news/loans-credits/2017/06/09/climate-adaptation-project-in-moldova",
+  "nota": "Introdus manual: împrumut BIRD de 12,4 mil. USD, credit AID echivalent cu 12,8 mil. USD și grant GEF de 2 mil. USD pentru „Adaptarea la schimbările climatice” (P155968), aprobate la 9 iunie 2017, potrivit Băncii Mondiale. Finanțarea a fost anulată integral la 30 ianuarie 2019; nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG163/2006": {
+  "v": 9100000,
+  "val": "DST",
+  "u": "https://webapps.ifad.org/members/eb/86/docs/EB-2005-86-R-28-Rev-1.pdf?attach=1",
+  "nota": "Introdus manual: împrumut FIDA de 9,1 mil. DST (circa 13,02 mil. USD) pentru Programul de dezvoltare a afacerilor rurale, potrivit raportului președintelui FIDA către Consiliul executiv (decembrie 2005)."
+ },
+ "HG1064/2005": {
+  "v": 5700000,
+  "val": "DST",
+  "u": "https://old.mf.gov.md/en/about/delurproject/proiect1",
+  "nota": "Introdus manual: credit AID de 5,7 mil. DST (circa 8,548 mil. USD) pentru proiectul „Managementul finanțelor publice”, semnat la 7 iulie 2005, potrivit Ministerului Finanțelor."
+ },
+ "HG735/2004": {
+  "v": 5300000,
+  "val": "DST",
+  "u": "https://documents1.worldbank.org/curated/en/150901468052730802/pdf/C37830doc.pdf",
+  "nota": "Introdus manual: creditul AID nr. 3783-MD („Facilitarea comerțului și transportului în Europa de Sud-Est”), de 5 300 000 DST, semnat la 13 iunie 2003, potrivit textului acordului publicat de Banca Mondială și Legii nr. 301/2003. Împrumutul e numărat deja la LP301/2003, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HP1506/1998": {
+  "v": 5000000,
+  "val": "USD",
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P035781",
+  "nota": "Introdus manual: credit AID echivalent cu 5 mil. USD pentru Proiectul de finanțare rurală (creditul nr. 3031), semnat la Chișinău la 28 ianuarie 1998, potrivit fișei proiectului pe site-ul Băncii Mondiale. Acordul e exprimat în DST; suma în DST n-a fost găsită."
+ },
+ "HP513/1995": {
+  "v": 30000000,
+  "val": "USD",
+  "u": "https://documents1.worldbank.org/curated/en/938951468276555573/pdf/C9134D195C2FE36685256F03000D831F.pdf",
+  "nota": "Introdus manual: împrumut BIRD de 30 000 000 USD (nr. 3851) pentru „Facilitatea de garanții la preexport”, potrivit textului acordului de împrumut din 19 aprilie 1995, publicat de Banca Mondială."
+ },
+ "HG380/1995": {
+  "v": 30000000,
+  "val": "USD",
+  "u": "https://documents1.worldbank.org/curated/en/938951468276555573/pdf/C9134D195C2FE36685256F03000D831F.pdf",
+  "nota": "Introdus manual: împrumut BIRD de 30 000 000 USD (nr. 3851) pentru „Facilitatea de garanții la preexport”, potrivit textului acordului de împrumut din 19 aprilie 1995, publicat de Banca Mondială. Împrumutul e numărat deja la HP513/1995, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HP215/1994": {
+  "v": 45000000,
+  "val": "ECU",
+  "u": "https://eur-lex.europa.eu/eli/dec/1994/346",
+  "nota": "Introdus manual: împrumut pe termen lung al Comunității Europene, de cel mult 45 mil. ECU, în două tranșe, potrivit Deciziei Consiliului 94/346/CE din 13 iunie 1994 privind asistența macrofinanciară pentru Moldova. Suma e plafonul din decizie, nu a fost citită din acordul de credit."
  }
 }
