@@ -1,5 +1,5 @@
 {
- "_cum_se_foloseste": "Sume puse de mână, pe codul actului din registrul legis.md. {\"v\": suma, \"val\": \"EUR\", \"nota\": \"de unde e\"} pune suma acordului; cu \"unde\": \"text\" o pune ca sumă din textul actului. {\"ascunde\": true} ascunde suma citită greșit din atașament; {\"fara_text\": true} pe cea citită greșit din textul actului. Ce e aici bate citirea automată. Cheile care încep cu _ sunt ignorate.",
+ "_cum_se_foloseste": "Sume puse de mână, pe codul actului din registrul legis.md. {\"v\": suma, \"val\": \"EUR\", \"nota\": \"de unde e\"} pune suma acordului; cu \"unde\": \"text\" o pune ca sumă din textul actului. {\"ascunde\": true} ascunde suma citită greșit din atașament; {\"fara_text\": true} pe cea citită greșit din textul actului. {\"fara_guvern\": true} ascunde suma luată din nota Guvernului. Ce e aici bate citirea automată. Cheile care încep cu _ sunt ignorate.",
  "OMDED182/2025": {
   "v": 184297.33,
   "val": "EUR",
@@ -37,7 +37,8 @@
  },
  "LP115/2025": {
   "ascunde": true,
-  "nota": "Suma citită automat (493 103 338 EUR) era bugetul total al programului Interreg Europe, pentru toate țările."
+  "fara_guvern": true,
+  "nota": "Sumele citite automat (493 103 338 și 394 482 670 EUR) sunt bugetul și alocarea UE pentru tot programul Interreg Europe, pentru toate țările."
  },
  "LP68/2025": {
   "v": 465000000,
@@ -272,5 +273,23 @@
   "v": 1500000000,
   "val": "EUR",
   "nota": "Introdus manual, după textul acordului atașat: facilitate de împrumut cu o valoare totală a principalului de maximum 1 500 000 000 EUR. Cei 67,5 mil. EUR din același text sunt doar prefinanțarea."
+ },
+ "LP232/2023": {
+  "ascunde": true,
+  "nota": "Memorandumul repetă suma asistenței macrofinanciare (150 mil. EUR), care e deja numărată la acordul de împrumut (Legea 230/2023) și la cel de grant (Legea 231/2023)."
+ },
+ "LP194/2020": {
+  "v": 18939000,
+  "val": "EUR",
+  "nota": "Introdus manual, după textul acordului atașat: împrumut FIDA de 18 939 000 EUR („The amount of the loan is eighteen million nine hundred thirty nine thousand Euros”)."
+ },
+ "LP170/2020": {
+  "v": 43700000,
+  "val": "JPY",
+  "nota": "Introdus manual, după textul acordului atașat: grant JICA de până la 43 700 000 yeni japonezi."
+ },
+ "LP89/2020": {
+  "ascunde": true,
+  "nota": "Suma citită automat (100 mil. EUR) e creditul total aprobat de BEI; contractul ratificat aici e de 25 mil. EUR, cum scrie în titlul actului."
  }
 }
