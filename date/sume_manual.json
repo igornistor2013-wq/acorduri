@@ -736,5 +736,259 @@
   "u": "https://ewsdata.rightsindevelopment.org/projects/EBRD-41442/",
   "nota": "Introdus manual: împrumut BERD de până la 75 mil. EUR pentru reabilitarea drumurilor, semnat la 29 octombrie 2010, potrivit fișei BERD a proiectului („Moldova Road Rehabilitation III”). Împrumutul e numărat deja la LP77/2011, deci rândul acesta nu intră în totaluri.",
   "fara_total": true
+ },
+ "HG678/2015": {
+  "v": 150000000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=89507&lang=ro",
+  "nota": "Introdus manual: asistență financiară rambursabilă de la România, de până la 150 000 000 EUR, în trei tranșe, semnată la Chișinău la 7 octombrie 2015, potrivit textului Legii nr. 184/2015 și legii române de ratificare nr. 91/2016. Împrumutul e numărat deja la LP184/2015, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG799/2014": {
+  "v": 102500000,
+  "val": "EUR",
+  "u": "https://www.ebrd.com/home/news-and-events/news/2014/ebrd-and-partners-put-moldovan-railway-on-track-for-change.html",
+  "nota": "Introdus manual: negocieri pentru două împrumuturi: BERD, 52,5 mil. EUR (Legea nr. 22/2015), și BEI, 50 mil. EUR (Legea nr. 298/2016), în total 102,5 mil. EUR. Împrumutul e numărat deja la LP22/2015 și LP298/2016, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DPRM1248/2014": {
+  "v": 170000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=21473&lang=ro",
+  "nota": "Introdus manual: grant BIRD nr. TF015873 din Fondul de Carbon (CDCF Plus), de 170 000 USD, semnat la 4 aprilie 2014, potrivit textului Legii nr. 120/2014. E grant, nu împrumut. Împrumutul e numărat deja la LP120/2014, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG230/2014": {
+  "v": 100000000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=21477&lang=ro",
+  "nota": "Introdus manual: credit de asistență de la Guvernul Poloniei, de 100 mil. EUR, semnat la Varșovia la 14 mai 2014, potrivit textului Legii nr. 134/2014. Împrumutul e numărat deja la LP134/2014, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DPRM1025/2014": {
+  "v": 170000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=21473&lang=ro",
+  "nota": "Introdus manual: grant BIRD nr. TF015873 din Fondul de Carbon (CDCF Plus), de 170 000 USD, semnat la 4 aprilie 2014, potrivit textului Legii nr. 120/2014. E grant, nu împrumut. Împrumutul e numărat deja la LP120/2014, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG296/2013": {
+  "v": 300000000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=21874&lang=ro",
+  "nota": "Introdus manual: negocieri pentru două împrumuturi a câte 150 mil. EUR, de la BERD (Legea nr. 191/2013) și de la BEI (Legea nr. 190/2013), în total 300 mil. EUR. Împrumutul e numărat deja la LP191/2013 și LP190/2013, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DPRM508/2013": {
+  "v": 6500000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=7257&lang=ro",
+  "nota": "Introdus manual: credit AID de 6,5 mil. DST pentru „Suport de urgență pentru agricultura Moldovei”, semnat la 29 mai 2013, potrivit textului Legii nr. 165/2013. Împrumutul e numărat deja la LP165/2013, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "LP272/2012": {
+  "v": 30000000,
+  "val": "USD",
+  "u": "https://www.worldbank.org/en/news/loans-credits/2012/11/01/moldova-competitiveness-development-policy-operation",
+  "nota": "Introdus manual: credit AID echivalent cu 30 mil. USD pentru Operațiunea de politici de dezvoltare în domeniul competitivității (P122226), aprobat la 1 noiembrie 2012, potrivit Băncii Mondiale. Acordul e exprimat în DST; suma în DST n-a fost găsită."
+ },
+ "DP216/2012": {
+  "v": 13400000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=22360&lang=ro",
+  "nota": "Introdus manual: împrumut-cadru CEB de 13,4 mil. EUR pentru locuințe pentru păturile social vulnerabile II, semnat la 16 iunie 2012, potrivit textului Legii nr. 182/2012. Împrumutul e numărat deja la LP182/2012, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG482/2012": {
+  "v": 13400000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=22360&lang=ro",
+  "nota": "Introdus manual: împrumut-cadru CEB de 13,4 mil. EUR pentru locuințe pentru păturile social vulnerabile II, semnat la 16 iunie 2012, potrivit textului Legii nr. 182/2012. Împrumutul e numărat deja la LP182/2012, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG481/2012": {
+  "v": 20000000,
+  "val": "USD",
+  "u": "https://www.ebrd.com/news/2012/modernisation-of-moldovas-energy-infrastructure.html",
+  "nota": "Introdus manual: împrumut BERD de 20 mil. USD pentru reabilitarea rețelelor electrice de transport ale „Moldelectrica”, semnat la 22 mai 2012, potrivit comunicatului BERD și textului Legii nr. 180/2012. Împrumutul e numărat deja la LP180/2012, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG480/2012": {
+  "v": 17000000,
+  "val": "EUR",
+  "u": "https://www.eib.org/en/projects/all/20110140",
+  "nota": "Introdus manual: contract de finanțare BEI de 17 000 000 EUR pentru rețelele electrice de transport ale „Moldelectrica”, semnat la 26 iunie 2012, potrivit fișei proiectului pe site-ul BEI (nr. 20110140)."
+ },
+ "HG927/2010": {
+  "v": 6800000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=13029&lang=ro",
+  "nota": "Introdus manual: credit AID de 6,8 mil. DST pentru „Managementul dezastrelor și riscurilor climatice”, semnat la 12 august 2010, potrivit textului Legii nr. 224/2010. Împrumutul e numărat deja la LP224/2010, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG883/2010": {
+  "v": 12720000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=9543&lang=ro",
+  "nota": "Introdus manual: finanțare FIDA de 12 720 000 DST pentru Proiectul de servicii financiare rurale și dezvoltare a businessului agricol, semnată la Roma la 21 februarie 2011, potrivit textului Legii nr. 108/2011. Împrumutul e numărat deja la LP108/2011, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG813/2010": {
+  "v": 25000000,
+  "val": "USD",
+  "u": "https://www.worldbank.org/en/news/press-release/2010/06/25/world-bank-supports-economic-recovery-moldova",
+  "nota": "Introdus manual: credit AID echivalent cu 25 mil. USD pentru Operațiunea de politici de dezvoltare pentru recuperarea economică, aprobat la 24 iunie 2010 și semnat la 12 august 2010, potrivit Băncii Mondiale. Acordul e exprimat în DST; suma în DST n-a fost găsită."
+ },
+ "LP203/2010": {
+  "v": 10000000,
+  "val": "EUR",
+  "u": "https://ipn.md/en/moldova-borrows-10m-from-ebrd-to-modernize-water-utilities-7966_983188.html",
+  "nota": "Introdus manual: împrumut BERD de 10 mil. EUR pentru Programul de dezvoltare a serviciilor de aprovizionare cu apă, semnat la 16 iunie 2010, potrivit comunicatului BERD preluat de IPN (BEI dă separat alte 10 mil. EUR, Legea nr. 13/2011)."
+ },
+ "HG480/2010": {
+  "v": 10000000,
+  "val": "EUR",
+  "u": "https://ipn.md/en/moldova-borrows-10m-from-ebrd-to-modernize-water-utilities-7966_983188.html",
+  "nota": "Introdus manual: împrumut BERD de 10 mil. EUR pentru Programul de dezvoltare a serviciilor de aprovizionare cu apă, semnat la 16 iunie 2010, potrivit comunicatului BERD preluat de IPN. Împrumutul e numărat deja la LP203/2010, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG329/2010": {
+  "v": 25000000,
+  "val": "USD",
+  "u": "https://www.worldbank.org/en/news/press-release/2010/06/25/world-bank-supports-economic-recovery-moldova",
+  "nota": "Introdus manual: credit AID echivalent cu 25 mil. USD pentru Operațiunea de politici de dezvoltare pentru recuperarea economică, aprobat la 24 iunie 2010, potrivit Băncii Mondiale. Acordul e exprimat în DST. Împrumutul e numărat deja la HG813/2010, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG193/2010": {
+  "v": 12500000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=23451&lang=ro",
+  "nota": "Introdus manual: finanțare suplimentară AID de 12,5 mil. DST (circa 20 mil. USD) pentru Proiectul II al Fondului de Investiții Sociale, semnată la 22 februarie 2010, potrivit textului Legii nr. 58/2010. Împrumutul e numărat deja la LP58/2010, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG152/2010": {
+  "v": 15000000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=23450&lang=ro",
+  "nota": "Introdus manual: împrumut de la Guvernul Poloniei, de 15 mil. USD, semnat la Varșovia la 18 februarie 2010, potrivit textului Legii nr. 57/2010. Împrumutul e numărat deja la LP57/2010, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG39/2010": {
+  "v": 15400000,
+  "val": "DST",
+  "u": "https://documents1.worldbank.org/curated/en/969491468054249232/text/504820PJPR0P08101Official0Use0Only1.txt",
+  "nota": "Introdus manual: finanțare suplimentară AID de 15,4 mil. DST (circa 24 mil. USD) pentru Proiectul de ameliorare a competitivității, potrivit documentului Băncii Mondiale și textului Legii nr. 27/2010. Împrumutul e numărat deja la LP27/2010, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG424/2009": {
+  "v": 15400000,
+  "val": "DST",
+  "u": "https://documents1.worldbank.org/curated/en/969491468054249232/text/504820PJPR0P08101Official0Use0Only1.txt",
+  "nota": "Introdus manual: finanțare suplimentară AID de 15,4 mil. DST (circa 24 mil. USD) pentru Proiectul de ameliorare a competitivității, potrivit documentului Băncii Mondiale și textului Legii nr. 27/2010. Împrumutul e numărat deja la LP27/2010, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG364/2009": {
+  "v": 3400000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=23609&lang=ro",
+  "nota": "Introdus manual: finanțare suplimentară AID de 3,4 mil. DST (circa 5 mil. USD) pentru Proiectul II al Fondului de Investiții Sociale, semnată la 4 mai 2009, potrivit textului Legii nr. 21/2009. Împrumutul e numărat deja la LP21/2009, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG365/2009": {
+  "v": 6700000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=23611&lang=ro",
+  "nota": "Introdus manual: finanțare suplimentară AID de 6,7 mil. DST (circa 10 mil. USD) pentru Proiectul Energetic II, semnată la 16 martie 2009, potrivit textului Legii nr. 22/2009. Împrumutul e numărat deja la LP22/2009, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG230/2009": {
+  "v": 6800000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=23607&lang=ro",
+  "nota": "Introdus manual: finanțare suplimentară AID de 6,8 mil. DST (circa 10 mil. USD) pentru al doilea Proiect de investiții și servicii rurale (RISP II), semnată la 11 iunie 2009, potrivit textului Legii nr. 18/2009. Împrumutul e numărat deja la LP18/2009, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG716/2008": {
+  "v": 6100000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=24414&lang=ro",
+  "nota": "Introdus manual: credit AID de 6,1 mil. DST (circa 10 mil. USD), al doilea credit pentru susținerea reducerii sărăciei, semnat la 2 iunie 2008, potrivit textului Legii nr. 150/2008. Împrumutul e numărat deja la LP150/2008, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "LP216/2007": {
+  "v": 30000000,
+  "val": "EUR",
+  "u": "https://www.old.ipn.md/en/government-signs-road-rehabilitation-agreements-with-two-european-banks-7966_965383.html",
+  "nota": "Introdus manual: împrumut BERD de 30 mil. EUR pentru reabilitarea drumurilor, în două etape (12,5 și 17,5 mil.), semnat la 28 iunie 2007, potrivit știrii IPN de la semnare și fișei BERD a proiectului; BEI a semnat în aceeași zi alte 30 mil. EUR."
+ },
+ "HG704/2007": {
+  "v": 60000000,
+  "val": "EUR",
+  "u": "https://www.old.ipn.md/en/government-signs-road-rehabilitation-agreements-with-two-european-banks-7966_965383.html",
+  "nota": "Introdus manual: negocieri pentru două împrumuturi a câte 30 mil. EUR, de la BERD și de la BEI, semnate la 28 iunie 2007, potrivit știrii IPN și fișei BEI a proiectului (nr. 20060485). Partea BERD e numărată la LP216/2007; partea BEI nu e numărată nicăieri, iar rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG441/2007": {
+  "v": 15000000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=116967&lang=ro",
+  "nota": "Introdus manual: credit tehnic de la Guvernul Poloniei, de cel mult 15 000 000 USD, potrivit textului acordului publicat pe legis.md. Împrumutul e numărat deja la AMAEIE128/2009, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG84/2007": {
+  "v": 6800000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=26036&lang=ro",
+  "nota": "Introdus manual: credit AID de 6,8 mil. DST (circa 10 mil. USD), primul credit pentru susținerea reducerii sărăciei, semnat la 22 decembrie 2006, potrivit textului Legii nr. 32/2007. Împrumutul e numărat deja la LP32/2007, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG252/2005": {
+  "v": 6000000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=14487&lang=ro",
+  "nota": "Introdus manual: împrumut-cadru CEB de 6 000 000 EUR, semnat la 5 ianuarie 2005, potrivit textului Legii nr. 77/2005. Împrumutul e numărat deja la LP77/2005, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG1229/2004": {
+  "v": 4646794.45,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=26706&lang=ro",
+  "nota": "Introdus manual: împrumut KfW pentru Fondul de Investiții Sociale, în sumă totală de 4 646 794,45 EUR, potrivit textului Legii nr. 400/2004 (legea dă ca dată a semnării 6 octombrie 2004, hotărârea – 13 octombrie). Împrumutul e numărat deja la LP400/2004, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG1173/2002": {
+  "v": 2300000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=29801&lang=ro",
+  "nota": "Introdus manual: credit KfW de 2 300 000 EUR pentru „Micro Enterprise Credit” (MEC), potrivit textului Legii nr. 1442/2002. Împrumutul e numărat deja la LP1442/2002, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG1207/2000": {
+  "v": 23000000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=42244&lang=ro",
+  "nota": "Introdus manual: a doua tranșă a creditului de la „Export Credit Bank” (Turcia), de 23 mil. USD, potrivit textului Hotărârii Guvernului nr. 345/2000. Împrumutul e numărat deja la HG345/2000, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG912/1998": {
+  "v": 15000000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=62428&lang=ro",
+  "nota": "Introdus manual: împrumut de la „Export Credit Bank” (Turcia), de 15 mil. USD, pentru aprovizionarea cu apă potabilă a sudului Moldovei, potrivit textului Hotărârii Parlamentului nr. 1294/1997. Împrumutul e numărat deja la HP1294/1997, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG306/1996": {
+  "v": 10000000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=60773&lang=ro",
+  "nota": "Introdus manual: împrumut BIRD de 10 mil. USD pentru primul proiect agricol, semnat la Washington la 7 mai 1996, potrivit textului Hotărârii Parlamentului nr. 974/1996. Împrumutul e numărat deja la HP974/1996, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DPRM345/1995": {
+  "v": 35000000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=60506&lang=ro",
+  "nota": "Introdus manual: împrumut BIRD de 35 mil. USD pentru primul proiect de dezvoltare a sectorului privat, semnat la Washington la 17 aprilie 1996, potrivit textului Hotărârii Parlamentului nr. 880/1996. Împrumutul e numărat deja la HP880/1996, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
  }
 }
