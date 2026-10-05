@@ -65,6 +65,48 @@ def cod_legis(a):
     return pre + m.group(1) + '/' + m.group(4), '%02d.%02d.%s' % (int(m.group(2)), luna, m.group(4))
 
 
+def legaturi_monitor(brut, cale=None, iesire=None):
+    """date/legaturi_legis.json: actul din Monitorul Oficial → doc_id-ul fișei lui pe legis.md.
+    Registrul din Monitor (acorduri.html) îl citește ca numărul actului să ducă direct la act,
+    nu la o căutare. Legăm doar când tipul, numărul și anul dau o singură fișă, iar titlurile
+    se potrivesc; altfel linkul rămâne căutarea."""
+    cale = Path(cale or AICI / 'date.json')
+    iesire = Path(iesire or AICI / 'date' / 'legaturi_legis.json')
+    if not cale.exists():
+        return 0
+    try:
+        mo = json.load(open(cale, encoding='utf-8')).get('acte', {})
+    except Exception:
+        return 0
+
+    def cheie(c):
+        m = re.match(r'^([A-Z]+?)(\d+)(?:/\d+)?/(\d{4})$', c or '')
+        if not m:
+            return None
+        p = 'DP' if m.group(1).startswith('DP') else ('O' if m.group(1).startswith('O') else m.group(1))
+        return (p, m.group(2), m.group(3))
+
+    def cuvinte(t):
+        return {w for w in re.findall(r'[a-z0-9]+', norm(t)) if len(w) > 3}
+
+    dupa = {}
+    for r in brut:
+        dupa.setdefault(cheie(r['c']), []).append(r)
+    leg = {}
+    for k, a in mo.items():
+        cod, _ = cod_legis(a)
+        fise = dupa.get(cheie(cod), []) if cod else []
+        if len(fise) != 1:
+            continue
+        x, y = cuvinte(re.sub(r'^\S+\s+', '', a.get('titlu', ''))), cuvinte(fise[0]['t'])
+        if x and y and len(x & y) / min(len(x), len(y)) >= 0.6:
+            leg[k] = fise[0]['id']
+    iesire.parent.mkdir(exist_ok=True)
+    with open(iesire, 'w', encoding='utf-8') as f:
+        json.dump(leg, f, ensure_ascii=False, indent=0, sort_keys=True)
+    return len(leg)
+
+
 def adauga_din_monitor(acte, ids, cale=None):
     cale = Path(cale or AICI / 'date.json')
     if not cale.exists():
@@ -110,6 +152,7 @@ def adauga_din_monitor(acte, ids, cale=None):
 
 def main(BRUT=None, OUT=None):
     global s
+    rulare_reala = BRUT is None and OUT is None       # testele dau alte căi: nu scriem peste datele adevărate
     BRUT = BRUT or str(AICI / 'legis_brut.json')
     OUT = OUT or str(AICI / 'legis_acorduri.html')
     brut = json.load(open(BRUT, encoding='utf-8'))
@@ -141,6 +184,9 @@ def main(BRUT=None, OUT=None):
     # (ce e nou) dau registrul complet, actualizat zilnic, fără ca cineva să
     # mai citească legis.md. Ce există deja în baza legis nu se dublează.
     din_mo = adauga_din_monitor(acte, ids)
+    legate = legaturi_monitor(brut) if rulare_reala else 0
+    if legate:
+        print(legate, 'acte din Monitor legate direct de fișa lor pe legis.md')
 
     # Sumele citite din textul integral al actelor (legis_sume.py → date/legis_sume.json).
     # Fiecare act primește cel mult două sume, cu fragmentul de text din care vin,

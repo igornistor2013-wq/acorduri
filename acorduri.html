@@ -880,10 +880,26 @@
       '&nr_doc=' + m[1] + '&datepicker1=' + data +
       '&publication_status=+-+TOATE+-+&nr=&publish_date=&search_type=1&search_string=';
   }
-  function nrAct(act){
-    var u = linkLegis(act);
-    return u ? '<a class="spre-legis" href="' + esc(u) + '" target="_blank" rel="noopener noreferrer"' +
-      ' title="Deschide actul în Registrul de stat (legis.md)">' + esc(act) + '</a>' : esc(act);
+  /* Linkul direct la fișa actului pe legis.md, când îi știm doc_id-ul: din registrul
+     legis (a.url) sau din date/legaturi_legis.json, care leagă actele din Monitor de
+     fișele lor. Căutarea după număr și dată rămâne doar pentru actele încă nepublicate
+     pe legis.md — și atunci linkul spune că e o căutare. */
+  function linkDirect(a){
+    if (a && a.legis_id) return 'https://www.legis.md/cautare/getResults?doc_id=' + encodeURIComponent(a.legis_id) + '&lang=ro';
+    var u = a ? linkSigur(a.url) : '';
+    return /legis\.md\/.*[?&]doc_id=\d+/.test(u) ? u : '';
+  }
+  /* Ediția Monitorului: doar când adresa duce chiar la ediție, nu la pagina de căutare a site-ului. */
+  function linkEditie(a){
+    var u = a ? linkSigur(a.url) : '';
+    return /monitorul\.gov\.md\/ro\/search\/?$|legis\.md\/cautare\/getResults\?document_status=/.test(u) ? '' : u;
+  }
+  function nrAct(a){
+    var act = (a && a.act) || '', d = linkDirect(a), u = d || linkLegis(act);
+    if (!u) return esc(act);
+    return '<a class="spre-legis" href="' + esc(u) + '" target="_blank" rel="noopener noreferrer" title="' +
+      (d ? 'Deschide actul pe legis.md' : 'Actul nu are încă fișă legată pe legis.md: se deschide căutarea după număr și dată') +
+      '">' + esc(act) + '</a>' + (d ? '' : ' <span class="nil" title="Linkul duce la o căutare, nu direct la act">(căutare)</span>');
   }
 
   function esc(s){
@@ -1718,7 +1734,7 @@
           }).join(' + ');
           randuri.push([a.data_editie, 'MO ' + a.editie, a.act, a.categorie,
             a.suport ? 'da' : '', a.partener || '', caps, denumire(a.titlu), a.titlu,
-            a.semnat || '', a.url]);
+            a.semnat || '', linkDirect(a) || a.url]);
         });
     } else {
       nume = 'Acorduri';
@@ -2207,7 +2223,7 @@
           '</div>' +
           (ex.length ? '<div class="det-lbl">Ultimele acte din această etapă</div><ul class="det-ex">' +
             ex.map(function(a){
-              var u = linkSigur(a.url);
+              var u = linkDirect(a) || linkEditie(a);
               return '<li>' +
                 (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">'
                    : '<span class="nil-link">') +
@@ -2825,7 +2841,7 @@
                  : '<span class="et-mic vig">' + esc(VIGOARE.cap) + '</span>';
       }).join('');
       return '<tr class="act-rand">' +
-        '<td class="a-nr" data-l="Act">' + nrAct(a.act) + '</td>' +
+        '<td class="a-nr" data-l="Act">' + nrAct(a) + '</td>' +
         '<td data-l="Categorie"><span class="tag ' + (CLS[a.categorie]||'t-alt') + '">' +
           esc(a.categorie) + '</span>' +
           (a.suport ? '<span class="tag t-suport">suport bugetar</span>' : '') + '</td>' +
@@ -2835,8 +2851,8 @@
         '<td data-l="Semnat">' + (a.semnat ? '<span class="semnat">' + esc(a.semnat) + '</span>'
           : '<span class="nil">—</span>') + '</td>' +
         '<td class="a-src" data-l="Ediția">' +
-          (linkSigur(a.url)
-            ? '<a href="' + esc(linkSigur(a.url)) + '" target="_blank" rel="noopener noreferrer">MO ' +
+          (linkEditie(a)
+            ? '<a href="' + esc(linkEditie(a)) + '" target="_blank" rel="noopener noreferrer">MO ' +
               esc(a.editie) + '</a>'
             : 'MO ' + esc(a.editie)) +
           '<br>' + esc(a.data_editie) + '</td></tr>';
@@ -2879,8 +2895,8 @@
     }
     document.getElementById('rows').innerHTML = out.slice(0, limita).map(function(g, i){
       var lista = g.acte.map(function(a){
-        var u = linkSigur(a.url);
-        return '<li><div class="a-nr">' + nrAct(a.act) + '</div>' +
+        var u = linkEditie(a);
+        return '<li><div class="a-nr">' + nrAct(a) + '</div>' +
           '<div class="a-tit">' + esc(a.titlu) + '</div>' +
           '<div class="a-src">' +
             (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">MO '
@@ -3044,6 +3060,28 @@
       .catch(function(){});
   }
   window.addEventListener('load', function(){ setTimeout(adaugaSume, 0); });
+
+  /* date/legaturi_legis.json: pentru fiecare act din Monitor, doc_id-ul fișei lui pe legis.md
+     (scris de legis_pagina.py). Cu el, numărul actului duce direct la act. */
+  function adaugaLegaturi(){
+    if (window.__LEGIS__) return;                       // registrul legis are deja linkuri directe
+    fetch('date/legaturi_legis.json?_=' + Date.now(), {cache: 'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(leg){
+        if (!leg) return;
+        var incercari = 0;
+        (function pune(){
+          if (!db || !db.acte){ if (incercari++ < 60) setTimeout(pune, 250); return; }
+          var n = 0;
+          Object.keys(db.acte).forEach(function(k){
+            if (leg[k] && !db.acte[k].legis_id){ db.acte[k].legis_id = String(leg[k]); n++; }
+          });
+          if (n) paint();
+        })();
+      })
+      .catch(function(){});
+  }
+  window.addEventListener('load', function(){ setTimeout(adaugaLegaturi, 0); });
   window.addEventListener('load', function(){
     fetch('date/gov_sume.json?_=' + Date.now(), {cache: 'no-store'})
       .then(function(r){ return r.ok ? r.json() : null; })

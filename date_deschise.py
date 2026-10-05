@@ -25,9 +25,12 @@ def tip(titlu):
     return (titlu or '').split(' ')[0]
 
 
-def randuri(acte):
+def randuri(acte, legaturi=None):
+    """legaturi: cheia actului din date.json → doc_id pe legis.md (date/legaturi_legis.json).
+    Cu ea, linkul duce direct la act, nu la ediția Monitorului sau la o căutare."""
     out = []
-    for a in acte.values():
+    for k, a in acte.items():
+        direct = (legaturi or {}).get(k)
         out.append({
             'act': a.get('act', ''),
             'data_editie': a.get('data_editie', ''),
@@ -38,7 +41,7 @@ def randuri(acte):
             'semnat': a.get('semnat', ''),
             'editie': a.get('editie', ''),
             'suport_bugetar': 'da' if a.get('suport') else '',
-            'link': a.get('url', ''),
+            'link': ('https://www.legis.md/cautare/getResults?doc_id=%s&lang=ro' % direct) if direct else a.get('url', ''),
         })
 
     def cheie(r):
@@ -148,7 +151,11 @@ def sitemap(ultima):
 
 def main():
     db = json.load(open(AICI / 'date.json', encoding='utf-8'))
-    mo = randuri(db.get('acte', {}))
+    try:
+        legaturi = json.load(open(AICI / 'date' / 'legaturi_legis.json', encoding='utf-8'))
+    except Exception:
+        legaturi = {}
+    mo = randuri(db.get('acte', {}), legaturi)
     scrie('acorduri_monitor', mo)
     legis = randuri(acte_legis())
     scrie('acorduri_legis', legis)
