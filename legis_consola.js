@@ -46,6 +46,7 @@
     SITE: 'https://nistor.vivi.md',          // de unde iau registrul și sumele de până acum
     BAZA: location.origin,                   // legis.md
     OCR: true, PAGINI_OCR: 12, PAGINI_TEXT: 80, PAUZA: 400, MAX_MB: 30,
+    LIMITA_DESC: 180, LIMITA_DOC: 360,       // secunde: cât aștept descărcarea, respectiv citirea unui document
     DOVEZI: true, PASAJE: 8,                 // păstrează, din fiecare document, pasajele cu sume, pentru verificare
     DOAR: null, REINCEARCA: false, TOT: false, TEST: false,
     PDFJS: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
@@ -303,7 +304,11 @@
   }
   async function cere(url, ms) {
     var c = new AbortController(), t = setTimeout(function () { c.abort(); }, ms || 90000);
-    try { return await fetch(url, { cache: 'no-store', credentials: 'include', signal: c.signal }); }
+    try {
+      var r = await fetch(url, { cache: 'no-store', credentials: 'include', signal: c.signal });
+      r.anuleaza = function () { try { c.abort(); } catch (e) {} };      // oprește și descărcarea corpului
+      return r;
+    }
     finally { clearTimeout(t); }
   }
   function incarcaScript(src) {
@@ -324,7 +329,7 @@
   var caseta = document.createElement('div');
   caseta.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:2147483647;width:360px;background:#fff;color:#16294a;' +
     'border:2px solid #22406b;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.3);font:13px/1.45 Arial,sans-serif;padding:12px 14px';
-  caseta.innerHTML = '<b style="font-size:14px">Sumele acordurilor</b><div id="la-stare" style="margin:6px 0">Pornesc…</div>' +
+  caseta.innerHTML = '<b style="font-size:14px">Sumele acordurilor</b><div id="la-stare" style="margin:6px 0">Pornesc…</div><div id="la-pas" style="color:#22406b;font-size:12px;min-height:16px"></div>' +
     '<div id="la-cifre" style="color:#4f5668;font-size:12px"></div><div style="margin-top:9px;display:flex;gap:8px">' +
     '<button id="la-stop" style="padding:5px 10px;cursor:pointer">Oprește</button>' +
     '<button id="la-desc" style="padding:5px 10px;cursor:pointer">Descarcă ce am până acum</button></div>';
@@ -332,6 +337,15 @@
   function spune(text, rosu) {
     var e = caseta.querySelector('#la-stare'); e.textContent = text; e.style.color = rosu ? '#b3261e' : '#16294a';
     console.log('[sume] ' + text);
+  }
+  function pas(text) { caseta.querySelector('#la-pas').textContent = text || ''; }
+  /* Un document care nu se mai termină (descărcare agățată, PDF pe care biblioteca nu-l duce
+     la capăt) nu are voie să oprească tot: după un timp îl lăsăm și trecem mai departe. */
+  function cuLimita(p, secunde, ce) {
+    return new Promise(function (ok, fail) {
+      var t = setTimeout(function () { fail(new Error(ce + ' a durat peste ' + secunde + ' de secunde')); }, secunde * 1000);
+      Promise.resolve(p).then(function (v) { clearTimeout(t); ok(v); }, function (e) { clearTimeout(t); fail(e); });
+    });
   }
   var S = { acte: 0, total: 0, pdf: 0, sume: 0, ocr: 0, faraText: 0, erori: 0 };
   function cifre() {
@@ -361,11 +375,14 @@
   }
   /* (text, pagini, metoda): 'text' = PDF-ul are text; 'ocr' = scanat, citit cu OCR;
      'fara-text' = scanat și OCR-ul nu e disponibil. */
-  async function textPdf(lib, octeti, cuOcr) {
-    var doc = await lib.getDocument({ data: octeti, isEvalSupported: false }).promise;
+  async function textPdf(lib, octeti, cuOcr, ctl) {
+    ctl = ctl || {};
+    ctl.sarcina = lib.getDocument({ data: octeti, isEvalSupported: false });
+    var doc = await ctl.sarcina.promise;
     try {
       var pagini = doc.numPages, text = '', i;
-      for (i = 1; i <= Math.min(pagini, CFG.PAGINI_TEXT); i++) {
+      for (i = 1; i <= Math.min(pagini, CFG.PAGINI_TEXT) && !ctl.anulat; i++) {
+        if (i % 10 === 1) pas((ctl.nume || '') + 'citesc textul, pagina ' + i + ' din ' + pagini + '…');
         var tc = await (await doc.getPage(i)).getTextContent();
         text += tc.items.map(function (it) { return it.str + (it.hasEOL ? '\n' : ' '); }).join('') + '\n';
       }
@@ -374,7 +391,8 @@
       var w = cuOcr ? await ocr() : null;
       if (!w) return { text: text, pagini: pagini, metoda: 'fara-text' };
       var t2 = '';
-      for (i = 1; i <= Math.min(pagini, CFG.PAGINI_OCR); i++) {
+      for (i = 1; i <= Math.min(pagini, CFG.PAGINI_OCR) && !ctl.anulat; i++) {
+        pas((ctl.nume || '') + 'PDF scanat, îl citesc cu OCR: pagina ' + i + ' din ' + Math.min(pagini, CFG.PAGINI_OCR) + '…');
         var pg = await doc.getPage(i), vp = pg.getViewport({ scale: 2 });
         var cv = document.createElement('canvas'); cv.width = Math.ceil(vp.width); cv.height = Math.ceil(vp.height);
         await pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
@@ -387,7 +405,11 @@
     } finally { try { await doc.destroy(); } catch (e) {} }
   }
   async function descarcaPdf(url) {
-    var r = await cere(url), b = new Uint8Array(await r.arrayBuffer());
+    var r = await cere(url), lung = +(r.headers.get('content-length') || 0);
+    if (lung > CFG.MAX_MB * 1048576) { r.anuleaza(); return { eroare: 'PDF prea mare (' + Math.floor(lung / 1048576) + ' MB)' }; }
+    var b;
+    try { b = new Uint8Array(await cuLimita(r.arrayBuffer(), CFG.LIMITA_DESC, 'descărcarea')); }
+    catch (e) { r.anuleaza(); return { eroare: String(e.message || e).slice(0, 120) }; }
     if (b.length > CFG.MAX_MB * 1048576) return { eroare: 'PDF prea mare (' + Math.floor(b.length / 1048576) + ' MB)' };
     if (!(b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46)) {       // %PDF
       if (eBlocat(r.status, new TextDecoder().decode(b.subarray(0, 5000)))) throw new Blocat(url);
@@ -663,7 +685,7 @@
         if (pa.eroare) nouR = { act: T.act, eroare: pa.eroare, citit: zi };
         else {
           try {
-            var ta2 = await textPdf(lib, pa.octeti, false);
+            var ta2 = await cuLimita(textPdf(lib, pa.octeti, false, { nume: 'textul actului: ' }), CFG.LIMITA_DOC, 'citirea actului');
             nouR = { act: T.act, sume: sume_din_text(ta2.text), pagini: ta2.pagini, citit: zi, v: REGULI };
             if (!ta2.text.trim()) nouR.nota = 'PDF fără text (scanat)';
           } catch (e) { nouR = { act: T.act, eroare: 'PDF necitibil: ' + String(e.message || e).slice(0, 120), citit: zi }; }
@@ -697,16 +719,26 @@
         if (!CFG.DOVEZI && v && v.suma && !CFG.TOT) { noi.push(v); continue; }                                   // are deja suma
         if (!CFG.DOVEZI && v && v.metoda && !CFG.TOT && !(CFG.REINCEARCA && v.metoda === 'fara-text')) { noi.push(v); continue; }   // citit deja
         var x = { u: u, suma: null, cost: null, citit: zi, v: REGULI };
+        var eticheta = 'documentul ' + (j + 1) + ' din ' + g.linkuri.length + ': ';
+        pas(eticheta + 'îl descarc…');
         var p = await descarcaPdf(u);
         if (p.eroare) x.eroare = p.eroare;
         else {
+          var ctl = { nume: eticheta };
           try {
-            var tx = await textPdf(lib, p.octeti, CFG.OCR), sa = suma_acord(tx.text, instr);
+            var tx = await cuLimita(textPdf(lib, p.octeti, CFG.OCR, ctl), CFG.LIMITA_DOC, 'citirea documentului'), sa = suma_acord(tx.text, instr);
             x.suma = sa.suma; x.cost = sa.cost; x.pagini = tx.pagini; x.metoda = tx.metoda;
             if (!sa.suma && sa.candidat) x.candidat = sa.candidat;
             if (CFG.DOVEZI) dv.push(dovada(u, tx, sa));
-          } catch (e) { x.eroare = 'PDF necitibil: ' + String(e.message || e).slice(0, 120); }
+          } catch (e) {
+            x.eroare = 'PDF necitibil: ' + String(e.message || e).slice(0, 120);
+            // oprim ce a rămas în lucru, ca documentul următor să pornească curat
+            ctl.anulat = true;
+            try { if (ctl.sarcina) ctl.sarcina.destroy(); } catch (e2) {}
+            if (/a durat peste/.test(x.eroare) && ocrW) { try { ocrW.terminate(); } catch (e2) {} ocrW = undefined; }
+          }
         }
+        pas('');
         if (x.eroare && CFG.DOVEZI) dv.push({ u: u, eroare: x.eroare });
         S.pdf++; S.erori += x.eroare ? 1 : 0; S.sume += x.suma ? 1 : 0; S.ocr += x.metoda === 'ocr' ? 1 : 0; S.faraText += x.metoda === 'fara-text' ? 1 : 0;
         noi.push(x); cifre();

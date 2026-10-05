@@ -175,6 +175,8 @@ def main(BRUT=None, OUT=None):
             nota = str(m.get('nota') or 'Sumă introdusă de mână.')
             if m.get('fara_text'):
                 a.pop('sume', None)
+            if m.get('fara_guvern'):
+                a['faraG'] = 1
             if (m.get('v') or 0) > 0 and m.get('unde') == 'text':
                 a['sume'] = [[m['v'], m.get('val', 'EUR'), nota[:180]]]
             elif (m.get('v') or 0) > 0:

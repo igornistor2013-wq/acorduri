@@ -268,6 +268,24 @@
   @media (max-width:640px){.filtru-rand{flex-direction:column;gap:6px}.f-lbl{padding-top:0}}
 
   /* fluxul interactiv al etapelor */
+  .sume-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+  @media (max-width:980px){.sume-grid{grid-template-columns:repeat(2,1fr)}}
+  @media (max-width:520px){.sume-grid{grid-template-columns:1fr}}
+  .sume-card{text-align:left;background:var(--panel);cursor:pointer;border:1.5px solid var(--line-strong);
+    border-radius:9px;padding:12px 13px;font-family:inherit;display:flex;flex-direction:column;gap:5px}
+  .sume-card:hover{border-color:var(--navy-deep)}
+  .sume-card .st{font-size:12px;font-weight:700;color:var(--navy-deep)}
+  .sume-card .sv{font-size:23px;font-weight:800;color:var(--navy-deep);letter-spacing:-.02em;line-height:1.1}
+  .sume-card .sb{height:5px;border-radius:3px;background:#e8edf6;overflow:hidden}
+  .sume-card .sb i{display:block;height:100%;background:var(--navy-deep);border-radius:3px}
+  .sume-card .sn{font-size:11.5px;color:var(--ink-dim);font-family:var(--mono)}
+  .sume-card .sx{font-size:11.5px;color:var(--ink);line-height:1.4;margin-top:2px}
+  .sume-total{font-size:13.5px;margin:0 0 12px}
+  .sume-tab{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0 4px}
+  .sume-tab th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);
+    border-bottom:1px solid var(--line-strong);padding:5px 8px}
+  .sume-tab td{padding:5px 8px;border-bottom:1px solid var(--line)}
+  .sume-tab td.r,.sume-tab th.r{text-align:right;font-family:var(--mono)}
   .flux{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
   @media (max-width:980px){.flux{grid-template-columns:repeat(3,1fr)}}
   @media (max-width:560px){.flux{grid-template-columns:repeat(2,1fr)}}
@@ -1008,6 +1026,112 @@
     return null;
   }
   function dataRo(iso){ var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? m[3] + '.' + m[2] + '.' + m[1] : (iso || ''); }
+  /* Totalurile pe tipuri de finanțare, în euro.
+
+     Cursuri orientative, unități pentru 1 EUR: cursurile de referință ale Băncii
+     Centrale Europene din 1 iulie 2026. DST (drepturi speciale de tragere) e calculat
+     din coșul FMI la aceleași cursuri: 1 DST = 1,1905 EUR. Marca germană are cursul
+     fix de trecere la euro, ECU e 1:1, iar leii românești vechi trec prin leul nou
+     (1 RON = 10 000 ROL). Toate sumele, și cele din anii '90, sunt trecute la cursul
+     de azi: e un ordin de mărime, nu valoarea de la semnare. */
+  var CURS_DATA = '1 iulie 2026';
+  var PER_EUR = { EUR: 1, USD: 1.1383, JPY: 185.21, CHF: 0.9234, SEK: 11.0955, CAD: 1.6191, DKK: 7.4745,
+                  GBP: 0.85973, PLN: 4.2958, RON: 5.2367, CNY: 7.7342, DEM: 1.95583, ECU: 1, ROL: 52367, DST: 0.83998 };
+  var ORDINE_TIP = ['Grant', 'Împrumut', 'Asistență tehnică', 'Asistență financiară'];
+  function sumaAfisata(g){ return g.sumaA || g.suma || g.sumaT || g.sumaG || null; }
+  function fmtEur(v){
+    var z = function(x, d){ return x.toFixed(d).replace(/\.?0+$/, '').replace('.', ','); };
+    return v >= 1e9 ? z(v / 1e9, 2) + ' mld. EUR' : v >= 1e6 ? z(v / 1e6, 1) + ' mil. EUR'
+         : v >= 1e3 ? z(v / 1e3, 0) + ' mii EUR' : z(v, 0) + ' EUR';
+  }
+  /* Același acord ajunge uneori pe mai multe rânduri (titluri scrise diferit de la un act la
+     altul). La adunare îl numărăm o dată: aceeași sumă, aceeași valută, același finanțator și
+     aceleași prime cuvinte din denumire. */
+  var FAM_FIN = { jica: 'japonia', aid: 'bm', bird: 'bm', banca: 'bm' };
+  var GOL_NUME = ' de la in si a al ale cu pentru din privind proiectul proiect proiectului programul program programului acordul acord acordului contractul contract contractului republica moldova republicii moldovei the of and dintre intre guvernul guvernului cadru finantare imprumut grant credit ';
+  function cheieSuma(g, s){
+    var p = (fold(g.parteneri || '').match(/[a-z]+/) || [''])[0];
+    var cuv = (fold(g.numeScurt || g.nume || '').match(/[a-z0-9]+/g) || [])
+      .filter(function(w){ return w.length > 2 && GOL_NUME.indexOf(' ' + w + ' ') < 0; })
+      .slice(0, 3).map(function(w){ return w.slice(0, 6); }).sort().join(' ');
+    return s.v + '|' + s.val + '|' + (FAM_FIN[p] || p) + '|' + cuv;
+  }
+  function statSume(grupuri){
+    var tip = {}, uniq = {}, neconv = {};
+    grupuri.forEach(function(g){
+      var c = g.categorie || 'Alt tip';
+      tip[c] = tip[c] || { toate: 0, n: 0, eur: 0, valute: {}, top: [] };
+      tip[c].toate++;
+      var s = sumaAfisata(g);
+      if (!s) return;
+      var k = cheieSuma(g, s);
+      (uniq[k] = uniq[k] || []).push(g);
+    });
+    var dubluri = 0;
+    Object.keys(uniq).forEach(function(k){
+      var L = uniq[k], s = sumaAfisata(L[0]), nr = {}, c = L[0].categorie || 'Alt tip';
+      dubluri += L.length - 1;
+      L.forEach(function(g){ var x = g.categorie || 'Alt tip'; nr[x] = (nr[x] || 0) + 1; if (nr[x] > nr[c]) c = x; });
+      var e = PER_EUR[s.val] ? s.v / PER_EUR[s.val] : null;
+      if (e === null){ neconv[s.val] = (neconv[s.val] || 0) + 1; return; }
+      var t = tip[c];
+      t.n++; t.eur += e;
+      var v = t.valute[s.val] = t.valute[s.val] || { n: 0, v: 0, eur: 0 };
+      v.n++; v.v += s.v; v.eur += e;
+      t.top.push({ nume: L[0].numeScurt || L[0].nume, eur: e, s: s });
+    });
+    Object.keys(tip).forEach(function(c){ tip[c].top.sort(function(a, b){ return b.eur - a.eur; }); });
+    return { tip: tip, dubluri: dubluri, neconv: neconv };
+  }
+  function panouSume(grupuri){
+    var st = statSume(grupuri), tipuri = ORDINE_TIP.filter(function(c){ return st.tip[c]; })
+      .concat(Object.keys(st.tip).filter(function(c){ return ORDINE_TIP.indexOf(c) < 0; }));
+    var total = 0, cuSuma = 0, maxim = 0;
+    tipuri.forEach(function(c){ total += st.tip[c].eur; cuSuma += st.tip[c].n; maxim = Math.max(maxim, st.tip[c].eur); });
+    var carduri = tipuri.map(function(c){
+      var t = st.tip[c];
+      return '<button class="sume-card" data-tip="' + esc(c) + '" title="Arată în listă acordurile de acest tip">' +
+        '<span class="st">' + esc(c) + '</span>' +
+        '<span class="sv">' + (t.n ? esc(fmtEur(t.eur)) : '—') + '</span>' +
+        '<span class="sb"><i style="width:' + (maxim ? Math.max(1, Math.round(100 * t.eur / maxim)) : 0) + '%"></i></span>' +
+        '<span class="sn">' + t.n + ' acorduri cu sumă din ' + t.toate + (total && t.n ? ' · ' + Math.round(100 * t.eur / total) + '% din total' : '') + '</span>' +
+        (t.top.length ? '<span class="sx">Cele mai mari: ' + t.top.slice(0, 3).map(function(x){
+            return esc(x.nume.length > 46 ? x.nume.slice(0, 45) + '…' : x.nume) + ' (' + esc(fmtSuma(x.s)) + ')'; }).join('; ') + '</span>' : '') +
+        '</button>';
+    }).join('');
+    var randuri = '';
+    tipuri.forEach(function(c){
+      var V = st.tip[c].valute;
+      Object.keys(V).sort(function(a, b){ return V[b].eur - V[a].eur; }).forEach(function(val, i){
+        randuri += '<tr><td>' + (i ? '' : '<b>' + esc(c) + '</b>') + '</td><td>' + esc(val) + '</td><td class="r">' + V[val].n + '</td>' +
+          '<td class="r">' + esc(fmtSuma({ v: Math.round(V[val].v * 100) / 100, val: val })) + '</td>' +
+          '<td class="r">' + (val === 'EUR' ? '—' : String(PER_EUR[val]).replace('.', ',')) + '</td>' +
+          '<td class="r">' + esc(fmtEur(V[val].eur)) + '</td></tr>';
+      });
+    });
+    var neconv = Object.keys(st.neconv).map(function(v){ return st.neconv[v] + ' în ' + v; }).join(', ');
+    return '<div class="panel" id="sume"><div class="panel-head"><h2>' + ico('file') + 'Sumele acordurilor, pe tipuri de finanțare</h2>' +
+        '<span class="count">în euro, la cursul din ' + CURS_DATA + '</span></div>' +
+      '<div class="panel-body">' +
+        '<p class="sume-total">Acordurile cu sumă cunoscută adună <b>' + esc(fmtEur(total)) + '</b>: ' + cuSuma +
+          ' de acorduri din ' + grupuri.length + '. Celelalte ' + (grupuri.length - cuSuma - st.dubluri) +
+          ' nu au încă suma în registru, deci totalurile sunt un minim, nu tot ce s-a semnat.</p>' +
+        '<div class="sume-grid">' + carduri + '</div>' +
+        '<details class="inv-wrap"><summary>Pe valute și cum s-a făcut conversia</summary>' +
+          '<table class="sume-tab"><thead><tr><th>Tip</th><th>Valuta</th><th class="r">Acorduri</th><th class="r">Suma în valuta acordului</th>' +
+            '<th class="r">Unități pentru 1 EUR</th><th class="r">În euro</th></tr></thead><tbody>' + randuri + '</tbody></table>' +
+          '<p class="fila-intro">Cursurile sunt cele de referință ale Băncii Centrale Europene din ' + CURS_DATA + '. DST (drepturile speciale de tragere) e ' +
+            'calculat din coșul FMI la aceleași cursuri, marca germană are cursul fix de trecere la euro, ECU e socotit 1 la 1, iar leii românești ' +
+            'vechi trec prin leul nou. Toate sumele, și cele din anii ’90, sunt trecute la cursul de azi: rezultatul e un ordin de mărime, nu ' +
+            'valoarea de la data semnării.</p>' +
+          '<p class="fila-intro">Fiecare acord e numărat o dată, cu suma afișată pe rândul lui' + (st.dubluri ? '; ' + st.dubluri +
+            ' rânduri care repetă același acord (aceeași sumă, același finanțator, aceeași denumire) au fost lăsate deoparte' : '') +
+            '. Un amendament care majorează un acord poate apărea totuși ca rând separat. Tipul e cel de pe rând: grant, împrumut, ' +
+            'asistență tehnică sau asistență financiară.' + (neconv ? ' Fără curs, deci neadunate: ' + esc(neconv) + '.' : '') + '</p>' +
+        '</details>' +
+      '</div></div>';
+  }
+
   function fmtSuma(s){
     if (!s) return '';
     var n = s.v >= 1e9 ? (s.v / 1e9).toFixed(2).replace(/\.?0+$/, '').replace('.', ',') + ' mld.'
@@ -1462,7 +1586,7 @@
         var c = dupaNume[cheie(denumire(p.titlu)) + '\u0001' + (p.partener || '').split(' / ')[0].trim()];
         if (c && c.length === 1) g = c[0];
       }
-      if (!g || g.sumaG) return;
+      if (!g || g.sumaG || g.acte.some(function(a){ return a.faraG; })) return;
       var s = p.sume[0];
       g.sumaG = { v: s.v, val: s.val, f: s.f || '', data: p.data || '', pdf: p.pdf || '', nr: nr };
     });
@@ -1891,9 +2015,15 @@
         '<span class="inv-ref">HG 377/2018, ' + esc(c.ref) + '</span></li>';
     }).join('');
 
+    /* Pe registrul din legis.md, unde sunt sumele, locul celor două diagrame despre etape
+       îl ia prezentarea pe sume. Diagramele rămân în pagină, ascunse: butoanele lor de
+       filtrare sunt legate de restul codului. */
+    var peLegis = !!window.__LEGIS__;
+    var ascuns = peLegis ? ' style="display:none"' : '';
     app.innerHTML =
       '<div class="kpis">' + kpis + '</div>' +
-      '<div class="panel"><div class="panel-head"><h2>' + ico('file') +
+      (peLegis ? panouSume(grupuri) : '') +
+      '<div class="panel" id="cumSeIncheie"' + ascuns + '><div class="panel-head"><h2>' + ico('file') +
         'Cum se încheie un acord</h2>' +
         '<div class="btns seg" id="filaBtns">' +
           '<button data-fila="etape" aria-pressed="true">Etapele</button>' +
@@ -1943,7 +2073,7 @@
           '<ul class="def-list">' + contracteHtml + '</ul>' +
           '<span class="inv-ref">Excepțiile: anexa 1¹, pct. 7 și 30</span></div>' +
       '</div>' +
-      '<div class="panel" id="analiza"><div class="panel-head"><h2>' + ico('file') +
+      '<div class="panel" id="analiza"' + ascuns + '><div class="panel-head"><h2>' + ico('file') +
         'Cum merg acordurile</h2>' +
         '<div class="btns seg" id="anBtns">' +
           '<button data-an="palnie" aria-pressed="' + (anFila==='palnie') + '">Pâlnia etapelor</button>' +
@@ -1978,6 +2108,13 @@
     });
 
     bind('#catBtns button', 'cat', function(v){ fCat = v; });
+    Array.prototype.forEach.call(document.querySelectorAll('.sume-card'), function(b){
+      b.addEventListener('click', function(){                       // cardul filtrează lista pe tipul lui
+        var t = document.querySelector('#catBtns button[data-cat="' + b.dataset.tip + '"]');
+        if (t && t.getAttribute('aria-pressed') !== 'true') t.click();
+        var l = document.getElementById('lista'); if (l) l.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
 
     renderAnaliza(grupuri);
     app.querySelectorAll('#anBtns button').forEach(function(b){
@@ -2895,6 +3032,7 @@
           var m = manual[a.act];
           if (m && typeof m === 'object'){
             if (m.fara_text && a.sume){ delete a.sume; n++; }
+            if (m.fara_guvern && !a.faraG){ a.faraG = 1; n++; }
             if (m.v > 0 && m.unde === 'text'){ a.sume = [[m.v, m.val || 'EUR', String(m.nota || 'Sumă introdusă de mână.').slice(0, 180)]]; n++; }
             else if (m.v > 0){ a.acord = {v: m.v, val: m.val || 'EUR', f: String(m.nota || 'Sumă introdusă de mână.').slice(0, 220), u: m.u || a.url || '', manual: true}; n++; }
             else if (m.ascunde && a.acord){ delete a.acord; n++; }
