@@ -1,5 +1,5 @@
 {
- "_cum_se_foloseste": "Sume puse de mână, pe codul actului din registrul legis.md. {\"v\": suma, \"val\": \"EUR\", \"nota\": \"de unde e\"} pune suma acordului; cu \"unde\": \"text\" o pune ca sumă din textul actului. {\"ascunde\": true} ascunde suma citită greșit din atașament; {\"fara_text\": true} pe cea citită greșit din textul actului. {\"fara_guvern\": true} ascunde suma luată din nota Guvernului. Ce e aici bate citirea automată. Cheile care încep cu _ sunt ignorate.",
+ "_cum_se_foloseste": "Sume puse de mână, pe codul actului din registrul legis.md. {\"v\": suma, \"val\": \"EUR\", \"nota\": \"de unde e\"} pune suma acordului; cu \"unde\": \"text\" o pune ca sumă din textul actului. {\"ascunde\": true} ascunde suma citită greșit din atașament; {\"fara_text\": true} pe cea citită greșit din textul actului. {\"fara_guvern\": true} ascunde suma luată din nota Guvernului. \"fara_total\": true lasă suma pe rând, dar n-o adună în totalurile pe tipuri de finanțare. Ce e aici bate citirea automată. Cheile care încep cu _ sunt ignorate.",
  "OMDED182/2025": {
   "v": 184297.33,
   "val": "EUR",
@@ -217,8 +217,9 @@
   "nota": "Introdus manual: grant BEI de 12,4 milioane EUR, potrivit Raportului Ministerului Finanțelor privind asistența externă în 2022. Citirea automată luase împrumutul BERD de 30 mil. EUR, pomenit în definițiile acordului."
  },
  "OMMPS273/2026": {
-  "ascunde": true,
-  "nota": "Suma citită automat (300 000 CHF) era prima rată a contribuției FICR, nu toată suma."
+  "v": 580000,
+  "val": "CHF",
+  "nota": "Introdus de autorul registrului."
  },
  "LP20/2025": {
   "ascunde": true,
@@ -275,8 +276,10 @@
   "nota": "Introdus manual, după textul acordului atașat: facilitate de împrumut cu o valoare totală a principalului de maximum 1 500 000 000 EUR. Cei 67,5 mil. EUR din același text sunt doar prefinanțarea."
  },
  "LP232/2023": {
-  "ascunde": true,
-  "nota": "Memorandumul repetă suma asistenței macrofinanciare (150 mil. EUR), care e deja numărată la acordul de împrumut (Legea 230/2023) și la cel de grant (Legea 231/2023)."
+  "v": 150000000,
+  "val": "EUR",
+  "nota": "Introdus de autorul registrului: asistență macrofinanciară de până la 150 de milioane EUR. Suma se regăsește în acordul de împrumut și în cel de grant, deci memorandumul nu intră în totaluri.",
+  "fara_total": true
  },
  "LP194/2020": {
   "v": 18939000,
@@ -291,5 +294,447 @@
  "LP89/2020": {
   "ascunde": true,
   "nota": "Suma citită automat (100 mil. EUR) e creditul total aprobat de BEI; contractul ratificat aici e de 25 mil. EUR, cum scrie în titlul actului."
+ },
+ "OMDED75/2026": {
+  "v": 3920000,
+  "val": "CHF",
+  "nota": "Introdus de autorul registrului."
+ },
+ "OMDED25/2026": {
+  "v": 1850000,
+  "val": "EUR",
+  "nota": "Introdus de autorul registrului: 1 850 000 EUR. În documentul atașat apare „până la 1 831 800 EUR”."
+ },
+ "OP357/2025": {
+  "v": 5000000,
+  "val": "CHF",
+  "nota": "Introdus de autorul registrului."
+ },
+ "OMM100/2025": {
+  "v": 200000000,
+  "val": "EUR",
+  "nota": "Introdus de autorul registrului: 200 de milioane EUR e valoarea proiectului de investiții descris în acordul de servicii de consultanță, nu o sumă acordată prin acest acord; nu intră în totaluri.",
+  "fara_total": true
+ },
+ "OMDED32/2025": {
+  "v": 5000000,
+  "val": "SEK",
+  "nota": "Introdus de autorul registrului."
+ },
+ "OMS128/2025": {
+  "v": 8300000,
+  "val": "CHF",
+  "nota": "Introdus de autorul registrului."
+ },
+ "LP218/2023": {
+  "v": 220000000,
+  "val": "USD",
+  "nota": "Introdus de autorul registrului: 220 de milioane dolari SUA, finanțarea suplimentară adusă de amendamentul nr. 15."
+ },
+ "OMMPS183/2024": {
+  "v": 8000000,
+  "val": "CHF",
+  "nota": "Introdus de autorul registrului."
+ },
+ "LP10/2024": {
+  "v": 300000000,
+  "val": "JPY",
+  "nota": "Introdus de autorul registrului."
+ },
+ "LP236/2023": {
+  "v": 13500000000,
+  "val": "JPY",
+  "nota": "Introdus manual: împrumut JICA de până la 13,5 miliarde de yeni, potrivit comunicatului JICA de la semnare (10 iulie 2023) și notei Ministerului Finanțelor."
+ },
+ "LP154/2023": {
+  "v": 40000000,
+  "val": "EUR",
+  "nota": "Introdus de autorul registrului."
+ },
+ "LP56/2022": {
+  "v": 1549000000,
+  "val": "JPY",
+  "nota": "Introdus de autorul registrului."
+ },
+ "LP180/2021": {
+  "v": 3800000,
+  "val": "USD",
+  "nota": "Introdus de autorul registrului."
+ },
+ "LP171/2020": {
+  "v": 2059000000,
+  "val": "JPY",
+  "nota": "Introdus de autorul registrului: împrumut JICA de cel mult 2 059 000 000 de yeni."
+ },
+ "LP172/2020": {
+  "v": 2059000000,
+  "val": "JPY",
+  "nota": "Introdus de autorul registrului: împrumut JICA de cel mult 2 059 000 000 de yeni (schimbul de note pentru același împrumut)."
+ },
+ "LP168/2020": {
+  "v": 70000000,
+  "val": "EUR",
+  "nota": "Introdus de autorul registrului."
+ },
+ "HG87/2026": {
+  "v": 192000000,
+  "val": "JPY",
+  "nota": "Introdus manual, după nota de argumentare depusă la ședința Guvernului din 14 ianuarie 2026: grant nerambursabil de 192 de milioane de yeni japonezi (circa 21 de milioane de lei)."
+ },
+ "DP552/2026": {
+  "v": 192000000,
+  "val": "JPY",
+  "nota": "Introdus manual, după nota de argumentare depusă la ședința Guvernului din 14 ianuarie 2026: grant nerambursabil de 192 de milioane de yeni japonezi (același acord ca la HG87/2026)."
+ },
+ "HG183/2025": {
+  "v": 30000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după nota de argumentare depusă la ședința Guvernului din 14 mai 2025: împrumut BIRD de 30 000 000 EUR (finanțare suplimentară); nota mai pomenește un grant de 8 475 000 dolari SUA."
+ },
+ "HG526/2024": {
+  "v": 37400000,
+  "val": "EUR",
+  "nota": "Introdus manual, după nota de argumentare depusă la ședința Guvernului din 26 februarie 2025: împrumut BIRD de 37,4 milioane EUR (pachet de 40 de milioane dolari SUA)."
+ },
+ "HG603/2019": {
+  "v": 4600000,
+  "val": "CHF",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2020 (anexa cu acordurile semnate, „valoarea conform acordului”): memorandumul cu Agenția Elvețiană, faza 1, 4,6 mil. CHF (grant)."
+ },
+ "HG243/2020": {
+  "v": 4600000,
+  "val": "CHF",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2020 (anexa cu acordurile semnate, „valoarea conform acordului”): memorandumul cu Agenția Elvețiană, prima fază, 4,6 mil. CHF (grant)."
+ },
+ "HG138/2020": {
+  "v": 5900000,
+  "val": "CHF",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2020 (anexa cu acordurile semnate, „valoarea conform acordului”): memorandumul cu Agenția Elvețiană, prima fază a proiectului „Mă implic”, 5,9 mil. CHF (grant)."
+ },
+ "HG640/2020": {
+  "v": 10000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2020 (anexa cu acordurile semnate, „valoarea conform acordului”): cooperarea financiară cu Germania, 10,0 mil. EUR (grant)."
+ },
+ "HG717/2020": {
+  "v": 9000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2020 (anexa cu acordurile semnate, „valoarea conform acordului”): acordul de finanțare „UE4Moldova: Facilitatea de sprijin…”, 9,0 mil. EUR (grant)."
+ },
+ "DP1610/2020": {
+  "v": 13500000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2020 (anexa cu acordurile semnate, „valoarea conform acordului”): a treia finanțare adițională AID pentru „Agricultura Competitivă (MAC-P)”, 13,5 mil. EUR (credit)."
+ },
+ "DP1875/2020": {
+  "v": 2960000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2020 (anexa cu acordurile semnate, „valoarea conform acordului”): grantul de finanțare adițională pentru răspunsul de urgență la COVID-19, 2,96 mil. EUR."
+ },
+ "HG288/2020": {
+  "v": 52900000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2020 (anexa cu acordurile semnate, „valoarea conform acordului”): acordul de finanțare AID pentru răspunsul de urgență la COVID-19, 52,9 mil. EUR (credit)."
+ },
+ "DP1557/2020": {
+  "v": 35700000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2020 (anexa cu acordurile semnate, „valoarea conform acordului”): acordul de finanțare AID pentru proiectul „Învățământul superior”, 35,7 mil. EUR (credit)."
+ },
+ "HG373/2021": {
+  "v": 15000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2021 (anexa cu acordurile semnate, „valoarea conform acordului”): acordul de cooperare cu BEI privind asistența tehnică, 15 mil. EUR (grant), semnat la 10.12.2021."
+ },
+ "DP34/2021": {
+  "v": 15000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2021 (anexa cu acordurile semnate, „valoarea conform acordului”): „Contractul de Reziliență COVID-19”, 15 mil. EUR (grant, suport bugetar), semnat la 19.02.2021."
+ },
+ "HG432/2021": {
+  "v": 60000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2021 (anexa cu acordurile semnate, „valoarea conform acordului”): acordul inițial din 15.12.2021, 60 mil. EUR (grant, suport bugetar); majorat ulterior prin amendamente."
+ },
+ "HG412/2022": {
+  "v": 1549000000,
+  "val": "JPY",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2021 (anexa cu acordurile semnate, „valoarea conform acordului”): grantul Japoniei pentru echipamentele de stingere a incendiilor, 11,93 mil. EUR în raport; 1 549 000 000 de yeni în acord."
+ },
+ "LP279/2022": {
+  "v": 900000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2022 (anexa cu acordurile semnate, „valoarea conform acordului”): grantul CEB pentru servicii de sănătate, 900 000 EUR, semnat la 09.08.2022."
+ },
+ "DP659/2022": {
+  "v": 900000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2022 (anexa cu acordurile semnate, „valoarea conform acordului”): grantul CEB pentru servicii de sănătate, 900 000 EUR, semnat la 09.08.2022."
+ },
+ "HG356/2022": {
+  "v": 49000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2022 (anexa cu acordurile semnate, „valoarea conform acordului”): grantul CEB pentru activități preparatorii (locuințe sociale), 49 000 EUR, semnat la 05.05.2022."
+ },
+ "HG750/2022": {
+  "v": 25000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2022 (anexa cu acordurile semnate, „valoarea conform acordului”): Programul „UE pentru redresare și reziliență”, 25 mil. EUR (grant), semnat la 09.11.2022."
+ },
+ "HG751/2022": {
+  "v": 27000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2022 (anexa cu acordurile semnate, „valoarea conform acordului”): Programul „UE pentru Reforme”, 27 mil. EUR (grant), semnat la 09.11.2022."
+ },
+ "HG176/2023": {
+  "v": 5700000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2023 (anexa cu acordurile semnate, „valoarea conform acordului”): memorandumul cu Agenția Elvețiană, faza a treia a proiectului MENSANA, 5,7 mil. EUR."
+ },
+ "HG253/2023": {
+  "v": 36500000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2023 (anexa cu acordurile semnate, „valoarea conform acordului”): împrumutul BIRD pentru „Îmbunătățirea calității educației”: 36,5 mil. EUR și 10,0 mil. USD, semnat la 30.06.2023."
+ },
+ "HG758/2017": {
+  "v": 4000000,
+  "val": "MDL",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2017–2018 (anexa cu acordurile semnate, „valoarea conform acordului”): acordul cu Agenția Elvețiană, faza a II-a, 4 mil. lei (echivalentul a 230 mii USD), semnat la 29.09.2017."
+ },
+ "DPRM209/2017": {
+  "v": 500000000,
+  "val": "JPY",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2017–2018 (anexa cu acordurile semnate, „valoarea conform acordului”): grantul Japoniei „Agricultura conservativă”, 500 mil. yeni (echivalentul a 4,8 mil. USD), semnat la 07.03.2017."
+ },
+ "HG226/2017": {
+  "v": 40000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2017–2018 (anexa cu acordurile semnate, „valoarea conform acordului”): acordul de grant cu UE privind asistența macrofinanciară, 40 mil. EUR, semnat la 23.11.2017."
+ },
+ "LP224/2023": {
+  "v": 36500000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2023 (anexa cu acordurile semnate, „valoarea conform acordului”): împrumutul BIRD e de 36,5 mil. EUR și 10,0 mil. USD, semnat la 30.06.2023."
+ },
+ "HG351/2022": {
+  "v": 44100000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul Ministerului Finanțelor privind asistența externă pe 2022 (anexa 2): acordul de finanțare AID pentru „Securitatea aprovizionării cu apă și sanitație”, 44,1 mil. EUR (credit), semnat la 21.04.2022."
+ },
+ "DP275/2021": {
+  "v": 1550000,
+  "val": "EUR",
+  "nota": "Introdus manual, după Raportul Ministerului Finanțelor privind asistența externă pe 2022 (anexa 2): acordul de grant BIRD pentru același proiect, 1,55 mil. EUR, semnat la 21.04.2022."
+ },
+ "HG546/2026": {
+  "v": 61000000,
+  "val": "EUR",
+  "u": "https://documents1.worldbank.org/curated/en/099062024130028678/pdf/P160829-67ce8936-c2e5-420b-b6a2-e9708a9be1a8.pdf",
+  "nota": "Introdus manual: amendament la cele două credite AID din 26 septembrie 2019 (nr. 6380-MD, 47,9 mil. EUR, și nr. 6381-MD, 13,1 mil. EUR), în total 61,0 mil. EUR, potrivit Băncii Mondiale și legilor nr. 179/2019 și nr. 177/2019. Textul amendamentului din 7 septembrie 2026 n-a fost citit. Împrumutul e numărat deja la LP179/2019 și LP177/2019, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG405/2026": {
+  "v": 344000000,
+  "val": "EUR",
+  "u": "https://mf.gov.md/ro/content/republica-moldova-%C8%99i-berd-semneaz%C4%83-un-acord-de-344-milioane-de-euro-pentru-modernizarea",
+  "nota": "Introdus manual: împrumut BERD de până la 344 000 000 EUR pentru Proiectul VI de reabilitare a drumurilor (tranșe de 175 și 169 mil. EUR), semnat în septembrie 2026, potrivit comunicatului Ministerului Finanțelor și al BERD."
+ },
+ "HG529/2024": {
+  "v": 46700000,
+  "val": "EUR",
+  "u": "https://ewsdata.rightsindevelopment.org/projects/p500560-sustainable-transition-through-energy-efficiency-i/",
+  "nota": "Introdus manual: împrumut BIRD de 46,7 mil. EUR (echivalentul a 50 mil. USD) pentru proiectul STEEM (P500560), potrivit documentului de evaluare al Băncii Mondiale, citat de Early Warning System; proiectul mai are un grant M-GROW de 4,5 mil. USD."
+ },
+ "HG389/2024": {
+  "v": 49000000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=143943&lang=ro",
+  "nota": "Introdus manual: același acord ca la LP158/2024 – împrumutul-cadru CEB pentru penitenciarul din Chișinău, 39 mil. EUR la semnare (Legea nr. 295/2013), 49 000 000 EUR cu amendamentele nr. 1 și nr. 2. Împrumutul e numărat deja la LP158/2024, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG843/2022": {
+  "v": 12580000,
+  "val": "USD",
+  "u": "https://www.worldbank.org/en/news/loans-credits/2016/06/06/moldova-tax-administration-modernization-project",
+  "nota": "Introdus manual: împrumut BIRD de 12 580 000 USD (nr. 8625-MD) și credit AID de 5 300 000 DST (circa 7,42 mil. USD), în total 20 mil. USD, potrivit Băncii Mondiale și textului Legii nr. 225/2016. Amendamentul nr. 3 modifică aceste acorduri. Împrumutul e numărat deja la LP225/2016, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG299/2021": {
+  "v": 52500000,
+  "val": "EUR",
+  "u": "https://www.ebrd.com/home/news-and-events/news/2014/ebrd-and-partners-put-moldovan-railway-on-track-for-change.html",
+  "nota": "Introdus manual: împrumut BERD de 52,5 mil. EUR pentru locomotive și infrastructura feroviară, semnat la 14 noiembrie 2014, potrivit comunicatului BERD și textului Legii nr. 22/2015. Amendamentul din 18 august 2017 modifică acest acord. Împrumutul e numărat deja la LP22/2015, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG275/2021": {
+  "v": 3800000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=128829&lang=ro",
+  "nota": "Introdus manual: același acord ca la LP180/2021 (Acordul de cooperare cu IFC, „Reforma climatului investițional”, faza II), unde autorul registrului a trecut 3 800 000 USD. Suma n-a fost verificată din altă sursă. Împrumutul e numărat deja la LP180/2021, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG167/2021": {
+  "v": 150000000,
+  "val": "EUR",
+  "u": "https://ewsdata.rightsindevelopment.org/projects/EBRD-45094/",
+  "nota": "Introdus manual: împrumut BERD de până la 150 000 000 EUR, semnat la 28 iunie 2013, potrivit fișei BERD a proiectului („Moldova Roads Rehabilitation IV”) și textului Legii nr. 191/2013. Acordul de modificare nr. 2 modifică acest acord. Împrumutul e numărat deja la LP191/2013, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG831/2020": {
+  "v": 75000000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=4041&lang=ro",
+  "nota": "Introdus manual: contractul de finanțare cu BEI din 23 noiembrie 2010, în valoare de 75,0 mil. EUR, potrivit textului Legii nr. 79/2011. Amendamentul nr. 3 modifică acest contract. Împrumutul e numărat deja la LP79/2011, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG252/2020": {
+  "v": 200000000,
+  "val": "EUR",
+  "u": "https://www.mf.gov.md/sites/default/files/Argumentarea%20necesitatii%20incheierii%20Acordului.docx",
+  "nota": "Introdus manual: împrumut de stat de 200 mil. EUR (două tranșe a câte 100 mil.), semnat la 17 aprilie 2020, potrivit Ministerului Finanțelor. Acordul a fost declarat neconstituțional prin Hotărârea Curții Constituționale nr. 12/2020, iar banii n-au fost primiți; nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DP1307/2019": {
+  "v": 12580000,
+  "val": "USD",
+  "u": "https://www.worldbank.org/en/news/loans-credits/2016/06/06/moldova-tax-administration-modernization-project",
+  "nota": "Introdus manual: împrumut BIRD de 12 580 000 USD (nr. 8625-MD) și credit AID de 5 300 000 DST (circa 7,42 mil. USD), în total 20 mil. USD, potrivit Băncii Mondiale și textului Legii nr. 225/2016. Amendamentul din 2019 modifică aceste acorduri. Împrumutul e numărat deja la LP225/2016, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG976/2018": {
+  "v": 30100000,
+  "val": "EUR",
+  "u": "https://ipn.md/en/land-registration-and-property-valuation-project-to-be-implemented-in-7966_1044614.html",
+  "nota": "Introdus manual: credit AID de 30,1 mil. EUR (nr. 6306-MD, circa 35 mil. USD) pentru Proiectul de înregistrare și evaluare funciară, semnat la 17 septembrie 2018, potrivit știrii IPN de la aprobarea în Guvern și textului Legii nr. 240/2018. Împrumutul e numărat deja la LP240/2018, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG337/2018": {
+  "v": 7100000,
+  "val": "DST",
+  "u": "https://ccrm.md/en/the-audit-of-the-financial-reports-of-the-education-reform-80_92880.html",
+  "nota": "Introdus manual: finanțare adițională AID de 7 100 000 DST (circa 10 mil. USD), semnată la 12 martie 2018, potrivit raportului de audit al Curții de Conturi și textului Legii nr. 88/2018. Împrumutul e numărat deja la LP88/2018, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "LP129/2017": {
+  "v": 26100000,
+  "val": "DST",
+  "u": "https://ccrm.md/en/the-audit-of-the-financial-reports-of-the-education-reform-80_92880.html",
+  "nota": "Introdus manual: credit AID de 26 100 000 DST (circa 40 mil. USD) pentru Proiectul reformei învățământului, semnat în februarie 2013, potrivit raportului de audit al Curții de Conturi. Amendamentul nr. 2 modifică acest acord. Împrumutul e numărat deja la HG189/2013, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG473/2017": {
+  "v": 41000000,
+  "val": "EUR",
+  "u": "https://www.ebrd.com/home/news-and-events/news/2016/eu-bank-and-ebrd-support-gas-interconnection-between-moldova-and-romania.html",
+  "nota": "Introdus manual: împrumut BERD de 41 mil. EUR pentru gazoductul Ungheni–Chișinău, semnat la 19 decembrie 2016, potrivit comunicatului BERD (BEI împrumută separat alte 41 mil. EUR, iar UE dă un grant de 10 mil. EUR)."
+ },
+ "HG474/2017": {
+  "v": 41000000,
+  "val": "EUR",
+  "u": "https://www.eib.org/en/projects/all/20130294",
+  "nota": "Introdus manual: contract de finanțare BEI de 41 000 000 EUR pentru gazoductul Ungheni–Chișinău, semnat la 19 decembrie 2016, potrivit fișei proiectului pe site-ul BEI (nr. 20130294)."
+ },
+ "HG405/2017": {
+  "v": 26100000,
+  "val": "DST",
+  "u": "https://ccrm.md/en/the-audit-of-the-financial-reports-of-the-education-reform-80_92880.html",
+  "nota": "Introdus manual: credit AID de 26 100 000 DST (circa 40 mil. USD) pentru Proiectul reformei învățământului, semnat în februarie 2013, potrivit raportului de audit al Curții de Conturi. Amendamentul nr. 2 modifică acest acord. Împrumutul e numărat deja la HG189/2013, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DPRM2466/2016": {
+  "v": 27200000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=96781&lang=ro",
+  "nota": "Introdus manual: împrumut BIRD de 27 200 000 USD și credit AID de 13 000 000 DST pentru DPO-2, potrivit textului Legii nr. 293/2016. Suma n-a fost verificată din altă sursă. Împrumutul e numărat deja la LP293/2016, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG1090/2016": {
+  "v": 150000000,
+  "val": "EUR",
+  "u": "https://ewsdata.rightsindevelopment.org/projects/EBRD-45094/",
+  "nota": "Introdus manual: împrumut BERD de până la 150 000 000 EUR, semnat la 28 iunie 2013, potrivit fișei BERD a proiectului („Moldova Roads Rehabilitation IV”) și textului Legii nr. 191/2013. Acordul de modificare nr. 1 modifică acest acord. Împrumutul e numărat deja la LP191/2013, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG1079/2016": {
+  "v": 50000000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=97031&lang=ro",
+  "nota": "Introdus manual: contract de finanțare BEI de 50 mil. EUR pentru infrastructura feroviară și materialul rulant, semnat la 26 septembrie 2016, potrivit textului Legii nr. 298/2016. O știre IPN de la semnare dă 52,5 mil. EUR; am păstrat suma din lege. Împrumutul e numărat deja la LP298/2016, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DPRM2139/2016": {
+  "v": 12580000,
+  "val": "USD",
+  "u": "https://www.worldbank.org/en/news/loans-credits/2016/06/06/moldova-tax-administration-modernization-project",
+  "nota": "Introdus manual: împrumut BIRD de 12 580 000 USD (nr. 8625-MD) și credit AID de 5 300 000 DST (circa 7,42 mil. USD), în total 20 mil. USD, potrivit Băncii Mondiale și textului Legii nr. 225/2016. Împrumutul e numărat deja la LP225/2016, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DPRM2050/2016": {
+  "v": 12580000,
+  "val": "USD",
+  "u": "https://www.worldbank.org/en/news/loans-credits/2016/06/06/moldova-tax-administration-modernization-project",
+  "nota": "Introdus manual: împrumut BIRD de 12 580 000 USD (nr. 8625-MD) și credit AID de 5 300 000 DST (circa 7,42 mil. USD), în total 20 mil. USD, potrivit Băncii Mondiale și textului Legii nr. 225/2016. Împrumutul e numărat deja la LP225/2016, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DPRM2024/2016": {
+  "v": 150000000,
+  "val": "EUR",
+  "u": "https://ewsdata.rightsindevelopment.org/projects/EBRD-45094/",
+  "nota": "Introdus manual: împrumut BERD de până la 150 000 000 EUR, semnat la 28 iunie 2013, potrivit fișei BERD a proiectului („Moldova Roads Rehabilitation IV”) și textului Legii nr. 191/2013. Acordul de modificare nr. 1 modifică acest acord. Împrumutul e numărat deja la LP191/2013, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DPRM1762/2015": {
+  "v": 57000000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=94415&lang=ro",
+  "nota": "Introdus manual: credit AID de 57 000 000 DST pentru „Îmbunătățirea drumurilor locale”, semnat la 28 aprilie 2016, potrivit textului Legii nr. 155/2016. Decretul privea și un împrumut BIRD, care nu apare în lege. Suma n-a fost verificată din altă sursă. Împrumutul e numărat deja la LP155/2016, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG333/2015": {
+  "v": 40500000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=84452&lang=ro",
+  "nota": "Introdus manual: împrumut BIRD de 40 500 000 USD pentru eficiența sectorului de alimentare centralizată cu energie termică, semnat la 15 aprilie 2015, potrivit textului Legii nr. 148/2015. Suma n-a fost verificată din altă sursă. Împrumutul e numărat deja la LP148/2015, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG982/2014": {
+  "v": 52500000,
+  "val": "EUR",
+  "u": "https://www.ebrd.com/home/news-and-events/news/2014/ebrd-and-partners-put-moldovan-railway-on-track-for-change.html",
+  "nota": "Introdus manual: împrumut BERD de 52,5 mil. EUR pentru locomotive și infrastructura feroviară (două tranșe, a doua de 27,5 mil.), semnat la 14 noiembrie 2014, potrivit comunicatului BERD și textului Legii nr. 22/2015. Împrumutul e numărat deja la LP22/2015, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG625/2013": {
+  "v": 39000000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=21765&lang=ro",
+  "nota": "Introdus manual: împrumutul-cadru CEB pentru penitenciarul din Chișinău, 39,0 mil. EUR, semnat la 10 octombrie 2013, potrivit textului Legii nr. 295/2013 (majorat ulterior la 49 mil. EUR). Suma n-a fost verificată din altă sursă. Împrumutul e numărat deja la LP158/2024, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "HG189/2013": {
+  "v": 26100000,
+  "val": "DST",
+  "u": "https://ccrm.md/en/the-audit-of-the-financial-reports-of-the-education-reform-80_92880.html",
+  "nota": "Introdus manual: credit AID de 26 100 000 DST (circa 40 mil. USD) pentru Proiectul reformei învățământului, semnat în februarie 2013, potrivit raportului de audit al Curții de Conturi."
+ },
+ "HG889/2012": {
+  "v": 26100000,
+  "val": "DST",
+  "u": "https://ccrm.md/en/the-audit-of-the-financial-reports-of-the-education-reform-80_92880.html",
+  "nota": "Introdus manual: credit AID de 26 100 000 DST (circa 40 mil. USD) pentru Proiectul reformei învățământului, semnat în februarie 2013, potrivit raportului de audit al Curții de Conturi. Împrumutul e numărat deja la HG189/2013, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "LP77/2011": {
+  "v": 75000000,
+  "val": "EUR",
+  "u": "https://ewsdata.rightsindevelopment.org/projects/EBRD-41442/",
+  "nota": "Introdus manual: împrumut BERD de până la 75 mil. EUR pentru reabilitarea drumurilor, semnat la 29 octombrie 2010, potrivit fișei BERD a proiectului („Moldova Road Rehabilitation III”); BEI a dat în paralel alte 75 mil. EUR (Legea nr. 79/2011)."
+ },
+ "HG161/2011": {
+  "v": 75000000,
+  "val": "EUR",
+  "u": "https://ewsdata.rightsindevelopment.org/projects/EBRD-41442/",
+  "nota": "Introdus manual: împrumut BERD de până la 75 mil. EUR pentru reabilitarea drumurilor, semnat la 29 octombrie 2010, potrivit fișei BERD a proiectului („Moldova Road Rehabilitation III”). Împrumutul e numărat deja la LP77/2011, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
  }
 }
