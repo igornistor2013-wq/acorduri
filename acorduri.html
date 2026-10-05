@@ -1057,13 +1057,14 @@
     return s.v + '|' + s.val + '|' + (FAM_FIN[p] || p) + '|' + cuv;
   }
   function statSume(grupuri){
-    var tip = {}, uniq = {}, neconv = {};
+    var tip = {}, uniq = {}, neconv = {}, fara = 0;
     grupuri.forEach(function(g){
       var c = g.categorie || 'Alt tip';
       tip[c] = tip[c] || { toate: 0, n: 0, eur: 0, valute: {}, top: [] };
       tip[c].toate++;
       var s = sumaAfisata(g);
-      if (!s) return;
+      if (!s) fara++;
+      if (!s || s.faraTotal) return;            // „fara_total": suma se vede pe rând, dar nu se adună
       var k = cheieSuma(g, s);
       (uniq[k] = uniq[k] || []).push(g);
     });
@@ -1081,7 +1082,7 @@
       t.top.push({ nume: L[0].numeScurt || L[0].nume, eur: e, s: s });
     });
     Object.keys(tip).forEach(function(c){ tip[c].top.sort(function(a, b){ return b.eur - a.eur; }); });
-    return { tip: tip, dubluri: dubluri, neconv: neconv };
+    return { tip: tip, dubluri: dubluri, neconv: neconv, fara: fara };
   }
   function panouSume(grupuri){
     var st = statSume(grupuri), tipuri = ORDINE_TIP.filter(function(c){ return st.tip[c]; })
@@ -1114,7 +1115,7 @@
         '<span class="count">în euro, la cursul din ' + CURS_DATA + '</span></div>' +
       '<div class="panel-body">' +
         '<p class="sume-total">Acordurile cu sumă cunoscută adună <b>' + esc(fmtEur(total)) + '</b>: ' + cuSuma +
-          ' de acorduri din ' + grupuri.length + '. Celelalte ' + (grupuri.length - cuSuma - st.dubluri) +
+          ' de acorduri din ' + grupuri.length + '. Alte ' + st.fara +
           ' nu au încă suma în registru, deci totalurile sunt un minim, nu tot ce s-a semnat.</p>' +
         '<div class="sume-grid">' + carduri + '</div>' +
         '<details class="inv-wrap"><summary>Pe valute și cum s-a făcut conversia</summary>' +
@@ -3034,7 +3035,7 @@
             if (m.fara_text && a.sume){ delete a.sume; n++; }
             if (m.fara_guvern && !a.faraG){ a.faraG = 1; n++; }
             if (m.v > 0 && m.unde === 'text'){ a.sume = [[m.v, m.val || 'EUR', String(m.nota || 'Sumă introdusă de mână.').slice(0, 180)]]; n++; }
-            else if (m.v > 0){ a.acord = {v: m.v, val: m.val || 'EUR', f: String(m.nota || 'Sumă introdusă de mână.').slice(0, 220), u: m.u || a.url || '', manual: true}; n++; }
+            else if (m.v > 0){ a.acord = {v: m.v, val: m.val || 'EUR', f: String(m.nota || 'Sumă introdusă de mână.').slice(0, 220), u: m.u || a.url || '', manual: true, faraTotal: !!m.fara_total}; n++; }
             else if (m.ascunde && a.acord){ delete a.acord; n++; }
           }
         });

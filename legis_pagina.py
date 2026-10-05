@@ -181,6 +181,8 @@ def main(BRUT=None, OUT=None):
                 a['sume'] = [[m['v'], m.get('val', 'EUR'), nota[:180]]]
             elif (m.get('v') or 0) > 0:
                 a['acord'] = {'v': m['v'], 'val': m.get('val', 'EUR'), 'f': nota[:220], 'u': m.get('u') or a.get('url', ''), 'manual': True}
+                if m.get('fara_total'):
+                    a['acord']['faraTotal'] = True
             elif m.get('ascunde'):
                 a.pop('acord', None)
     if sume:
