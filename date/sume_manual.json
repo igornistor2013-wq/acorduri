@@ -26,24 +26,29 @@
   "nota": "Suma citită automat (2 500 CHF) era plafonul pentru achiziții dintr-o singură sursă, nu suma acordului."
  },
  "LP275/2024": {
-  "ascunde": true,
-  "nota": "Suma citită automat (36 000 USD) era plafonul unui subproiect școlar, nu suma grantului."
+  "v": 4800000,
+  "val": "USD",
+  "nota": "Introdus manual de autorul registrului: grant de 4 800 000 dolari SUA. Citirea automată luase plafonul unui subproiect școlar (36 000 USD)."
  },
  "LP152/2019": {
-  "ascunde": true,
-  "nota": "Suma citită automat (250 000 EUR) era cofinanțarea UN Women, nu contribuția UE."
+  "v": 10700000,
+  "val": "EUR",
+  "nota": "Introdus manual de autorul registrului: 10 700 000 EUR. Citirea automată luase cofinanțarea UN Women (250 000 EUR)."
  },
  "LP115/2025": {
   "ascunde": true,
   "nota": "Suma citită automat (493 103 338 EUR) era bugetul total al programului Interreg Europe, pentru toate țările."
  },
  "LP68/2025": {
-  "ascunde": true,
-  "nota": "Suma citită automat (65 mil. EUR) era o tranșă, cu numărul rupt în PDF („1 65 de milioane”)."
+  "v": 465000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după textul acordului atașat: suma împrumutului alocată în tabelul de categorii, 465 de milioane EUR (300 de milioane inițial plus Tranșa 3 de 165 de milioane)."
  },
  "LP177/2024": {
-  "ascunde": true,
-  "nota": "Suma citită automat (92,4 mil. EUR) era a acordului de împrumut BIRD la care textul face trimitere, nu a acestui acord cu AID."
+  "v": 5600000,
+  "val": "EUR",
+  "u": "https://documents1.worldbank.org/curated/en/099061924192570006/pdf/P180153102ba250d219d2016b12d8e393e6.pdf",
+  "nota": "Introdus manual: credit AID de 5 600 000 EUR, potrivit Acordului de finanțare publicat de Banca Mondială (Credit nr. 7538-MD). Cei 92,4 mil. EUR din același text sunt împrumutul BIRD, ratificat prin Legea 176/2024."
  },
  "LP378/2023": {
   "ascunde": true,
@@ -154,5 +159,118 @@
   "val": "DST",
   "unde": "text",
   "nota": "Introdus manual, după textul actului: 8 300 000 D.S.T. (circa 10,5 milioane dolari SUA). Citirea automată luase echivalentul aproximativ în dolari."
+ },
+ "LP249/2024": {
+  "v": 120000000,
+  "val": "CAD",
+  "nota": "Introdus manual: împrumut de 120 000 000 dolari canadieni, potrivit proiectului de acord publicat pe particip.gov.md și comunicatului Parlamentului la ratificare. Suma nu a fost citită din atașamentul de pe legis.md."
+ },
+ "LP211/2025": {
+  "v": 50100000,
+  "val": "EUR",
+  "nota": "Introdus manual: împrumut BIRD de 50,1 milioane EUR (acordul AGGRI semnat la 5 iunie 2023), potrivit comunicatelor de la ratificarea în Parlament. Legea 211/2025 ratifică un amendament la acest acord."
+ },
+ "LP204/2022": {
+  "v": 29800000,
+  "val": "EUR",
+  "nota": "Introdus manual: credit AID de 29,80 milioane EUR, potrivit documentului de evaluare al Băncii Mondiale (PAD4824). Acordul atașat pe legis.md e un PDF scanat, necitit automat."
+ },
+ "LP169/2022": {
+  "v": 44100000,
+  "val": "EUR",
+  "nota": "Introdus manual: credit AID de 44,1 milioane EUR, potrivit Raportului Ministerului Finanțelor privind asistența externă în 2022 (anexa 2, „valoarea conform acordului”). Suma nu a fost citită din atașamentul de pe legis.md."
+ },
+ "LP205/2022": {
+  "v": 150000000,
+  "val": "EUR",
+  "nota": "Introdus manual: împrumut BEI de 150 milioane EUR, potrivit Raportului Ministerului Finanțelor privind asistența externă în 2022 (anexa 2, „valoarea conform acordului”). Suma nu a fost citită din atașamentul de pe legis.md."
+ },
+ "LP197/2022": {
+  "v": 101300000,
+  "val": "EUR",
+  "nota": "Introdus manual: împrumut BIRD de 101,3 milioane EUR (suport bugetar), potrivit Raportului Ministerului Finanțelor privind asistența externă în 2022 (anexa 2, „valoarea conform acordului”). Suma nu a fost citită din atașamentul de pe legis.md."
+ },
+ "LP198/2022": {
+  "v": 40800000,
+  "val": "EUR",
+  "nota": "Introdus manual: credit AID de 40,8 milioane EUR și 9,24 milioane dolari SUA (suport bugetar), potrivit Raportului Ministerului Finanțelor privind asistența externă în 2022 (anexa 2, „valoarea conform acordului”). Suma nu a fost citită din atașamentul de pe legis.md."
+ },
+ "LP349/2022": {
+  "v": 43755509,
+  "val": "USD",
+  "nota": "Introdus manual, după textul acordului atașat: grant din Fondul fiduciar multidonator, de cel mult 43 755 509 dolari SUA."
+ },
+ "OMDED116/2025": {
+  "v": 20000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după textul acordului atașat: grant KfW de cel mult 20 de milioane EUR („twenty million euros”). Citirea automată luase 2 miliarde dintr-un număr stricat de OCR („20,000.000.00”)."
+ },
+ "LP168/2022": {
+  "v": 3105000,
+  "val": "USD",
+  "nota": "Introdus manual, după textul acordului atașat: grant de maximum trei milioane o sută cinci mii dolari SUA. Citirea automată luase 310,5 milioane dintr-un număr stricat de OCR („3.105,000,00”)."
+ },
+ "LP294/2022": {
+  "v": 12400000,
+  "val": "EUR",
+  "nota": "Introdus manual: grant BEI de 12,4 milioane EUR, potrivit Raportului Ministerului Finanțelor privind asistența externă în 2022. Citirea automată luase împrumutul BERD de 30 mil. EUR, pomenit în definițiile acordului."
+ },
+ "OMMPS273/2026": {
+  "ascunde": true,
+  "nota": "Suma citită automat (300 000 CHF) era prima rată a contribuției FICR, nu toată suma."
+ },
+ "LP20/2025": {
+  "ascunde": true,
+  "nota": "Suma citită automat (86 769 799 EUR) era contribuția fondurilor Interreg la tot programul, pentru toate țările."
+ },
+ "OMM23/2026": {
+  "v": 7903975,
+  "val": "USD",
+  "nota": "Introdus manual, după textul acordului atașat: grant de maximum 7 903 975 dolari SUA."
+ },
+ "OMDED151/2025": {
+  "v": 56905000,
+  "val": "JPY",
+  "nota": "Introdus manual, după textul acordului atașat: bugetul provizoriu total al cooperării cu JICA, de până la 56 905 000 yeni."
+ },
+ "OMS737/2025": {
+  "v": 5120000,
+  "val": "CHF",
+  "nota": "Introdus manual, după textul acordului atașat: contribuția totală maximă a SDC, de 5 120 000 franci elvețieni."
+ },
+ "LP215/2024": {
+  "v": 37300000,
+  "val": "EUR",
+  "nota": "Introdus manual, după textul acordului atașat: împrumut BIRD de 37 300 000 EUR."
+ },
+ "LP158/2024": {
+  "v": 49000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după textul acordului atașat: suma totală aprobată a împrumutului-cadru cu CEB, cu amendamentele nr. 1 și nr. 2: 49 000 000 EUR."
+ },
+ "LP328/2023": {
+  "v": 86000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după textul acordului atașat: împrumut-cadru CEB de 86 000 000 EUR."
+ },
+ "LP254/2023": {
+  "v": 88386110,
+  "val": "USD",
+  "nota": "Introdus manual, după textul acordului atașat: grant din Fondul fiduciar multidonator, de cel mult 88 386 110 dolari SUA."
+ },
+ "LP222/2023": {
+  "v": 4800000,
+  "val": "USD",
+  "nota": "Introdus manual, după textul acordului atașat: grant al Parteneriatului Global pentru Educație, de cel mult 4 800 000 dolari SUA."
+ },
+ "LP307/2022": {
+  "v": 60000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după textul acordului atașat: facilitate de credit AFD de 60 000 000 EUR, într-o singură tragere; aceeași sumă în raportul Ministerului Finanțelor pe 2022."
+ },
+ "LP118/2025": {
+  "v": 1500000000,
+  "val": "EUR",
+  "nota": "Introdus manual, după textul acordului atașat: facilitate de împrumut cu o valoare totală a principalului de maximum 1 500 000 000 EUR. Cei 67,5 mil. EUR din același text sunt doar prefinanțarea."
  }
 }
