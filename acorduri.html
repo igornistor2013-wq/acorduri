@@ -1159,7 +1159,16 @@
 
 
   function cheie(nume){
-    var k = sumaCanonica(fold(nume));
+    /* Ortografia veche și cea nouă: „Învățămîntul" (decretele din 2020) și
+       „Învățământul" (legea) sunt același cuvânt. fold() le dădea litere
+       diferite (î→i, â→a) și acordul apărea pe două rânduri. */
+    var k = sumaCanonica(fold(String(nume || '').replace(/[âÂ]/g, 'î')));
+    // Cuvinte lipite în textul publicat: „Acorduluidintre Guvernul Federației Ruse".
+    k = k.replace(/\b(acordului|acordul|contractului|memorandumului|conventiei|protocolului|amendamentului)(dintre|intre)\b/g, '$1 $2');
+    /* „…, astfel cum a fost modificat prin cele cinci protocoale adiționale" spune
+       în ce formă e acordul azi, nu care acord e: fiecare protocol nou schimba
+       cheia și acordul României de 100 mil. EUR mai apărea o dată. */
+    k = k.replace(/[\s,]+astfel cum a fost modificat[\s\S]*$/, '');
     k = k.replace(/^amendament\S*[\s\S]*?\bla\s+(?=acord|contract|conventi|memorandum)/, '');
     /* La fel protocoalele adiționale și addendumurile: „Protocolul adițional … la
        Acordul …" ține de acordul de bază. Acordul României de 100 mil. EUR și cele
@@ -1360,7 +1369,11 @@
     }
     function distinctiv(k){
       return k.split('\u0001')[0].split(' ').filter(function(w){
-        return /^(aditional\w*|suplimentar\w*|faza|ii|iii|iv|vi|vii|viii|doua|treia|patra|cincea|doilea|treilea|patrulea)$/.test(w);
+        /* „obiectivul": „Acordul de asistență privind obiectivul de dezvoltare … pentru
+           creștere economică durabilă…" (SUA, 2016) e alt acord decât „Acordul de
+           asistență … pentru creștere economică" (SUA, 2010), deși îi cuprinde toate
+           cuvintele; amendamentele 7 și 8 la cel din 2010 ajunseseră pe rândul celui din 2016. */
+        return /^(aditional\w*|suplimentar\w*|faza|ii|iii|iv|vi|vii|viii|doua|treia|patra|cincea|doilea|treilea|patrulea|obiectivul)$/.test(w);
       });
     }
     var alias = {};
@@ -1379,10 +1392,122 @@
         if (Object.keys(ca).length < Object.keys(cb).length && inclus(ca, cb)) alias[x] = y;
       });
     });
+    /* A doua trecere: aceeași denumire cu greșeli de tipar. Titlurile sunt copiate
+       de mână de la o etapă la alta și apar cuvinte lipite („Instituția
+       PublicăCompania «Teleradio-Moldova»" în decretul de promulgare), litere
+       schimbate („system", „Finanțelolr", „climaterice"), alt caz gramatical
+       („reabilitare a" / „reabilitarea") sau părțile în altă ordine. Niciuna nu
+       trecea de prima regulă, care cere ca toate cuvintele unei denumiri să se
+       regăsească întocmai în cealaltă, așa că legea ajungea pe un rând, iar
+       decretul ei de promulgare pe altul.
+
+       Contopim două rânduri cu același finanțator, instrument și fond când, lăsând
+       deoparte cuvintele de legătură, rămân aceleași cuvinte — cel mult trei
+       dintre ele scrise puțin altfel sau lipite. Nu contopim când diferă o cifră
+       sau un număr roman (faza I / faza II, 2014–2020 / 2021–2027), un cuvânt
+       care deosebește o finanțare de alta (vezi mai sus) ori când cele două
+       rânduri au sume cunoscute și niciuna comună: „Educație de calitate în
+       mediul rural" (2012, 700 000 DST) e finanțarea adițională la „Educația de
+       calitate…" (2006, 3,6 mil. DST). */
+    var LEGATURA = /^(a|al|ale|de|din|in|la|cu|pe|si|sau|pentru|privind|intre|cel|cea|cele|un|unei|unui)$/;
+    function numeCheie(k){ return k.split('\u0001')[0]; }
+    function toate(k){ return numeCheie(k).split(' ').filter(Boolean); }
+    function pline(k){
+      var o = {};
+      toate(k).forEach(function(w){ if (!LEGATURA.test(w)) o[w] = true; });
+      return Object.keys(o);
+    }
+    function numerale(k){
+      return (numeCheie(k).match(/\b(?:\d+|i|ii|iii|iv|v|vi|vii|viii|ix|x)\b/g) || []).sort().join(' ');
+    }
+    function distanta(a, b){                 // Levenshtein, oprit devreme: ne interesează doar 0, 1, 2
+      if (Math.abs(a.length - b.length) > 2) return 3;
+      var p = [], i, j;
+      for (j = 0; j <= b.length; j++) p[j] = j;
+      for (i = 1; i <= a.length; i++){
+        var c = [i], m = i;
+        for (j = 1; j <= b.length; j++){
+          c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1));
+          if (c[j] < m) m = c[j];
+        }
+        if (m > 2) return 3;
+        p = c;
+      }
+      return p[b.length];
+    }
+    function aproape(w, u){                  // același cuvânt, cu o greșeală sau în alt caz gramatical
+      if (w.length < 5 || u.length < 5 || /\d/.test(w + u)) return false;
+      var s = w.length < u.length ? w : u, l = s === w ? u : w;
+      return distanta(w, u) <= 2 || (l.indexOf(s) === 0 && l.length - s.length <= 4);
+    }
+    function aceeasiDenumire(x, y){
+      var nx = numeCheie(x), ny = numeCheie(y);
+      if (nx.length < 20 || ny.length < 20) return false;
+      if (numerale(x) !== numerale(y)) return false;
+      if (distinctiv(x).sort().join(' ') !== distinctiv(y).sort().join(' ')) return false;
+      if (nx.replace(/ /g, '') === ny.replace(/ /g, '')) return true;          // doar spațiile diferă
+      var px = pline(x), py = pline(y);
+      if (px.length < 3 || py.length < 3) return false;
+      var dx = px.filter(function(w){ return py.indexOf(w) < 0; }),
+          dy = py.filter(function(w){ return px.indexOf(w) < 0; }), pasi = 0;
+      function lipit(w, lista){               // „socialmentevulnerabile" = „socialmente" + „vulnerabile"
+        for (var i = 0; i < lista.length; i++)
+          for (var j = 0; j < lista.length; j++)
+            if (i !== j && lista[i] + lista[j] === w) return [lista[i], lista[j]];
+        return null;
+      }
+      function scoate(l, w){ var i = l.indexOf(w); if (i > -1) l.splice(i, 1); }
+      while (dx.length || dy.length){
+        if (++pasi > 3) return false;
+        var w = dx.length ? dx[0] : dy[0], aici = dx.length ? dx : dy, dincolo = dx.length ? dy : dx,
+            sursaDincolo = dx.length ? y : x;
+        var u = dincolo.filter(function(v){ return aproape(w, v); })[0];
+        if (u){ scoate(aici, w); scoate(dincolo, u); continue; }
+        var buc = lipit(w, toate(sursaDincolo));
+        if (buc){ scoate(aici, w); buc.forEach(function(b){ scoate(dincolo, b); }); continue; }
+        return false;
+      }
+      return true;
+    }
+    function radacina(k){ var n = 0; while (alias[k] && n++ < 50) k = alias[k]; return k; }
+    // rândurile, așa cum au ieșit din prima trecere: cheia rămasă → cheile contopite în ea
+    var rand = {};
+    chei.forEach(function(k){ var r = radacina(k); (rand[r] = rand[r] || []).push(k); });
+    function sumeRand(r){                    // sumele cunoscute ale tuturor actelor de pe rând
+      var o = {};
+      rand[r].forEach(function(k){
+        map[k].acte.forEach(function(a){
+          var t = sumaAct(a.titlu);
+          if (t) o[t.v + ' ' + t.val] = true;
+          if (a.sume && a.sume.length) o[a.sume[0][0] + ' ' + a.sume[0][1]] = true;
+          if (a.acord && a.acord.v) o[a.acord.v + ' ' + a.acord.val] = true;
+        });
+      });
+      return Object.keys(o);
+    }
+    function acteRand(r){ return rand[r].reduce(function(n, k){ return n + map[k].acte.length; }, 0); }
+    var cos = {};
+    chei.forEach(function(k){ var A = k.split('\u0001'), b = A[1] + '\u0001' + A[2] + '\u0001' + A[3]; (cos[b] = cos[b] || []).push(k); });
+    Object.keys(cos).forEach(function(b){
+      var l = cos[b], i, j;
+      for (i = 0; i < l.length; i++) for (j = i + 1; j < l.length; j++){
+        var rx = radacina(l[i]), ry = radacina(l[j]);
+        if (rx === ry || !aceeasiDenumire(l[i], l[j])) continue;
+        var sx = sumeRand(rx), sy = sumeRand(ry);
+        if (sx.length && sy.length && !sx.some(function(s){ return sy.indexOf(s) > -1; })) continue;
+        // rămâne rândul cu mai multe acte; la egalitate, ordinea alfabetică, ca rezultatul să fie stabil
+        var nxa = acteRand(rx), nya = acteRand(ry), ramane = (nxa > nya || (nxa === nya && rx < ry)) ? rx : ry,
+            pleaca = ramane === rx ? ry : rx;
+        alias[pleaca] = ramane;
+        rand[ramane] = rand[ramane].concat(rand[pleaca]);
+        delete rand[pleaca];
+      }
+    });
+
     var out = {};
     chei.forEach(function(k){
       var t = k, n = 0;
-      while (alias[t] && n++ < 5) t = alias[t];        // lanț scurt, fără bucle
+      while (alias[t] && n++ < 50) t = alias[t];       // lanț scurt, fără bucle
       if (!out[t]) out[t] = map[t];
       if (t !== k){
         out[t].acte = out[t].acte.concat(map[k].acte);
