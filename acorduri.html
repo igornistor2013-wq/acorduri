@@ -1504,6 +1504,52 @@
       }
     });
 
+    /* A treia trecere: Japonia. Un proiect finanțat de Japonia are două acte juridice
+       pentru aceiași bani: înțelegerea prin schimb de note cu Guvernul Japoniei și
+       acordul (de grant sau de împrumut) cu JICA, agenția care plătește. Titlurile
+       lor numesc alt finanțator („Japonia" / „JICA") și primesc uneori alt
+       instrument — nota pentru „Teleradio-Moldova" spune „cooperarea tehnică", deși e
+       un grant de 192 mil. JPY — așa că ajungeau pe două rânduri, iar suma se aduna
+       de două ori: 5,9 mld. JPY la „Îmbunătățirea serviciilor medicale", 13,5 mld. la
+       „Politici de dezvoltare întru redresarea economică".
+
+       Le unim când denumirea e aceeași (întocmai sau cu greșeli de tipar) ori când
+       cuvintele denumirii mai scurte se regăsesc în cea lungă și o sumă comună o
+       confirmă. Două sume cunoscute și diferite rămân două acorduri. */
+    var JAPONIA = /^(Japonia|JICA)$/, UMPLUTURA = /^(proiect\w*|program\w*)$/;
+    function cuprins(x, y){
+      if (numerale(x) !== numerale(y)) return false;
+      var a = pline(x).filter(function(w){ return !UMPLUTURA.test(w); }),
+          b = pline(y).filter(function(w){ return !UMPLUTURA.test(w); });
+      if (a.length > b.length){ var t = a; a = b; b = t; }
+      if (a.length < 3 || !a.every(function(w){
+        return b.indexOf(w) > -1 || b.some(function(u){ return aproape(w, u); });
+      })) return 0;
+      /* Fără o sumă comună care să confirme, includerea ajunge doar când denumirea
+         scurtă e destul de lungă ca să nu fie o coincidență (șase cuvinte pline) sau
+         când cele două denumiri sunt, de fapt, aceleași cuvinte. */
+      return (a.length >= 6 || b.length - a.length <= 1) ? 2 : 1;
+    }
+    var jap = chei.filter(function(k){ return JAPONIA.test(k.split('\u0001')[1]); });
+    jap.forEach(function(x, i){
+      jap.slice(i + 1).forEach(function(y){
+        var A = x.split('\u0001'), B = y.split('\u0001');
+        if (A[3] !== B[3] || (A[1] === B[1] && A[2] === B[2])) return;   // același finanțator și instrument: l-au judecat trecerile de mai sus
+        var rx = radacina(x), ry = radacina(y);
+        if (rx === ry) return;
+        var sx = sumeRand(rx), sy = sumeRand(ry),
+            comun = sx.some(function(s){ return sy.indexOf(s) > -1; });
+        if (sx.length && sy.length && !comun) return;
+        var inclus = cuprins(x, y);
+        if (!(A[0] === B[0] || aceeasiDenumire(x, y) || inclus === 2 || (comun && inclus))) return;
+        var nxa = acteRand(rx), nya = acteRand(ry), ramane = (nxa > nya || (nxa === nya && rx < ry)) ? rx : ry,
+            pleaca = ramane === rx ? ry : rx;
+        alias[pleaca] = ramane;
+        rand[ramane] = rand[ramane].concat(rand[pleaca]);
+        delete rand[pleaca];
+      });
+    });
+
     var out = {};
     chei.forEach(function(k){
       var t = k, n = 0;
@@ -1516,6 +1562,16 @@
         Object.keys(map[k].cats).forEach(function(c){ out[t].cats[c] = true; });
         if (!out[t].semnat) out[t].semnat = map[k].semnat;
       }
+    });
+    /* Instrumentul rândului unit din nota Guvernului Japoniei și acordul cu JICA e cel
+       din acordul cu JICA: acela spune dacă banii sunt grant sau împrumut. */
+    Object.keys(out).forEach(function(t){
+      var g = out[t];
+      if (Object.keys(g.cats).length < 2 || !Object.keys(g.orgs).every(function(o){ return JAPONIA.test(o); })) return;
+      var jica = g.acte.filter(function(a){
+        return /^JICA/.test(a.partener || '') && /^(Grant|Împrumut)$/.test(a.categorie || '');
+      })[0];
+      g.categorieFixa = jica ? jica.categorie : g.cats['Împrumut'] ? 'Împrumut' : g.cats['Grant'] ? 'Grant' : '';
     });
     return out;
   }
@@ -1663,7 +1719,7 @@
         return;
       }
       Object.keys(dupaSuma).forEach(function(cs){
-        var sub = {nume: g.nume, acte: dupaSuma[cs], et: {}, orgs: {}, cats: {}, semnat: '',
+        var sub = {nume: g.nume, acte: dupaSuma[cs], et: {}, orgs: {}, cats: {}, semnat: '', categorieFixa: g.categorieFixa,
                    suma: cs ? sumaAct(dupaSuma[cs][0].titlu) : null};
         sub.acte.forEach(function(a){
           etapa(a).forEach(function(e){ sub.et[e] = true; });
@@ -1692,7 +1748,7 @@
       g.acte.sort(function(x,y){ return ord(y).localeCompare(ord(x)); });
       g.ultim = g.acte[0];
       g.parteneri = Object.keys(g.orgs).join(' / ');
-      g.categorie = Object.keys(g.cats)[0] || '—';
+      g.categorie = g.categorieFixa || Object.keys(g.cats)[0] || '—';
       return g;
     }).sort(function(x,y){ return ord(y.ultim).localeCompare(ord(x.ultim)); });
     adaugaSumeGuvern(grupuri);
