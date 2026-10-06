@@ -201,9 +201,11 @@ def main(BRUT=None, OUT=None):
         manual = {}
     cu_suma = 0
     for a in acte.values():
-        if a.get('editie') != 'legis.md':
-            continue
-        r = sume.get(str(a.get('editie_id', '')))
+        # Sumele citite de pe legis.md se leagă de act prin doc_id, deci doar actele legis.md le pot primi.
+        # Sumele puse de mână (date/sume_manual.json) se leagă prin numărul actului și trebuie aplicate
+        # și actelor venite din Monitorul Oficial: altfel suma unui act nou (HG546/2026) nu apărea deloc
+        # până când actul ajungea în baza legis.
+        r = sume.get(str(a.get('editie_id', ''))) if a.get('editie') == 'legis.md' else None
         if r and r.get('sume'):
             a['sume'] = [[s['v'], s['val'], s.get('f', '')[:180]] for s in r['sume'][:2]]
             cu_suma += 1

@@ -1181,7 +1181,7 @@
          // „între Republica Moldova" și „dintre Republica Moldova" sunt
          // folosite alternativ în același acord, de la o etapă la alta.
          .replace(/\bdintre\b/g, 'intre');
-    k = k.split(/\s(?:si\s+(?:acordarea|imputernicirea|imputernicirilor|desemnarea)|semnat[aă]?\s+la\s|incheiat[aă]?\s+la\s|intocmit\s+la\s)/)[0];
+    k = k.split(/\s(?:si\s+(?:acordarea|imputernicirea|imputernicirilor|desemnarea)|semnat[aăe]?\s+la\s|incheiat[aăe]?\s+la\s|intocmit\s+la\s)/)[0];
     // Aceleași cuvinte scrise altfel de la o etapă la alta.
     k = k.replace(/\bmunicipiul\b/g, 'mun').replace(/\brepublicii moldova\b/g, 'republica moldova');
     return k.replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -1440,8 +1440,28 @@
       var s = w.length < u.length ? w : u, l = s === w ? u : w;
       return distanta(w, u) <= 2 || (l.indexOf(s) === 0 && l.length - s.length <= 4);
     }
+    /* Suma scrisă în titlu („…electroenergetic (în valoare de 13,1 milioane euro)") ajunge
+       în cheie ca „suma 13100000 eur". Hotărârea care aprobă proiectul de lege o are,
+       legea de ratificare nu, și nu se mai potriveau. La compararea denumirilor o lăsăm
+       deoparte: sumele se compară separat, mai jos, pe rânduri întregi. */
+    function faraSuma(k){
+      return numeCheie(k).replace(/\bsuma \d+(?: \d+)? [a-z]{3}\b/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+    // suma din titlu, în forma în care o ține sumeRand(): „13100000 EUR"
+    function sumaTitlu(k){
+      var m = /\bsuma (\d+(?: \d+)?) ([a-z]{3})\b/.exec(numeCheie(k));
+      return m ? m[1].replace(' ', '.') + ' ' + m[2].toUpperCase() : '';
+    }
+    /* O sumă scrisă în titlu trebuie să se regăsească pe celălalt rând: împrumutul
+       polonez „în sumă de 20 de milioane de euro" (2022) nu e cel de 15 mil. USD din 2010,
+       deși restul denumirii e identic. */
+    function sumaTitluLipseste(x, y, sx, sy){
+      var tx = sumaTitlu(x), ty = sumaTitlu(y);
+      return (tx && sy.indexOf(tx) < 0) || (ty && sx.indexOf(ty) < 0);
+    }
     function aceeasiDenumire(x, y){
-      var nx = numeCheie(x), ny = numeCheie(y);
+      x = faraSuma(x); y = faraSuma(y);
+      var nx = x, ny = y;
       if (nx.length < 20 || ny.length < 20) return false;
       if (numerale(x) !== numerale(y)) return false;
       if (distinctiv(x).sort().join(' ') !== distinctiv(y).sort().join(' ')) return false;
@@ -1495,6 +1515,7 @@
         if (rx === ry || !aceeasiDenumire(l[i], l[j])) continue;
         var sx = sumeRand(rx), sy = sumeRand(ry);
         if (sx.length && sy.length && !sx.some(function(s){ return sy.indexOf(s) > -1; })) continue;
+        if (sumaTitluLipseste(l[i], l[j], sx, sy)) continue;
         // rămâne rândul cu mai multe acte; la egalitate, ordinea alfabetică, ca rezultatul să fie stabil
         var nxa = acteRand(rx), nya = acteRand(ry), ramane = (nxa > nya || (nxa === nya && rx < ry)) ? rx : ry,
             pleaca = ramane === rx ? ry : rx;
@@ -1540,6 +1561,7 @@
         var sx = sumeRand(rx), sy = sumeRand(ry),
             comun = sx.some(function(s){ return sy.indexOf(s) > -1; });
         if (sx.length && sy.length && !comun) return;
+        if (sumaTitluLipseste(x, y, sx, sy)) return;
         var inclus = cuprins(x, y);
         if (!(A[0] === B[0] || aceeasiDenumire(x, y) || inclus === 2 || (comun && inclus))) return;
         var nxa = acteRand(rx), nya = acteRand(ry), ramane = (nxa > nya || (nxa === nya && rx < ry)) ? rx : ry,
