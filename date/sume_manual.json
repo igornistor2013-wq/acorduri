@@ -647,13 +647,6 @@
   "nota": "Introdus manual: contract de finanțare BEI de 50 mil. EUR pentru infrastructura feroviară și materialul rulant, semnat la 26 septembrie 2016, potrivit textului Legii nr. 298/2016. O știre IPN de la semnare dă 52,5 mil. EUR; am păstrat suma din lege. Împrumutul e numărat deja la LP298/2016, deci rândul acesta nu intră în totaluri.",
   "fara_total": true
  },
- "DPRM2050/2016": {
-  "v": 12580000,
-  "val": "USD",
-  "u": "https://www.worldbank.org/en/news/loans-credits/2016/06/06/moldova-tax-administration-modernization-project",
-  "nota": "Introdus manual: împrumut BIRD de 12 580 000 USD (nr. 8625-MD) și credit AID de 5 300 000 DST (circa 7,42 mil. USD), în total 20 mil. USD, potrivit Băncii Mondiale și textului Legii nr. 225/2016. Împrumutul e numărat deja la LP225/2016, deci rândul acesta nu intră în totaluri.",
-  "fara_total": true
- },
  "DPRM1762/2015": {
   "v": 57000000,
   "val": "DST",
@@ -972,5 +965,19 @@
   "val": "ECU",
   "u": "https://eur-lex.europa.eu/eli/dec/1994/346",
   "nota": "Introdus manual: împrumut pe termen lung al Comunității Europene, de cel mult 45 mil. ECU, în două tranșe, potrivit Deciziei Consiliului 94/346/CE din 13 iunie 1994 privind asistența macrofinanciară pentru Moldova. Suma e plafonul din decizie, nu a fost citită din acordul de credit."
+ },
+ "DP1106/2019": {
+  "v": 55000000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=112807&lang=ro",
+  "nota": "Introdus manual: 55 mil. USD e suma estimată la inițierea negocierilor (februarie 2019). Acordul semnat la 26 septembrie 2019 e de 47,9 mil. EUR, potrivit Legii nr. 179/2019. Împrumutul e numărat deja la LP179/2019, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
+ },
+ "DP1107/2019": {
+  "v": 15000000,
+  "val": "USD",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=112808&lang=ro",
+  "nota": "Introdus manual: 15 mil. USD e suma estimată la inițierea negocierilor (februarie 2019). Acordul semnat la 26 septembrie 2019 e de 13,1 mil. EUR, potrivit Legii nr. 177/2019. Împrumutul e numărat deja la LP177/2019, deci rândul acesta nu intră în totaluri.",
+  "fara_total": true
  }
 }
