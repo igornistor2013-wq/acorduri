@@ -5,8 +5,12 @@
 Scrie:
   date/acorduri_monitor.csv / .json   registrul din Monitorul Oficial (date.json)
   date/acorduri_legis.csv   / .json   registrul din legis.md (cel din legis_acorduri.html)
+  date/stare.json                     data ultimei verificări (citită de registrul legis.md)
   rss.xml                             ultimele 50 de acte, pentru abonare
   sitemap.xml                         lista paginilor pentru motoarele de căutare
+
+rss.xml și sitemap.xml se schimbă doar când apar acte noi: datele din ele sunt ale
+celui mai nou act, nu ale rulării. Altfel s-ar modifica (și s-ar urca) în fiecare zi.
 
 Rulează zilnic în monitor.yml, după colectare și după legis_pagina.py, ca
 fișierele să fie mereu la zi cu paginile. CSV-urile au BOM UTF-8, ca Excel să
@@ -92,7 +96,10 @@ def rss(rows, ultima):
             + ('<pubDate>' + data_rss(r['data_editie']) + '</pubDate>' if data_rss(r['data_editie']) else '') +
             '<category>' + escape(r['categorie']) + '</category>'
             '<description>' + escape(desc + '. ' + r['titlu']) + '</description></item>')
-    build = data_rss((ultima or '')[:10]) or email.utils.format_datetime(datetime.datetime.now(datetime.timezone.utc))
+    # „Ultima schimbare a conținutului": data celui mai nou act din flux, nu a rulării —
+    # altfel fișierul s-ar schimba zilnic fără niciun articol nou.
+    build = (data_rss(rows[0]['data_editie']) if rows else None) or data_rss((ultima or '')[:10]) \
+        or email.utils.format_datetime(datetime.datetime.now(datetime.timezone.utc))
     xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>'
            '<title>Acorduri de asistență externă — Republica Moldova</title>'
@@ -118,11 +125,11 @@ def cautare(rows):
     print('date/cautare.json:', len(out), 'acte')
 
 
-def sitemap(ultima):
-    """sitemap.xml pentru motoarele de căutare. Registrele se schimbă la fiecare
-    rulare cu acte noi, deci primesc data ultimei rulări; restul paginilor, data
-    ultimei modificări a fișierului."""
-    m = re.match(r'(\d{2})\.(\d{2})\.(\d{4})', ultima or '')
+def sitemap(ultima, cel_mai_nou=None):
+    """sitemap.xml pentru motoarele de căutare. Registrele se schimbă când apar acte
+    noi, deci primesc data celui mai nou act (data ediției lui); restul paginilor,
+    data ultimei modificări a fișierului. Data rulării ar schimba fișierul zilnic."""
+    m = re.match(r'(\d{2})\.(\d{2})\.(\d{4})', cel_mai_nou or '') or re.match(r'(\d{2})\.(\d{2})\.(\d{4})', ultima or '')
     azi = f'{m.group(3)}-{m.group(2)}-{m.group(1)}' if m else datetime.date.today().isoformat()
     pagini = [('', 'index.html', '1.0'), ('acorduri.html', 'acorduri.html', '0.9'),
               ('legis_acorduri.html', 'legis_acorduri.html', '0.9'), ('hg246.html', 'hg246.html', '0.6'),
@@ -149,6 +156,17 @@ def sitemap(ultima):
     print('sitemap.xml:', len(rows), 'pagini')
 
 
+def stare(ultima):
+    """date/stare.json: data ultimei verificări a Monitorului. Registrul legis.md are
+    datele încrustate în pagină și se reconstruiește doar când apar acte noi; data
+    ultimei verificări o citește de aici, la fiecare deschidere."""
+    d = AICI / 'date'
+    d.mkdir(exist_ok=True)
+    with open(d / 'stare.json', 'w', encoding='utf-8') as f:
+        json.dump({'ultima_rulare': ultima or ''}, f, ensure_ascii=False)
+    print('date/stare.json:', ultima or '—')
+
+
 def main():
     db = json.load(open(AICI / 'date.json', encoding='utf-8'))
     try:
@@ -161,7 +179,8 @@ def main():
     scrie('acorduri_legis', legis)
     cautare(legis or mo)
     rss(mo, db.get('ultima_rulare'))
-    sitemap(db.get('ultima_rulare'))
+    sitemap(db.get('ultima_rulare'), mo[0]['data_editie'] if mo else None)
+    stare(db.get('ultima_rulare'))
 
 
 if __name__ == '__main__':

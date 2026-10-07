@@ -22,7 +22,6 @@ funcțiile dau răspunsul bun, ci că lanțul se execută cap-coadă.
 import io
 import json
 import os
-import re
 import sys
 import tempfile
 import contextlib
@@ -30,6 +29,7 @@ import contextlib
 import monitor_watch as mw
 
 ESECURI = []
+GET_ADEVARAT = mw.get      # testele de mai jos înlocuiesc mw.get; aici rămâne cel adevărat
 
 
 def verifica(nume, conditie, detaliu=""):
@@ -201,6 +201,102 @@ def test_data_semnarii():
          mw.signed_on("Acord semnat la Chișinău la 27 iunie 2023"), "27.06.2023")
     egal("data semnării: absentă",
          mw.signed_on("Acord de împrumut fără dată"), "")
+
+
+# ------------------------------------------- același număr, emitenți diferiți
+
+def test_acte_cu_acelasi_numar():
+    """Hotărârea nr. 10 și ordinul nr. 10 din aceeași zi sunt două acte, nu unul."""
+    cuprins = (
+        "<html><body>"
+        "<p>10. Hotărâre cu privire la aprobarea semnării Acordului de grant dintre Guvernul "
+        "Republicii Moldova și Guvernul Japoniei (nr. 10, 18 ianuarie 2026)</p>"
+        "<p>11. Ordin cu privire la intrarea în vigoare a Contractului de asistență tehnică dintre "
+        "Ministerul Finanțelor și Agenția Franceză de Dezvoltare (nr. 10, 18 ianuarie 2026)</p>"
+        "</body></html>")
+    mw.get = lambda u, tries=3: cuprins
+    eticheta = "Monitorul Oficial Nr. 9-10 din 20.01.2026"
+
+    db = {"acte": {}, "editii_vazute": []}
+    with contextlib.redirect_stdout(io.StringIO()):
+        ok, noi = mw.culege(db, "3500", eticheta)
+    verifica("ediția cu două acte nr. 10 se citește", ok)
+    egal("ambele acte nr. 10 sunt noi", noi, 2)
+    egal("ambele acte nr. 10 rămân în registru", len(db["acte"]), 2)
+    egal("fiecare cu tipul lui",
+         sorted(mw.tip_act(a) for a in db["acte"].values()), ["hota", "ordi"])
+    verifica("primul act păstrează cheia obișnuită, număr|ediție",
+             "nr. 10, 18 ianuarie 2026|3500" in db["acte"])
+
+    with contextlib.redirect_stdout(io.StringIO()):
+        ok, noi = mw.culege(db, "3500", eticheta)
+    egal("a doua citire nu adaugă nimic", noi, 0)
+    egal("a doua citire nu pierde și nu dublează", len(db["acte"]), 2)
+
+    # Actul venit întâi din PDF e înlocuit de versiunea de pe site, nu dublat.
+    db = {"acte": {"nr. 10, 18 ianuarie 2026|pdf-9-10": {
+        "act": "nr. 10, 18 ianuarie 2026", "editie_id": "pdf-9-10", "sursa": "PDF",
+        "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de grant dintre Guvernul "
+                 "Republicii Moldova și Guvernul Japoniei"}}, "editii_vazute": []}
+    with contextlib.redirect_stdout(io.StringIO()):
+        mw.culege(db, "3500", eticheta)
+    egal("versiunea din PDF nu se dublează", len(db["acte"]), 2)
+    verifica("versiunea de pe site o înlocuiește pe cea din PDF",
+             "nr. 10, 18 ianuarie 2026|pdf-9-10" not in db["acte"]
+             and "nr. 10, 18 ianuarie 2026|3500" in db["acte"])
+
+
+# ---------------------------------------------------------- rețea și timp
+
+def test_404_fara_reincercari():
+    """O pagină care nu există nu se cere de trei ori; o pană de server, da."""
+    apeluri = []
+
+    def fals(cod):
+        def cere(url, headers=None, timeout=None):
+            apeluri.append(url)
+            e = mw.requests.HTTPError(str(cod))
+            e.response = type("R", (), {"status_code": cod})()
+            raise e
+        return cere
+
+    vechi_get, vechi_sleep = mw.requests.get, mw.time.sleep
+    mw.time.sleep = lambda s: None
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            mw.requests.get = fals(404)
+            rez = GET_ADEVARAT("https://exemplu.test/ro/monitor/1")
+            egal("404: fără rezultat", rez, None)
+            egal("404: o singură cerere", len(apeluri), 1)
+            del apeluri[:]
+            mw.requests.get = fals(500)
+            GET_ADEVARAT("https://exemplu.test/ro/monitor/2")
+            egal("500: se reîncearcă", len(apeluri), 3)
+    finally:
+        mw.requests.get, mw.time.sleep = vechi_get, vechi_sleep
+
+
+def test_buget_de_timp():
+    """Când timpul s-a terminat, rularea se oprește singură și salvează registrul."""
+    acasa = ("<html><body><a href='/ro/monitor/3400'>Monitorul Oficial Nr. 1-2 din 25.08.2026</a>"
+             "<a href='/ro/monitor/3401'>Monitorul Oficial Nr. 3-4 din 26.08.2026</a></body></html>")
+    mw.get = lambda u, tries=3: acasa if u.endswith("/ro") else CUPRINS
+    mw.time.sleep = lambda s: None
+    iesire = io.StringIO()
+    with tempfile.TemporaryDirectory() as folder:
+        vechi_data, vechi_buget = mw.DATA, mw.BUGET_SECUNDE
+        mw.DATA = os.path.join(folder, "date.json")
+        mw.BUGET_SECUNDE = -1                      # bugetul e deja depășit
+        try:
+            with contextlib.redirect_stdout(iesire):
+                mw.main()
+            db = json.load(open(mw.DATA, encoding="utf-8"))
+        finally:
+            mw.DATA, mw.BUGET_SECUNDE = vechi_data, vechi_buget
+    egal("buget depășit: nicio ediție citită", len(db["acte"]), 0)
+    egal("buget depășit: edițiile nu sunt marcate ca văzute", db["editii_vazute"], [])
+    verifica("buget depășit: registrul e totuși salvat", bool(db.get("ultima_rulare")))
+    verifica("buget depășit: mesajul spune ce s-a întâmplat", "m-am oprit din citit" in iesire.getvalue())
 
 
 # ------------------------------------------------------------------ pornire

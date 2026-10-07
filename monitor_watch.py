@@ -39,6 +39,14 @@ HOME = BASE + "/ro"
 # de pauză, deci 25 înseamnă sub un minut în plus; un gol mai mare se închide
 # în rulările următoare, câte 25 pe zi.
 MAX_RECUPERARI = 25
+
+# Cât are voie să dureze citirea edițiilor, în secunde. Workflow-ul oprește
+# job-ul după un număr fix de minute, iar o oprire forțată nu mai apucă să
+# salveze nimic: tot ce se citise în rularea aceea se pierdea. O ediție care
+# nu răspunde costă până la 100 de secunde (trei încercări a câte 30, plus
+# pauzele), iar o rulare poate cere zece ediții și 25 de recuperări. Când
+# bugetul se termină, ne oprim noi, salvăm ce avem și lăsăm restul pe mâine.
+BUGET_SECUNDE = 7 * 60
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "date.json")
 
@@ -403,6 +411,13 @@ def get(url, tries=3, pauze=(3, 8, 20, 45)):
             return r.text
         except Exception as e:
             ultima = e
+            # „Nu există" nu e o pană trecătoare: a doua și a treia încercare ar
+            # primi același răspuns, după 11 secunde de pauze pierdute. La 25 de
+            # ediții inexistente din șir, asta însemna cinci minute de așteptat.
+            cod = getattr(getattr(e, "response", None), "status_code", None)
+            if cod in (404, 410):
+                print(f"   ! {url}: pagina nu există (HTTP {cod})")
+                return None
             if i < tries - 1:
                 asteptare = pauze[min(i, len(pauze) - 1)]
                 print(f"   … {url} nu răspunde ({e.__class__.__name__}), "
@@ -512,6 +527,37 @@ def save(db):
 
 # ----------------------------------------------------------------------- main
 
+def tip_act(a):
+    """Tipul actului, din primul cuvânt al denumirii: „lege", „hota", „decr", „ordi".
+
+    Patru litere ajung ca să deosebești tipurile și trec peste ortografia veche
+    („Hotărîre" și „Hotărâre" dau amândouă „hota")."""
+    return norm(a.get("titlu", "")).split(" ")[0][:4]
+
+
+def identitate(a):
+    """Ce face dintr-un rând un act anume: numărul, data ȘI tipul.
+
+    Numărul și data singure nu ajung. Fiecare emitent își numerotează actele
+    separat, așa că în aceeași zi pot exista Hotărârea Guvernului nr. 10 și
+    Ordinul ministrului finanțelor nr. 10 — în Registrul de stat sunt mai multe
+    asemenea perechi. Cu vechea regulă, al doilea îl înlocuia pe primul în
+    registru, fără niciun semn."""
+    return norm(a["act"]) + "|" + tip_act(a)
+
+
+def cheie_libera(db, act):
+    """Cheia sub care se ține actul în date.json.
+
+    Rămâne „număr|ediție", ca până acum — de ea atârnă legăturile spre legis.md
+    din date/legaturi_legis.json. Doar când cheia e deja ocupată de ALT act (alt
+    tip, același număr, aceeași ediție) îi adăugăm tipul."""
+    key = act["act"] + "|" + act["editie_id"]
+    if key in db["acte"] and identitate(db["acte"][key]) != identitate(act):
+        key += "|" + tip_act(act)
+    return key
+
+
 def culege(db, eid, label):
     """Citește o ediție și adaugă/actualizează actele în registru.
 
@@ -527,20 +573,21 @@ def culege(db, eid, label):
     # PDF (import_pdf.py) unde nu se știa ID-ul ediției. Fără verificarea asta,
     # ar apărea de două ori în listă: o dată cu link către arhivă, o dată
     # cu link către ediție. Versiunea de pe site câștigă, fiindcă are linkul bun.
-    dupa_act = {norm(a["act"]): k for k, a in db["acte"].items()}
+    dupa_act = {identitate(a): k for k, a in db["acte"].items()}
 
     noi = 0
     for act in acte:
-        key = act["act"] + "|" + act["editie_id"]
-        veche = dupa_act.get(norm(act["act"]))
+        ident = identitate(act)
+        key = cheie_libera(db, act)
+        veche = dupa_act.get(ident)
         if veche and veche != key:
             db["acte"].pop(veche, None)
             db["acte"][key] = act
-            dupa_act[norm(act["act"])] = key
+            dupa_act[ident] = key
             continue
         if key not in db["acte"]:
             db["acte"][key] = act
-            dupa_act[norm(act["act"])] = key
+            dupa_act[ident] = key
             noi += 1
             print(f"     + {act['categorie']}: {act['titlu'][:78]}…")
         else:
@@ -605,6 +652,10 @@ def main():
         return
 
     print("Verific Monitorul Oficial…")
+    inceput = time.time()
+
+    def fara_timp():
+        return time.time() - inceput > BUGET_SECUNDE
 
     # Pagina principală e singurul lucru fără de care nu se poate face nimic,
     # așa că îi dăm cinci încercări în loc de trei.
@@ -624,7 +675,13 @@ def main():
     # ratate, în loc să le lase pierdute pentru totdeauna.
     noi = 0
     esecuri = []
+    amanate = 0
     for eid, label in editions:
+        if fara_timp():
+            # Necitită acum, nemarcată ca văzută: se reia la rularea următoare.
+            esecuri.append(label or eid)
+            amanate += 1
+            continue
         print(f" → ediția {label or eid}")
         ok, n = culege(db, eid, label)
         noi += n
@@ -652,6 +709,9 @@ def main():
               f"({min(len(lipsa), MAX_RECUPERARI)} acum, de la cele mai noi):")
         esuate = db.setdefault("editii_esuate", {})
         for eid in lipsa[:MAX_RECUPERARI]:
+            if fara_timp():
+                amanate += 1
+                break
             print(f" ← ediția {eid}")
             ok, n = culege(db, str(eid), "")
             noi += n
@@ -686,6 +746,9 @@ def main():
         print(f"\n{noi} acte noi. Total în registru: {total}.")
     else:
         print(f"\nNimic nou. Total în registru: {total}.")
+    if amanate:
+        print(f"Site-ul a răspuns greu: după {BUGET_SECUNDE // 60} minute m-am oprit din citit, "
+              "ca rularea să apuce să salveze. Restul edițiilor se citesc la rularea următoare.")
     if esecuri:
         print("Ediții nedescărcate (se reiau la rularea următoare): " + ", ".join(esecuri))
     if ramase:

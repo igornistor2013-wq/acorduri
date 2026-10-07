@@ -156,8 +156,18 @@ _u = la.uneste([{'u': 'https://x/a%20b.pdf', 'suma': {'v': 1, 'val': 'EUR', 'man
 verifica('suma pusă de mână nu e înlocuită', _u[0]['suma']['v'] == 1, _u[0])
 verifica('o sumă deja găsită nu e ștearsă de o recitire fără rezultat', _u[1]['suma'] and _u[1]['suma']['v'] == 5, _u[1])
 verifica('atașamentele noi se adaugă, cele vechi rămân', [x['u'][-5:] for x in _u[2:]] == ['d.pdf', 'i.pdf'], _u)
-verifica('actul neparcurs se deschide; cel parcurs, nu', la.are_nevoie({'sume': []}) and not la.are_nevoie({'sume': [], 'atas': [], 'atas_citit': 'x'})
-         and not la.are_nevoie(None))
+verifica('actul neparcurs se deschide; cel parcurs, nu', la.are_nevoie({'sume': []})
+         and not la.are_nevoie({'sume': [], 'atas': [], 'atas_citit': 'x', 'fisa_ok': 1}) and not la.are_nevoie(None))
+verifica('„niciun atașament” fără fișă confirmată se mai verifică o dată; cu atașamente găsite, nu',
+         la.are_nevoie({'sume': [], 'atas': [], 'atas_citit': 'x'})
+         and not la.are_nevoie({'sume': [], 'atas_citit': 'x', 'atas': [{'u': 'u', 'suma': None, 'metoda': 'text'}]}))
+verifica('fișa care încă își încarcă conținutul nu trece drept citită',
+         not la.fisa_incarcata('Conținutul se încarcă... ' + 'x' * 400) and not la.fisa_incarcata('scurt')
+         and la.fisa_incarcata('Lege pentru ratificarea Acordului ' * 20))
+verifica('actul cu descărcarea eșuată se reia singur de câteva ori, apoi doar cu --reincearca',
+         ls.de_reincercat({'eroare': ls.ESEC_DESCARCARE + ': Failed to fetch', 'incercari': 1})
+         and not ls.de_reincercat({'eroare': ls.ESEC_DESCARCARE + ': x', 'incercari': ls.MAX_INCERCARI_DESCARCARE})
+         and not ls.de_reincercat({'eroare': 'HTTP 404, nu e PDF'}) and not ls.de_reincercat({'sume': []}))
 verifica('--reincearca reia PDF-urile scanate rămase fără text',
          la.are_nevoie({'atas_citit': 'x', 'atas': [{'u': 'u', 'suma': None, 'metoda': 'fara-text'}]}, reincearca=True)
          and not la.are_nevoie({'atas_citit': 'x', 'atas': [{'u': 'u', 'suma': None, 'metoda': 'text'}]}, reincearca=True))
@@ -216,6 +226,34 @@ finally:
     shutil.rmtree(_tmp, ignore_errors=True)
 
 print()
+print('Ordinele: cod provizoriu din Monitor, cod întreg în legis.md')
+verifica('forma comună a codului unui ordin', pagina.forma_ordin('OMMPS147/2026') == 'O147/2026'
+         and pagina.forma_ordin('O147/2026') == 'O147/2026' and pagina.forma_ordin('HG147/2026') is None)
+_man = {'_cum_se_foloseste': 'text', 'OMMPS147/2026': {'v': 5, 'val': 'EUR'}, 'LP1/2026': {'v': 7}}
+verifica('suma pusă sub codul întreg se aplică și actului cu cod provizoriu',
+         pagina.manual_pentru('O147/2026', _man, {'O147/2026': 1})[0] == {'v': 5, 'val': 'EUR'})
+verifica('suma pusă sub codul provizoriu rămâne valabilă când actul primește codul întreg',
+         pagina.manual_pentru('OMMPS147/2026', {'O147/2026': {'v': 9}}, {'O147/2026': 1}) == ({'v': 9}, 'O147/2026'))
+verifica('două ordine cu același număr și an: nicio ghicire',
+         pagina.manual_pentru('O147/2026', _man, {'O147/2026': 2}) == (None, None)
+         and pagina.manual_pentru('OMF147/2026', {'O147/2026': {'v': 9}, 'OMS147/2026': {'v': 1}}, {'O147/2026': 1}) == (None, None))
+verifica('cheia exactă bate orice altceva; legile și hotărârile nu au altă formă',
+         pagina.manual_pentru('LP1/2026', _man, {})[1] == 'LP1/2026' and pagina.manual_pentru('LP2/2026', _man, {}) == (None, None))
+with tempfile.TemporaryDirectory() as _d:
+    _mo = {'acte': {
+        'nr. 73, 16 martie 2026|3400': {'act': 'nr. 73, 16 martie 2026', 'editie': '100-101', 'data_editie': '20.03.2026', 'editie_id': '3400',
+            'titlu': 'Ordin cu privire la intrarea în vigoare a Acordului de grant dintre Ministerul Sănătății și Agenția Franceză de Dezvoltare'},
+        'nr. 74, 16 martie 2026|3400': {'act': 'nr. 74, 16 martie 2026', 'editie': '100-101', 'data_editie': '20.03.2026', 'editie_id': '3400',
+            'titlu': 'Ordin cu privire la intrarea în vigoare a Contractului de asistență tehnică dintre Ministerul Muncii și Programul Alimentar Mondial'}}}
+    json.dump(_mo, open(Path(_d) / 'mo.json', 'w', encoding='utf-8'), ensure_ascii=False)
+    _acte, _ids = {}, {'OMMPS73/2026': '1', 'OMMPS74/2026': '2'}
+    _tit = {'OMMPS73/2026': 'cu privire la aprobarea Regulamentului privind organizarea concursului pentru ocuparea funcțiilor vacante',
+            'OMMPS74/2026': 'cu privire la intrarea în vigoare a Contractului de asistență tehnică dintre Ministerul Muncii și Programul Alimentar Mondial'}
+    _n = pagina.adauga_din_monitor(_acte, _ids, Path(_d) / 'mo.json', titluri=_tit)
+verifica('ordinul altui minister cu același număr nu ține locul celui din Monitor; același ordin nu se dublează',
+         _n == 1 and [a['act'] for a in _acte.values()] == ['O73/2026'], (_n, list(_acte)))
+
+print()
 print('Notele Guvernului (gov_sume.py)')
 import gov_sume as gs
 verifica('titlul punctului devine titlul hotărârii',
@@ -235,6 +273,14 @@ verifica('lista ședințelor, cu data din adresă', [x[1] for x in _s] == ['2026
 verifica('modificările se recunosc (suma lor nu e a acordului)',
          bool(gs.RX_MODIFICARE.search('ratificarea Scrisorii de modificare la Acordul de împrumut'))
          and not gs.RX_MODIFICARE.search('aprobarea semnării Acordului de împrumut'))
+_azi = datetime.date(2026, 10, 7)
+verifica('ședința recentă sau viitoare se recitește (ordinea de zi se mai completează); cea veche, nu',
+         gs.e_recenta('2026-10-08', _azi) and gs.e_recenta('2026-09-28', _azi)
+         and not gs.e_recenta('2026-09-20', _azi) and not gs.e_recenta('', _azi))
+_n = {}
+verifica('nota care nu se poate descărca rămâne de reîncercat, nu cu sumă',
+         not gs.citeste_nota(_n, None, ls.sume_din_text, ls.text_din_pdf) and _n == {'eroare': 'PDF indisponibil'}
+         and not gs.citeste_nota(_n, b'<html>eroare</html>', ls.sume_din_text, ls.text_din_pdf))
 
 if '--browser' in sys.argv:
     print('Browser, pe legis.md simulat')

@@ -23,7 +23,10 @@ set PY=python
 where py >nul 2>&1 && set PY=py -3
 
 echo [1/4] Aduc ultima versiune de pe GitHub...
-git pull --rebase origin main >> "%JURNAL%" 2>&1 || goto :eroare_git
+REM --autostash: daca a ramas vreun fisier modificat local de la o rulare trecuta,
+REM git il pune deoparte, aduce noutatile si il pune la loc. Fara asta, "git pull
+REM --rebase" refuza sa porneasca si scriptul se oprea aici la fiecare rulare.
+git pull --rebase --autostash origin main >> "%JURNAL%" 2>&1 || goto :eroare_git
 
 echo [2/4] Caut acte noi pe legis.md (se deschide o fereastra de browser)...
 %PY% legis_watch.py --headed --profil .legis_profil --browser msedge
@@ -53,14 +56,16 @@ if not "%COD%"=="0" if not "%COD%"=="3" (echo Citirea atasamentelor a esuat, cod
 
 echo [4/4] Public pe GitHub, daca e ceva nou...
 REM git status vede si fisierul de sume la prima lui aparitie (git diff nu vede fisierele noi)
+REM Se urca tot ce rescrie rularea: si pagina, si date/legaturi_legis.json (scris de
+REM legis_pagina.py). Legaturile lipseau de aici: ramaneau modificate doar pe calculator
+REM si blocau "git pull" la rularea urmatoare.
 set SCHIMBAT=
-for /f "delims=" %%i in ('git status --porcelain -- legis_brut.json date/legis_sume.json') do set SCHIMBAT=1
+for /f "delims=" %%i in ('git status --porcelain -- legis_brut.json legis_acorduri.html date/legis_sume.json date/legaturi_legis.json') do set SCHIMBAT=1
 if not defined SCHIMBAT (echo Nimic nou pe legis.md azi. & echo nimic nou >> "%JURNAL%" & goto :gata)
-git add legis_brut.json legis_acorduri.html raport_legis.md jurnal_legis.md
-REM separat: daca fisierul de sume lipseste, un singur "git add" ar esua cu totul
-if exist "date\legis_sume.json" git add date/legis_sume.json
+REM pe rand: daca unul dintre fisiere lipseste, un singur "git add" ar esua cu totul
+for %%f in (legis_brut.json legis_acorduri.html raport_legis.md jurnal_legis.md date\legis_sume.json date\legaturi_legis.json) do if exist "%%f" git add "%%f" >> "%JURNAL%" 2>&1
 git commit -m "legis.md: acte noi (local) - %date%" >> "%JURNAL%" 2>&1
-git push >> "%JURNAL%" 2>&1 || (git pull --rebase origin main >> "%JURNAL%" 2>&1 & git push >> "%JURNAL%" 2>&1) || goto :eroare_git
+git push >> "%JURNAL%" 2>&1 || (git pull --rebase --autostash origin main >> "%JURNAL%" 2>&1 & git push >> "%JURNAL%" 2>&1) || goto :eroare_git
 echo Publicat pe GitHub. Vezi raport_legis.md pentru lista.
 echo publicat >> "%JURNAL%"
 goto :gata
@@ -75,9 +80,13 @@ exit /b 3
 
 :eroare_git
 echo.
-echo Git nu a putut comunica cu GitHub (detalii in legis_local.log).
-echo Daca e prima rulare, poate trebuie sa te autentifici: ruleaza o data
-echo "git push" in acest folder si urmeaza fereastra de login GitHub.
+echo Git nu a putut aduce sau urca modificarile (detalii in legis_local.log).
+echo Cauzele obisnuite:
+echo   1. Nu esti autentificat: ruleaza o data "git push" in acest folder si
+echo      urmeaza fereastra de login GitHub.
+echo   2. Un fisier a fost schimbat si pe calculator, si pe GitHub: ruleaza
+echo      "git status" in acest folder ca sa vezi care.
+echo   3. Nu ai internet.
 echo eroare git >> "%JURNAL%"
 timeout /t 120
 exit /b 1

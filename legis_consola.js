@@ -503,7 +503,9 @@
     if (CFG.TOT || !('atas_citit' in r)) return true;
     // „niciun atașament" de la o versiune care nu aștepta încărcarea fișei: mai verificăm o dată
     if (!(r.atas || []).length && !r.fisa_ok) return true;
-    if (!sume_tin(r)) return true;                       // o sumă veche nu mai rezistă regulilor de azi
+    // o sumă veche nu mai rezistă regulilor de azi; dacă recitirea a eșuat deja o dată sub
+    // aceleași reguli, nu o mai încercăm la fiecare rulare — doar cu REINCEARCA
+    if (!sume_tin(r) && (CFG.REINCEARCA || r.recitire_esuata !== REGULI)) return true;
     if ((r.atas || []).some(function (x) { return !suma_atas_tine(x, r.instr || 'grant'); })) return true;
     if (CFG.REINCEARCA) return !!r.atas_eroare || (r.atas || []).some(function (x) { return x.eroare || (x.metoda === 'fara-text' && !x.suma); });
     return false;
@@ -694,7 +696,14 @@
         if (!nouR.eroare) {                                  // păstrăm ce s-a citit din atașamente
           if (vechiR) ['atas', 'instr', 'atas_citit', 'atas_eroare'].forEach(function (k) { if (k in vechiR) nouR[k] = vechiR[k]; });
           r = acte[d] = nouR;
-        } else { S.erori++; vechiR.v = REGULI; }             // recitirea n-a mers: rămâne ce era, nu mai încercăm la fiecare rulare
+        } else {
+          /* Recitirea n-a mers: rămâne ce era. Înainte, actul primea aici „v = REGULI",
+             adică suma care tocmai picase reverificarea era ștampilată ca verificată cu
+             regulile de azi și nu mai era pusă la îndoială niciodată. Notăm doar că
+             recitirea a eșuat: scriptul nu o mai încearcă singur la fiecare rulare, dar
+             suma rămâne „de reverificat" pentru REINCEARCA și pentru legis_sume.py. */
+          S.erori++; vechiR.recitire_esuata = REGULI;
+        }
         await somn(CFG.PAUZA);
       }
       var g;

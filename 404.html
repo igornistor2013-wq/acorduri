@@ -19,15 +19,23 @@
   .en{margin-top:18px;font-size:13.5px}
   a{color:#22406b;font-weight:700}
 </style>
+<script src="/traducere.js" defer></script>
 </head>
 <body>
 <div class="wrap">
   <script src="/meniu.js" data-pagina=""></script>
   <div class="box">
     <div class="n">404</div>
-    <h1>Pagina nu există</h1>
-    <p>Adresa poate fi greșită sau pagina a fost mutată. Folosește meniul de mai sus sau începe de la <a href="/">pagina principală</a>. Datele descărcabile sunt în <a href="/despre.html#date">Despre date</a>.</p>
-    <p class="en">Page not found. Use the menu above or go to the <a href="/">home page</a>.</p>
+    <!-- Blocurile data-bloc sunt arătate de traducere.js după limba aleasă (butonul RO/EN din meniu). -->
+    <div data-bloc="ro" data-no-tr>
+      <h1>Pagina nu există</h1>
+      <p>Adresa poate fi greșită sau pagina a fost mutată. Folosește meniul de mai sus sau începe de la <a href="/">pagina principală</a>. Datele descărcabile sunt în <a href="/despre.html#date">Despre date</a>.</p>
+      <p class="en">Page not found. Use the menu above or go to the <a href="/">home page</a>.</p>
+    </div>
+    <div data-bloc="en" data-no-tr>
+      <h1>Page not found</h1>
+      <p>The address may be wrong or the page has been moved. Use the menu above or start from the <a href="/">home page</a>. The downloadable data is under <a href="/despre.html#date">About the data</a>.</p>
+    </div>
   </div>
 </div>
 </body>

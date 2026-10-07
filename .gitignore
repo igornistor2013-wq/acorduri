@@ -5,3 +5,5 @@ __pycache__/
 # scrise de legis_atasamente.py: lista de verificat de mână și pagina de depanare
 sume_lipsa.csv
 legis_atasamente_debug.html
+# folderul în care import_pdf.py desface o arhivă (îl șterge la sfârșit)
+_pdf_temp/

@@ -186,7 +186,37 @@
       ': agreements not governed by public international law, or that state in their text that they are not a treaty. They follow their own route, set by annex no. 1¹ to Government Decision 377/2018, and the contract category decides who approves it and when it enters into force. The National Bank of Moldova applies its own procedures, and contracts with no financial impact may be concluded by exchange of letters.',
     // meniu (index are propriul sistem)
     'Toate raioanele': 'All districts',
-    'Despre date și metodologie': 'About the data and methodology'
+    'Despre date și metodologie': 'About the data and methodology',
+    // sumele acordurilor (coloana „Suma", fișa acordului, panoul din registrul legis.md)
+    'Suma': 'Amount', 'Suma:': 'Amount:', 'Suma acordului:': 'Agreement amount:', 'Costul total al proiectului:': 'Total project cost:',
+    '— scrisă în titlul actului oficial.': '— stated in the title of the official act.',
+    '— din textul acordului:': '— from the text of the agreement:',
+    'documentul (PDF, legis.md)': 'the document (PDF, legis.md)', 'nota (PDF, gov.md)': 'the note (PDF, gov.md)',
+    '(căutare)': '(search)', 'Deschide actul pe legis.md': 'Open the act on legis.md',
+    'Linkul duce la o căutare, nu direct la act': 'The link leads to a search, not straight to the act',
+    'Actul nu are încă fișă legată pe legis.md: se deschide căutarea după număr și dată': 'The act has no linked page on legis.md yet: a search by number and date opens instead',
+    'Suma scrisă în titlul actului oficial': 'The amount stated in the title of the official act',
+    'Suma nu apare nici în actele publicate, nici în notele Guvernului citite până acum': 'The amount appears neither in the published acts nor in the Government notes read so far',
+    'Suma acordului: din titlul actului oficial sau din textul lui integral (legea de ratificare, hotărârea de aprobare). Clic pe rând pentru fragmentul din act.':
+      'Agreement amount: from the title of the official act or from its full text (the ratification law, the approval decision). Click the row for the passage in the act.',
+    'Sumele acordurilor, pe tipuri de finanțare': 'Agreement amounts, by type of financing',
+    'Acordurile cu sumă cunoscută adună': 'Agreements with a known amount add up to',
+    'Arată în listă acordurile de acest tip': 'Show agreements of this type in the list',
+    'Pe valute și cum s-a făcut conversia': 'By currency, and how the conversion was done',
+    'Valuta': 'Currency', 'Suma în valuta acordului': 'Amount in the agreement currency', 'Unități pentru 1 EUR': 'Units per 1 EUR', 'În euro': 'In euro',
+    'Alt tip': 'Other type',
+    'Pagina nu există': 'Page not found',
+    // HG 246, după încărcarea anexei
+    '2. Perioada de finalizare': '2. End-date period', 'toate datele de finalizare trecute': 'all past end dates',
+    'De la': 'From', 'Până la': 'To', 'Ultimele 12 luni': 'Last 12 months', 'Mai vechi de 3 ani': 'Older than 3 years',
+    'Se numără numai proiectele a căror dată de finalizare a trecut. Lăsând ambele câmpuri goale, intră toate.':
+      'Only projects whose end date has passed are counted. Leaving both fields empty includes all.',
+    'cu număr de înregistrare': 'with a registration number', 'toate cele expirate': 'all the expired ones',
+    'Din care, date planificate': 'Of which, planned dates',
+    'Încă în derulare': 'Still ongoing', 'data de finalizare nu a trecut': 'the end date has not passed',
+    // parteneri care apar ca nume de țară
+    'Japonia': 'Japan', 'Suedia': 'Sweden', 'Germania': 'Germany', 'Polonia': 'Poland', 'Turcia': 'Türkiye', 'Belgia': 'Belgium',
+    'SUA': 'USA', 'Elveția': 'Switzerland', 'România': 'Romania'
   };
 
   // fraze cu numere și date
@@ -194,6 +224,20 @@
   var ETAPA = {'Inițiere negocieri':'Start of negotiations','Aprobare semnare':'Approval to sign','Aprobare proiect de lege':'Approval of the draft law',
     'Ratificare sau aprobare':'Ratification or approval','Decret de promulgare':'Promulgation decree','Inițierea negocierilor':'Start of negotiations',
     'Aprobarea semnării':'Approval to sign','Proiectul de lege':'Draft law','Ratificare / aprobare':'Ratification / approval','Promulgare':'Promulgation'};
+  /* Sumele sunt scrise de pagină pe românește („151,5 mil. EUR", „1,5 mld. USD");
+     în engleză le dăm forma folosită pe pagina de donatori: „151.5 M EUR", „1.5 bn USD". */
+  function sume(x){
+    return String(x).replace(/(\d+(?:,\d+)?) (mil\.|mld\.|mii) ([A-Z]{3})/g, function(m, n, u, v){
+      return n.replace(',', '.') + ' ' + (u === 'mil.' ? 'M' : u === 'mld.' ? 'bn' : 'K') + ' ' + v; });
+  }
+  var LUNA = {ianuarie:'January', februarie:'February', martie:'March', aprilie:'April', mai:'May', iunie:'June', iulie:'July',
+    august:'August', septembrie:'September', octombrie:'October', noiembrie:'November', decembrie:'December'};
+  var MOTIV_DOC = {
+    'fișierul nu pare o arhivă ZIP validă': 'the file does not look like a valid ZIP archive',
+    'documentul nu conține niciun tabel': 'the document contains no table',
+    'arhiva nu conține word/document.xml — nu e un fișier Word': 'the archive has no word/document.xml — it is not a Word file',
+    'document.xml nu a putut fi analizat': 'document.xml could not be parsed'
+  };
   function durata(x){ return x.replace(/(\d+(?:,\d+)?) zile/g, '$1 days').replace(/(\d+(?:,\d+)?) luni/g, '$1 months').replace(/(\d+(?:,\d+)?) ani/g, '$1 years'); }
   var TIPARE = [
     [/^(\d+) acorduri$/, '$1 agreements'],
@@ -236,7 +280,45 @@
       return "An agreement goes through five stages that can be followed act by act in the Official Gazette: the decision or decree starting negotiations, the approval to sign, the decision approving the draft law, the ratification law (or the approval decision, for agreements within the Government's competence) and the promulgation decree. Entry into force is not a sixth stage. The date shown under the stages is when the ratification law entered into force — its final article says the law enters into force on publication in the Gazette, which is the date of the edition. The agreement itself enters into force later, after the exchange of instruments of ratification; that date cannot be inferred from the contents, because the foreign minister's order announcing it is collective and does not name the agreement. Other mandatory stages — endorsement, initialling, full powers, the signing itself — produce no published act. Some of the agreements here are not international treaties but state contracts, which follow their own route: the contract category — with an impact on the state budget, on the authority's budget, with no budget impact, or inter-institutional cooperation — decides who approves it and when it enters into force. The financing types shown on the rows (grant, loan, credit, financing) are inferred from the act's title; their legal definitions are in the panel \"How an agreement is concluded\". Legal basis: Government Decision 442/2015, Government Decision 377/2018 with annexes 1 and 1¹, and Law no. 419/2006 for state loans. " + (y
         ? 'Source of this version: the State Register of Legal Acts (legis.md), searched by keywords in titles, year by year, ' + y[1] + '–' + y[2] + ', then filtered with the register\'s classifier, extended. The act number opens its page on legis.md.'
         : 'Source: the contents of the Official Gazette of the Republic of Moldova.'); }],
-    [/^proiecte\. Raportul live nu a răspuns \((.+)\) — se lucrează doar cu arhiva, care acoperă până în (\d{4})\.$/, 'projects. The live report did not respond ($1) — working with the archive only, which covers up to $2.']
+    [/^proiecte\. Raportul live nu a răspuns \((.+)\) — se lucrează doar cu arhiva, care acoperă până în (\d{4})\.$/, 'projects. The live report did not respond ($1) — working with the archive only, which covers up to $2.'],
+    // ---- sumele acordurilor
+    [/^\d+(?:,\d+)? (?:mil\.|mld\.|mii) [A-Z]{3}$/, function(m){ return sume(m); }],
+    [/^cost proiect: (.+)$/, function(m, x){ return 'project cost: ' + sume(x); }],
+    [/^— din textul acordului atașat la (\S+):$/, '— from the text of the agreement attached to $1:'],
+    [/^— din textul actului (\S+):$/, '— from the text of act $1:'],
+    [new RegExp('^— din nota de argumentare depusă la ședința Guvernului din ' + DATA + ' \\(număr unic ([^)]+)\\):$'),
+      '— from the explanatory note submitted to the Government meeting of $1 (unique number $2):'],
+    [/^Alte sume în actele acordului: (.+)$/, function(m, x){ return "Other amounts in the agreement's acts: " + sume(x); }],
+    [/^Din textul acordului, atașat la (\S+): ([\s\S]*)$/, 'From the text of the agreement, attached to $1: $2'],
+    [/^Din textul integral al actului (\S+): ([\s\S]*)$/, 'From the full text of act $1: $2'],
+    [new RegExp('^Din nota de argumentare a Guvernului \\(ședința din ' + DATA + '\\): ([\\s\\S]*)$'), "From the Government's explanatory note (meeting of $1): $2"],
+    [/^Costul total al proiectului, din textul acordului atașat la (\S+): ([\s\S]*)$/, 'Total project cost, from the text of the agreement attached to $1: $2'],
+    [/^în euro, la cursul din (\d{1,2}) (\S+) (\d{4})$/, function(m, z, l, a){ return 'in euro, at the rate of ' + z + ' ' + (LUNA[l] || l) + ' ' + a; }],
+    [/^: (\d+) de acorduri din (\d+)\. Alte (\d+) nu au încă suma în registru, deci totalurile sunt un minim, nu tot ce s-a semnat\.$/,
+      ': $1 agreements out of $2. Another $3 have no amount in the register yet, so the totals are a minimum, not everything that was signed.'],
+    [/^(\d+) acorduri cu sumă din (\d+)(?: · (\d+)% din total)?$/, function(m, a, b, pr){
+      return a + ' agreements with an amount, out of ' + b + (pr ? ' · ' + pr + '% of the total' : ''); }],
+    [/^Cele mai mari: (.+)$/, function(m, x){ return 'Largest: ' + sume(x); }],
+    [/^Cursurile sunt cele de referință ale Băncii Centrale Europene din (\d{1,2}) (\S+) (\d{4})\. DST[\s\S]*$/, function(m, z, l, a){
+      return 'The rates are the European Central Bank reference rates of ' + z + ' ' + (LUNA[l] || l) + ' ' + a + '. SDR (special drawing rights) is ' +
+        'computed from the IMF basket at the same rates, the German mark uses its fixed euro conversion rate, the ECU is taken at 1 to 1, and old ' +
+        "Romanian lei go through the new leu. All amounts, including those from the 1990s, are converted at today's rate: the result is an order of " +
+        'magnitude, not the value at the signing date.'; }],
+    [/^Fiecare acord e numărat o dată, cu suma afișată pe rândul lui(?:; (\d+) rânduri care repetă același acord \(aceeași sumă, același finanțator, aceeași denumire\) au fost lăsate deoparte)?\. Un amendament care majorează un acord poate apărea totuși ca rând separat\. Tipul e cel de pe rând: grant, împrumut, asistență tehnică sau asistență financiară\.(?: Fără curs, deci neadunate: (.+)\.)?$/,
+      function(m, d, n){
+        return 'Each agreement is counted once, with the amount shown on its row' +
+          (d ? '; ' + d + ' rows repeating the same agreement (same amount, same funder, same name) were left out' : '') +
+          '. An amendment that increases an agreement may still appear as a separate row. The type is the one on the row: grant, loan, ' +
+          'technical assistance or financial assistance.' + (n ? ' No exchange rate, so not added up: ' + n.replace(/ în /g, ' in ') + '.' : ''); }],
+    // categoria și partenerul scrise sub denumirea acordului („Împrumut · AID")
+    [/^(Grant|Împrumut|Asistență tehnică|Asistență financiară) · (.+)$/, function(m, c, pa){
+      return EXACT[c] + ' · ' + pa.split(' / ').map(function(x){ return EXACT[x] || x; }).join(' / '); }],
+    // ---- HG 246, după încărcarea anexei
+    [/^Document citit: (\d+) proiecte în anexă\.$/, 'Document read: $1 projects in the annex.'],
+    [/^din (\d+) expirate$/, 'of $1 expired'],
+    [/^(\d+) proiecte în intervalul ales$/, '$1 projects in the chosen range'],
+    [/^Documentul nu a putut fi (citit|generat): (.+)$/, function(m, ce, de){
+      return 'The document could not be ' + (ce === 'citit' ? 'read' : 'generated') + ': ' + (MOTIV_DOC[de] || de); }]
   ];
 
   var SARI = '.pname,.a-tit,.det-nume,.acte-list .a-tit,script,style,[data-no-tr]';
@@ -268,7 +350,7 @@
     if (limba !== 'en') return;
     textNodes(root, function(n){
       var e = n.parentElement;
-      if (!e || e.closest(SARI) || e.closest('.mg')) return;
+      if (!e || (e.closest(SARI) && !e.closest('.pname-sub')) || e.closest('.mg')) return;
       if (orig.has(n)) return;
       var r = traduce(n.nodeValue);
       if (r !== null){ orig.set(n, n.nodeValue); n.nodeValue = r; }
@@ -304,7 +386,7 @@
     if (limba !== 'en') return;
     muts.forEach(function(m){ m.addedNodes.forEach(function(n){
       if (n.nodeType === 1) aplica(n);
-      else if (n.nodeType === 3 && n.parentElement && !orig.has(n)){ var r = traduce(n.nodeValue); if (r !== null && !n.parentElement.closest(SARI)){ orig.set(n, n.nodeValue); n.nodeValue = r; } }
+      else if (n.nodeType === 3 && n.parentElement && !orig.has(n)){ var r = traduce(n.nodeValue); if (r !== null && (!n.parentElement.closest(SARI) || n.parentElement.closest('.pname-sub'))){ orig.set(n, n.nodeValue); n.nodeValue = r; } }
     }); });
   }).observe(document.documentElement, {childList: true, subtree: true});
 

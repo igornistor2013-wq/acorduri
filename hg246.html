@@ -643,6 +643,10 @@ async function proceseaza(file){
 
   const azi = new Date(); azi.setHours(0,0,0,0);
   const expirate = [], negasite = [], faraData = [];
+  /* Proiectele cu data de finalizare încă în viitor nu intră în nicio listă, dar
+     sunt proiecte din anexă: fără ele, „Proiecte în anexă" arăta mai puține decât
+     are documentul (14 în loc de 18 la o anexă cu patru proiecte în derulare). */
+  let inDerulare = 0;
 
   for(const tr of el(tbl, 'tr')){
     const nfo = clasificaRand(tr);
@@ -656,12 +660,14 @@ async function proceseaza(file){
       id: nfo.id, denumire: denumire || rec.t, donator: (rec.d || []).join(' / '),
       de: de, deText: formateaza(de), tip: rec.tip || '', src: rec.src
     });
+    else inDerulare++;
   }
 
   expirate.sort((a, b) => b.de - a.de);
   CTX = { expirate: expirate, negasite: negasite, faraData: faraData,
           xml: xml, numeFisier: file.name,
-          total: expirate.length + negasite.length + faraData.length };
+          inDerulare: inDerulare,
+          total: expirate.length + negasite.length + faraData.length + inDerulare };
 
   stare.className = 'stare ok';
   stare.textContent = 'Document citit: ' + CTX.total + ' proiecte în anexă.';
@@ -774,6 +780,7 @@ function aplica(){
                                              : 'din ' + CTX.expirate.length + ' expirate') +
     kpi('Din care, date planificate', alese.filter(p => p.tip === 'planificată').length,
         'fără dată efectivă în platformă') +
+    kpi('Încă în derulare', CTX.inDerulare, 'data de finalizare nu a trecut') +
     kpi('Fără dată de finalizare', CTX.faraData.length, 'nici efectivă, nici planificată') +
     kpi('Negăsite în platformă', CTX.negasite.length, 'numărul nu există în AMP');
 

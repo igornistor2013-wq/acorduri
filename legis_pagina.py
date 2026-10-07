@@ -65,6 +65,45 @@ def cod_legis(a):
     return pre + m.group(1) + '/' + m.group(4), '%02d.%02d.%s' % (int(m.group(2)), luna, m.group(4))
 
 
+def cuvinte(t):
+    """Cuvintele mai lungi de trei litere dintr-o denumire, pentru compararea a două titluri."""
+    return {w for w in re.findall(r'[a-z0-9]+', norm(t)) if len(w) > 3}
+
+
+def acelasi_titlu(a, b):
+    """Două denumiri sunt ale aceluiași act? (cel puțin 60% din cuvintele celei mai scurte coincid)"""
+    x, y = cuvinte(a), cuvinte(b)
+    return bool(x and y) and len(x & y) / min(len(x), len(y)) >= 0.6
+
+
+def forma_ordin(cod):
+    """„OMMPS147/2026" și „O147/2026" → „O147/2026"; pentru orice alt act, None.
+
+    Ordinele venite din Monitorul Oficial apar în registru cu un cod provizoriu, fără
+    emitent (din cuprins nu se vede care minister a dat ordinul); în legis.md același
+    ordin are codul întreg."""
+    m = re.match(r'^O[A-Z]*(\d+)/(\d{4})$', cod or '')
+    return 'O' + m.group(1) + '/' + m.group(2) if m else None
+
+
+def manual_pentru(cod, manual, cate_ordine):
+    """Intrarea din sume_manual.json pentru actul cu acest cod, sau None.
+
+    Întâi cheia exactă. Pentru ordine, și cealaltă formă a codului (provizorie sau
+    întreagă) — dar numai când în registru e un singur ordin cu acel număr și an și o
+    singură cheie care i se potrivește. Altfel suma pusă de mână sub codul provizoriu
+    dispărea din pagină, fără niciun semn, în ziua în care actul ajungea în istoricul
+    legis.md și își primea codul întreg. Întoarce (intrarea, cheia folosită)."""
+    m = manual.get(cod)
+    if isinstance(m, dict):
+        return m, cod
+    f = forma_ordin(cod)
+    if not f or cate_ordine.get(f, 0) != 1:
+        return None, None
+    cand = [k for k, v in manual.items() if k != cod and isinstance(v, dict) and forma_ordin(k) == f]
+    return (manual[cand[0]], cand[0]) if len(cand) == 1 else (None, None)
+
+
 def legaturi_monitor(brut, cale=None, iesire=None):
     """date/legaturi_legis.json: actul din Monitorul Oficial → doc_id-ul fișei lui pe legis.md.
     Registrul din Monitor (acorduri.html) îl citește ca numărul actului să ducă direct la act,
@@ -86,9 +125,6 @@ def legaturi_monitor(brut, cale=None, iesire=None):
         p = 'DP' if m.group(1).startswith('DP') else ('O' if m.group(1).startswith('O') else m.group(1))
         return (p, m.group(2), m.group(3))
 
-    def cuvinte(t):
-        return {w for w in re.findall(r'[a-z0-9]+', norm(t)) if len(w) > 3}
-
     dupa = {}
     for r in brut:
         dupa.setdefault(cheie(r['c']), []).append(r)
@@ -98,8 +134,7 @@ def legaturi_monitor(brut, cale=None, iesire=None):
         fise = dupa.get(cheie(cod), []) if cod else []
         if len(fise) != 1:
             continue
-        x, y = cuvinte(re.sub(r'^\S+\s+', '', a.get('titlu', ''))), cuvinte(fise[0]['t'])
-        if x and y and len(x & y) / min(len(x), len(y)) >= 0.6:
+        if acelasi_titlu(re.sub(r'^\S+\s+', '', a.get('titlu', '')), fise[0]['t']):
             leg[k] = fise[0]['id']
     iesire.parent.mkdir(exist_ok=True)
     with open(iesire, 'w', encoding='utf-8') as f:
@@ -107,7 +142,7 @@ def legaturi_monitor(brut, cale=None, iesire=None):
     return len(leg)
 
 
-def adauga_din_monitor(acte, ids, cale=None):
+def adauga_din_monitor(acte, ids, cale=None, titluri=None):
     cale = Path(cale or AICI / 'date.json')
     if not cale.exists():
         return 0
@@ -124,12 +159,28 @@ def adauga_din_monitor(acte, ids, cale=None):
         p = 'DP' if m.group(1).startswith('DP') else ('O' if m.group(1).startswith('O') else m.group(1))
         return (p, m.group(2), m.group(3))
     exista = {cheie(c) for c in ids}
+    # Ordinele se numerotează separat la fiecare minister: „ordinul nr. 73 din 2026"
+    # pot fi mai multe acte. Pentru ele, „există deja în baza legis" cere și aceeași
+    # denumire; altfel ordinul unui minister era lăsat pe dinafară fiindcă alt minister
+    # dăduse, în același an, un ordin cu același număr.
+    titluri_ordine = {}
+    for c, t in (titluri or {}).items():
+        if cheie(c) and cheie(c)[0] == 'O':
+            titluri_ordine.setdefault(cheie(c), []).append(t)
     n = 0
     for k, a in mo.items():
         cod, data = cod_legis(a)
-        if not cod or cheie(cod) in exista:
+        if not cod:
             continue
-        exista.add(cheie(cod))
+        ch = cheie(cod)
+        if ch in exista:
+            if ch[0] != 'O' or titluri is None:
+                continue
+            titlu_mo = re.sub(r'^\S+\s+', '', a.get('titlu', ''))
+            if ch not in titluri_ordine or any(acelasi_titlu(titlu_mo, t) for t in titluri_ordine[ch]):
+                continue
+        exista.add(ch)
+        titluri_ordine.setdefault(ch, []).append(re.sub(r'^\S+\s+', '', a.get('titlu', '')))
         nr, an = re.match(r'^[A-Z]+(\d+)/(\d{4})$', cod).groups()
         acte[cod + '|mo' + k] = {
             'act': cod,
@@ -156,7 +207,7 @@ def main(BRUT=None, OUT=None):
     BRUT = BRUT or str(AICI / 'legis_brut.json')
     OUT = OUT or str(AICI / 'legis_acorduri.html')
     brut = json.load(open(BRUT, encoding='utf-8'))
-    acte, ids = {}, {}
+    acte, ids, titluri = {}, {}, {}
     for r in brut:
         t = repara(re.sub(r'^(Modificat|Abrogat|Suspendat)\s*', '', r['t']).strip())
         cat = clasifica(t)
@@ -177,13 +228,14 @@ def main(BRUT=None, OUT=None):
             'suport': mw.e_suport_bugetar(t),
         }
         ids[r['c']] = r['id']
+        titluri[r['c']] = t
 
     # Actele noi vin zilnic din Monitorul Oficial (date.json, colectat de
     # monitor.yml pe GitHub, fără Cloudflare). Orice act ajunge întâi în
     # Monitor, apoi în legis.md — deci baza legis (istoricul) + Monitorul
     # (ce e nou) dau registrul complet, actualizat zilnic, fără ca cineva să
     # mai citească legis.md. Ce există deja în baza legis nu se dublează.
-    din_mo = adauga_din_monitor(acte, ids)
+    din_mo = adauga_din_monitor(acte, ids, titluri=titluri)
     legate = legaturi_monitor(brut) if rulare_reala else 0
     if legate:
         print(legate, 'acte din Monitor legate direct de fișa lor pe legis.md')
@@ -200,6 +252,11 @@ def main(BRUT=None, OUT=None):
     except Exception:
         manual = {}
     cu_suma = 0
+    cate_ordine, chei_folosite = {}, set()
+    for a in acte.values():
+        f = forma_ordin(a.get('act'))
+        if f:
+            cate_ordine[f] = cate_ordine.get(f, 0) + 1
     for a in acte.values():
         # Sumele citite de pe legis.md se leagă de act prin doc_id, deci doar actele legis.md le pot primi.
         # Sumele puse de mână (date/sume_manual.json) se leagă prin numărul actului și trebuie aplicate
@@ -218,8 +275,9 @@ def main(BRUT=None, OUT=None):
             if x.get('cost') and x['cost']['v'] < 1e12 and 'cost' not in a:
                 a['cost'] = {'v': x['cost']['v'], 'val': x['cost']['val'], 'f': x['cost'].get('f', '')[:220], 'u': x.get('u', '')}
         # sumele puse de mână (date/sume_manual.json) bat orice sumă citită automat
-        m = manual.get(a.get('act'))
+        m, cheia = manual_pentru(a.get('act'), manual, cate_ordine)
         if isinstance(m, dict):
+            chei_folosite.add(cheia)
             nota = str(m.get('nota') or 'Sumă introdusă de mână.')
             if m.get('fara_text'):
                 a.pop('sume', None)
@@ -235,9 +293,23 @@ def main(BRUT=None, OUT=None):
                 a.pop('acord', None)
     if sume:
         print(cu_suma, 'acte cu sumă găsită în textul integral (din', len(sume), 'citite)')
+    # O cheie din sume_manual.json care nu mai corespunde niciunui act e o sumă care a
+    # dispărut din pagină pe tăcute (cod scris greșit, act scos din registru). O spunem.
+    orfane = sorted(k for k, v in manual.items() if isinstance(v, dict) and k not in chei_folosite)
+    if orfane and rulare_reala:
+        mesaj = ('ATENȚIE: %d chei din date/sume_manual.json nu corespund niciunui act din registru, '
+                 'deci sumele lor nu apar în pagină: %s' % (len(orfane), ', '.join(orfane[:30])))
+        print(mesaj)
+        rezumat = __import__('os').environ.get('GITHUB_STEP_SUMMARY')
+        if rezumat:
+            with open(rezumat, 'a', encoding='utf-8') as g:
+                g.write('### ⚠️ Sume puse de mână fără act\n\n' + mesaj + '\n')
 
-    # data afișată = ultima colectare din Monitor, nu ziua de azi: altfel pagina
-    # s-ar schimba (și s-ar face commit) în fiecare zi, fără nimic nou
+    # Data încrustată = ultima colectare din Monitor. Ea se schimbă la fiecare rulare
+    # (are și ora), așa că pagina întreagă — peste un megaoctet — era rescrisă și urcată
+    # zilnic, chiar fără niciun act nou. Acum pagina se rescrie doar când i se schimbă
+    # conținutul (vezi sfârșitul funcției); data proaspătă a ultimei verificări o ia, la
+    # deschidere, din date/stare.json, scris zilnic de date_deschise.py.
     azi = datetime.date.today().strftime('%d.%m.%Y')
     try:
         azi = json.load(open(AICI / 'date.json', encoding='utf-8')).get('ultima_rulare') or azi
@@ -318,6 +390,15 @@ def main(BRUT=None, OUT=None):
     inlocuieste('<script src="meniu.js" data-pagina="acorduri-mo"></script>',
                 '<script src="meniu.js" data-pagina="acorduri-legis"></script>')
 
+    # Aceeași pagină, doar cu altă dată a ultimei verificări: nu o rescriem.
+    fara_data = lambda t: re.sub(r'"ultima_rulare":"[^"]*"', '"ultima_rulare":""', t, count=1)
+    try:
+        veche = open(OUT, encoding='utf-8').read()
+    except Exception:
+        veche = None
+    if veche is not None and fara_data(veche) == fara_data(s):
+        print('pagina', Path(OUT).name, 'e neschimbată (doar data verificării e alta): nu o rescriu')
+        return
     open(OUT, 'w', encoding='utf-8').write(s)
     print('scris', OUT, len(s) // 1024, 'KB')
 

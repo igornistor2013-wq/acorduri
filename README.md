@@ -15,14 +15,20 @@ Paginile care arată, din surse oficiale, cine finanțează Republica Moldova
 
 Un workflow GitHub Actions rulează în fiecare zi lucrătoare la 06:00 UTC
 (09:00 la Chișinău vara, 08:00 iarna), citește edițiile recente ale Monitorului
-Oficial, extrage actele de finanțare externă și face commit dacă a găsit ceva
-nou. Nu e nevoie ca vreun calculator să fie pornit.
+Oficial, extrage actele de finanțare externă și le publică. Nu e nevoie ca
+vreun calculator să fie pornit.
+
+Fiecare rulare lasă un commit. Când apar acte, mesajul lui e „Acte noi”. Când
+nu apare nimic, e „Verificare zilnică, fără acte noi” și atinge doar `date.json`
+și `date/stare.json`: cele două poartă data ultimei verificări, pe care paginile
+o arată și o compară cu ziua de azi. Restul fișierelor (pagina legis, fluxul
+RSS, harta site-ului, datele deschise) se schimbă doar când apare ceva nou.
 
 Înainte de colectare rulează `teste.py`. Dacă testele pică, colectarea nici nu
 pornește: o rulare oprită se vede imediat în fila Actions, un registru stricat
 ar trece neobservat.
 
-Scriptul mai face două lucruri care nu se văd:
+Scriptul mai face trei lucruri care nu se văd:
 
 **Recuperează edițiile sărite.** Prima pagină a Monitorului arată doar zece
 ediții. Dacă automatizarea stă oprită mai mult, unele ies din listă înainte de
@@ -33,7 +39,18 @@ edițiile speciale și volumele suplimentare ocupă numere proprii.
 
 **Semnalează tăcerea.** Dacă ultima colectare e mai veche de patru zile,
 `acorduri.html` scrie asta cu roșu în antet. Pragul ține cont că rularea e
-programată doar în zilele lucrătoare.
+programată doar în zilele lucrătoare. Registrul din legis.md face același
+lucru, cu data din `date/stare.json`.
+
+**Se oprește la timp.** Când monitorul.gov.md răspunde greu, scriptul nu mai
+așteaptă până îl oprește GitHub (o oprire forțată nu apucă să salveze nimic):
+după șapte minute de citit se oprește singur, salvează ce are și lasă restul
+edițiilor pe a doua zi. O pagină care nu există (404) nu mai e cerută de trei
+ori la rând.
+
+Două acte cu același număr și aceeași dată, dar de la emitenți diferiți — o
+hotărâre de Guvern nr. 10 și un ordin nr. 10 din aceeași zi — sunt ținute ca
+două acte: registrul le deosebește și după tip, nu doar după număr și dată.
 
 ## Fișiere
 
@@ -52,7 +69,7 @@ programată doar în zilele lucrătoare.
 | `meniu.js` | Bara de navigare comună, aceeași pe toate paginile (Donatori, Analize, Export, IATI, Acorduri, HG 246). Un buton nou se adaugă o singură dată, aici |
 | `traducere.js` | Engleza pentru paginile de acorduri, HG 246 și Despre: dicționar de fraze ale interfeței; denumirile oficiale ale actelor rămân în română |
 | `despre.html` | Despre date și metodologie: surse, termeni, calcule, limite, date deschise, RSS (în română și engleză) |
-| `date_deschise.py` | Scrie zilnic `date/acorduri_monitor.csv/.json`, `date/acorduri_legis.csv/.json`, `date/cautare.json` (indexul căutării), `rss.xml` și `sitemap.xml`; rulat de `monitor.yml` |
+| `date_deschise.py` | Scrie `date/acorduri_monitor.csv/.json`, `date/acorduri_legis.csv/.json`, `date/cautare.json` (indexul căutării), `rss.xml`, `sitemap.xml` și `date/stare.json` (data ultimei verificări, citită de registrul legis.md la deschidere); rulat de `monitor.yml`. Doar `date/stare.json` se schimbă în fiecare zi; celelalte, când apar acte noi |
 | `robots.txt` | Indică motoarelor de căutare harta site-ului (`sitemap.xml`) |
 | `xlsx.min.js` | Biblioteca SheetJS pentru Excel, încărcată doar la descărcare (nu la fiecare deschidere a paginii) |
 | `unelte.js` | Roata dințată de pe fiecare panou (meniu cu „Copiază ca imagine" și „Descarcă datele (CSV)"), linkul care păstrează filtrele (`?ani=…&don=…`), raportul PDF pe o pagină, indicatorul de prospețime a datelor și comparația între perioade din „Analize avansate" |
@@ -74,11 +91,11 @@ programată doar în zilele lucrătoare.
 | `teste_legis.py` | Testele verificării legis.md |
 | `legis_local.bat` | Aceeași verificare, rulată de pe calculatorul tău (Windows) |
 | `legis_sume.py` | Sumele acordurilor, din textul integral al actelor: descarcă PDF-ul fiecărui act de pe legis.md (legi, hotărâri, ordine; fără decrete), caută „în sumă de…”, „în valoare de…” și scrie rezultatul, cu fragmentul de text, în `date/legis_sume.json`. Rulat de `legis_local.bat`; continuă de unde a rămas |
-| `date/sume_manual.json` | Sume puse de mână, pe codul actului (`LP203/2022`). Citirea automată greșește uneori — o tranșă în locul sumei întregi, bugetul unui program întreg, o dată chiar un cont bancar. Ce e aici bate orice sumă citită automat: `{"v": …, "val": "EUR", "nota": "…"}` pune suma, `{"ascunde": true}` o ascunde pe cea greșită. Citit de pagină la fiecare deschidere și de `legis_pagina.py` |
+| `date/sume_manual.json` | Sume puse de mână, pe codul actului (`LP203/2022`). Citirea automată greșește uneori — o tranșă în locul sumei întregi, bugetul unui program întreg, o dată chiar un cont bancar. Ce e aici bate orice sumă citită automat: `{"v": …, "val": "EUR", "nota": "…"}` pune suma, `{"ascunde": true}` o ascunde pe cea greșită. Citit de pagină la fiecare deschidere și de `legis_pagina.py`. Un ordin venit din Monitorul Oficial apare cu un cod provizoriu, fără emitent (`O147/2026`), până ajunge în istoricul legis.md, unde are codul întreg (`OMMPS147/2026`); suma pusă sub oricare dintre cele două forme rămâne valabilă și sub cealaltă, cât timp în registru e un singur ordin cu acel număr și an. La fiecare construire a paginii, `legis_pagina.py` anunță cheile din fișier care nu mai corespund niciunui act |
 | `legis_consola.js` | Aceeași citire a acordurilor atașate, dar fără nimic de instalat: se lipește în consola browserului (F12) pe www.legis.md. Citește PDF-urile cu pdf.js și pe cele scanate cu OCR (tesseract.js), ia și actele noi, și descarcă `legis_sume.json` gata de urcat în `date/`, plus `sume_lipsa.csv`. Continuă de unde a rămas. Pașii sunt scriși la începutul fișierului |
-| `legis_atasamente.py` | Sumele din acordurile atașate la acte: deschide fișa fiecărui act pe legis.md, descarcă PDF-urile atașate (textul acordului), citește cu OCR pe cele scanate (dacă Tesseract e instalat) și scrie suma acordului și costul proiectului în `date/legis_sume.json`, la „atas”. Rulat de `legis_local.bat` după `legis_sume.py`; continuă de unde a rămas. Ce rămâne fără sumă ajunge în `sume_lipsa.csv`, cu motivul |
-| `gov_sume.py` | Sumele acordurilor din notele de argumentare ale Guvernului: citește de pe gov.md ordinea de zi a fiecărei ședințe și, pentru punctele despre acorduri, PDF-ul notei („Aspectul financiar”). Rulat zilnic de `.github/workflows/sume.yml`; rezultatul, `date/gov_sume.json`, e citit de pagina Acorduri la deschidere (sumele marcate cu G) |
-| `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi |
+| `legis_atasamente.py` | Sumele din acordurile atașate la acte: deschide fișa fiecărui act pe legis.md, descarcă PDF-urile atașate (textul acordului), citește cu OCR pe cele scanate (dacă Tesseract e instalat) și scrie suma acordului și costul proiectului în `date/legis_sume.json`, la „atas”. Rulat de `legis_local.bat` după `legis_sume.py`; continuă de unde a rămas. Așteaptă ca fișa să-și încarce conținutul și redeschide o dată actele notate „fără atașamente” de versiunile care nu așteptau. O descărcare eșuată se notează și se trece mai departe; dacă legis.md nu mai răspunde deloc, se oprește și reia data viitoare. Ce rămâne fără sumă ajunge în `sume_lipsa.csv`, cu motivul |
+| `gov_sume.py` | Sumele acordurilor din notele de argumentare ale Guvernului: citește de pe gov.md ordinea de zi a fiecărei ședințe și, pentru punctele despre acorduri, PDF-ul notei („Aspectul financiar”). Rulat zilnic de `.github/workflows/sume.yml`; rezultatul, `date/gov_sume.json`, e citit de pagina Acorduri la deschidere (sumele marcate cu G). Ședințele din ultimele zece zile se recitesc la fiecare rulare, fiindcă ordinea de zi se completează până în ziua ședinței; o notă care n-a putut fi descărcată se reîncearcă la rulările următoare |
+| `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi. Le scrie `legis_watch.py`; apar în repository după prima rulare reușită a lui `legis_local.bat` |
 | `CNAME` | Domeniul propriu |
 
 ## Registrul din legis.md — cum se actualizează
@@ -93,7 +110,9 @@ programată doar în zilele lucrătoare.
 Orice lege, hotărâre sau decret apare întâi în Monitorul Oficial și abia apoi
 în legis.md, deci actele noi nu trebuie căutate pe legis.md. După fiecare
 colectare, `monitor.yml` rulează `legis_pagina.py`, care reconstruiește pagina
-și publică dacă s-a schimbat ceva. Totul rulează pe GitHub; nimic de instalat.
+și o rescrie doar dacă i s-a schimbat conținutul. Data ultimei verificări nu e
+un motiv de rescriere: pagina o citește la deschidere din `date/stare.json`.
+Totul rulează pe GitHub; nimic de instalat.
 
 Actele venite din Monitor apar cu sursa „MO …", iar numărul lor duce la
 căutarea pe legis.md după număr și data adoptării. Actele din istoric duc
@@ -112,11 +131,16 @@ Colectarea zilnică ajunge doar la edițiile de pe prima pagină a Monitorului.
 Perioadele mai vechi se adaugă din arhivele PDF, local:
 
 ```
-python3 import_pdf.py CALEA/CATRE/arhiva.rar --dry-run
+python3 import_pdf.py CALEA/CATRE/FOLDER_CU_PDF-URI --dry-run
+python3 import_pdf.py CALEA/CATRE/arhiva.zip --dry-run
 ```
 
-Merge direct pe arhivă, fără dezarhivare. Scoți `--dry-run` când ești mulțumit
-de ce vezi. Are nevoie de un extractor de text: `poppler-utils` sau `pdfplumber`.
+Primește un folder, un singur PDF sau o arhivă. Arhivele `.zip` le desface
+singur. Pentru `.rar` și `.7z` are nevoie de un program deja instalat (7-Zip,
+WinRAR, `unrar` sau `tar`-ul din Windows 10/11); dacă nu găsește niciunul, spune
+asta și atunci desfaci arhiva într-un folder și îi dai folderul. Scoți
+`--dry-run` când ești mulțumit de ce vezi. Are nevoie de un extractor de text:
+`poppler-utils`, `pdfplumber` sau `pypdf`.
 
 Ediția rusească a fiecărui număr e sărită automat.
 

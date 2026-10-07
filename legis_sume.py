@@ -22,7 +22,7 @@ deja citit nu se mai descarcă.
 Are nevoie de:  pip install playwright pypdf     (sau pdfplumber în loc de pypdf)
                 --fara-browser are nevoie doar de:  pip install requests pypdf
 
-Coduri de ieșire: 0 = a mers, 3 = blocat de Cloudflare, 1 = altă eroare.
+Coduri de ieșire: 0 = a mers, 3 = blocat de Cloudflare, 1 = legis.md nu răspunde sau altă eroare.
 """
 import argparse, base64, datetime, io, json, re, sys, time, unicodedata
 from pathlib import Path
@@ -33,6 +33,12 @@ sys.path.insert(0, str(AICI))
 IESIRE = AICI / 'date' / 'legis_sume.json'
 BLOCAT = re.compile(r"Just a moment|verificării de securitate|nu ești un robot|Verify you are human|Checking your browser", re.I)
 MAX_OCTETI = 30 * 1024 * 1024        # un PDF mai mare (acord cu toate anexele scanate) se sare
+# După atâtea descărcări eșuate una după alta nu mai e vorba de un act anume, ci
+# de legătura cu legis.md: ne oprim, fără să trecem actele acelea la erori.
+MAX_ESECURI_LA_RAND = 3
+# De câte ori reîncercăm singuri, la rulări diferite, un act a cărui descărcare a eșuat.
+MAX_INCERCARI_DESCARCARE = 3
+ESEC_DESCARCARE = 'descărcare eșuată'
 
 
 # ------------------------------------------------------------- sumele din text
@@ -378,17 +384,20 @@ def text_din_pdf(octeti):
 
 
 JS_DESCARCA = """async (url) => {
-  const c = new AbortController(), t = setTimeout(() => c.abort(), 90000);
+  const c = new AbortController(), t = setTimeout(() => c.abort(), 180000);
   try {
     const r = await fetch(url, {cache: 'no-store', credentials: 'include', signal: c.signal});
     const tip = r.headers.get('content-type') || '';
+    // mărimea anunțată de server: un PDF uriaș nu se mai descarcă doar ca să fie aruncat
+    const anuntat = +(r.headers.get('content-length') || 0);
+    if (anuntat > %d) { c.abort(); return {status: r.status, tip: tip, mare: anuntat}; }
     const b = new Uint8Array(await r.arrayBuffer());
     if (b.length > %d) return {status: r.status, tip: tip, mare: b.length};
     let s = '';
     for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
     return {status: r.status, tip: tip, b64: btoa(s)};
   } finally { clearTimeout(t); }
-}""" % MAX_OCTETI
+}""" % (MAX_OCTETI, MAX_OCTETI)
 
 
 def incarca():
@@ -402,8 +411,18 @@ def salveaza(baza):
     IESIRE.parent.mkdir(exist_ok=True)
     baza['actualizat'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
     tmp = IESIRE.with_suffix('.tmp')
-    json.dump(baza, open(tmp, 'w', encoding='utf-8'), ensure_ascii=False, indent=0, sort_keys=True)
+    # Aceeași formă compactă (o singură linie) în care scriu fișierul și legis_atasamente.py,
+    # și scriptul din consolă. Scris când pe linii, când compact, fișierul se schimba în
+    # întregime în git la fiecare salvare, chiar dacă se adăugase un singur act.
+    with open(tmp, 'w', encoding='utf-8') as f:
+        json.dump(baza, f, ensure_ascii=False, separators=(',', ':'))
     tmp.replace(IESIRE)
+
+
+def de_reincercat(r):
+    """Actul a rămas cu o descărcare eșuată și mai are încercări?"""
+    return bool(r) and str(r.get('eroare', '')).startswith(ESEC_DESCARCARE) \
+        and r.get('incercari', 1) < MAX_INCERCARI_DESCARCARE
 
 
 def main():
@@ -428,7 +447,7 @@ def main():
         de_citit = [d for d in a.doar if d in toate] or list(a.doar)
     else:
         de_citit = [d for d in toate if d not in acte or (a.reincearca and acte[d].get('eroare'))
-                    or not sume_tin(acte[d])]
+                    or de_reincercat(acte[d]) or not sume_tin(acte[d])]
     # cele mai noi întâi: doc_id-urile mari sunt actele recente
     de_citit.sort(key=lambda d: -int(d) if d.isdigit() else 0)
     if a.doar:
@@ -458,23 +477,50 @@ def main():
         acte[doc] = nou
 
     def citeste(descarca):
-        """Bucla comună: descarcă(doc) → {'status', 'tip', 'octeti' | 'mare'}. Întoarce 0 sau 3."""
+        """Bucla comună: descarcă(doc) → {'status', 'tip', 'octeti' | 'mare' | 'esec'}.
+        Întoarce 0, 3 (Cloudflare) sau 1 (legis.md nu răspunde)."""
+        # Descărcările eșuate una după alta. Cât timp nu știm dacă e vina actului sau a
+        # legăturii, nu le scriem nicăieri; devin erori ale actelor doar când următoarea
+        # descărcare reușește, deci legis.md răspunde.
+        amanate = []
+
+        def confirma_amanate(azi):
+            for d2, motiv in amanate:
+                vechi = acte.get(d2) or {}
+                inc = vechi.get('incercari', 0) + 1 if str(vechi.get('eroare', '')).startswith(ESEC_DESCARCARE) else 1
+                pune(d2, {'act': toate.get(d2, ''), 'eroare': ESEC_DESCARCARE + ': ' + motiv, 'citit': azi, 'incercari': inc})
+                stare['erori'] += 1
+            del amanate[:]
+
         for i, doc in enumerate(de_citit, 1):
             if termen_total and time.time() > termen_total:
                 print(f'Limita de {a.limita_min:g} minute: continuă la rularea următoare.')
                 return 0
             rez = descarca(f'{baza_url}/cautare/downloadpdf/{doc}')
             azi = datetime.date.today().isoformat()
-            if rez.get('mare'):
-                pune(doc, {'act': toate.get(doc, ''), 'eroare': f"PDF prea mare ({rez['mare'] // 1048576} MB)", 'citit': azi})
-                stare['erori'] += 1
+            if rez.get('esec'):
+                # Înainte, o singură descărcare eșuată (conexiune ruptă, termen depășit)
+                # oprea tot scriptul cu o eroare. Actul nu era notat nicăieri și era
+                # primul și la rularea următoare: dacă eșua mereu, nu se mai trecea de el.
+                amanate.append((doc, str(rez['esec'])[:100]))
+                if len(amanate) >= MAX_ESECURI_LA_RAND:
+                    print(f'legis.md nu răspunde: {len(amanate)} descărcări eșuate la rând '
+                          f'({amanate[-1][1]}). Mă opresc și salvez ce am citit; actele acestea se reiau data viitoare.')
+                    return 1
+                time.sleep(a.pauza)
                 continue
             octeti = rez.get('octeti') or b''
-            if not octeti.startswith(b'%PDF'):
+            if not rez.get('mare') and not octeti.startswith(b'%PDF'):
                 inceput = octeti[:3000].decode('utf-8', 'ignore')
                 if BLOCAT.search(inceput) or rez.get('status') in (403, 503) and 'cloudflare' in inceput.lower():
                     print('Cloudflare a cerut verificarea; mă opresc și salvez ce am citit.')
                     return 3
+            confirma_amanate(azi)
+            if rez.get('mare'):
+                pune(doc, {'act': toate.get(doc, ''), 'eroare': f"PDF prea mare ({rez['mare'] // 1048576} MB)", 'citit': azi})
+                stare['erori'] += 1
+                continue
+            if not octeti.startswith(b'%PDF'):
                 pune(doc, {'act': toate.get(doc, ''), 'eroare': f"HTTP {rez.get('status')}, nu e PDF", 'citit': azi})
                 stare['erori'] += 1
                 continue
@@ -523,7 +569,7 @@ def main():
                 except Exception as e:
                     eroare = str(e)[:100]
                     time.sleep(5 * (incercare + 1))
-            return {'status': 0, 'octeti': ('eroare de rețea: ' + eroare).encode()}
+            return {'status': 0, 'esec': eroare}
         try:
             cod = citeste(descarca)
         finally:
@@ -558,7 +604,11 @@ def main():
                     page.wait_for_timeout(3000)
 
                 def descarca(url):
-                    rez = page.evaluate(JS_DESCARCA, url)
+                    try:
+                        rez = page.evaluate(JS_DESCARCA, url)
+                    except Exception as e:
+                        # fetch() a aruncat: rețea căzută, conexiune ruptă, termenul de 3 minute depășit
+                        return {'status': 0, 'esec': str(e).split('\n')[0]}
                     if rez.get('b64') is not None:
                         rez['octeti'] = base64.b64decode(rez.pop('b64'))
                     return rez
@@ -569,8 +619,8 @@ def main():
                 if browser:
                     browser.close()
     citite, cu_suma, erori = stare['citite'], stare['cu_suma'], stare['erori']
-    if cod == 3:
-        return 3
+    if cod in (1, 3):
+        return cod
     print(f'Gata: {citite} acte citite, {cu_suma} cu sumă, {erori} erori. Rezultatul: {IESIRE.relative_to(AICI)}')
     return 0
 

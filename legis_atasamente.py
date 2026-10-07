@@ -29,7 +29,7 @@ Pentru PDF-urile scanate (OCR), în plus:  pip install pypdfium2 pytesseract
   https://github.com/UB-Mannheim/tesseract/wiki  (la instalare bifează „Romanian")
 Fără OCR scriptul merge la fel, doar că PDF-urile scanate rămân marcate „fara-text".
 
-Coduri de ieșire: 0 = a mers, 3 = blocat de Cloudflare, 1 = altă eroare.
+Coduri de ieșire: 0 = a mers, 3 = blocat de Cloudflare, 1 = legis.md nu răspunde sau altă eroare.
 """
 import argparse, base64, csv, datetime, html as _html, json, os, re, sys, time
 from pathlib import Path
@@ -186,6 +186,13 @@ def are_nevoie(r, reincearca=False, tot=False):
         return False                      # încă necitit de legis_sume.py
     if tot or 'atas_citit' not in r:
         return True
+    # „Niciun atașament" notat de o versiune care nu aștepta încărcarea fișei: fișa își
+    # aduce conținutul după ce se deschide, deci răspunsul putea fi citit prea devreme.
+    # Mai verificăm o dată; după o citire confirmată actul primește „fisa_ok" și nu se
+    # mai redeschide. Aceeași regulă ca în legis_consola.js — altfel sutele de acte
+    # marcate așa rămâneau neverificate pentru cine rulează doar legis_local.bat.
+    if not (r.get('atas') or []) and not r.get('fisa_ok'):
+        return True
     if any(not ls.suma_atas_tine(x, r.get('instr') or 'grant') for x in r.get('atas') or []):
         return True                       # o sumă veche nu mai rezistă regulilor de azi
     if reincearca:
@@ -195,13 +202,8 @@ def are_nevoie(r, reincearca=False, tot=False):
 
 
 def salveaza(baza):
-    """În forma compactă în care e ținut fișierul (o singură linie)."""
-    ls.IESIRE.parent.mkdir(exist_ok=True)
-    baza['actualizat'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-    tmp = ls.IESIRE.with_suffix('.tmp')
-    with open(tmp, 'w', encoding='utf-8') as f:
-        json.dump(baza, f, ensure_ascii=False, separators=(',', ':'))
-    tmp.replace(ls.IESIRE)
+    """În forma compactă în care e ținut fișierul (o singură linie) — o scrie legis_sume.py."""
+    ls.salveaza(baza)
 
 
 def raport(acte, toate):
@@ -248,6 +250,18 @@ def e_blocat(status, text):
 
 class Blocat(Exception):
     pass
+
+
+# Textul pe care fișa îl arată până își aduce conținutul.
+RX_SE_INCARCA = re.compile(r'Con[țţt]inutul se [îi]ncarc[ăa]', re.I)
+# După atâtea fișe la rând care nu se deschid, problema e legătura cu legis.md, nu actele.
+MAX_FISE_ESUATE_LA_RAND = 5
+
+
+def fisa_incarcata(text):
+    """Fișa și-a adus conținutul? (are text destul și nu mai scrie „Conținutul se încarcă")"""
+    t = (text or '').strip()
+    return len(t) >= 300 and not RX_SE_INCARCA.search(t)
 
 
 def main():
@@ -303,6 +317,7 @@ def main():
     termen_total = time.time() + a.limita_min * 60 if a.limita_min else None
     azi = datetime.date.today().isoformat()
     stare = {'acte': 0, 'pdf': 0, 'sume': 0, 'ocr': 0, 'fara_text': 0, 'erori': 0, 'candidati': 0}
+    oprit_retea = False
 
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
@@ -332,26 +347,44 @@ def main():
                 page.wait_for_timeout(3000)
 
         def linkuri_fetch(d):
-            r = page.evaluate(JS_PAGINA, fisa(d))
+            try:
+                r = page.evaluate(JS_PAGINA, fisa(d))
+            except Exception as e:
+                # cererea a eșuat (rețea, termen depășit): actul rămâne de deschis data viitoare
+                return 0, [], 'cerere eșuată: ' + str(e).split('\n')[0][:100]
             if e_blocat(r.get('status'), r.get('text')):
                 raise Blocat()
             return r.get('status'), linkuri_din_html(r.get('text') or '', fisa(d)), r.get('text') or ''
 
         def linkuri_navigare(d):
-            page.goto(fisa(d), wait_until='domcontentloaded', timeout=90000)
             try:
-                page.wait_for_load_state('networkidle', timeout=8000)
-            except Exception:
-                pass
-            continut = ''
-            for cadru in page.frames:
+                page.goto(fisa(d), wait_until='domcontentloaded', timeout=90000)
+            except Exception as e:
+                return 0, [], 'fișa nu s-a deschis: ' + str(e).split('\n')[0][:100]
+            # Fișa își aduce conținutul după ce se deschide. Așteptăm până dispare
+            # „Conținutul se încarcă" și pagina nu se mai schimbă, cel mult 30 de secunde.
+            termen, ultim, stabil, continut, text = time.time() + 30, -1, 0, '', ''
+            while True:
+                continut = ''
+                for cadru in page.frames:
+                    try:
+                        continut += cadru.content()
+                    except Exception:
+                        pass
                 try:
-                    continut += cadru.content()
+                    text = page.inner_text('body', timeout=5000)
                 except Exception:
-                    pass
-            if e_blocat(200, page.inner_text('body')[:5000] if continut else ''):
-                raise Blocat()
-            return 200, linkuri_din_html(continut, fisa(d)), continut
+                    text = ''
+                if e_blocat(200, text[:5000]):
+                    raise Blocat()
+                if fisa_incarcata(text):
+                    stabil = stabil + 1 if len(continut) == ultim else 0
+                    ultim = len(continut)
+                    if stabil >= 2:
+                        return 200, linkuri_din_html(continut, fisa(d)), continut
+                if time.time() > termen:
+                    return 0, [], 'fișa nu și-a încărcat conținutul în 30 de secunde'
+                page.wait_for_timeout(600)
 
         try:
             page.goto(baza_url + '/', wait_until='domcontentloaded', timeout=90000)
@@ -385,17 +418,29 @@ def main():
                     gaseste = linkuri_navigare
                     print('Atașamentele apar doar în pagina deschisă în fereastră; lucrez așa (ceva mai încet).')
 
+            fise_esuate = 0
             for i, d in enumerate(de_citit, 1):
                 if termen_total and time.time() > termen_total:
                     print(f'Limita de {a.limita_min:g} minute: continuă la rularea următoare.')
                     break
                 r = acte[d]
-                status, linkuri, _ = gaseste(d)
+                status, linkuri, continut = gaseste(d)
+                if status == 200 and not linkuri and gaseste is linkuri_fetch and RX_SE_INCARCA.search(continut or ''):
+                    # răspunsul simplu a venit înainte de conținut: deschidem fișa în fereastră și așteptăm
+                    status, linkuri, continut = linkuri_navigare(d)
                 if status != 200:
-                    r['atas_eroare'] = f'fișa actului: HTTP {status}'
+                    r['atas_eroare'] = f'fișa actului: HTTP {status}' if status else 'fișa actului: ' + (continut or 'nu s-a deschis')[:120]
                     stare['erori'] += 1
+                    fise_esuate += 1
+                    if fise_esuate >= MAX_FISE_ESUATE_LA_RAND:
+                        print(f'legis.md nu răspunde: {fise_esuate} fișe la rând nu s-au deschis. '
+                              'Mă opresc și salvez ce am citit; actele acestea se reiau data viitoare.')
+                        oprit_retea = True
+                        break
                     continue
+                fise_esuate = 0
                 r.pop('atas_eroare', None)
+                r['fisa_ok'] = 1                            # conținutul fișei a fost citit cu adevărat
                 instr = r.get('instr') or instrument(titluri.get(d, ''))
                 for x in r.get('atas') or []:           # suma veche care nu mai rezistă regulilor: o recitim
                     if not ls.suma_atas_tine(x, instr):
@@ -411,9 +456,16 @@ def main():
                     if v and v.get('metoda') and not a.tot and not (a.reincearca and v['metoda'] == 'fara-text'):
                         noi.append(v)                       # citit deja de acest script
                         continue
-                    rez = page.evaluate(ls.JS_DESCARCA, u)
+                    try:
+                        rez = page.evaluate(ls.JS_DESCARCA, u)
+                    except Exception as e:
+                        # o descărcare eșuată nu mai oprește tot: se notează la atașament
+                        # și se reia cu --reincearca
+                        rez = {'esec': str(e).split('\n')[0][:100]}
                     x = {'u': u, 'suma': None, 'cost': None, 'citit': azi, 'v': ls.REGULI}
-                    if rez.get('mare'):
+                    if rez.get('esec'):
+                        x['eroare'] = ls.ESEC_DESCARCARE + ': ' + rez['esec']
+                    elif rez.get('mare'):
                         x['eroare'] = f"PDF prea mare ({rez['mare'] // 1048576} MB)"
                     else:
                         octeti = base64.b64decode(rez.get('b64') or '')
@@ -457,6 +509,8 @@ def main():
                 browser.close()
 
     n = raport(acte, toate)
+    if oprit_retea:
+        return 1
     print(f"Gata: {stare['acte']} acte deschise, {stare['pdf']} PDF-uri citite, {stare['sume']} cu sumă găsită "
           f"({stare['ocr']} citite cu OCR), {stare['fara_text']} scanate rămase necitite, {stare['erori']} erori.")
     print(f"De verificat de mână: {n} rânduri în {RAPORT.name} ({stare['candidati']} cu o sumă-candidat).")

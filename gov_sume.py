@@ -39,6 +39,13 @@ RX_SEDINTA = re.compile(r'/ro/sedinte-de-guvern/(sedinta-guvernului-din-(\d{1,2}
 RX_NUMAR = re.compile(r'\(\s*număr\s+unic\s+([^)]+?)\s*\)', re.I)
 # modificările (scrisori de modificare, amendamente, addendumuri, protocoale) au în notă
 # sumele modificării — nu suma acordului; le păstrăm, dar pagina nu le arată ca sumă
+# O ședință se recitește cât timp e recentă. Ordinea de zi apare pe gov.md cu
+# câteva zile înaintea ședinței și se completează până în ziua ei (și după, cu
+# punctele suplimentare): ședința din 7 octombrie 2026 era deja citită pe 2
+# octombrie, iar ce s-a adăugat între timp nu mai ajungea niciodată în fișier.
+ZILE_RECITIRE = 10
+# De câte ori reîncercăm un PDF care n-a putut fi descărcat, la rulări diferite.
+MAX_INCERCARI_PDF = 5
 RX_MODIFICARE = re.compile(r'\b(?:scriso\w+ de modificare|amendament\w*|addendum\w*|protocol\w* adi\w+|acordul\w* de modificare)\b', re.I)
 
 
@@ -93,6 +100,30 @@ def sedinte_din_lista(html, baza=BAZA):
     return out
 
 
+def e_recenta(data, azi=None):
+    """Ședința e destul de nouă (sau încă în viitor) ca ordinea ei de zi să se mai schimbe?"""
+    if not data:
+        return False
+    azi = azi or datetime.date.today()
+    return data >= (azi - datetime.timedelta(days=ZILE_RECITIRE)).isoformat()
+
+
+def citeste_nota(p, octeti, sume_din_text, text_din_pdf):
+    """Pune în punctul p sumele din PDF-ul notei, sau eroarea. Întoarce True dacă PDF-ul a fost citit."""
+    if not octeti or not octeti.startswith(b'%PDF'):
+        p['eroare'] = 'PDF indisponibil'
+        return False
+    try:
+        text, _ = text_din_pdf(octeti)
+        p['sume'] = sume_din_text(text, maxim=3)
+        p.pop('eroare', None)
+        p.pop('incercari', None)
+        return True
+    except Exception as e:
+        p['eroare'] = 'PDF necitibil: ' + str(e)[:100]
+        return False
+
+
 def incarca():
     try:
         return json.load(open(IESIRE, encoding='utf-8'))
@@ -126,6 +157,7 @@ def main():
     baza = incarca()
     sedinte, puncte = baza.setdefault('sedinte', {}), baza.setdefault('puncte', {})
     noi_sed = noi_pct = cu_suma = 0
+    schimbat = False        # ceva de salvat și fără ședințe sau puncte noi
     lista_url = a.url
     # Până când istoricul e citit tot, fiecare rulare merge mai departe în trecut (ședințele
     # deja citite se sar); după aceea, rulările zilnice se opresc la prima pagină deja cunoscută.
@@ -146,6 +178,22 @@ def main():
         return None
 
     try:
+        # Notele care n-au putut fi descărcate la o rulare anterioară. Rămâneau
+        # pentru totdeauna cu „PDF indisponibil": punctul era deja în fișier, iar
+        # ședința lui deja citită, deci nimic nu le mai cerea a doua oară.
+        for numar, p in list(puncte.items()):
+            if p.get('eroare') != 'PDF indisponibil' or p.get('incercari', 1) >= MAX_INCERCARI_PDF or not p.get('pdf'):
+                continue
+            if termen and time.time() > termen:
+                break
+            time.sleep(a.pauza)
+            if citeste_nota(p, ia(p['pdf'], binar=True), sume_din_text, text_din_pdf):
+                cu_suma += bool(p.get('sume'))
+                print(f'  nota {numar} a putut fi citită acum', flush=True)
+            else:
+                p['incercari'] = p.get('incercari', 1) + 1
+            schimbat = True
+
         for pag in range(a.pagini):
             if termen and time.time() > termen:
                 print(f'Limita de {a.limita_min:g} minute: continuă la rularea următoare.')
@@ -158,10 +206,13 @@ def main():
                 break
             lista = sedinte_din_lista(html, re.match(r'^https?://[^/]+', lista_url).group(0))
             if not lista or [s[0] for s in lista] == precedenta:
-                baza['istoric_complet'] = True          # am ajuns la capătul listei
+                if not baza.get('istoric_complet'):
+                    baza['istoric_complet'] = True      # am ajuns la capătul listei
+                    schimbat = True                     # se salvează și dacă rularea n-a găsit nimic nou
                 break
             precedenta = [s[0] for s in lista]
-            noi = [s for s in lista if s[0] not in sedinte]
+            # ședințele necitite și cele recente, a căror ordine de zi se mai poate completa
+            noi = [s for s in lista if s[0] not in sedinte or e_recenta(s[1])]
             for slug, data, url in noi:
                 if termen and time.time() > termen:
                     break
@@ -182,17 +233,15 @@ def main():
                          'categorie': cat, 'partener': partener(titlu)}
                     if RX_MODIFICARE.search(titlu):
                         p['modificare'] = True
-                    if not octeti or not octeti.startswith(b'%PDF'):
-                        p['eroare'] = 'PDF indisponibil'
-                    else:
-                        try:
-                            text, _ = text_din_pdf(octeti)
-                            p['sume'] = sume_din_text(text, maxim=3)
-                            cu_suma += bool(p['sume'])
-                        except Exception as e:
-                            p['eroare'] = 'PDF necitibil: ' + str(e)[:100]
+                    if citeste_nota(p, octeti, sume_din_text, text_din_pdf):
+                        cu_suma += bool(p['sume'])
                     puncte[numar] = p
                     noi_pct += 1
+                if slug in sedinte:
+                    # ședință recentă, recitită: numărăm doar ce s-a adăugat acum
+                    if n_acord:
+                        sedinte[slug]['acorduri'] = sedinte[slug].get('acorduri', 0) + n_acord
+                    continue
                 sedinte[slug] = {'data': data, 'acorduri': n_acord}
                 noi_sed += 1
                 if noi_sed % 10 == 0:
@@ -201,7 +250,7 @@ def main():
             if not noi and pag >= 1 and complet:
                 break               # o pagină întreagă deja citită: restul sunt mai vechi și citite
     finally:
-        if noi_sed or noi_pct:
+        if noi_sed or noi_pct or schimbat:
             salveaza(baza)
     print(f'Gata: {noi_sed} ședințe noi, {noi_pct} puncte despre acorduri, {cu_suma} cu sumă. '
           f'Total: {len(sedinte)} ședințe, {len(puncte)} puncte.')

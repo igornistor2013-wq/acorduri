@@ -11,6 +11,11 @@ pune și linkul corect către ediție.
 Rulare:
     python3 import_pdf.py FOLDER_CU_PDF-URI
     python3 import_pdf.py FOLDER --dry-run     # arată ce ar adăuga, fără să scrie
+    python3 import_pdf.py arhiva.zip           # merge și direct pe o arhivă
+
+Arhivele .zip le desface singur. Pentru .rar și .7z are nevoie de un program
+deja instalat — tar (cel din Windows 10/11), 7-Zip, WinRAR sau unrar; dacă nu
+găsește niciunul, spune asta și cere un folder.
 
 Se pune lângă monitor_watch.py și date.json — refolosește exact aceleași reguli
 de clasificare, deci nu există riscul ca PDF-urile să fie filtrate altfel decât
@@ -23,7 +28,6 @@ Are nevoie de un extractor de text. În ordinea preferinței:
 Ajunge oricare dintre ele.
 """
 
-import json
 import os
 import re
 import shutil
@@ -277,34 +281,89 @@ def e_ruseasca(text):
     return litere > 200 and chirilice / litere > 0.3
 
 
+def _are_pdf(folder):
+    return any(f.lower().endswith(".pdf") for _, _, fs in os.walk(folder) for f in fs)
+
+
+def dezarhiveaza(sursa, temp):
+    """Desface arhiva în folderul temp. Întoarce True dacă au ieșit PDF-uri.
+
+    Python desface singur doar .zip. Arhivele Monitorului circulă însă și ca
+    .rar, iar pentru ele (și pentru .7z) e nevoie de un program din afară.
+    Le încercăm pe rând pe cele obișnuite; „tar" din Windows 10 și 11 e de
+    fapt bsdtar, care citește și .rar."""
+    if zipfile.is_zipfile(sursa):
+        with zipfile.ZipFile(sursa) as z:
+            z.extractall(temp)
+        return _are_pdf(temp)
+
+    def gaseste(nume, *cai):
+        return shutil.which(nume) or next((c for c in cai if os.path.exists(c)), None)
+
+    pf = os.environ.get("ProgramFiles", r"C:\Program Files")
+    pf86 = os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")
+    sapte = gaseste("7z", os.path.join(pf, "7-Zip", "7z.exe"), os.path.join(pf86, "7-Zip", "7z.exe")) or gaseste("7za")
+    unrar = gaseste("unrar", os.path.join(pf, "WinRAR", "UnRAR.exe"), os.path.join(pf86, "WinRAR", "UnRAR.exe"))
+    comenzi = [
+        [gaseste("tar"), "-xf", sursa, "-C", temp],
+        [gaseste("bsdtar"), "-xf", sursa, "-C", temp],
+        [sapte, "x", "-y", "-o" + temp, sursa],
+        [unrar, "x", "-o+", sursa, temp + os.sep],
+        [gaseste("unar"), "-force-overwrite", "-o", temp, sursa],
+    ]
+    for c in comenzi:
+        if not c[0]:
+            continue
+        try:
+            subprocess.run(c, capture_output=True, timeout=3600)
+        except Exception:
+            continue
+        if _are_pdf(temp):
+            return True
+    return False
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     dry = "--dry-run" in sys.argv
     if not args:
-        sys.exit("Folosire: python3 import_pdf.py FOLDER_CU_PDF-URI [--dry-run]")
+        sys.exit("Folosire: python3 import_pdf.py FOLDER_CU_PDF-URI | ARHIVA.zip [--dry-run]")
 
     sursa = args[0]
+    if not os.path.exists(sursa):
+        sys.exit(f"Nu găsesc {sursa}.")
     temp = None
-    if zipfile.is_zipfile(sursa):
+    pdfs = []
+    if os.path.isfile(sursa) and sursa.lower().endswith(".pdf"):
+        pdfs = [sursa]                           # un singur PDF, dat direct
+    elif os.path.isfile(sursa):
         temp = os.path.join(HERE, "_pdf_temp")
+        shutil.rmtree(temp, ignore_errors=True)  # resturi de la o rulare întreruptă
         os.makedirs(temp, exist_ok=True)
         print(f"Dezarhivez {sursa}…")
-        with zipfile.ZipFile(sursa) as z:
-            z.extractall(temp)
+        if not dezarhiveaza(sursa, temp):
+            shutil.rmtree(temp, ignore_errors=True)
+            sys.exit(f"Nu am putut desface {os.path.basename(sursa)}.\n"
+                     "Arhivele .zip le desfac singur; pentru .rar și .7z am nevoie de un program "
+                     "instalat (7-Zip, WinRAR, unrar sau tar-ul din Windows 10/11).\n"
+                     "Mai simplu: desfă arhiva într-un folder și rulează  "
+                     "python3 import_pdf.py FOLDERUL --dry-run")
         sursa = temp
 
-    pdfs = []
-    for radacina, _, fisiere in os.walk(sursa):
-        for f in sorted(fisiere):
-            if f.lower().endswith(".pdf"):
-                pdfs.append(os.path.join(radacina, f))
+    if not pdfs:
+        for radacina, _, fisiere in os.walk(sursa):
+            for f in sorted(fisiere):
+                if f.lower().endswith(".pdf"):
+                    pdfs.append(os.path.join(radacina, f))
     if not pdfs:
         sys.exit(f"Niciun PDF în {sursa}.")
     print(f"{len(pdfs)} PDF-uri de citit.\n")
 
     db = mw.load()
     # Un act deja în registru NU se dublează, indiferent din ce sursă a venit.
-    existente = {mw.norm(a["act"]) for a in db["acte"].values()}
+    # „Același act" înseamnă același număr, aceeași dată și același tip: vezi
+    # monitor_watch.identitate().
+    existente = {mw.identitate(a) for a in db["acte"].values()}
     # Numerele de ediție deja colectate de pe site ne dau ID-ul real, deci
     # linkul corect, chiar dacă numele fișierului PDF nu conține nimic util.
     nr_la_id = {a["editie"]: a["editie_id"] for a in db["acte"].values()
@@ -329,10 +388,10 @@ def main():
 
         adaugate = 0
         for act in acte_din_text(text, nr, data, eid, url):
-            if mw.norm(act["act"]) in existente:
+            if mw.identitate(act) in existente:
                 continue
-            db["acte"][act["act"] + "|" + act["editie_id"]] = act
-            existente.add(mw.norm(act["act"]))
+            db["acte"][mw.cheie_libera(db, act)] = act
+            existente.add(mw.identitate(act))
             adaugate += 1
             print(f"     + {act['categorie']}: {act['titlu'][:70]}…")
         noi += adaugate

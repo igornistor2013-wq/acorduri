@@ -805,6 +805,12 @@
       fSuport = false, seek = '', vedere = 'acorduri';
   // #acord=… deschide direct un acord (linkul copiat din rândul lui)
   var deepAcord = '';
+  /* Rândurile deschise se țin minte după id-ul acordului, nu după poziția din
+     listă. Lista se redesenează de câteva ori în primele secunde — când sosesc
+     sumele și legăturile spre legis.md — iar fiecare redesenare închidea tot:
+     acordul deschis dintr-un link „#acord=…" se închidea singur după o clipă,
+     la fel și un rând deschis de om înainte să se termine încărcarea. */
+  var deschise = {}, tintaId = '', tintaUrmareste = false;
   function idAcord(g){
     var a = g.acte[g.acte.length - 1] || {};
     return fold((a.act || '') + ' ' + (a.data_editie || '')).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -2064,7 +2070,13 @@
       var atunci = new Date(+m[3], +m[2] - 1, +m[1]);
       return Math.floor((new Date() - atunci) / 86400000);
     })();
-    var tarziu = vechime !== null && vechime > 4;
+    /* În registrul legis.md, data e încrustată în pagină la ultima ei reconstruire,
+       iar pagina se reconstruiește doar când apar acte noi. Vechimea acelei date nu
+       spune nimic despre automatizare. Data adevărată a ultimei verificări vine din
+       date/stare.json (vezi adaugaStare, mai jos); până sosește — sau dacă pagina e
+       deschisă de pe disc și nu poate sosi — nu tragem nicio concluzie. */
+    var stiuVechimea = !window.__LEGIS__ || !!window.__STARE__;
+    var tarziu = stiuVechimea && vechime !== null && vechime > 4;
 
     topMeta.innerHTML =
       (dtToate.length
@@ -2075,7 +2087,7 @@
         'lucrătoare. O pauză mai lungă înseamnă de obicei că automatizarea a ' +
         'eșuat — verifică fila Actions din repository."' : '') +
       '>Ultima verificare: <b>' + esc(db.ultima_rulare||'—') + '</b>' +
-      (vechime !== null && vechime > 1
+      (stiuVechimea && vechime !== null && vechime > 1
         ? ' <b>(acum ' + numeral(vechime, 'zile') + ')</b>' : '') + '</span>' +
       '<span>Ediții parcurse: <b>' + ((db.editii_vazute||[]).length) + '</b></span>' +
       (lipsa
@@ -3168,6 +3180,18 @@
           '<button type="button" class="link-acord" data-id="' + idAcord(g) + '">' + ico('link') + '<span>Copiază linkul acestui acord</span></button></td></tr>';
     }).join('');
 
+    // acordul cerut în link: îl trecem între cele deschise înainte de a lega rândurile
+    if (deepAcord){
+      tintaId = deepAcord; deepAcord = '';
+      deschise[tintaId] = 1;
+      tintaUrmareste = true;
+      // de îndată ce omul derulează sau apasă ceva, nu-l mai tragem înapoi la acord
+      ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function(ev){
+        window.addEventListener(ev, function(){ tintaUrmareste = false; }, { once: true, passive: true });
+      });
+      setTimeout(function(){ tintaUrmareste = false; }, 6000);
+    }
+
     document.querySelectorAll('tr.acord').forEach(function(tr){
       /* Rândul e un buton, nu doar o zonă pe care se poate da clic: primește
          focus, se anunță ca atare cititoarelor de ecran și se deschide cu
@@ -3179,6 +3203,11 @@
         var d = document.querySelector('tr.detalii[data-d="' + tr.dataset.i + '"]');
         var open = d.classList.toggle('hid');
         tr.setAttribute('aria-expanded', String(!open));
+        if (open) delete deschise[tr.dataset.id]; else deschise[tr.dataset.id] = 1;
+      }
+      if (deschise[tr.dataset.id]){
+        var det = document.querySelector('tr.detalii[data-d="' + tr.dataset.i + '"]');
+        if (det){ det.classList.remove('hid'); tr.setAttribute('aria-expanded', 'true'); }
       }
       tr.addEventListener('click', comuta);
       tr.addEventListener('keydown', function(ev){
@@ -3197,13 +3226,15 @@
       });
     });
     // deschiderea directă a acordului din link: rândul se deschide, pagina coboară la el
-    if (deepAcord){
-      var tinta = document.querySelector('tr.acord[data-id="' + deepAcord + '"]');
-      deepAcord = '';
+    if (tintaId){
+      var tinta = null;
+      document.querySelectorAll('tr.acord').forEach(function(tr){ if (tr.dataset.id === tintaId) tinta = tr; });
       if (tinta){
-        tinta.click();
         tinta.classList.add('tinta');
-        setTimeout(function(){ tinta.scrollIntoView({block:'center'}); }, 60);
+        /* La fiecare redesenare din primele secunde revenim la acord: panourile de
+           deasupra își schimbă înălțimea când sosesc sumele, iar rândul vechi, la
+           care se derulase, nu mai există. */
+        if (tintaUrmareste) setTimeout(function(){ if (tinta.isConnected) tinta.scrollIntoView({block:'center'}); }, 60);
       }
     }
 
@@ -3231,10 +3262,31 @@
         var j = rez[0], manual = rez[1] || {};
         if (!db || !db.acte) return;
         var n = 0;
+        /* Ordinele venite din Monitorul Oficial apar în registrul legis.md cu un cod
+           provizoriu („O147/2026"): din cuprins nu se vede care minister l-a emis. Când
+           actul ajunge și în istoricul legis.md, primește codul întreg („OMMPS147/2026").
+           O sumă pusă de mână sub una dintre forme trebuie să rămână valabilă și sub
+           cealaltă, altfel dispare din pagină fără niciun semn chiar în ziua în care
+           actul își schimbă codul. O acceptăm doar când în registru e un singur ordin cu
+           acel număr și an și o singură cheie în sume_manual.json care i se potrivește. */
+        var formaOrdin = function(c){ var x = /^O[A-Z]*(\d+)\/(\d{4})$/.exec(c || ''); return x ? 'O' + x[1] + '/' + x[2] : null; };
+        var cateOrdine = {};
+        Object.keys(db.acte).forEach(function(k){ var f = formaOrdin(db.acte[k].act); if (f) cateOrdine[f] = (cateOrdine[f] || 0) + 1; });
+        var manualPentru = function(cod){
+          var m = manual[cod];
+          if (m && typeof m === 'object') return m;
+          var f = formaOrdin(cod);
+          if (!f || cateOrdine[f] !== 1) return null;
+          var cand = Object.keys(manual).filter(function(c){ return c !== cod && manual[c] && typeof manual[c] === 'object' && formaOrdin(c) === f; });
+          return cand.length === 1 ? manual[cand[0]] : null;
+        };
         Object.keys(db.acte).forEach(function(k){
           var a = db.acte[k];
-          if (a.editie !== 'legis.md') return;
-          var r = j && j.acte ? j.acte[String(a.editie_id)] : null;
+          var dinLegis = a.editie === 'legis.md';
+          // în registrul din Monitor actele nu au cod legis, deci nici sume puse de mână;
+          // în registrul legis.md, și actele venite din Monitor pot avea una
+          if (!dinLegis && !window.__LEGIS__) return;
+          var r = dinLegis && j && j.acte ? j.acte[String(a.editie_id)] : null;
           if (r && r.sume && r.sume.length){
             a.sume = r.sume.slice(0, 2).map(function(s){ return [s.v, s.val, String(s.f || '').slice(0, 180)]; });
             n++;
@@ -3249,7 +3301,7 @@
             else if (a.acord){ delete a.acord; n++; }
             if (cuC){ a.cost = {v: cuC.cost.v, val: cuC.cost.val, f: String(cuC.cost.f || '').slice(0, 220), u: cuC.u}; n++; }
           }
-          var m = manual[a.act];
+          var m = manualPentru(a.act);
           if (m && typeof m === 'object'){
             if (m.fara_text && a.sume){ delete a.sume; n++; }
             if (m.fara_guvern && !a.faraG){ a.faraG = 1; n++; }
@@ -3285,6 +3337,24 @@
       .catch(function(){});
   }
   window.addEventListener('load', function(){ setTimeout(adaugaLegaturi, 0); });
+
+  /* date/stare.json: data ultimei verificări a Monitorului Oficial, scrisă la fiecare
+     rulare de date_deschise.py. Registrul legis.md are datele încrustate în pagină,
+     deci fără fișierul acesta ar trebui rescrisă toată pagina (peste un megaoctet) în
+     fiecare zi, doar ca să i se schimbe o dată din antet. */
+  function adaugaStare(){
+    if (!window.__LEGIS__) return;                      // registrul din Monitor citește date.json la fiecare deschidere
+    fetch('date/stare.json?_=' + Date.now(), {cache: 'no-store'})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j){
+        if (!j || !j.ultima_rulare || !db) return;
+        window.__STARE__ = true;
+        db.ultima_rulare = j.ultima_rulare;
+        paint();
+      })
+      .catch(function(){});
+  }
+  window.addEventListener('load', function(){ setTimeout(adaugaStare, 0); });
   window.addEventListener('load', function(){
     fetch('date/gov_sume.json?_=' + Date.now(), {cache: 'no-store'})
       .then(function(r){ return r.ok ? r.json() : null; })
