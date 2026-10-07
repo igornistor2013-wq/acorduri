@@ -4254,6 +4254,7 @@ async function parseLiveCSV(csvText, onProgress, pastreazaBrut){
   }
 
   const out = [];
+  const inAfara = [];       // proiectele cu bani în afara anilor raportului (vezi mai jos)
   for(let r = 1; r < rows.length; r++){
     const c = rows[r];
     if(!c || c.length < 2) continue;
@@ -4266,6 +4267,24 @@ async function parseLiveCSV(csvText, onProgress, pastreazaBrut){
       if(!v) return;
       if(!y[fc.year]) y[fc.year] = [0, 0];
       y[fc.year][fc.metric] += v;
+    });
+
+    /* Bani în afara anilor raportului. Raportul are coloane doar pentru un interval de
+       ani (2008–2026). O tranzacție datată în afara lui — caz real: o debursare de
+       2.000.000 trecută în AMP cu anul 2035 la proiectul 872111154262 — nu are coloană,
+       deci dispărea din suma proiectului: pagina arăta 3.000.000 în loc de 5.000.000.
+       Totalul scris de raport pe același rând o cuprinde însă. Diferența dintre acel
+       total și suma coloanelor pe ani se trece la „an nespecificat": banii nu se pierd
+       și nu inventăm un an (aceeași regulă ca la anii stricați din arhivă). */
+    [0, 1].forEach(m => {
+      if(totalCol[m] === -1) return;
+      const peAni = Object.keys(y).reduce((x, k) => x + (y[k][m] || 0), 0);
+      const rest = num(c[totalCol[m]]) - peAni;
+      if(rest > 1){                          // sub 1 EUR sunt rotunjiri
+        if(!y.NA) y.NA = [0, 0];
+        y.NA[m] += rest;
+        inAfara.push({ id: id, masura: m, suma: Math.round(rest), peAni: Math.round(peAni) });
+      }
     });
 
     out.push({
@@ -4293,7 +4312,14 @@ async function parseLiveCSV(csvText, onProgress, pastreazaBrut){
       await __sleep0();
     }
   }
-  return contopesteRanduriLive(out, header, fundingCols, totalCol, pastreazaBrut);
+  const gata = contopesteRanduriLive(out, header, fundingCols, totalCol, pastreazaBrut);
+  if(pastreazaBrut && window.__ampBrut){
+    const aniCol = fundingCols.map(fc => +fc.year).filter(a => !isNaN(a));
+    window.__ampBrut.inAfara = inAfara;
+    window.__ampBrut.aniRaport = aniCol.length ? [Math.min.apply(null, aniCol), Math.max.apply(null, aniCol)] : null;
+    if(inAfara.length) console.warn('AMP live: ' + inAfara.length + ' sume în afara anilor raportului, trecute la „an nespecificat".', inAfara);
+  }
+  return gata;
 }
 
 /* Același AMP ID pe mai multe rânduri ale raportului.
@@ -4845,7 +4871,66 @@ function renderDataStatus(){
     btn.addEventListener('click', loadLiveData);
     el.appendChild(btn);
   }
+  if(lastStatus.kind === 'ok') renderInAfaraAnilor(el);
   if(typeof renderProspetime === 'function') renderProspetime();
+}
+/* Sumele pe care raportul AMP le are în afara anilor lui. Sunt aproape sigur greșeli de
+   introducere în AMP (un an scris greșit), deci merită văzute și corectate la sursă:
+   pagina le numără, dar nu știe în ce an au fost de fapt. */
+function inAfaraAnilor(){
+  const B = window.__ampBrut;
+  if(!B || !B.inAfara || !B.inAfara.length) return [];
+  const dupa = new Map();
+  B.inAfara.forEach(x => {
+    const o = dupa.get(x.id) || { id: x.id, ang: 0, deb: 0 };
+    if(x.masura === 0) o.ang += x.suma; else o.deb += x.suma;
+    dupa.set(x.id, o);
+  });
+  // doar proiectele care au rămas în dashboard (cele fără donator sunt excluse)
+  const proiecte = new Map(PROJECTS.map(p => [p.id, p]));
+  return [...dupa.values()].filter(o => proiecte.has(o.id)).map(o => Object.assign(o, { p: proiecte.get(o.id) }))
+    .sort((a, b) => (b.deb + b.ang) - (a.deb + a.ang));
+}
+function renderInAfaraAnilor(el){
+  const lista = inAfaraAnilor();
+  if(!lista.length) return;
+  const en = currentLang === 'en', B = window.__ampBrut;
+  const ani = B.aniRaport ? ' (' + B.aniRaport[0] + '–' + B.aniRaport[1] + ')' : '';
+  const deb = lista.reduce((x, o) => x + o.deb, 0), ang = lista.reduce((x, o) => x + o.ang, 0);
+  const d = document.createElement('div');
+  d.id = 'ampInAfara';
+  d.style.cssText = 'margin-top:6px;padding-top:6px;border-top:1px solid rgba(0,0,0,.08);color:#8a5c0d;';
+  d.innerHTML = (en
+    ? '<b>' + lista.length + '</b> ' + (lista.length === 1 ? 'project has' : 'projects have') + ' amounts outside the years of the AMP report' + ani +
+      ' — usually a year typed wrongly in AMP: disbursements of <b>' + fmtNum(deb) + '</b> EUR, commitments of <b>' + fmtNum(ang) +
+      '</b> EUR. They are counted, under “year unspecified”. '
+    : 'La <b>' + lista.length + '</b> ' + (lista.length === 1 ? 'proiect' : 'proiecte') + ', raportul AMP are sume în afara anilor lui' + ani +
+      ' — de regulă un an scris greșit în AMP: debursări de <b>' + fmtNum(deb) + '</b> EUR, angajamente de <b>' + fmtNum(ang) +
+      '</b> EUR. Sunt numărate, la „an nespecificat”. ');
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.id = 'ampInAfaraCsv';
+  b.textContent = en ? 'Download the list (CSV)' : 'Descarcă lista (CSV)';
+  b.style.cssText = 'margin-left:4px;background:none;border:1px solid currentColor;border-radius:5px;padding:2px 8px;font-size:11.5px;font-weight:600;color:inherit;cursor:pointer;';
+  b.addEventListener('click', inAfaraAnilorCsv);
+  d.appendChild(b);
+  el.appendChild(d);
+}
+function inAfaraAnilorCsv(){
+  const en = currentLang === 'en', lista = inAfaraAnilor();
+  const linii = [en ? ['AMP ID', 'Project', 'Donor', 'Disbursements outside the report years', 'Commitments outside the report years', 'Total disbursements', 'Total commitments', 'Start date', 'End date']
+                    : ['AMP ID', 'Proiect', 'Donator', 'Debursări în afara anilor raportului', 'Angajamente în afara anilor raportului', 'Debursări în total', 'Angajamente în total', 'Data începerii', 'Data finalizării']];
+  lista.forEach(o => {
+    const dt = REAL_DATES_LOOKUP[o.id] || {};
+    linii.push([o.id, projectLabel(o.p), o.p.donator || (o.p.donatori || []).join(', '), o.deb, o.ang, Math.round(o.p.deb || 0), Math.round(o.p.ang || 0), dt.s || '', dt.e || '']);
+  });
+  const q = v => { v = String(v == null ? '' : v); return /[;"\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff' + linii.map(l => l.map(q).join(';')).join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'amp-sume-in-afara-anilor-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  return lista.length;
 }
 function onLanguageChanged(){
   if(lastStatus && lastStatus.kind === 'ok' && window.__liveLaOra) lastStatus.params.ora = __oraScurta(window.__liveLaOra);
@@ -6621,11 +6706,16 @@ function iatiCauza(p, m, pr){
   if(pr.randuri.length > 1)
     out.push(en ? 'The AMP report lists this project on ' + pr.randuri.length + ' rows; their amounts were added together.'
                 : 'Raportul AMP scrie proiectul pe ' + pr.randuri.length + ' rânduri; sumele lor au fost adunate.');
-  if(pr.totalRaport != null && pr.randuri.length && Math.abs(pr.totalRaport - pr.anLive) > 1)
+  if(pr.totalRaport != null && pr.randuri.length && pr.totalRaport - pr.anLive > 1){
+    const ar = pr.B && pr.B.aniRaport ? ' (' + pr.B.aniRaport[0] + '–' + pr.B.aniRaport[1] + ')' : '';
+    out.push((en ? 'The AMP report has disbursements of ' : 'Raportul AMP are debursări de ') + fmtNum(pr.totalRaport - pr.anLive) +
+      (en ? ' outside its years' + ar + ' — most likely a transaction entered in AMP with a wrong year. The report\'s own total (' : ' în afara anilor lui' + ar +
+        ' — cel mai probabil o tranzacție trecută în AMP cu anul greșit. Totalul scris de raport (') + fmtNum(pr.totalRaport) +
+      (en ? ') includes them, so they are counted here under “year unspecified”. The year should be corrected in AMP.'
+          : ') le cuprinde, deci sunt numărate aici, la „an nespecificat”. Anul trebuie corectat în AMP.'));
+  } else if(pr.totalRaport != null && pr.randuri.length && pr.anLive - pr.totalRaport > 1)
     out.push((en ? 'The report\'s own total for disbursements (' : 'Totalul de debursări scris de raport (') + fmtNum(pr.totalRaport) +
-      (en ? ') differs from the sum of its yearly columns (' : ') diferă de suma coloanelor lui pe ani (') + fmtNum(pr.anLive) +
-      (en ? '): part of the money sits outside the years the report covers, or in a column this page does not recognise.'
-          : '): o parte din bani e în afara anilor acoperiți de raport sau într-o coloană pe care pagina nu o recunoaște.'));
+      (en ? ') is smaller than the sum of its yearly columns (' : ') e mai mic decât suma coloanelor lui pe ani (') + fmtNum(pr.anLive) + ').');
   if(pr.randuri.length && pr.inArhiva && pr.arhivaDeb - deb > 1000 && pr.arhivaDeb - deb > 0.01 * pr.arhivaDeb)
     out.push((en ? 'The 1993–2022 archive had disbursements of ' : 'Arhiva 1993–2022 avea debursări de ') + fmtNum(pr.arhivaDeb) +
       (en ? '; the live report now has ' : '; raportul live are acum ') + fmtNum(pr.anLive) +
@@ -6638,7 +6728,7 @@ function iatiCauza(p, m, pr){
     if(frati.length > 1)
       out.push((en ? 'IATI has ' : 'În IATI sunt ') + frati.length + (en ? ' activities with this title; only the first is compared. Together they report '
         : ' activități cu această denumire; se compară doar prima. Împreună raportează ') + fmtNum(frati.reduce((x, a) => x + (a.spend_eur || 0), 0)) + '.');
-    if(iatiDifera(p, m) && deb < spend && !(pr.totalRaport != null && Math.abs(pr.totalRaport - pr.anLive) > 1)){
+    if(iatiDifera(p, m) && deb < spend){
       const ang = p.ang || 0;
       if(pr.randuri.length && ang > deb && Math.abs(ang - spend) <= 0.01 * Math.max(ang, spend))
         out.push((en ? 'AMP itself records commitments of ' : 'AMP însăși are angajamente de ') + fmtNum(ang) +
