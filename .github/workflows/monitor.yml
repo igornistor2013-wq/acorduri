@@ -17,7 +17,10 @@ concurrency:
 jobs:
   verifica:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # monitor_watch.py se oprește singur din citit după 7 minute și salvează ce are
+    # (BUGET_SECUNDE). Limita de aici rămâne deasupra, ca oprirea să fie a scriptului,
+    # nu a job-ului: un job oprit forțat nu mai apucă să salveze nimic.
+    timeout-minutes: 15
 
     steps:
       - name: Descarcă repository-ul
@@ -65,7 +68,7 @@ jobs:
         continue-on-error: true
         run: python date_deschise.py
 
-      - name: Salvează dacă au apărut acte noi
+      - name: Salvează
         run: |
           if [ -z "$(git status --porcelain date.json legis_acorduri.html date rss.xml sitemap.xml)" ]; then
             echo "Nimic nou — nu fac commit."
@@ -76,7 +79,16 @@ jobs:
           # sitemap.xml lipsea de aici: era rescris la fiecare rulare, dar nu ajungea
           # niciodată pe site, iar motoarele de căutare vedeau date vechi.
           git add date.json legis_acorduri.html date rss.xml sitemap.xml
-          git commit -m "Acte noi — $(date +%d.%m.%Y)"
+          # Mesajul spune ce s-a întâmplat de fapt. date.json și date/stare.json se
+          # schimbă la fiecare rulare: poartă data ultimei verificări, pe care paginile
+          # o arată și o compară cu ziua de azi. Restul fișierelor se schimbă doar când
+          # apare ceva nou. Înainte, fiecare rulare scria „Acte noi", cu sau fără acte.
+          ALTELE="$(git status --porcelain date.json legis_acorduri.html date rss.xml sitemap.xml | grep -v -e ' date\.json$' -e ' date/stare\.json$' || true)"
+          if [ -z "$ALTELE" ]; then
+            git commit -m "Verificare zilnică, fără acte noi — $(date +%d.%m.%Y)"
+          else
+            git commit -m "Acte noi — $(date +%d.%m.%Y)"
+          fi
 
           # Dacă main a avansat între checkout și acum (o altă rulare, un fișier
           # urcat manual), push-ul simplu e respins și tot job-ul pică degeaba.
