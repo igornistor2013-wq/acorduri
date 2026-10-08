@@ -1,0 +1,6 @@
+{
+  "_cum_se_foloseste": "Legături acord ↔ proiect AMP confirmate de oameni, pentru pagina „De la lege la bani”. Se completează din pagină (butonul „Confirmă”, apoi „Copiază JSON” și lipești aici tot fișierul) sau de mână. „confirmate”: id-ul acordului (cel din linkul #acord=… al registrului) → lista AMP ID ale proiectelor lui; o legătură confirmată trece înaintea oricărei potriviri automate. „respinse”: proiecte pe care potrivirea automată le propune greșit pentru acord (nu mai apar). „fara_proiect”: id-uri de acorduri despre care s-a verificat că nu au proiect în AMP. Un AMP ID care nu mai e în date rămâne aici și apare cu observația „proiectul nu e în datele de azi”.",
+  "confirmate": {},
+  "respinse": {},
+  "fara_proiect": []
+}
