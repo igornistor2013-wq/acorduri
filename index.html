@@ -254,6 +254,44 @@
   .iati-det-col{min-width:240px;max-width:100%;overflow-x:auto;}
   .iati-det-col table{border-collapse:collapse;font-size:11.5px;margin-top:4px;}
   .iati-det-nota{color:var(--ink-dim);font-size:11px;margin:2px 0 4px;max-width:420px;}
+  /* De la lege la bani: acordurile legate de proiectele AMP */
+  .leg-status{font-size:12.5px;padding:9px 12px;border-radius:6px;background:var(--blue-bg);color:var(--navy);font-weight:600;margin:0 0 12px;}
+  .leg-status.err{background:var(--red-bg);color:var(--red);}
+  .leg-kpis{margin:0 0 4px !important;grid-template-columns:repeat(5,1fr);}
+  @media (max-width:1100px){.leg-kpis{grid-template-columns:repeat(3,1fr);}}
+  @media (max-width:800px){.leg-kpis{grid-template-columns:repeat(2,1fr);}}
+  .leg-bara{padding:10px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .leg-bara input[type=text],.leg-bara select{padding:8px 10px;border:1px solid var(--line-strong);border-radius:6px;font-size:13px;background:var(--panel);color:inherit;}
+  .leg-bara input[type=text]{flex:1;min-width:220px;}
+  .leg-tabs{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden;}
+  .leg-tabs button{background:var(--panel);border:0;padding:6px 14px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--navy);}
+  .leg-tabs button.activ{background:var(--navy);color:#fff;}
+  .leg-badge{display:inline-block;border-radius:4px;padding:1px 7px;font-size:10.5px;font-weight:700;white-space:nowrap;}
+  .leg-badge.confirmat{background:var(--navy);color:#fff;}
+  .leg-badge.suma{background:var(--green-bg);color:var(--green-ink);}
+  .leg-badge.titlu{background:var(--gold-bg);color:var(--amber-dim);}
+  .leg-badge.ambiguu{background:#fbe3d6;color:#9a4a12;}
+  .leg-badge.fara{background:#eceff3;color:var(--ink-dim);}
+  #legTabel{width:100%;border-collapse:collapse;font-size:12.5px;}
+  #legTabel th{padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);}
+  #legTabel td{padding:8px 10px;vertical-align:top;border-top:1px solid var(--line);}
+  #legTabel .num{text-align:right;white-space:nowrap;font-family:var(--mono);font-size:11.5px;}
+  tr.leg-rand{cursor:pointer;} tr.leg-rand:hover{background:rgba(0,0,0,.025);}
+  .leg-nume{font-weight:700;}
+  .leg-sub,.leg-aprox{color:var(--ink-dim);font-size:11.5px;}
+  .leg-titlu{max-width:300px;}
+  tr.leg-detaliu > td{background:var(--panel-2, rgba(0,0,0,.025));padding:12px 14px !important;}
+  .leg-det-t{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin:0 0 4px;font-weight:700;}
+  .leg-leg{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--line);font-size:12px;}
+  .leg-chip{font-size:10.5px;background:var(--gold-bg);color:var(--amber-dim);border-radius:10px;padding:1px 8px;}
+  .leg-sumaText{flex:1 0 100%;color:var(--ink-dim);font-size:11.5px;}
+  .leg-act,.leg-manual{font-size:11.5px;color:var(--ink-dim);margin-top:10px;}
+  .leg-manual{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .leg-manual input{padding:4px 8px;border:1px solid var(--line-strong);border-radius:6px;font-size:12px;width:170px;}
+  .leg-btn{background:var(--panel);color:var(--navy);border:1px solid var(--line-strong);border-radius:6px;padding:3px 10px;font-size:11.5px;font-weight:600;cursor:pointer;}
+  .leg-btn:hover{border-color:var(--navy);}
+  .leg-btn.ok{background:var(--navy);color:#fff;border-color:var(--navy);}
+  #legPanouConf textarea{width:100%;min-height:150px;font-family:var(--mono);font-size:11.5px;border:1px solid var(--line-strong);border-radius:6px;padding:8px;box-sizing:border-box;background:var(--panel);color:inherit;}
   .mai-mult-btn{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;}
   .mai-mult-btn:hover{filter:brightness(1.15);}
   .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -1560,6 +1598,58 @@
         </div>
       </div>
     </footer>
+  </div>
+</div>
+
+<div id="legaturiView" role="main" style="display:none;">
+  <h1 class="sr-only" data-i18n="legH1">De la lege la bani</h1>
+  <div class="wrap">
+    <div class="panel-head" style="padding:16px 0 8px;display:flex;justify-content:flex-start;align-items:center;gap:14px;">
+      <div class="logo-badge" id="logoBadgeLeg" aria-hidden="true" title="Înapoi la pagina principală" data-i18n-title="logoBackTitle" style="cursor:pointer;width:40px;height:40px;"></div>
+      <button id="backFromLegBtn" style="background:var(--panel);color:var(--navy);border:1px solid var(--line-strong);border-radius:8px;padding:10px 18px;font-size:13.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--navy);fill:none;stroke-width:2;"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+        <span data-i18n="backToMainBtn">Înapoi la pagina principală</span>
+      </button>
+    </div>
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-head"><h2><svg class="ico" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span data-i18n="legTitle">De la lege la bani: acordurile legate de proiectele din AMP</span></h2></div>
+      <div style="padding:14px 16px;font-size:13px;line-height:1.6;color:var(--ink-dim);">
+        <p style="margin:0 0 10px;" data-i18n="legIntro">…</p>
+        <div id="legStatus" class="leg-status"></div>
+        <div class="kpis leg-kpis" id="legKpis"></div>
+      </div>
+    </div>
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-head" style="flex-wrap:wrap;gap:10px;">
+        <h2><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span id="legListTitle" data-i18n="legListTitle">Acordurile și proiectele lor</span></h2>
+        <div class="leg-tabs" role="tablist">
+          <button type="button" id="legTabAcorduri" class="activ" data-tab="acorduri" data-i18n="legTabAcorduri">Pe acorduri</button>
+          <button type="button" id="legTabProiecte" data-tab="proiecte" data-i18n="legTabProiecte">Pe proiecte</button>
+        </div>
+      </div>
+      <div class="leg-bara">
+        <input type="text" id="legSearch" placeholder="Caută după denumire, finanțator, act sau AMP ID..." data-i18n-placeholder="legSearchPh"/>
+        <select id="legNivel" aria-label="Legătura"></select>
+        <select id="legPartener" aria-label="Finanțator"></select>
+        <button type="button" class="leg-btn" id="legCsvBtn" data-i18n="legCsvBtn">Descarcă tabelul (CSV)</button>
+        <span id="legCount" style="font-size:12px;color:var(--ink-dim);white-space:nowrap;"></span>
+      </div>
+      <div class="table-scroll" style="max-height:680px;">
+        <table id="legTabel"><thead id="legCap"></thead><tbody id="legCorp"></tbody></table>
+      </div>
+    </div>
+    <div class="panel" id="legPanouConf" style="display:none;margin-bottom:16px;">
+      <div class="panel-head"><h2><span data-i18n="legPanouTitlu">Confirmări în pregătire</span></h2></div>
+      <div style="padding:12px 16px;font-size:12.5px;line-height:1.6;color:var(--ink-dim);">
+        <p style="margin:0 0 8px;" data-i18n="legPanouText">…</p>
+        <textarea id="legJson" readonly spellcheck="false"></textarea>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="leg-btn ok" id="legCopiaJson" data-i18n="legCopiaJson">Copiază JSON</button>
+          <button type="button" class="leg-btn" id="legDescarcaJson" data-i18n="legDescarcaJson">Descarcă legaturi_amp.json</button>
+          <button type="button" class="leg-btn" id="legGoleste" data-i18n="legGoleste">Șterge alegerile mele</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3639,6 +3729,7 @@ function setLanguage(lang){
   if(__advInitialized && window.__initAdvancedView){ window.__initAdvancedView(); }
   // paginile IATI / d-portal / export au propriile texte dinamice
   try{ if(typeof dpRender === 'function') dpRender(); }catch(e){}
+  try{ if(typeof legaturiRender === 'function') legaturiRender(); }catch(e){}
   try{ if(typeof iatiRenderList === 'function'){ iatiApply(); } }catch(e){}
   try{ if(typeof exportSetSource === 'function') exportSetSource(exportSource); }catch(e){}
   if(typeof onLanguageChanged === 'function') onLanguageChanged();
@@ -4828,6 +4919,8 @@ function rebuildAll(records){
   if(typeof initExportFilters === 'function') initExportFilters();
   if(typeof exportRenderColumnPicker === 'function') exportRenderColumnPicker();
   if(typeof exportRenderPreview === 'function') exportRenderPreview();
+  // „De la lege la bani": cifrele AMP s-au schimbat (de ex. au sosit cele live)
+  if(typeof window.legaturiDupaDate === 'function') setTimeout(function(){ try{ window.legaturiDupaDate(); }catch(e){} }, 0);
 }
 
 /* ---------- Banner de stare ---------- */
@@ -6375,13 +6468,16 @@ const VEDERI = {
   'analize':   'showAdvancedView',
   'export':    'showExportView',
   'iati':      'showIatiView',
-  'dportal':   'showDportalView'
+  'dportal':   'showDportalView',
+  'legaturi':  'showLegaturiView'
 };
 const FRAGMENT = { showMainView:'', showAdvancedView:'analize', showExportView:'export',
-                   showIatiView:'iati', showDportalView:'dportal' };
+                   showIatiView:'iati', showDportalView:'dportal', showLegaturiView:'legaturi' };
 let __schimbDinIstoric = false;   // nu rescriem adresa când chiar browserul ne-a adus aici
 
 function __marcheazaVederea(numeFunctie){
+  // oricare altă vedere o ascunde pe „De la lege la bani": funcțiile show…View nu o cunosc
+  if(numeFunctie !== 'showLegaturiView'){ const lv = document.getElementById('legaturiView'); if(lv) lv.style.display = 'none'; }
   try{ if(window.Meniu) Meniu.activ(FRAGMENT[numeFunctie] || 'acasa'); }catch(e){}
   if(__schimbDinIstoric) return;
   const frag = FRAGMENT[numeFunctie] || '';
@@ -8096,6 +8192,386 @@ document.getElementById('iatiSelectorOptDash').addEventListener('click', () => {
 });
 document.getElementById('backFromDportalBtn').addEventListener('click', showMainView);
 
+/* ============================================================
+   DE LA LEGE LA BANI — acordurile din registru, legate de proiectele AMP.
+   Potrivirea (denumire + finanțator + sumă) e în legatura-amp.js: funcții pure,
+   testate în teste_legatura.js. Aici sunt datele, tabelul și confirmările.
+   Acordurile vin din date/acorduri_legare.json (scris de legatura_acorduri.py din
+   registrul de acorduri); proiectele, din aceleași PROJECTS ca restul paginii, deci
+   cu exact aceleași cifre ca dashboardul — arhivă + raportul live.
+   ============================================================ */
+const LEG = {
+  date: null, oficiale: {}, pending: { confirmate: {}, respinse: {}, fara_proiect: [] },
+  rez: null, pr: {}, proj: new Map(), semn: '', tab: 'acorduri', limit: 50,
+  deschise: new Set(), incarcare: null, eroare: false, partenere: false,
+  /* Crește la fiecare schimbare a confirmărilor (ale omului sau cele din fișier). Semnătura de mai jos
+     folosea înainte lungimea JSON-ului lor — dar „confirmă" apoi „respinge" aceeași legătură mută
+     un element dintr-o listă în alta fără să schimbe lungimea, iar rezultatul rămânea cel vechi. */
+  versiune: 0
+};
+try{
+  const s = JSON.parse(localStorage.getItem('legaturiAmpPending') || 'null');
+  if(s && s.confirmate && s.respinse) LEG.pending = { confirmate: s.confirmate, respinse: s.respinse, fara_proiect: s.fara_proiect || [] };
+}catch(e){}
+function legSalveaza(){ try{ localStorage.setItem('legaturiAmpPending', JSON.stringify(LEG.pending)); }catch(e){} }
+function legCere(u){
+  return fetch(u + '?_=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null);
+}
+function legIncarca(){
+  if(LEG.incarcare) return LEG.incarcare;
+  LEG.incarcare = Promise.all([legCere('date/acorduri_legare.json'), legCere('date/legaturi_amp.json')]).then(r => {
+    LEG.date = r[0] && r[0].acorduri ? r[0] : null;
+    LEG.eroare = !LEG.date;
+    LEG.oficiale = r[1] || {};
+    LEG.versiune++;
+  });
+  return LEG.incarcare;
+}
+/* confirmările oficiale (din fișier) + cele pe care le-a făcut omul în această pagină */
+function legUneste(a, b){
+  const o = { confirmate: {}, respinse: {}, fara_proiect: [] };
+  [a, b].forEach(x => {
+    ['confirmate', 'respinse'].forEach(k => Object.keys((x && x[k]) || {}).forEach(id => {
+      const l = o[k][id] = o[k][id] || [];
+      (x[k][id] || []).forEach(v => { if(l.indexOf(v) < 0) l.push(v); });
+    }));
+    ((x && x.fara_proiect) || []).forEach(id => { if(o.fara_proiect.indexOf(id) < 0) o.fara_proiect.push(id); });
+  });
+  return o;
+}
+function legProiecte(){
+  const dupaId = new Map(ALL_RECORDS.map(r => [r.id, r]));
+  return PROJECTS.map(p => {
+    const r = dupaId.get(p.id) || {}, d = REAL_DATES_LOOKUP[p.id] || {};
+    return { id: p.id, titluri: [r.t || p.denumire, PROJECT_TITLE_EN[p.id]].filter(Boolean),
+             donatori: (p.donatori && p.donatori.length) ? p.donatori : (r.d || []),
+             inceput: parseDMY(d.s) || (typeof p.an === 'number' ? p.an : null),
+             ang: p.ang || 0, deb: p.deb || 0, vp: r.vp || 0 };
+  });
+}
+/* Recalculează potrivirile când s-a schimbat ceva: datele AMP, lista de acorduri sau confirmările. */
+function legCalculeaza(){
+  if(!LEG.date || !window.LegaturaAmp || !PROJECTS.length) return false;
+  const pr = legProiecte();
+  let s = 0; pr.forEach(p => { s += p.ang + p.deb; });
+  const semn = [pr.length, Math.round(s), LEG.date.numar, LEG.versiune].join('|');
+  if(semn === LEG.semn && LEG.rez) return false;
+  LEG.semn = semn;
+  LEG.pr = {}; pr.forEach(p => { LEG.pr[p.id] = p; });
+  LEG.proj = new Map(PROJECTS.map(p => [p.id, p]));
+  LEG.rez = LegaturaAmp.potriveste(LEG.date.acorduri, pr, legUneste(LEG.oficiale, LEG.pending));
+  return true;
+}
+window.legaturiDupaDate = function(){            // apelat de rebuildAll când sosesc datele live
+  const v = document.getElementById('legaturiView');
+  if(v && v.style.display !== 'none') legaturiRender();
+};
+
+const LEG_RANG = { confirmat: 0, suma: 1, titlu: 2, ambiguu: 3, fara: 4, 'fara-confirmat': 5 };
+const LEG_ETICHETA = { confirmat: 'legNivelConfirmat', suma: 'legNivelSuma', titlu: 'legNivelTitlu', ambiguu: 'legNivelAmbiguu',
+                       fara: 'legNivelFara', 'fara-confirmat': 'legNivelFaraConf' };
+const LEG_MOTIV_EN = { 'faza': 'phase differs', 'suma diferă': 'amount differs', 'suma necunoscută': 'amount unknown',
+  'finanțator nerecunoscut': 'funder not recognised', 'data': 'date does not fit', 'mai multe proiecte potrivite': 'several projects fit',
+  'alt proiect se potrivește mai bine la sumă': 'another project fits the amount better', 'costul total al proiectului coincide': 'total project cost matches',
+  'proiectul nu e în datele de azi': 'project not in today’s data' };
+function legMotiv(m){
+  if(currentLang !== 'en') return m;
+  const x = /^același proiect pentru (\d+) acorduri$/.exec(m);
+  return x ? 'same project for ' + x[1] + ' agreements' : (LEG_MOTIV_EN[m] || m);
+}
+const LEG_LUNI_EN = { ianuarie: 'January', februarie: 'February', martie: 'March', aprilie: 'April', mai: 'May', iunie: 'June', iulie: 'July',
+  august: 'August', septembrie: 'September', octombrie: 'October', noiembrie: 'November', decembrie: 'December' };
+function legData(s){
+  const m = /^(\d{1,2}) (\S+) (\d{4})$/.exec(String(s || ''));
+  return currentLang === 'en' && m && LEG_LUNI_EN[m[2]] ? m[1] + ' ' + LEG_LUNI_EN[m[2]] + ' ' + m[3] : (s || '—');
+}
+function legFold(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+function legBadge(n){ return '<span class="leg-badge ' + (n === 'fara-confirmat' ? 'fara' : n) + '">' + esc(t(LEG_ETICHETA[n])) + '</span>'; }
+function legTitlu(id){ const po = LEG.proj.get(id); return po ? projectLabel(po) : t('legNuInDate'); }
+function legAn(a){ return ((a.semnat || a.primul || '').slice(6)) || ''; }
+function legEur(v){ return v ? fmtCompact(v) + ' EUR' : '—'; }
+
+function legRanduriAcorduri(){
+  const q = legFold(document.getElementById('legSearch').value.trim());
+  const niv = document.getElementById('legNivel').value, par = document.getElementById('legPartener').value;
+  let R = LEG.rez.rezultate.filter(x => {
+    const s = x.stare;
+    if(niv === 'sigure' && !(s === 'confirmat' || s === 'suma')) return false;
+    if(niv === 'verificat' && !(s === 'titlu' || s === 'ambiguu')) return false;
+    if(niv === 'fara' && !(s === 'fara' || s === 'fara-confirmat')) return false;
+    if(par && x.acord.parteneri.split(' / ').map(z => z.trim()).indexOf(par) < 0) return false;
+    if(!q) return true;
+    const text = [x.acord.scurt, x.acord.nume, x.acord.parteneri, x.acord.acte.map(a => a.act).join(' '),
+                  x.legaturi.map(l => l.idProiect + ' ' + legTitlu(l.idProiect)).join(' ')].join(' ');
+    return legFold(text).indexOf(q) > -1;
+  });
+  R.sort((a, b) => LEG_RANG[a.stare] - LEG_RANG[b.stare] || ((b.acord.suma && b.acord.suma.eur) || 0) - ((a.acord.suma && a.acord.suma.eur) || 0));
+  return R;
+}
+/* Banii unui acord: din legăturile sigure; dacă nu există, din cele „după titlu", cu semnul ≈. */
+function legBaniAcord(x){
+  const b = LegaturaAmp.bani(x, LEG.pr);
+  if(b.siguri > 0) return { ang: b.ang, deb: b.deb, aprox: false, partajat: !!b.partajate };
+  if(b.probabile.proiecte > 0) return { ang: b.probabile.ang, deb: b.probabile.deb, aprox: true, partajat: false };
+  return null;
+}
+function legRandAcord(x){
+  const a = x.acord, b = legBaniAcord(x), prim = x.legaturi[0], eur = a.suma && a.suma.eur;
+  let proiect = '<span class="leg-aprox">—</span>';
+  if(prim){
+    proiect = ampIdHtml(prim.idProiect) + '<div class="leg-titlu leg-sub">' + esc(legTitlu(prim.idProiect)) + '</div>' +
+      (x.legaturi.length > 1 ? '<div class="leg-sub">+' + (x.legaturi.length - 1) + ' ' + esc(t('legProiecteAlte')) + '</div>' : '');
+  }
+  const cel = v => b === null ? '<span class="leg-aprox">—</span>' : '<span' + (b.aprox ? ' class="leg-aprox"' : '') + '>' + (b.aprox ? '≈ ' : '') + fmtNum(Math.round(v)) + '</span>';
+  const pct = b !== null && eur ? Math.round(100 * b.deb / eur) + '%' : '—';
+  const valuta = a.suma && a.suma.val !== 'EUR' ? ' <span class="leg-sub">(' + fmtCompact(a.suma.v) + ' ' + esc(a.suma.val) + ')</span>' : '';
+  return '<tr class="leg-rand" data-id="' + esc(a.id) + '" tabindex="0" role="button" aria-expanded="' + (LEG.deschise.has(a.id) ? 'true' : 'false') + '">' +
+    '<td><div class="leg-nume">' + esc(a.scurt) + '</div><div class="leg-sub">' + esc(a.parteneri) + ' · ' + esc(a.categorie) +
+      (legAn(a) ? ' · ' + esc(legAn(a)) : '') + ' · ' + a.acte.length + ' ' + esc(t('legActeN')) + '</div></td>' +
+    '<td class="num">' + (eur ? esc(legEur(eur)) : '—') + valuta + '</td>' +
+    '<td>' + proiect + '</td>' +
+    '<td class="num">' + (b ? cel(b.ang) : cel(0)) + '</td>' +
+    '<td class="num">' + (b ? cel(b.deb) : cel(0)) + (b && b.partajat ? ' <span title="' + esc(t('legPartajatTitlu')) + '">↔</span>' : '') + '</td>' +
+    '<td class="num">' + (b && b.aprox && pct !== '—' ? '<span class="leg-aprox">≈ ' + pct + '</span>' : pct) +
+      (b && !b.aprox && eur && b.ang < 0.5 * eur ? ' <span title="' + esc(t('legAmpPutin')) + '" style="cursor:help;">⚠</span>' : '') + '</td>' +
+    '<td>' + legBadge(x.stare) + '</td></tr>';
+}
+function legSumaText(x, l){
+  const a = x.acord, s = l.suma || {};
+  if(s.stare === 'da') return t('legSumaDa').replace('{a}', fmtNum(Math.round(s.acord.v))).replace('{p}', fmtNum(Math.round(s.proiect.v)))
+    .replace('{src}', s.proiect.sursa === 'valoare propusă' ? t('legSursaVp') : t('legSursaAng')).replace('{d}', (s.rel * 100).toFixed(1).replace(/\.0$/, ''));
+  if(s.stare === 'nu') return t('legSumaNu').replace('{a}', a.suma ? fmtNum(a.suma.eur) : '—');
+  return t('legSumaNecunoscuta');
+}
+function legDetaliu(x){
+  const a = x.acord, id = esc(a.id);
+  let h = '<div class="leg-det">';
+  if(x.legaturi.length){
+    h += '<div class="leg-det-t">' + esc(t('legDetProiecte')) + '</div>';
+    x.legaturi.forEach(l => {
+      const p = LEG.pr[l.idProiect], idp = esc(l.idProiect);
+      const oficial = (LEG.oficiale.confirmate || {})[a.id] && LEG.oficiale.confirmate[a.id].indexOf(l.idProiect) > -1;
+      h += '<div class="leg-leg">' + legBadge(l.nivel) + ' ' + ampIdHtml(l.idProiect) + ' <b>' + esc(legTitlu(l.idProiect)) + '</b>' +
+        '<span class="leg-sub">' + esc(p ? (p.donatori || []).join(', ') : '') + '</span>' +
+        '<span>' + esc(t('legAng')) + ' ' + (p ? fmtNum(Math.round(p.ang)) : '—') + ' · ' + esc(t('legDeb')) + ' ' + (p ? fmtNum(Math.round(p.deb)) : '—') + '</span>' +
+        (l.nivel !== 'confirmat' ? '<span class="leg-sub">' + esc(t('legTitluPct')) + ' ' + Math.round(l.titlu * 100) + '%</span>' : '') +
+        (l.partajat ? '<span class="leg-chip">' + esc(t('legPartajat').replace('{n}', l.partajat)) + '</span>' : '') +
+        l.motive.map(m => '<span class="leg-chip">' + esc(legMotiv(m)) + '</span>').join(' ') +
+        '<span class="leg-sumaText">' + esc(legSumaText(x, l)) + '</span>' +
+        (l.nivel === 'confirmat'
+          ? (oficial ? '' : '<button type="button" class="leg-btn" data-act="anuleaza" data-acord="' + id + '" data-amp="' + idp + '">' + esc(t('legAnuleaza')) + '</button>')
+          : '<button type="button" class="leg-btn ok" data-act="confirma" data-acord="' + id + '" data-amp="' + idp + '">' + esc(t('legConfirma')) + '</button>') +
+        '<button type="button" class="leg-btn" data-act="respinge" data-acord="' + id + '" data-amp="' + idp + '">' + esc(t('legRespinge')) + '</button></div>';
+    });
+  } else {
+    h += '<div class="leg-sub">' + esc(x.stare === 'fara-confirmat' ? t('legFaraConfText') : t('legFaraText')) + '</div>';
+  }
+  const alte = [a.suma].concat(a.alte || [], a.cost ? [Object.assign({ sursa: 'cost' }, a.cost)] : []).filter(Boolean);
+  if(alte.length){
+    h += '<div class="leg-act">' + esc(t('legSumeAcord')) + ': ' + alte.map(s => esc(fmtNum(s.v) + ' ' + s.val) + (s.eur && s.val !== 'EUR' ? ' (≈ ' + esc(fmtNum(s.eur)) + ' EUR)' : '') +
+      ' <span class="leg-sub">[' + esc(t('legSursa_' + (s.sursa || 'acord')) || s.sursa) + ']</span>').join(' · ') + '</div>';
+  }
+  h += '<div class="leg-act">' + esc(t('legActe')) + ': ' + a.acte.map(z => (z.url ? '<a href="' + esc(z.url) + '" target="_blank" rel="noopener">' + esc(z.act) + '</a>' : esc(z.act)) +
+    ' <span class="leg-sub">(' + esc(z.data) + ')</span>').join(' · ') +
+    ' · <a href="legis_acorduri.html#acord=' + encodeURIComponent(a.id) + '">' + esc(t('legInRegistru')) + ' ↗</a></div>';
+  h += '<div class="leg-manual"><span>' + esc(t('legManual')) + '</span><input type="text" data-acord="' + id + '" placeholder="AMP ID" aria-label="AMP ID">' +
+    '<button type="button" class="leg-btn ok" data-act="manual" data-acord="' + id + '">' + esc(t('legLeaga')) + '</button>' +
+    (x.legaturi.length ? '' : '<button type="button" class="leg-btn" data-act="fara" data-acord="' + id + '">' + esc(t('legNuExista')) + '</button>') + '</div>';
+  return h + '</div>';
+}
+/* Tab-ul „pe proiecte": de la proiectul AMP la baza lui legală. */
+function legRanduriProiecte(){
+  const q = legFold(document.getElementById('legSearch').value.trim());
+  const niv = document.getElementById('legNivel').value, par = document.getElementById('legPartener').value;
+  const out = [];
+  Object.keys(LEG.rez.peProiect).forEach(id => {
+    const L = LEG.rez.peProiect[id], p = LEG.pr[id];
+    const sigure = L.filter(z => z.nivel === 'confirmat' || z.nivel === 'suma');
+    if(niv === 'sigure' && !sigure.length) return;
+    if(niv === 'verificat' && sigure.length) return;
+    if(niv === 'fara') return;
+    if(par && !L.some(z => z.acord.parteneri.split(' / ').map(s => s.trim()).indexOf(par) > -1)) return;
+    if(q && legFold(id + ' ' + legTitlu(id) + ' ' + L.map(z => z.acord.scurt + ' ' + z.acord.parteneri).join(' ')).indexOf(q) < 0) return;
+    out.push({ id: id, p: p, L: L.slice().sort((a, b) => LEG_RANG[a.nivel] - LEG_RANG[b.nivel]) });
+  });
+  out.sort((a, b) => ((b.p && b.p.deb) || 0) - ((a.p && a.p.deb) || 0));
+  return out;
+}
+function legRandProiect(r){
+  return '<tr><td>' + ampIdHtml(r.id) + '<div class="leg-titlu leg-sub">' + esc(legTitlu(r.id)) + '</div></td>' +
+    '<td class="leg-sub">' + esc(r.p ? (r.p.donatori || []).join(', ') : '') + '</td>' +
+    '<td class="num">' + (r.p ? fmtNum(Math.round(r.p.ang)) : '—') + '</td><td class="num">' + (r.p ? fmtNum(Math.round(r.p.deb)) : '—') + '</td>' +
+    '<td>' + r.L.slice(0, 4).map(z => '<div>' + legBadge(z.nivel) + ' ' + esc(z.acord.scurt) + ' <span class="leg-sub">' + esc(z.acord.parteneri) + (z.acord.suma && z.acord.suma.eur ? ' · ' + esc(legEur(z.acord.suma.eur)) : '') + '</span></div>').join('') +
+      (r.L.length > 4 ? '<div class="leg-sub">+' + (r.L.length - 4) + '</div>' : '') + '</td></tr>';
+}
+function legKpi(){
+  const R = LEG.rez.rezultate, c = s => R.filter(x => x.stare === s).length;
+  const sigure = c('confirmat') + c('suma'), verif = c('titlu') + c('ambiguu'), fara = c('fara') + c('fara-confirmat');
+  const vazut = new Set(); let ang = 0, deb = 0;
+  R.forEach(x => x.legaturi.forEach(l => {
+    if((l.nivel === 'confirmat' || l.nivel === 'suma') && !vazut.has(l.idProiect)){ vazut.add(l.idProiect); const p = LEG.pr[l.idProiect]; if(p){ ang += p.ang; deb += p.deb; } }
+  }));
+  const cuSuma = LEG.date.acorduri.filter(a => a.suma && a.suma.eur).length;
+  const k = (lbl, val, sub) => '<div class="kpi"><div class="lbl">' + esc(lbl) + '</div><div class="val">' + val + '</div><div class="sub">' + sub + '</div></div>';
+  return k(t('legKpiAcorduri'), fmtNum(R.length), esc(t('legKpiCuSuma').replace('{n}', fmtNum(cuSuma)))) +
+         k(t('legKpiSigure'), fmtNum(sigure), esc(t('legKpiSigureSub'))) +
+         k(t('legKpiVerif'), fmtNum(verif), esc(t('legKpiVerifSub'))) +
+         k(t('legKpiFara'), fmtNum(fara), esc(t('legKpiFaraSub'))) +
+         k(t('legKpiBani'), fmtCompact(deb) + '<small>EUR</small>', esc(t('legKpiBaniSub').replace('{a}', fmtCompact(ang)).replace('{p}', ang ? Math.round(100 * deb / ang) : 0).replace('{n}', fmtNum(vazut.size))));
+}
+function legPopuleazaFiltre(){
+  const nv = document.getElementById('legNivel'), pa = document.getElementById('legPartener');
+  const vn = nv.value, vp = pa.value;
+  nv.innerHTML = [['', 'legFiltruToate'], ['sigure', 'legFiltruSigure'], ['verificat', 'legFiltruVerificat'], ['fara', 'legFiltruFara']]
+    .map(o => '<option value="' + o[0] + '">' + esc(t(o[1])) + '</option>').join('');
+  nv.value = vn;
+  if(LEG.date){
+    const nr = {};
+    LEG.date.acorduri.forEach(a => a.parteneri.split(' / ').forEach(p => { p = p.trim(); if(p) nr[p] = (nr[p] || 0) + 1; }));
+    pa.innerHTML = '<option value="">' + esc(t('legFiltruPartener')) + '</option>' +
+      Object.keys(nr).sort((a, b) => nr[b] - nr[a]).slice(0, 30).map(p => '<option value="' + esc(p) + '">' + esc(p) + ' (' + nr[p] + ')</option>').join('');
+    pa.value = vp;
+  }
+}
+function legPanouConfirmari(){
+  const p = LEG.pending, n = Object.keys(p.confirmate).length + Object.keys(p.respinse).length + p.fara_proiect.length;
+  const panou = document.getElementById('legPanouConf');
+  panou.style.display = n ? '' : 'none';
+  if(!n) return;
+  const j = legUneste(LEG.oficiale, p), of = LEG.oficiale || {};
+  const iesire = { _cum_se_foloseste: of._cum_se_foloseste || t('legJsonCum'), confirmate: j.confirmate, respinse: j.respinse, fara_proiect: j.fara_proiect };
+  document.getElementById('legJson').value = JSON.stringify(iesire, null, 2);
+}
+function legaturiRender(){
+  const status = document.getElementById('legStatus'), corp = document.getElementById('legCorp'), cap = document.getElementById('legCap');
+  if(!status) return;
+  legPopuleazaFiltre();
+  if(!window.LegaturaAmp){ status.className = 'leg-status err'; status.textContent = t('legEroareModul'); return; }
+  document.querySelectorAll('#legaturiView .leg-tabs button').forEach(b => b.classList.toggle('activ', b.dataset.tab === LEG.tab));
+  if(LEG.eroare){
+    status.className = 'leg-status err'; status.textContent = t('legEroare');
+    corp.innerHTML = ''; cap.innerHTML = ''; document.getElementById('legKpis').innerHTML = ''; document.getElementById('legCount').textContent = '';
+    return;
+  }
+  if(!LEG.date){ status.className = 'leg-status'; status.innerHTML = '<span class="spin"></span>' + esc(t('legSeIncarca')); return; }
+  legCalculeaza();
+  if(!LEG.rez){ status.className = 'leg-status'; status.innerHTML = '<span class="spin"></span>' + esc(t('legSeIncarca')); return; }
+  status.className = 'leg-status';
+  status.textContent = t('legStatus').replace('{p}', fmtNum(PROJECTS.length)).replace('{src}', window.__liveLaOra ? t('legSursaLive') : t('legSursaArhiva'))
+    .replace('{a}', fmtNum(LEG.date.numar)).replace('{d}', legData(LEG.date.curs_data));
+  const idAcorduri = new Set(LEG.date.acorduri.map(a => a.id)), jc = legUneste(LEG.oficiale, LEG.pending);
+  const orfane = Object.keys(jc.confirmate).concat(Object.keys(jc.respinse), jc.fara_proiect).filter(id => !idAcorduri.has(id));
+  if(orfane.length) status.textContent += ' · ⚠ ' + t('legOrfane').replace('{n}', orfane.length).replace('{ids}', orfane.slice(0, 5).join(', '));
+  document.getElementById('legKpis').innerHTML = legKpi();
+  const tab = LEG.tab, H = (k, cls) => '<th' + (cls ? ' class="' + cls + '"' : '') + '>' + esc(t(k)) + '</th>';
+  if(tab === 'acorduri'){
+    cap.innerHTML = '<tr>' + H('legColAcord') + H('legColSuma', 'num') + H('legColProiect') + H('legColAng', 'num') + H('legColDeb', 'num') + H('legColPct', 'num') + H('legColNivel') + '</tr>';
+    const R = legRanduriAcorduri();
+    document.getElementById('legCount').textContent = fmtNum(R.length) + ' ' + t('legAfisate');
+    let h = '';
+    R.slice(0, LEG.limit).forEach(x => { h += legRandAcord(x); if(LEG.deschise.has(x.acord.id)) h += '<tr class="leg-detaliu"><td colspan="7">' + legDetaliu(x) + '</td></tr>'; });
+    if(R.length > LEG.limit) h += '<tr><td colspan="7" class="mai-mult-td"><button type="button" class="mai-mult-btn" id="legMaiMult">' + esc(t('legMaiMult').replace('{n}', Math.min(50, R.length - LEG.limit))) + '</button></td></tr>';
+    corp.innerHTML = h || '<tr><td colspan="7" class="leg-sub" style="padding:16px;">' + esc(t('legNimic')) + '</td></tr>';
+  } else {
+    cap.innerHTML = '<tr>' + H('legColProiect') + H('legColFinantator') + H('legColAng', 'num') + H('legColDeb', 'num') + H('legColBaza') + '</tr>';
+    const R = legRanduriProiecte();
+    document.getElementById('legCount').textContent = fmtNum(R.length) + ' ' + t('legProiecteAfisate');
+    let h = R.slice(0, LEG.limit).map(legRandProiect).join('');
+    if(R.length > LEG.limit) h += '<tr><td colspan="5" class="mai-mult-td"><button type="button" class="mai-mult-btn" id="legMaiMult">' + esc(t('legMaiMult').replace('{n}', Math.min(50, R.length - LEG.limit))) + '</button></td></tr>';
+    corp.innerHTML = h || '<tr><td colspan="5" class="leg-sub" style="padding:16px;">' + esc(t('legNimic')) + '</td></tr>';
+  }
+  legPanouConfirmari();
+}
+/* Confirmări: se țin în browser până sunt puse în date/legaturi_amp.json. */
+function legActiune(act, acord, amp){
+  const P = LEG.pending, scoate = (o, k, v) => { if(o[k]){ o[k] = o[k].filter(x => x !== v); if(!o[k].length) delete o[k]; } };
+  const pune = (o, k, v) => { const l = o[k] = o[k] || []; if(l.indexOf(v) < 0) l.push(v); };
+  if(act === 'confirma' || act === 'manual'){ pune(P.confirmate, acord, amp); scoate(P.respinse, acord, amp); P.fara_proiect = P.fara_proiect.filter(x => x !== acord); }
+  else if(act === 'respinge'){ pune(P.respinse, acord, amp); scoate(P.confirmate, acord, amp); }
+  else if(act === 'anuleaza'){ scoate(P.confirmate, acord, amp); }
+  else if(act === 'fara'){ if(P.fara_proiect.indexOf(acord) < 0) P.fara_proiect.push(acord); }
+  LEG.versiune++; legSalveaza(); legaturiRender();
+}
+function legComuta(id){
+  if(LEG.deschise.has(id)) LEG.deschise.delete(id); else LEG.deschise.add(id);
+  legaturiRender();
+  const r = [...document.querySelectorAll('#legCorp tr.leg-rand')].filter(x => x.dataset.id === id)[0];
+  if(r) r.focus();                    // redesenarea înlocuiește rândul: păstrăm focusul pentru tastatură
+}
+function legCsv(){
+  const en = currentLang === 'en', q = v => { v = String(v == null ? '' : v); return /[;"\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const cap = en ? ['Agreement', 'Funders', 'Type', 'Signed', 'Agreement amount (EUR)', 'Amount in original currency', 'Link status', 'AMP ID', 'AMP project', 'AMP donors', 'AMP commitments (EUR)', 'AMP disbursements (EUR)', 'Disbursed / agreement amount', 'Candidate projects', 'Notes', 'Acts', 'Register link']
+                 : ['Acord', 'Finanțatori', 'Tip', 'Semnat', 'Suma acordului (EUR)', 'Suma în valuta originală', 'Legătura', 'AMP ID', 'Proiect AMP', 'Donatori AMP', 'Angajat în AMP (EUR)', 'Debursat în AMP (EUR)', 'Debursat / suma acordului', 'Proiecte candidate', 'Observații', 'Acte', 'Link în registru'];
+  const linii = [cap];
+  LEG.rez.rezultate.slice().sort((a, b) => LEG_RANG[a.stare] - LEG_RANG[b.stare]).forEach(x => {
+    const a = x.acord, l = x.legaturi[0], p = l ? LEG.pr[l.idProiect] : null, eur = a.suma && a.suma.eur;
+    linii.push([a.nume, a.parteneri, a.categorie, a.semnat, eur || '', a.suma ? a.suma.v + ' ' + a.suma.val : '', t(LEG_ETICHETA[x.stare]),
+      l ? l.idProiect : '', l ? legTitlu(l.idProiect) : '', p ? (p.donatori || []).join(', ') : '', p ? Math.round(p.ang) : '', p ? Math.round(p.deb) : '',
+      p && eur ? (p.deb / eur).toFixed(3) : '', x.legaturi.length, l ? l.motive.map(legMotiv).join('; ') : '', a.acte.map(z => z.act).join(' '),
+      'legis_acorduri.html#acord=' + a.id]);
+  });
+  const text = '\ufeff' + linii.map(l => l.map(q).join(';')).join('\r\n') + '\r\n';
+  const el = document.createElement('a');
+  el.href = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
+  el.download = 'de-la-lege-la-bani-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(el); el.click(); el.remove();
+  setTimeout(() => URL.revokeObjectURL(el.href), 5000);
+}
+(function(){
+  const sel = id => document.getElementById(id);
+  const refa = () => { LEG.limit = 50; legaturiRender(); };
+  sel('legSearch').addEventListener('input', refa);
+  sel('legNivel').addEventListener('change', refa);
+  sel('legPartener').addEventListener('change', refa);
+  sel('legCsvBtn').addEventListener('click', () => { if(LEG.rez) legCsv(); });
+  document.querySelectorAll('#legaturiView .leg-tabs button').forEach(b => b.addEventListener('click', () => { LEG.tab = b.dataset.tab; LEG.limit = 50; legaturiRender(); }));
+  sel('legCorp').addEventListener('click', e => {
+    const mm = e.target.closest('#legMaiMult'); if(mm){ LEG.limit += 50; legaturiRender(); return; }
+    const b = e.target.closest('button[data-act]');
+    if(b){
+      e.stopPropagation();
+      let amp = b.dataset.amp || '';
+      if(b.dataset.act === 'manual'){
+        const inp = b.parentNode.querySelector('input'); amp = (inp.value || '').trim();
+        if(!/^[A-Za-z0-9_]{4,30}$/.test(amp)){ inp.focus(); inp.style.borderColor = 'var(--red)'; return; }
+      }
+      legActiune(b.dataset.act, b.dataset.acord, amp);
+      return;
+    }
+    if(e.target.closest('a,input,button,[data-ampid]')) return;
+    const tr = e.target.closest('tr.leg-rand'); if(!tr) return;
+    legComuta(tr.dataset.id);
+  });
+  sel('legCorp').addEventListener('keydown', e => {
+    if((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('tr.leg-rand')){ e.preventDefault(); legComuta(e.target.dataset.id); }
+  });
+  sel('legCopiaJson').addEventListener('click', () => {
+    const ta = sel('legJson');
+    try{ navigator.clipboard.writeText(ta.value); }catch(e){ ta.select(); document.execCommand && document.execCommand('copy'); }
+  });
+  sel('legDescarcaJson').addEventListener('click', () => {
+    const el = document.createElement('a');
+    el.href = URL.createObjectURL(new Blob([sel('legJson').value + '\n'], { type: 'application/json;charset=utf-8' }));
+    el.download = 'legaturi_amp.json';
+    document.body.appendChild(el); el.click(); el.remove();
+    setTimeout(() => URL.revokeObjectURL(el.href), 5000);
+  });
+  sel('legGoleste').addEventListener('click', () => {
+    LEG.pending = { confirmate: {}, respinse: {}, fara_proiect: [] }; LEG.versiune++; legSalveaza(); legaturiRender();
+  });
+})();
+function showLegaturiView(){
+  ['mainView', 'advancedView', 'updateView', 'iatiView', 'dportalView'].forEach(id => { const e = document.getElementById(id); if(e) e.style.display = 'none'; });
+  document.getElementById('legaturiView').style.display = '';
+  __marcheazaVederea('showLegaturiView');
+  window.scrollTo(0, 0);
+  legaturiRender();
+  legIncarca().then(legaturiRender);
+}
+window.showLegaturiView = showLegaturiView;
+document.getElementById('backFromLegBtn').addEventListener('click', showMainView);
+document.getElementById('logoBadgeLeg').addEventListener('click', showMainView);
+
 
 </script>
 <script>
@@ -8567,6 +9043,93 @@ Object.assign(I18N.ro, {
  "iatiOnlyDiff": "doar unde debursările diferă",
  "iatiOnlyDiffTitle": "Proiectele potrivite la care debursările din AMP și cele din IATI diferă cu peste 1% (și cu peste 1.000 EUR), de la diferența cea mai mare",
  "iatiDiffCsvBtn": "Descarcă diferențele (CSV)",
+ "legH1": "De la lege la bani",
+ "legTitle": "De la lege la bani: acordurile legate de proiectele din AMP",
+ "legIntro": "Fiecare acord din registrul de acorduri e căutat printre proiectele din AMP: după denumire, după finanțator și după sumă. O legătură e socotită sigură doar când suma acordului coincide cu angajamentele proiectului (cel mult 15% diferență) sau când a confirmat-o un om. Restul sunt „de verificat”: de obicei sunt faze diferite ale aceluiași program sau înregistrări parțiale în AMP, iar banii unui proiect nu se pun pe un acord doar fiindcă are un nume asemănător. „Fără proiect” nu înseamnă că proiectul lipsește din AMP, ci că nu l-am putut recunoaște după denumire.",
+ "legListTitle": "Acordurile și proiectele lor",
+ "legTabAcorduri": "Pe acorduri",
+ "legTabProiecte": "Pe proiecte",
+ "legSearchPh": "Caută după denumire, finanțator, act sau AMP ID...",
+ "legCsvBtn": "Descarcă tabelul (CSV)",
+ "legPanouTitlu": "Confirmări în pregătire",
+ "legPanouText": "Alegerile tale (confirmări, respingeri) rămân doar în acest browser. Ca să apară pentru toți, copiază textul de mai jos în fișierul date/legaturi_amp.json din repository și publică-l.",
+ "legCopiaJson": "Copiază JSON",
+ "legDescarcaJson": "Descarcă legaturi_amp.json",
+ "legGoleste": "Șterge alegerile mele",
+ "legNuInDate": "proiectul nu e în datele de azi",
+ "legProiecteAlte": "alte proiecte potrivite",
+ "legActeN": "acte",
+ "legPartajatTitlu": "Proiect folosit și de alt acord: banii nu sunt doar ai acestuia",
+ "legPartajat": "partajat cu {n} alt(e) acord(uri)",
+ "legSumaDa": "Suma acordului ({a}) coincide cu {src} din AMP ({p}); diferență {d}%.",
+ "legSursaVp": "valoarea propusă a proiectului",
+ "legSursaAng": "angajamentele",
+ "legSumaNu": "Suma acordului ({a} EUR) nu coincide cu cea din AMP.",
+ "legSumaNecunoscuta": "Suma acordului sau cea din AMP lipsește: nu se poate confirma după sumă.",
+ "legDetProiecte": "Proiecte AMP potrivite",
+ "legAng": "angajat",
+ "legDeb": "debursat",
+ "legTitluPct": "asemănarea denumirii",
+ "legAnuleaza": "Anulează confirmarea",
+ "legConfirma": "Confirmă",
+ "legRespinge": "Respinge",
+ "legFaraConfText": "Un om a confirmat că acest acord nu are proiect în AMP.",
+ "legFaraText": "Niciun proiect AMP nu s-a potrivit după denumire, finanțator și dată. Nu înseamnă că lipsește din AMP.",
+ "legSumeAcord": "Sume din acord",
+ "legSursa_acord": "textul acordului",
+ "legSursa_titlu": "titlul actului",
+ "legSursa_text": "textul actului",
+ "legSursa_guvern": "nota Guvernului",
+ "legSursa_cost": "costul total al proiectului",
+ "legSursa_alta": "altă sursă",
+ "legActe": "Acte",
+ "legInRegistru": "Vezi în registru",
+ "legManual": "Știi proiectul? Scrie AMP ID:",
+ "legLeaga": "Leagă",
+ "legNuExista": "Nu există în AMP",
+ "legKpiAcorduri": "Acorduri în registru",
+ "legKpiCuSuma": "cu sumă cunoscută: {n}",
+ "legKpiSigure": "Legate sigur",
+ "legKpiSigureSub": "sumă potrivită sau confirmat de un om",
+ "legKpiVerif": "De verificat",
+ "legKpiVerifSub": "doar după denumire sau mai multe proiecte potrivite",
+ "legKpiFara": "Fără proiect găsit",
+ "legKpiFaraSub": "nu înseamnă că lipsește din AMP",
+ "legKpiBani": "Debursat la cele legate sigur",
+ "legKpiBaniSub": "din {a} EUR angajați în AMP ({p}%), la {n} proiecte",
+ "legFiltruToate": "Toate legăturile",
+ "legFiltruSigure": "Doar cele sigure",
+ "legFiltruVerificat": "De verificat",
+ "legFiltruFara": "Fără proiect",
+ "legFiltruPartener": "Toți finanțatorii",
+ "legJsonCum": "Confirmări făcute de oameni. „confirmate”: id-ul acordului (din registru) → lista AMP ID ale proiectelor lui. „respinse”: legături automate care nu sunt corecte. „fara_proiect”: acorduri despre care s-a verificat că nu au proiect în AMP.",
+ "legEroare": "Lista acordurilor nu s-a putut încărca (date/acorduri_legare.json). Deschide site-ul de pe adresa lui publică sau generează fișierul cu legatura_acorduri.py.",
+ "legSeIncarca": "Se încarcă acordurile…",
+ "legStatus": "Proiecte AMP comparate: {p} ({src}) · acorduri: {a} · sume în euro la cursul din {d}",
+ "legSursaLive": "arhivă + raport live",
+ "legSursaArhiva": "doar arhiva: raportul live nu s-a încărcat",
+ "legColAcord": "Acord",
+ "legColSuma": "Suma acordului",
+ "legColProiect": "Proiect AMP",
+ "legColAng": "Angajat în AMP",
+ "legColDeb": "Debursat în AMP",
+ "legColPct": "Din acord",
+ "legColNivel": "Legătura",
+ "legColFinantator": "Finanțator",
+ "legColBaza": "Baza legală (acorduri)",
+ "legAfisate": "acorduri afișate",
+ "legProiecteAfisate": "proiecte afișate",
+ "legMaiMult": "Arată încă {n}",
+ "legNimic": "Niciun rezultat.",
+ "legNivelConfirmat": "confirmat",
+ "legNivelSuma": "sumă potrivită",
+ "legNivelTitlu": "de verificat",
+ "legNivelAmbiguu": "ambiguu",
+ "legNivelFara": "fără proiect",
+ "legNivelFaraConf": "fără proiect (confirmat)",
+ "legEroareModul": "Modulul de potrivire (legatura-amp.js) nu s-a încărcat. Reîncarcă pagina.",
+ "legAmpPutin": "AMP are angajamente mult mai mici decât suma acordului: proiect înregistrat parțial sau acord încă nedebursat. „Debursat din acord” arată ce scrie AMP, nu rata reală.",
+ "legOrfane": "{n} confirmări nu mai corespund niciunui acord din registru ({ids}); verifică id-urile din date/legaturi_amp.json.",
  "iatiColDashName": "Denumire în dashboard",
  "iatiColMatch": "Potrivire IATI",
  "iatiColPublisher": "Publicator IATI",
@@ -8643,6 +9206,93 @@ Object.assign(I18N.en, {
  "iatiOnlyDiff": "only where disbursements differ",
  "iatiOnlyDiffTitle": "Matched projects whose AMP and IATI disbursements differ by more than 1% (and by more than EUR 1,000), largest difference first",
  "iatiDiffCsvBtn": "Download the differences (CSV)",
+ "legH1": "From law to money",
+ "legTitle": "From law to money: agreements linked to AMP projects",
+ "legIntro": "Every agreement in the agreements register is looked up among the AMP projects: by name, by funder and by amount. A link is treated as secure only when the agreement amount matches the project’s commitments (at most 15% apart) or a person has confirmed it. The rest are “to verify”: usually different phases of the same programme or partial records in AMP, and a project’s money is not put on an agreement just because the names are alike. “No project” does not mean the project is missing from AMP, only that it could not be recognised by name.",
+ "legListTitle": "Agreements and their projects",
+ "legTabAcorduri": "By agreement",
+ "legTabProiecte": "By project",
+ "legSearchPh": "Search by name, funder, act or AMP ID...",
+ "legCsvBtn": "Download the table (CSV)",
+ "legPanouTitlu": "Confirmations in progress",
+ "legPanouText": "Your choices (confirmations, rejections) stay in this browser only. To make them visible to everyone, copy the text below into date/legaturi_amp.json in the repository and publish it.",
+ "legCopiaJson": "Copy JSON",
+ "legDescarcaJson": "Download legaturi_amp.json",
+ "legGoleste": "Clear my choices",
+ "legNuInDate": "project not in today’s data",
+ "legProiecteAlte": "other matching projects",
+ "legActeN": "acts",
+ "legPartajatTitlu": "Project shared with another agreement: the money is not this agreement’s alone",
+ "legPartajat": "shared with {n} other agreement(s)",
+ "legSumaDa": "The agreement amount ({a}) matches the {src} in AMP ({p}); difference {d}%.",
+ "legSursaVp": "proposed project value",
+ "legSursaAng": "commitments",
+ "legSumaNu": "The agreement amount ({a} EUR) does not match AMP.",
+ "legSumaNecunoscuta": "The agreement or AMP amount is missing: it cannot be confirmed by amount.",
+ "legDetProiecte": "Matching AMP projects",
+ "legAng": "committed",
+ "legDeb": "disbursed",
+ "legTitluPct": "name similarity",
+ "legAnuleaza": "Undo confirmation",
+ "legConfirma": "Confirm",
+ "legRespinge": "Reject",
+ "legFaraConfText": "A person confirmed that this agreement has no project in AMP.",
+ "legFaraText": "No AMP project matched by name, funder and date. This does not mean it is missing from AMP.",
+ "legSumeAcord": "Amounts in the agreement",
+ "legSursa_acord": "agreement text",
+ "legSursa_titlu": "act title",
+ "legSursa_text": "act text",
+ "legSursa_guvern": "Government note",
+ "legSursa_cost": "total project cost",
+ "legSursa_alta": "other source",
+ "legActe": "Acts",
+ "legInRegistru": "See in the register",
+ "legManual": "Know the project? Enter its AMP ID:",
+ "legLeaga": "Link",
+ "legNuExista": "Not in AMP",
+ "legKpiAcorduri": "Agreements in the register",
+ "legKpiCuSuma": "with a known amount: {n}",
+ "legKpiSigure": "Securely linked",
+ "legKpiSigureSub": "amount matches, or confirmed by a person",
+ "legKpiVerif": "To verify",
+ "legKpiVerifSub": "by name only, or several projects fit",
+ "legKpiFara": "No project found",
+ "legKpiFaraSub": "does not mean it is missing from AMP",
+ "legKpiBani": "Disbursed under the securely linked",
+ "legKpiBaniSub": "of EUR {a} committed in AMP ({p}%), across {n} projects",
+ "legFiltruToate": "All links",
+ "legFiltruSigure": "Secure only",
+ "legFiltruVerificat": "To verify",
+ "legFiltruFara": "No project",
+ "legFiltruPartener": "All funders",
+ "legJsonCum": "Confirmations made by people. “confirmate”: agreement id (from the register) → list of its AMP IDs. “respinse”: automatic links that are wrong. “fara_proiect”: agreements verified to have no project in AMP.",
+ "legEroare": "The list of agreements could not be loaded (date/acorduri_legare.json). Open the site from its public address, or generate the file with legatura_acorduri.py.",
+ "legSeIncarca": "Loading agreements…",
+ "legStatus": "AMP projects compared: {p} ({src}) · agreements: {a} · amounts in euro at the rate of {d}",
+ "legSursaLive": "archive + live report",
+ "legSursaArhiva": "archive only: the live report did not load",
+ "legColAcord": "Agreement",
+ "legColSuma": "Agreement amount",
+ "legColProiect": "AMP project",
+ "legColAng": "AMP commitments",
+ "legColDeb": "AMP disbursements",
+ "legColPct": "Of agreement",
+ "legColNivel": "Link",
+ "legColFinantator": "Funder",
+ "legColBaza": "Legal basis (agreements)",
+ "legAfisate": "agreements shown",
+ "legProiecteAfisate": "projects shown",
+ "legMaiMult": "Show {n} more",
+ "legNimic": "No results.",
+ "legNivelConfirmat": "confirmed",
+ "legNivelSuma": "amount matches",
+ "legNivelTitlu": "to verify",
+ "legNivelAmbiguu": "ambiguous",
+ "legNivelFara": "no project",
+ "legNivelFaraConf": "no project (confirmed)",
+ "legEroareModul": "The matching module (legatura-amp.js) did not load. Reload the page.",
+ "legAmpPutin": "AMP commitments are far below the agreement amount: a partly recorded project, or an agreement not yet disbursed. “Of agreement” shows what AMP says, not the real rate.",
+ "legOrfane": "{n} confirmations no longer match any agreement in the register ({ids}); check the ids in date/legaturi_amp.json.",
  "iatiColDashName": "Name in dashboard",
  "iatiColMatch": "IATI match",
  "iatiColPublisher": "IATI publisher",
@@ -9222,6 +9872,7 @@ loadLiveData();
 <script src="amp-linkuri.js"></script>
 <!-- ?v= se schimbă la fiecare modificare a lui unelte.js, ca browserele să nu folosească
      versiunea veche din memoria cache (GitHub Pages o păstrează până la 10 minute) -->
+<script src="legatura-amp.js?v=2026-10-07"></script>
 <script src="unelte.js?v=2026-10-02b"></script>
 
 </body>

@@ -282,6 +282,35 @@ verifica('nota care nu se poate descărca rămâne de reîncercat, nu cu sumă',
          not gs.citeste_nota(_n, None, ls.sume_din_text, ls.text_din_pdf) and _n == {'eroare': 'PDF indisponibil'}
          and not gs.citeste_nota(_n, b'<html>eroare</html>', ls.sume_din_text, ls.text_din_pdf))
 
+print()
+print('Lista acordurilor pentru „De la lege la bani” (legatura_acorduri.py)')
+import legatura_acorduri as lga
+_ac = lambda i, suma=True: {'id': 'a%d' % i, 'nume': 'Acord %d' % i, 'suma': {'v': 1, 'val': 'EUR', 'eur': 1} if suma else None}
+_bune = [_ac(i) for i in range(300)]
+verifica('o citire bună trece', lga.valideaza(_bune) == [], lga.valideaza(_bune))
+verifica('prea puține acorduri: pagina nu și-a încărcat datele', any('nu și-a încărcat' in x for x in lga.valideaza(_bune[:50])))
+verifica('id-uri care se repetă se refuză', any('se repetă' in x for x in lga.valideaza(_bune[:250] + [_ac(1)])))
+verifica('un acord fără denumire se refuză', any('fără id sau fără denumire' in x for x in lga.valideaza(_bune[:250] + [{'id': 'x', 'nume': ''}])))
+_fara_suma = [_ac(i, suma=(i < 30)) for i in range(300)]
+verifica('sumele care nu s-au încărcat (10% cu sumă) se refuză', any('sumele nu s-au încărcat' in x for x in lga.valideaza(_fara_suma)))
+verifica('scăderea bruscă a numărului de acorduri față de fișierul de acum se refuză', any('față de' in x for x in lga.valideaza(_bune[:230], _bune)))
+verifica('scăderea bruscă a acordurilor cu sumă față de fișierul de acum se refuză',
+         any('cu sumă față de' in x for x in lga.valideaza([_ac(i, suma=(i < 100)) for i in range(300)], _bune)))
+_nou = lga.continut(_bune[:3], '1 iulie 2026', '2026-10-07 10:00')
+_text = lga.text_json(_nou)
+verifica('fișierul scris e JSON valid și se citește înapoi la fel', json.loads(_text) == _nou, _text[:120])
+verifica('un acord pe linie', _text.count('\n') == 3 + 2 and _text.startswith('{"actualizat"'), _text.count('\n'))
+verifica('data scrierii nu schimbă conținutul', lga.fara_data(_nou) == lga.fara_data(lga.continut(_bune[:3], '1 iulie 2026', '2026-10-08 09:00')))
+_real = json.load(open(AICI / 'date' / 'acorduri_legare.json', encoding='utf-8'))
+verifica('fișierul din repository e coerent: numărul scris = numărul real, fără probleme de validare',
+         _real['numar'] == len(_real['acorduri']) and lga.valideaza(_real['acorduri']) == [], lga.valideaza(_real['acorduri']))
+_conf = json.load(open(AICI / 'date' / 'legaturi_amp.json', encoding='utf-8'))
+verifica('date/legaturi_amp.json are cele trei liste așteptate de pagină',
+         isinstance(_conf.get('confirmate'), dict) and isinstance(_conf.get('respinse'), dict) and isinstance(_conf.get('fara_proiect'), list))
+_ids = {a['id'] for a in _real['acorduri']}
+_orfane = [k for k in list(_conf['confirmate']) + list(_conf['respinse']) + list(_conf['fara_proiect']) if k not in _ids]
+verifica('nicio confirmare din legaturi_amp.json nu are un id de acord care nu mai există', _orfane == [], _orfane)
+
 if '--browser' in sys.argv:
     print('Browser, pe legis.md simulat')
 
@@ -410,6 +439,17 @@ if '--browser' in sys.argv:
     finally:
         srv.shutdown()
         shutil.rmtree(tmp, ignore_errors=True)
+
+    print()
+    print('Browser, pe registrul real: lista acordurilor (legatura_acorduri.py)')
+    _lista, _curs = lga.citeste_acorduri()
+    verifica('pagina de registru își dă lista de acorduri', len(_lista) >= lga.MINIM_ACORDURI, len(_lista))
+    verifica('lista trece validarea și are cursul trecut', lga.valideaza(_lista) == [] and bool(_curs), (lga.valideaza(_lista), _curs))
+    verifica('fiecare acord are acte, și aproape toate au partener (în registru e un act cu titlul „ACORD DE FINANȚARE*", fără finanțator)',
+             all(a['acte'] for a in _lista) and sum(1 for a in _lista if a['parteneri']) >= 0.99 * len(_lista))
+    _cu_eur = [a for a in _lista if a['suma'] and a['suma']['eur']]
+    verifica('sumele în euro sunt numere pozitive', _cu_eur and all(a['suma']['eur'] > 0 for a in _cu_eur))
+    verifica('lista scoasă acum are același număr de acorduri ca fișierul din repository', len(_lista) == _real['numar'], (len(_lista), _real['numar']))
 
 print()
 if picat:

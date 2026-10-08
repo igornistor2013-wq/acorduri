@@ -1061,6 +1061,46 @@
                   GBP: 0.85973, PLN: 4.2958, RON: 5.2367, CNY: 7.7342, DEM: 1.95583, ECU: 1, ROL: 52367, DST: 0.83998 };
   var ORDINE_TIP = ['Grant', 'Împrumut', 'Asistență tehnică', 'Asistență financiară'];
   function sumaAfisata(g){ return g.sumaA || g.suma || g.sumaT || g.sumaG || null; }
+
+  /* Lista acordurilor, așa cum le vede pagina: grupate, denumite, cu sumele alese și trecute în
+     euro. O citește legatura_acorduri.py (într-un browser fără ecran) și o scrie în
+     date/acorduri_legare.json, de unde o ia „De la lege la bani” din dashboard. Așa dashboardul
+     lucrează cu exact aceleași rânduri ca registrul, fără a repeta aici regulile de grupare, de
+     denumire și de sumă. Nu schimbă nimic din ce arată pagina. */
+  window.__ACORDURI__ = function(){
+    var eur = function(s){ return s && PER_EUR[s.val] ? Math.round(s.v / PER_EUR[s.val]) : null; };
+    var sursa = function(g, s){
+      return s === g.sumaA ? 'acord' : s === g.suma ? 'titlu' : s === g.sumaT ? 'text' : s === g.sumaG ? 'guvern' : '';
+    };
+    var plat = function(g, s, nume){
+      return s ? { v: s.v, val: s.val, eur: eur(s), sursa: nume || sursa(g, s), act: s.act || '' } : null;
+    };
+    return (window.__GRUPURI__ || []).map(function(g){
+      var s = sumaAfisata(g), alte = [], vazut = {};
+      [['acord', g.sumaA], ['titlu', g.suma], ['text', g.sumaT], ['guvern', g.sumaG]].forEach(function(p){
+        var x = plat(g, p[1], p[0]);
+        if (!x || x === s) return;
+        var k = x.v + ' ' + x.val;
+        if (s && k === s.v + ' ' + s.val) return;
+        if (!vazut[k]){ vazut[k] = 1; alte.push(x); }
+      });
+      var datele = g.acte.map(function(a){ return a.data_editie || ''; }).filter(Boolean)
+        .map(function(d){ return d.slice(6, 10) + d.slice(3, 5) + d.slice(0, 2); }).sort();
+      var ro = function(d){ return d ? d.slice(6, 8) + '.' + d.slice(4, 6) + '.' + d.slice(0, 4) : ''; };
+      return {
+        id: idAcord(g), nume: g.nume, scurt: g.numeScurt || g.nume,
+        parteneri: g.parteneri || '', categorie: g.categorie || '', semnat: g.semnat || '',
+        primul: ro(datele[0]), ultimul: ro(datele[datele.length - 1]), et: Object.keys(g.et || {}),
+        suma: s ? plat(g, s) : null, faraTotal: !!(s && s.faraTotal),
+        alte: alte, cost: g.cost ? { v: g.cost.v, val: g.cost.val, eur: eur(g.cost) } : null,
+        acte: g.acte.map(function(a){
+          return { act: a.act || '', tip: a.tip || String(a.titlu || '').split(' ')[0], data: a.data_editie || '', editie: a.editie || '',
+                   url: a.url || '', etape: etapa(a) };
+        })
+      };
+    });
+  };
+  window.__ACORDURI__.curs = CURS_DATA;        // data cursurilor folosite la conversia în euro
   function fmtEur(v){
     var z = function(x, d){ return x.toFixed(d).replace(/\.?0+$/, '').replace('.', ','); };
     return v >= 1e9 ? z(v / 1e9, 2) + ' mld. EUR' : v >= 1e6 ? z(v / 1e6, 1) + ' mil. EUR'
@@ -2044,6 +2084,7 @@
     citesteURL();          // filtrele din link, înainte de a desena butoanele
     var acte = Object.keys(db.acte||{}).map(function(k){ return db.acte[k]; });
     var grupuri = grupeaza(acte);
+    window.__GRUPURI__ = grupuri;          // pentru window.__ACORDURI__ (vezi mai sus)
     var dt = acte.map(ord).filter(function(x){ return x !== '0'; }).sort();
     PRIMA_DATA = dt.length
       ? dt[0].slice(6,8) + '.' + dt[0].slice(4,6) + '.' + dt[0].slice(0,4) : '';

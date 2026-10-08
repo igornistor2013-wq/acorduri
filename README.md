@@ -7,7 +7,7 @@ Paginile care arată, din surse oficiale, cine finanțează Republica Moldova
 
 | Pagina | Ce arată | Sursa |
 |---|---|---|
-| `index.html` | Donatori, proiecte, sume — tabloul principal, cu analize avansate și export. Butonul **Acorduri** deschide un meniu cu cele două registre de acorduri | Platforma AMP (live) + arhiva 1993–2022, verificare încrucișată cu IATI |
+| `index.html` | Donatori, proiecte, sume — tabloul principal, cu analize avansate și export. Butonul **Acorduri** deschide un meniu cu cele două registre de acorduri și cu „De la lege la bani" (acordurile legate de proiectele AMP) | Platforma AMP (live) + arhiva 1993–2022, verificare încrucișată cu IATI |
 | `acorduri.html` | Registrul acordurilor de asistență externă, act cu act, cu etapa la care a ajuns fiecare | Cuprinsurile Monitorului Oficial |
 | `hg246.html` | Compară anexa nr. 1 la HG 246/2010 cu baza AMP și scoate în Word proiectele expirate | Documentul încărcat de utilizator + AMP |
 
@@ -82,6 +82,7 @@ două acte: registrul le deosebește și după tip, nu doar după număr și dat
 | `import_pdf.py` | Importul din arhivele PDF ale Monitorului. Se rulează local |
 | `teste.py` | Testele colectorului. Rulate de workflow înaintea colectării |
 | `.github/workflows/monitor.yml` | Programarea rulării |
+| `.github/workflows/legaturi.yml` | Rescrie `date/acorduri_legare.json` după fiecare colectare din Monitor sau citire a notelor Guvernului (cu Playwright) |
 | `legis_acorduri.html` | Acordurile din legis.md, grupate pe acord. Datele sunt incluse în pagină |
 | `legis_brut.json` | Istoricul: toate actele găsite pe legis.md, 1992–2026 |
 | `legis_watch.py` | Reîmprospătarea istoricului de pe legis.md, cu browser (ocazional, de pe calculator) |
@@ -95,6 +96,11 @@ două acte: registrul le deosebește și după tip, nu doar după număr și dat
 | `legis_consola.js` | Aceeași citire a acordurilor atașate, dar fără nimic de instalat: se lipește în consola browserului (F12) pe www.legis.md. Citește PDF-urile cu pdf.js și pe cele scanate cu OCR (tesseract.js), ia și actele noi, și descarcă `legis_sume.json` gata de urcat în `date/`, plus `sume_lipsa.csv`. Continuă de unde a rămas. Pașii sunt scriși la începutul fișierului |
 | `legis_atasamente.py` | Sumele din acordurile atașate la acte: deschide fișa fiecărui act pe legis.md, descarcă PDF-urile atașate (textul acordului), citește cu OCR pe cele scanate (dacă Tesseract e instalat) și scrie suma acordului și costul proiectului în `date/legis_sume.json`, la „atas”. Rulat de `legis_local.bat` după `legis_sume.py`; continuă de unde a rămas. Așteaptă ca fișa să-și încarce conținutul și redeschide o dată actele notate „fără atașamente” de versiunile care nu așteptau. O descărcare eșuată se notează și se trece mai departe; dacă legis.md nu mai răspunde deloc, se oprește și reia data viitoare. Ce rămâne fără sumă ajunge în `sume_lipsa.csv`, cu motivul |
 | `gov_sume.py` | Sumele acordurilor din notele de argumentare ale Guvernului: citește de pe gov.md ordinea de zi a fiecărei ședințe și, pentru punctele despre acorduri, PDF-ul notei („Aspectul financiar”). Rulat zilnic de `.github/workflows/sume.yml`; rezultatul, `date/gov_sume.json`, e citit de pagina Acorduri la deschidere (sumele marcate cu G). Ședințele din ultimele zece zile se recitesc la fiecare rulare, fiindcă ordinea de zi se completează până în ziua ședinței; o notă care n-a putut fi descărcată se reîncearcă la rulările următoare |
+| `legatura-amp.js` | Potrivirea dintre acorduri și proiectele AMP („De la lege la bani"): funcții pure, fără DOM, folosite de `index.html` și de teste |
+| `teste_legatura.js` | Testele potrivirii: funcțiile mici, scenarii construite de mână și o verificare pe arhiva AMP + registrul real. Rulare: `node teste_legatura.js` |
+| `legatura_acorduri.py` | Scrie `date/acorduri_legare.json`: deschide pagina registrului într-un browser fără ecran și îi cere lista acordurilor așa cum le vede ea (grupate, denumite, cu suma aleasă și trecută în euro). Are nevoie de Playwright |
+| `date/acorduri_legare.json` | Acordurile din registru, gata grupate, un acord pe linie. Citit de pagina „De la lege la bani". Se rescrie doar când se schimbă ceva |
+| `date/legaturi_amp.json` | Legăturile acord ↔ proiect AMP confirmate de oameni (vezi mai jos). Se completează de mână sau din pagină |
 | `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi. Le scrie `legis_watch.py`; apar în repository după prima rulare reușită a lui `legis_local.bat` |
 | `CNAME` | Domeniul propriu |
 
@@ -124,6 +130,55 @@ ocazional, se poate rula de pe calculator `legis_local.bat` (cere Python, Git
 și `pip install playwright requests beautifulsoup4`).
 
 Testele: `python teste_legis.py` (rapid) sau `python teste_legis.py --browser`.
+
+## De la lege la bani — acordurile legate de proiectele AMP
+
+Pagina **Acorduri → De la lege la bani** (`index.html#legaturi`) caută fiecare acord din registru
+printre proiectele din AMP și arată, la fiecare, cât s-a angajat și cât s-a debursat. Are și o
+vedere „pe proiecte": de la proiectul AMP la acordurile lui. Lucrează cu aceleași cifre ca restul
+dashboardului (arhivă + raportul live) și poate fi descărcată ca CSV.
+
+**Cum se face o legătură.** Trei lucruri trebuie să fie de acord: *denumirea* (cuvintele rare din
+denumirea acordului se regăsesc în titlul proiectului), *finanțatorul* (BEI nu se leagă de un proiect
+al Japoniei) și *suma* (suma acordului coincide, cu cel mult 15% diferență, cu angajamentele
+proiectului sau cu valoarea lui propusă). Nivelurile:
+
+| Nivel | Înseamnă |
+|---|---|
+| **confirmat** | pus de un om în `date/legaturi_amp.json` |
+| **sumă potrivită** | denumire + finanțator + sumă, fără contradicții de dată sau de fază |
+| **de verificat** | denumire + finanțator, dar suma lipsește sau diferă; sau mai multe proiecte la fel de potrivite |
+| **fără proiect** | nu s-a găsit nimic. Nu înseamnă că proiectul lipsește din AMP |
+
+Doar legăturile „confirmat" și „sumă potrivită" intră în totaluri. De ce atâta prudență: de obicei
+un titlu potrivit nu ajunge. „Reabilitarea drumurilor — Proiectul V" și „— Proiectul VI" au același
+candidat în AMP, iar un proiect finanțat de două bănci (BEI și BERD) nu are banii unei singure bănci.
+Un proiect folosit de mai multe acorduri e marcat „partajat". Semnul ⚠ apare când AMP are mult mai
+puțin decât suma acordului (proiect înregistrat parțial sau acord încă nedebursat): atunci „Din
+acord" arată ce scrie AMP, nu rata reală.
+
+**Cum confirmi o legătură.** Deschide rândul unui acord și apasă *Confirmă*, *Respinge*, *Leagă*
+(cu un AMP ID) sau *Nu există în AMP*. Alegerile rămân doar în browserul tău, într-un panou
+„Confirmări în pregătire". Ca să apară pentru toți: *Copiază JSON*, lipești tot textul în
+`date/legaturi_amp.json` și publici fișierul. Acordurile sunt identificate prin id-ul din linkul
+registrului (`#acord=…`); dacă un id din fișier nu mai corespunde niciunui acord, pagina o spune.
+
+**De unde vine lista acordurilor.** Regulile de grupare, de denumire și de sumă ale registrului sunt
+lungi și potrivite pe date reale; nu le repetăm. `legatura_acorduri.py` deschide pagina
+`legis_acorduri.html` într-un browser fără ecran și îi cere lista pe care ea o folosește
+(`window.__ACORDURI__`, definită în `acorduri.html`). Workflow-ul `legaturi.yml` o rulează după fiecare
+colectare din Monitor și după fiecare citire a notelor Guvernului. Dacă lista pare incompletă (prea
+puține acorduri sau prea puține sume), nu scrie nimic și rularea apare roșie; fișierul bun rămâne.
+Pe calculatorul tău: `pip install playwright`, `python -m playwright install chromium`, apoi
+`python legatura_acorduri.py` (`--dry-run` arată ce ar scrie).
+
+**Teste.** `node teste_legatura.js` (rulat și de `legaturi.yml`) și `python teste_legis.py --browser`
+(include citirea listei din registrul real).
+
+**Limite.** Potrivirea a fost judecată pe eșantioane, folosind suma drept martor; nu are o precizie
+măsurată. Pentru acordurile fără sumă cunoscută nu există nicio confirmare automată, doar „de
+verificat". Proiectele din AMP fără angajamente apar cu zero, iar legătura prin „valoarea propusă"
+arată doar că proiectul există.
 
 ## Importul din arhive PDF
 
