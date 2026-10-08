@@ -4314,6 +4314,18 @@
       "editie_id": "3353",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3353"
+    },
+    "nr. 557, 7 octombrie 2026|3356": {
+      "act": "nr. 557, 7 octombrie 2026",
+      "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare pentru realizarea Proiectului „Moldova – Proiect de alimentare durabilă cu apă (irigații)”",
+      "categorie": "Împrumut",
+      "partener": "BERD",
+      "semnat": "",
+      "editie": "500-503",
+      "data_editie": "08.10.2026",
+      "editie_id": "3356",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3356"
     }
   },
   "editii_vazute": [
@@ -4359,9 +4371,10 @@
     "3352",
     "3353",
     "3354",
-    "3355"
+    "3355",
+    "3356"
   ],
-  "ultima_rulare": "07.10.2026 16:12",
+  "ultima_rulare": "08.10.2026 10:45",
   "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5
