@@ -1,0 +1,105 @@
+name: Legături acord ↔ proiect AMP
+
+# „De la lege la bani" (index.html#legaturi) leagă acordurile din registru de proiectele din AMP.
+# Lista acordurilor — grupate, denumite, cu suma aleasă și trecută în euro — o scrie
+# legatura_acorduri.py într-un browser fără ecran, chiar din pagina registrului. Așa dashboardul
+# lucrează cu exact aceleași rânduri ca registrul, fără a repeta regulile lui de grupare și de sumă.
+# Rezultatul: date/acorduri_legare.json. Potrivirea cu proiectele AMP se face în browser, în
+# legatura-amp.js, pentru că doar acolo sunt datele AMP de azi.
+#
+# Pornește:
+#   - după fiecare colectare din Monitor și după fiecare citire a notelor Guvernului (acolo se
+#     schimbă acordurile și sumele lor);
+#   - când se schimbă fișierele de care atârnă lista (inclusiv de pe calculator, prin legis_local.bat);
+#   - manual: Actions → „Legături acord ↔ proiect AMP" → Run workflow.
+#
+# Dacă lista citită pare incompletă (prea puține acorduri, sau sumele nu s-au încărcat), scriptul nu
+# scrie nimic și rularea apare ca eșuată: fișierul bun de până atunci rămâne.
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Verifică Monitorul Oficial", "Sumele acordurilor (notele Guvernului)"]
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - acorduri.html
+      - legis_pagina.py
+      - legatura_acorduri.py
+      - legis_brut.json
+      - date/legis_sume.json
+      - date/sume_manual.json
+      - date/legaturi_legis.json
+
+permissions:
+  contents: write
+
+# aceeași coadă ca monitor.yml și sume.yml: toate scriu în același repository
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  legaturi:
+    # dacă workflow-ul care ne-a pornit a eșuat, nu are ce să citim
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Descarcă repository-ul
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Pregătește Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Instalează bibliotecile și browserul
+        run: |
+          pip install --quiet requests beautifulsoup4 pypdf playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Testele potrivirii (Node)
+        run: node teste_legatura.js
+
+      # Pagina legis_acorduri.html se construiește din acorduri.html și din datele din repository;
+      # o refacem aici ca lista citită din ea să fie în pas cu datele de azi.
+      - name: Reconstruiește pagina registrului
+        run: python legis_pagina.py
+
+      - name: Citește acordurile din pagina registrului
+        run: |
+          python legatura_acorduri.py > /tmp/legaturi.txt 2>&1 || { cat /tmp/legaturi.txt; exit 1; }
+          cat /tmp/legaturi.txt
+          {
+            echo '### Legături acord ↔ proiect AMP'
+            echo
+            sed 's/^/- /' /tmp/legaturi.txt
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Salvează
+        run: |
+          FISIERE="date/acorduri_legare.json legis_acorduri.html"
+          if [ -z "$(git status --porcelain $FISIERE)" ]; then
+            echo "Nimic nou — nu fac commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add $FISIERE
+          git commit -m "Legături acord ↔ proiect AMP: lista acordurilor — $(date +%d.%m.%Y)"
+          for incercare in 1 2 3; do
+            if git push; then
+              echo "Publicat."
+              exit 0
+            fi
+            echo "Push respins (încercarea $incercare) — reîmprospătez și reîncerc."
+            git pull --rebase origin main || exit 1
+            sleep 3
+          done
+          echo "Nu am reușit să public după 3 încercări."
+          exit 1
