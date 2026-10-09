@@ -35,22 +35,74 @@ CAZURI = [
     ('pentru ratificarea Acordului dintre Republica Moldova și Uniunea Europeană privind participarea Republicii Moldova la Programul Europa Digitală', None, None),
     ('cu privire la reperfectarea licenţei Asociaţiei de Economii şi Împrumut „CIRCULA”', None, None),
     # partenerul din formulări vechi
-    ('pentru ratificarea Acordului de finanţare dintre Republica Moldova şi Asociaţia Internaţională de Dezvoltare privind realizarea Proiectului „Suport de urgenţă pentru agricultura Moldovei”', 'Asistență financiară', 'AID'),
+    ('pentru ratificarea Acordului de finanţare dintre Republica Moldova şi Asociaţia Internaţională de Dezvoltare privind realizarea Proiectului „Suport de urgenţă pentru agricultura Moldovei”', 'Împrumut', 'AID'),
     ('pentru ratificarea Acordului de împrumut dintre Guvernul Republicii Moldova și Guvernul Republicii Polone în sumă de 20 de milioane de euro', 'Împrumut', 'Polonia'),
-    ('pentru ratificarea Acordului-cadru dintre Guvernul Republicii Moldova şi Comisia Comunităţilor Europene privind asistenţa externă', 'Asistență financiară', 'UE'),
+    ('pentru ratificarea Acordului-cadru dintre Guvernul Republicii Moldova şi Comisia Comunităţilor Europene privind asistenţa externă', 'Grant', 'UE'),
     # acte de cadru, nu acorduri
     ('pentru modificarea Hotărârii Guvernului nr. 246/2010 cu privire la modul de aplicare a facilităților fiscale și vamale aferente realizării proiectelor de asistență tehnică și investițională în derulare, care cad sub incidența tratatelor internaționale la care Republica Moldova este parte sau a contractelor de stat', None, None),
     ('cu privire la Programul de asistenţă tehnică pentru anii 2001-2002', None, None),
     ('cu privire la aprobarea Regulamentului privind autorizarea centrelor de asistenţă tehnică pentru maşinile de casă şi de control/imprimantele fiscale', None, None),
     ('cu privire la Oficiul de Gestionare a Programelor de Asistență Externă', None, None),
     ('privind contractele de credit pentru consumatori', None, None),
-    ('pentru ratificarea Acordului de finanțare dintre Republica Moldova și Fondul Internațional pentru Dezvoltarea Agricolă în vederea realizării Proiectului de Reziliență Rurală (IFAD VII)', 'Asistență financiară', None),
+    ('pentru ratificarea Acordului de finanțare dintre Republica Moldova și Fondul Internațional pentru Dezvoltarea Agricolă în vederea realizării Proiectului de Reziliență Rurală (IFAD VII)', 'Împrumut', None),
+    # asistența financiară se împarte după rambursare: nerambursabilă = grant, rambursabilă = împrumut (credit)
+    ('pentru ratificarea Acordului privind asistenţa financiară rambursabilă dintre Republica Moldova şi România', 'Împrumut', 'România'),
+    ('cu privire la aprobarea Acordului dintre Guvernul Republicii Moldova și Guvernul Japoniei privind acordarea asistenței financiare nerambursabile', 'Grant', 'Japonia'),
+    ('cu privire la aprobarea Acordului dintre Guvernul Republicii Moldova și Guvernul României privind acordarea unui ajutor financiar nerambursabil', 'Grant', 'România'),
+    # nerambursabilitatea unei asistențe TEHNICE nu face din ea grant
+    ('cu privire la aprobarea Acordului de asistență tehnică nerambursabilă dintre Guvernul Republicii Moldova și Guvernul Japoniei', 'Asistență tehnică', 'Japonia'),
+    # cuvântul din titlu bate finanțatorul: BIRD împrumută de obicei, dar aici titlul spune grant
+    ('pentru ratificarea Acordului dintre Republica Moldova şi Banca Internaţională pentru Reconstrucţie şi Dezvoltare privind acordarea grantului nr. TF015873 din Fondul de Carbon pentru Dezvoltare', 'Grant', 'BIRD'),
+    ('privind promulgarea Legii pentru ratificarea Acordului de finanţare (grant danez) a Programului rural de rezilienţă economico-climatică incluzivă (IRECR) dintre Republica Moldova şi Fondul Internaţional pentru Dezvoltarea Agricolă', 'Grant', 'FIDA'),
+    # și invers: un titlu cu „credit" rămâne împrumut chiar dacă numește și un acord de grant
+    ('pentru ratificarea Acordului de credit și a Acordului de grant dintre Republica Moldova și Asociaţia Internaţională de Dezvoltare', 'Împrumut', 'AID'),
+    ('pentru ratificarea Acordului dintre Republica Moldova şi Banca Europeană pentru Reconstrucţie şi Dezvoltare privind garanţia de stat pentru realizarea proiectului terminalului petrolier Giurgiuleşti', 'Împrumut', 'BERD'),
+    # finanțatori care dau doar granturi / doar credite, când titlul nu spune
+    ('privind iniţierea negocierilor și aprobarea semnării Acordului de asistență financiară dintre Guvernul Republicii Moldova și Ministerul Afacerilor Externe al Republicii Bulgaria', 'Grant', 'Bulgaria'),
+    ('pentru ratificarea Acordului de finanțare dintre Republica Moldova și Banca Europeană de Investiții', 'Împrumut', 'BEI'),
+    # KfW a dat și grant, și credit: fără cuvânt în titlu, actul NU se ghicește
+    ('cu privire la aprobarea semnării Acordului de finanțare dintre Guvernul Republicii Moldova și KfW Entwicklungsbank', 'Asistență financiară', 'KfW'),
+    # IFC împrumută firmelor private, nu statului: acordul de cooperare cu Guvernul e consultanță, nu credit
+    ('pentru ratificarea Acordului de cooperare dintre Guvernul Republicii Moldova și Corporația Financiară Internațională în vederea realizării proiectului „Reforma climatului investițional în Republica Moldova, faza II”', 'Asistență tehnică', 'IFC'),
+    # titlu cu litere chirilice în loc de cele latine (cod de pagină greșit), fără reparația din legis_pagina
+    ('pentru ratificarea Acordului de оmprumut, finanюare şi proiect dintre Banca Germanг "Kreditanstalt fьr Wiederaufbau (KfW)", Republica Moldova şi Fondul de Investiюii Sociale din Moldova (FISM)', 'Împrumut', 'KfW'),
+    ('pentru ratificarea Acordului de сredit dintre Republica Moldova și Banca Europeană de Investiții', 'Împrumut', 'BEI'),
 ]
 for t, cat, part in CAZURI:
     c = clasifica(t)
     verifica(f'{(cat or "respins"):10} {t[:70]}…', c == cat, f'a dat {c}')
     if cat and part:
         verifica(f'partener {part}', part in partener(t), partener(t))
+
+print('Categorii hotărâte de mână (date/categorii_manual.json)')
+import legis_clasifica as lc
+_titlu_fr = ('cu privire la inițierea negocierilor asupra proiectului Protocolului financiar dintre Guvernul Republicii Moldova și Guvernul '
+             'Republicii Franceze privind finanțarea proiectului de modernizare a infrastructurii feroviare Chișinău – Ungheni')
+verifica('fără decizie, titlul care nu spune dacă banii se rambursează rămâne „Asistență financiară”', clasifica(_titlu_fr) == 'Asistență financiară', clasifica(_titlu_fr))
+verifica('decizia de mână bate clasificarea automată', lc.categorie_act('HG241/2023', _titlu_fr, {'HG241/2023': {'categorie': 'Împrumut'}}) == 'Împrumut')
+verifica('alt cod, altă decizie: clasificarea automată rămâne', lc.categorie_act('HG1/2023', _titlu_fr, {'HG241/2023': {'categorie': 'Împrumut'}}) == 'Asistență financiară')
+verifica('decizia nu adaugă acte: un titlu respins rămâne respins',
+         lc.categorie_act('HG7/2023', 'cu privire la aprobarea Regulamentului intern', {'HG7/2023': {'categorie': 'Grant'}}) is None)
+_t = Path(tempfile.mkdtemp())
+try:
+    json.dump({'_nota': 'ignorat',
+               'A1/2020': {'categorie': 'Grant', 'motiv': 'm', 'sursa': 'https://x'},
+               'A2/2020': {'categorie': 'Grant', 'motiv': 'm'},                        # fără sursă
+               'A3/2020': {'categorie': 'Credit', 'motiv': 'm', 'sursa': 'https://x'},  # categorie inexistentă
+               'A4/2020': {'categorie': 'Împrumut', 'motiv': ' ', 'sursa': 'https://x'}},   # motiv gol
+              open(_t / 'm.json', 'w', encoding='utf-8'))
+    _d = lc.decizii_manuale(_t / 'm.json')
+    verifica('doar intrările complete (categorie validă + motiv + sursă) se aplică', list(_d) == ['A1/2020'], list(_d))
+    verifica('fișierul lipsă nu oprește nimic', lc.decizii_manuale(_t / 'nu_exista.json') == {})
+finally:
+    shutil.rmtree(_t, ignore_errors=True)
+_real = json.load(open(AICI / 'date' / 'categorii_manual.json', encoding='utf-8'))
+verifica('date/categorii_manual.json: toate intrările au categorie validă, motiv și sursă (altfel ar fi ignorate)',
+         set(lc.decizii_manuale()) == {k for k in _real if not k.startswith('_')}, sorted({k for k in _real if not k.startswith('_')} - set(lc.decizii_manuale())))
+_brut = {r['c']: r for r in json.load(open(AICI / 'legis_brut.json', encoding='utf-8'))}
+verifica('fiecare decizie de mână privește un act din registru',
+         all(k in _brut and clasifica(pagina.repara(re.sub(r'^(Modificat|Abrogat|Suspendat)\s*', '', _brut[k]['t']).strip())) for k in lc.decizii_manuale()),
+         [k for k in lc.decizii_manuale() if k not in _brut])
 
 print('Diacritice stricate')
 verifica('„оmprumut, finanюare, Germanг” reparat',
@@ -161,6 +213,14 @@ verifica('actul neparcurs se deschide; cel parcurs, nu', la.are_nevoie({'sume': 
 verifica('„niciun atașament” fără fișă confirmată se mai verifică o dată; cu atașamente găsite, nu',
          la.are_nevoie({'sume': [], 'atas': [], 'atas_citit': 'x'})
          and not la.are_nevoie({'sume': [], 'atas_citit': 'x', 'atas': [{'u': 'u', 'suma': None, 'metoda': 'text'}]}))
+_f25 = 'The Bank agrees to lend to the Borrower the amount of EUR 25,000,000 (twenty-five million Euros). Front-end fee of EUR 62,500.'
+_cred = {'atas_citit': 'x', 'fisa_ok': 1, 'instr': 'grant', 'atas': [{'u': 'u', 'suma': {'v': 25000000, 'val': 'EUR', 'f': _f25}, 'metoda': 'text'}]}
+verifica('instrumentul de azi (din categorie) bate „instr” rămas din vechea clasificare: un credit notat „grant” își recitește suma, dar nu cel notat corect',
+         la.are_nevoie(_cred) and not la.are_nevoie(_cred, instr='imprumut') and la.are_nevoie(_cred, instr='grant'))
+verifica('instrument(): „imprumut” doar pentru împrumuturi, după categoria de azi, cu titlul curățat de „Modificat”',
+         la.instrument('Modificat pentru ratificarea Acordului privind asistența financiară rambursabilă dintre Republica Moldova și România') == 'imprumut'
+         and la.instrument('pentru ratificarea Acordului de grant dintre Republica Moldova și Uniunea Europeană') == 'grant'
+         and la.instrument(_titlu_fr, 'HG241/2023', {'HG241/2023': {'categorie': 'Împrumut'}}) == 'imprumut')
 verifica('fișa care încă își încarcă conținutul nu trece drept citită',
          not la.fisa_incarcata('Conținutul se încarcă... ' + 'x' * 400) and not la.fisa_incarcata('scurt')
          and la.fisa_incarcata('Lege pentru ratificarea Acordului ' * 20))
@@ -450,6 +510,50 @@ if '--browser' in sys.argv:
     _cu_eur = [a for a in _lista if a['suma'] and a['suma']['eur']]
     verifica('sumele în euro sunt numere pozitive', _cu_eur and all(a['suma']['eur'] > 0 for a in _cu_eur))
     verifica('lista scoasă acum are același număr de acorduri ca fișierul din repository', len(_lista) == _real['numar'], (len(_lista), _real['numar']))
+
+    print()
+    print('Browser: exportul Excel din registru are linkuri clicabile')
+    import zipfile, xml.dom.minidom, functools, html as _html
+    from playwright.sync_api import sync_playwright
+    _srv = lga._Server(('127.0.0.1', 0), functools.partial(lga._Liniste, directory=str(AICI)))
+    threading.Thread(target=_srv.serve_forever, daemon=True).start()
+    _baza = 'http://127.0.0.1:%d/' % _srv.server_address[1]
+    try:
+        with sync_playwright() as _p:
+            _b = _p.chromium.launch()
+            for _pagina in ('legis_acorduri.html', 'acorduri.html'):
+                _pg = _b.new_page()
+                _pg.route('**/*', lambda r: r.continue_() if r.request.url.startswith(_baza) else r.abort())
+                _pg.goto(_baza + _pagina, wait_until='networkidle', timeout=90000)
+                _pg.wait_for_timeout(2500)
+                _pg.click('#vedBtns [data-ved="acte"]')
+                _pg.wait_for_timeout(500)
+                with _pg.expect_download(timeout=30000) as _d:
+                    _pg.click('#export')
+                _z = zipfile.ZipFile(_d.value.path())
+                _foaie = _z.read('xl/worksheets/sheet1.xml').decode('utf-8')
+                _cale_rel = 'xl/worksheets/_rels/sheet1.xml.rels'
+                _rel = _z.read(_cale_rel).decode('utf-8') if _cale_rel in _z.namelist() else ''     # fără hyperlinkuri, fișierul nu există
+                _nume = _pagina.split('.')[0]
+                _adrese = re.findall(r'<t xml:space="preserve">(https?://[^<\s]+)</t>', _foaie)
+                _legaturi = _foaie.count('<hyperlink ')
+                verifica(_nume + ': foaia „Acte" are adrese, și fiecare e hyperlink (nu text simplu)', len(_adrese) > 100 and len(_adrese) == _legaturi, (len(_adrese), _legaturi))
+                _tinte = re.findall(r'Target="([^"]+)" TargetMode="External"', _rel)
+                verifica(_nume + ': fiecare hyperlink are o relație externă, spre aceeași adresă',
+                         len(_tinte) == _legaturi and [_html.unescape(t) for t in _tinte] == [_html.unescape(a) for a in _adrese])
+                verifica(_nume + ': stilul „hyperlink" e declarat și folosit',
+                         'xl/styles.xml' in _z.namelist() and '/xl/styles.xml' in _z.read('[Content_Types].xml').decode() and 's="1"' in _foaie)
+                _strict = []
+                for _n in _z.namelist():
+                    try:
+                        xml.dom.minidom.parseString(_z.read(_n))
+                    except Exception:
+                        _strict.append(_n)
+                verifica(_nume + ': toate părțile fișierului sunt XML valid', not _strict, _strict)
+                _pg.close()
+            _b.close()
+    finally:
+        _srv.shutdown()
 
 print()
 if picat:

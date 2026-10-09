@@ -497,7 +497,10 @@
                text: JSON.stringify({ generat: azi(), reguli: REGULI, parte: i + 1, din: parti.length, acte: p }) };
     });
   }
-  function areNevoie(r) {
+  /* instrCurent: instrumentul de azi al actului, din categoria lui din registru; fără el
+     se folosește cel notat la ultima citire. Categoria se poate schimba între rulări
+     (rambursabil = împrumut, nerambursabil = grant), iar „instr" notat atunci ar rămâne vechi. */
+  function areNevoie(r, instrCurent) {
     if (!r) return true;                                  // act necitit încă: îl citim cu totul
     if (r.eroare) return !!CFG.REINCEARCA;
     if (CFG.TOT || !('atas_citit' in r)) return true;
@@ -506,7 +509,7 @@
     // o sumă veche nu mai rezistă regulilor de azi; dacă recitirea a eșuat deja o dată sub
     // aceleași reguli, nu o mai încercăm la fiecare rulare — doar cu REINCEARCA
     if (!sume_tin(r) && (CFG.REINCEARCA || r.recitire_esuata !== REGULI)) return true;
-    if ((r.atas || []).some(function (x) { return !suma_atas_tine(x, r.instr || 'grant'); })) return true;
+    if ((r.atas || []).some(function (x) { return !suma_atas_tine(x, instrCurent || r.instr || 'grant'); })) return true;
     if (CFG.REINCEARCA) return !!r.atas_eroare || (r.atas || []).some(function (x) { return x.eroare || (x.metoda === 'fara-text' && !x.suma); });
     return false;
   }
@@ -578,7 +581,7 @@
     });
 
     var deCitit = tinte.filter(function (t) {
-      return CFG.DOAR ? CFG.DOAR.map(String).indexOf(t.doc) > -1 : (areNevoie(acte[t.doc]) || (CFG.DOVEZI === 'tot' && !dovezi[t.doc]));
+      return CFG.DOAR ? CFG.DOAR.map(String).indexOf(t.doc) > -1 : (areNevoie(acte[t.doc], t.instr) || (CFG.DOVEZI === 'tot' && !dovezi[t.doc]));
     });
     var parcurs = function (t) { return acte[t.doc] && 'atas_citit' in acte[t.doc] ? 1 : 0; };
     deCitit.sort(function (x, y) { return (parcurs(x) - parcurs(y)) || ((+y.doc) - (+x.doc)); });   // întâi cele neparcurse, cele mai noi primele
@@ -717,7 +720,7 @@
       r.fisa_ok = 1;                                         // conținutul fișei s-a încărcat cu adevărat
       if (g.status !== 200) { r.atas_eroare = 'fișa actului: HTTP ' + g.status; S.erori++; S.acte++; progres[d] = r; cifre(); await somn(CFG.PAUZA); continue; }
       delete r.atas_eroare;
-      var instr = r.instr || T.instr, vechi = {}, noi = [], dv = [];
+      var instr = T.instr || r.instr || 'grant', vechi = {}, noi = [], dv = [];
       (r.atas || []).forEach(function (x) {                  // suma veche care nu mai rezistă regulilor: o recitim
         if (!suma_atas_tine(x, instr)) { x.suma = null; delete x.metoda; }
         vechi[cheieUrl(x.u)] = x;

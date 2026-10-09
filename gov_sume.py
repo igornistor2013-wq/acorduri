@@ -177,6 +177,15 @@ def main():
             time.sleep(5 * (incercare + 1))
         return None
 
+    # Categoria și partenerul punctelor deja citite se pun la zi cu regulile de azi: la o
+    # schimbare a regulilor (ex. asistența financiară rambursabilă = împrumut) rămâneau
+    # cele de la data citirii, iar pagina leagă nota de acord și după categorie.
+    for p in puncte.values():
+        cat, par = clasifica(p.get('titlu', '')), partener(p.get('titlu', ''))
+        if cat and (cat != p.get('categorie') or par != p.get('partener')):
+            p['categorie'], p['partener'] = cat, par
+            schimbat = True
+
     try:
         # Notele care n-au putut fi descărcate la o rulare anterioară. Rămâneau
         # pentru totdeauna cu „PDF indisponibil": punctul era deja în fișier, iar

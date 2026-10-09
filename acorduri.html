@@ -579,7 +579,7 @@
   </div>
 
   <div class="footer-source">
-    Un acord parcurge cinci etape care pot fi urmărite act cu act în Monitorul Oficial: hotărârea sau decretul de inițiere a negocierilor, aprobarea semnării, hotărârea de aprobare a proiectului de lege, legea de ratificare (ori hotărârea de aprobare, pentru acordurile de competența Guvernului) și decretul de promulgare. Intrarea în vigoare nu e o a șasea etapă. Data afișată sub etape este cea la care a intrat în vigoare legea de ratificare — articolul ei final prevede că legea intră în vigoare la data publicării în Monitor, iar aceea e chiar data ediției. Acordul propriu-zis intră în vigoare mai târziu, după schimbul instrumentelor de ratificare; acea dată nu se poate deduce din cuprins, fiindcă ordinul ministrului afacerilor externe care o anunță este colectiv și nu numește acordul. Alte etape obligatorii — avizarea, parafarea, deplinele puteri, semnarea propriu-zisă — nu produc niciun act publicat. O parte din acordurile de aici nu sunt tratate internaționale, ci contracte de stat, care urmează un traseu propriu: categoria contractului — cu impact asupra bugetului de stat, asupra bugetului autorității, fără impact bugetar sau de colaborare interinstituțională — decide cine îl aprobă și când intră în vigoare. Tipurile de finanțare afișate pe rânduri (grant, împrumut, credit, finanțare) sunt deduse din denumirea actului; definițiile lor legale sunt în panoul „Cum se încheie un acord". Temeiul: HG 442/2015, HG 377/2018 cu anexele nr. 1 și nr. 1¹, și Legea nr. 419/2006 pentru împrumuturile de stat. Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova.
+    Un acord parcurge cinci etape care pot fi urmărite act cu act în Monitorul Oficial: hotărârea sau decretul de inițiere a negocierilor, aprobarea semnării, hotărârea de aprobare a proiectului de lege, legea de ratificare (ori hotărârea de aprobare, pentru acordurile de competența Guvernului) și decretul de promulgare. Intrarea în vigoare nu e o a șasea etapă. Data afișată sub etape este cea la care a intrat în vigoare legea de ratificare — articolul ei final prevede că legea intră în vigoare la data publicării în Monitor, iar aceea e chiar data ediției. Acordul propriu-zis intră în vigoare mai târziu, după schimbul instrumentelor de ratificare; acea dată nu se poate deduce din cuprins, fiindcă ordinul ministrului afacerilor externe care o anunță este colectiv și nu numește acordul. Alte etape obligatorii — avizarea, parafarea, deplinele puteri, semnarea propriu-zisă — nu produc niciun act publicat. O parte din acordurile de aici nu sunt tratate internaționale, ci contracte de stat, care urmează un traseu propriu: categoria contractului — cu impact asupra bugetului de stat, asupra bugetului autorității, fără impact bugetar sau de colaborare interinstituțională — decide cine îl aprobă și când intră în vigoare. Tipurile de finanțare afișate pe rânduri (grant, împrumut, asistență tehnică) sunt deduse din denumirea actului: ce e nerambursabil e grant, ce se rambursează e împrumut (credit); definițiile lor legale sunt în panoul „Cum se încheie un acord". Temeiul: HG 442/2015, HG 377/2018 cu anexele nr. 1 și nr. 1¹, și Legea nr. 419/2006 pentru împrumuturile de stat. Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova.
   </div>
 
   <!-- Singura cale de întoarcere era butonul din antet. După zeci de rânduri
@@ -715,11 +715,14 @@
      dintre ele, fiindcă titlurile nu folosesc mereu cuvintele din lege. */
   var ETICHETE = [
     {cat:'Împrumut', legal:'Asistență financiară rambursabilă (pct. 9.2)',
-     nota:'Prinde „acord de împrumut", dar și denumirile comerciale ale aceluiași lucru: ' +
-       'facilitate sau linie de credit, ori contractul de finanțare al Băncii Europene de ' +
-       'Investiții. Niciuna nu e o categorie legală separată.'},
+     nota:'Orice titlu care spune că banii se rambursează: „acord de împrumut", „asistență ' +
+       'financiară rambursabilă", facilitate sau linie de credit, ori contractul de finanțare ' +
+       'al Băncii Europene de Investiții. În vorbirea curentă e „credit" — aceeași categorie, ' +
+       'nu una separată. Dacă un titlu numește și un credit, și un grant, actul e tratat ca ' +
+       'împrumut: o parte din bani se întorc.'},
     {cat:'Grant', legal:'Asistență financiară nerambursabilă (pct. 9.13)',
-     nota:'„Acord de grant", grant investițional, asistență financiară nerambursabilă. ' +
+     nota:'„Acord de grant", grant investițional, „asistență financiară nerambursabilă" sau ' +
+       '„ajutor financiar nerambursabil" — aceeași categorie, scrisă altfel. ' +
        'Un grant care plătește servicii de consultanță rămâne grant: contează instrumentul.'},
     {cat:'suport bugetar', legal:'Marcaj, nu categorie (pct. 9.20¹)',
      nota:'Însoțește categoria, nu o înlocuiește. Suportul bugetar descrie unde ajung banii ' +
@@ -733,10 +736,13 @@
        'agenție de dezvoltare implementează un proiect: aduc expertiză și capacitate de ' +
        'execuție, nu bani rambursabili. Ajung în Monitor prin ordinul autorității semnatare.'},
     {cat:'Asistență financiară', legal:'Categoria-părinte (pct. 9.2)',
-     nota:'Se folosește doar când titlul spune „acord de finanțare" fără să arate dacă banii ' +
-       'se întorc, iar finanțatorul nu e nici bancă de dezvoltare, nici agenție de donații. ' +
-       'În rest, decide finanțatorul: acordul de finanțare cu AID e împrumut, iar cele cu ' +
-       'Comisia Europeană sau cu Crucea Roșie sunt granturi.'}
+     nota:'Nu rămâne categorie de sine stătătoare: asistența financiară se împarte după ' +
+       'rambursare — nerambursabilă înseamnă grant, rambursabilă înseamnă împrumut (credit). ' +
+       'Când titlul nu spune („acord de finanțare"), decide finanțatorul: acordul cu AID e ' +
+       'împrumut, iar cele cu Comisia Europeană sau cu Crucea Roșie sunt granturi. Un act pe ' +
+       'care nici titlul, nici finanțatorul nu-l lămuresc (KfW, de pildă, a dat Moldovei și ' +
+       'grant, și credit) rămâne aici până îl verifică cineva: mai bine neclasificat decât ' +
+       'clasificat greșit.'}
   ];
 
   /* Categoriile de contracte de stat și traseul fiecăreia, din HG 377/2018,
@@ -1189,8 +1195,9 @@
             'valoarea de la data semnării.</p>' +
           '<p class="fila-intro">Fiecare acord e numărat o dată, cu suma afișată pe rândul lui' + (st.dubluri ? '; ' + st.dubluri +
             ' rânduri care repetă același acord (aceeași sumă, același finanțator, aceeași denumire) au fost lăsate deoparte' : '') +
-            '. Un amendament care majorează un acord poate apărea totuși ca rând separat. Tipul e cel de pe rând: grant, împrumut, ' +
-            'asistență tehnică sau asistență financiară.' + (neconv ? ' Fără curs, deci neadunate: ' + esc(neconv) + '.' : '') + '</p>' +
+            '. Un amendament care majorează un acord poate apărea totuși ca rând separat. Tipul e cel de pe rând: grant (nerambursabil), ' +
+            'împrumut sau credit (rambursabil) ori asistență tehnică; „asistență financiară" apare doar la acordurile pe care nici ' +
+            'titlul, nici finanțatorul nu le lămuresc.' + (neconv ? ' Fără curs, deci neadunate: ' + esc(neconv) + '.' : '') + '</p>' +
         '</details>' +
       '</div></div>';
   }
@@ -1344,20 +1351,54 @@
     return s;
   }
 
+  /* O adresă scrisă într-o celulă ca text simplu nu e un link: Excel și LibreOffice nu o deschid la clic,
+     doar o afișează (clicabile devin doar adresele tastate de om sau cele marcate ca hyperlink în fișier).
+     De aceea coloana „Link" din foaia „Acte" părea plină de linkuri care „nu se deschid". Orice celulă
+     care e doar o adresă http(s) se scrie acum ca hyperlink adevărat, cu stilul albastru subliniat. */
+  var RX_ADRESA = /^https?:\/\/[^\s<>"']+$/;
+
   function xlsx(nume_foaie, randuri){
+    var legaturi = [];                         // [celulă, adresă] pentru fiecare hyperlink
     var sheet = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
-      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+      '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" ' +
+      'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
       '<sheetData>' +
       randuri.map(function(r, ri){
         return '<row r="' + (ri + 1) + '">' + r.map(function(v, ci){
+          var ref = coloana(ci) + (ri + 1);
           // numerele (sumele) rămân numere în Excel, ca să poată fi adunate și sortate
           if (typeof v === 'number' && isFinite(v))
-            return '<c r="' + coloana(ci) + (ri + 1) + '"><v>' + v + '</v></c>';
-          return '<c r="' + coloana(ci) + (ri + 1) + '" t="inlineStr"><is><t xml:space="preserve">' +
+            return '<c r="' + ref + '"><v>' + v + '</v></c>';
+          if (typeof v === 'string' && v.length <= 2000 && RX_ADRESA.test(v)){
+            legaturi.push([ref, v]);
+            return '<c r="' + ref + '" s="1" t="inlineStr"><is><t xml:space="preserve">' + xmlEsc(v) + '</t></is></c>';
+          }
+          return '<c r="' + ref + '" t="inlineStr"><is><t xml:space="preserve">' +
             xmlEsc(v) + '</t></is></c>';
         }).join('') + '</row>';
       }).join('') +
-      '</sheetData></worksheet>';
+      '</sheetData>' +
+      (legaturi.length ? '<hyperlinks>' + legaturi.map(function(l, i){
+        return '<hyperlink ref="' + l[0] + '" r:id="rId' + (i + 1) + '"/>';
+      }).join('') + '</hyperlinks>' : '') +
+      '</worksheet>';
+    var relFoaie = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      legaturi.map(function(l, i){
+        return '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" ' +
+          'Target="' + xmlEsc(l[1]) + '" TargetMode="External"/>';
+      }).join('') + '</Relationships>';
+    // stilurile: 0 = implicit, 1 = „Hyperlink" (albastru, subliniat)
+    var stiluri = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+      '<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font>' +
+      '<font><u/><sz val="11"/><color rgb="FF0563C1"/><name val="Calibri"/></font></fonts>' +
+      '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>' +
+      '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
+      '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+      '<cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+      '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs>' +
+      '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
 
     return zip([
       { name: '[Content_Types].xml', data:
@@ -1367,6 +1408,7 @@
         '<Default Extension="xml" ContentType="application/xml"/>' +
         '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
         '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+        '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
         '</Types>' },
       { name: '_rels/.rels', data:
         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -1382,9 +1424,11 @@
         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
         '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
         '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>' +
+        '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>' +
         '</Relationships>' },
+      { name: 'xl/styles.xml', data: stiluri },
       { name: 'xl/worksheets/sheet1.xml', data: sheet }
-    ]);
+    ].concat(legaturi.length ? [{ name: 'xl/worksheets/_rels/sheet1.xml.rels', data: relFoaie }] : []));
   }
 
   function ord(a){
@@ -1644,6 +1688,16 @@
     return out;
   }
 
+  /* Categoria unui acord ale cărui acte au categorii diferite (după contopire): cea mai
+     specifică, în ordinea de mai jos. Împrumutul bate grantul: dacă o parte din bani se
+     rambursează, statul are de întors. Înainte era prima găsită în listă, deci rândul
+     își schimba categoria după ordinea în care veneau actele. */
+  var ORDINE_CAT = ['Împrumut', 'Grant', 'Asistență tehnică', 'Asistență financiară'];
+  function categorieGrup(cats){
+    for (var i = 0; i < ORDINE_CAT.length; i++) if (cats[ORDINE_CAT[i]]) return ORDINE_CAT[i];
+    return Object.keys(cats)[0] || '—';
+  }
+
   function grupeaza(acte){
     var map = {};
     acte.forEach(function(a){
@@ -1816,7 +1870,7 @@
       g.acte.sort(function(x,y){ return ord(y).localeCompare(ord(x)); });
       g.ultim = g.acte[0];
       g.parteneri = Object.keys(g.orgs).join(' / ');
-      g.categorie = g.categorieFixa || Object.keys(g.cats)[0] || '—';
+      g.categorie = g.categorieFixa || categorieGrup(g.cats);
       return g;
     }).sort(function(x,y){ return ord(y.ultim).localeCompare(ord(x.ultim)); });
     adaugaSumeGuvern(grupuri);
@@ -2322,7 +2376,9 @@
           '<h3 class="sub-h">Cum ajunge un act într-o categorie</h3>' +
           '<p class="fila-intro">Categoriile de pe rânduri sunt chiar cele de mai sus. ' +
           'Titlurile actelor nu folosesc însă mereu cuvintele din lege, așa că iată regula ' +
-          'după care fiecare titlu ajunge la o categorie. Apasă una ca să filtrezi registrul.</p>' +
+          'după care fiecare titlu ajunge la o categorie. Regula de bază: asistența financiară ' +
+          'nerambursabilă e grant, cea rambursabilă e împrumut (credit). ' +
+          'Apasă una ca să filtrezi registrul.</p>' +
           '<ul class="def-list map-list">' + etichHtml + '</ul>' +
           '<p class="fila-intro"><b>Asistența tehnică ajunge în Monitor pe altă cale.</b> ' +
           'Contractele de stat fără impact bugetar care privesc proiecte de asistență ' +
@@ -2897,13 +2953,18 @@
     });
     svg += '</svg>';
     var numeTip = AN_TIPURI.concat(['Altele']);
+    // legenda și tabelul arată doar tipurile care există în date: „Asistență financiară" nu
+    // mai apare la rânduri, iar o coloană mereu goală sugera că lipsesc date
+    var vizibile = numeTip.map(function(n, k){ return k; }).filter(function(k){
+      return ani.some(function(a){ return perAn[a][k] > 0; });
+    });
     box.innerHTML = '<p class="an-intro">Acorduri noi pe an — anul primului act publicat al fiecărui acord — după tipul lui.</p>' +
       '<div class="ani-scroll">' + svg + '</div>' +
-      '<div class="an-leg">' + numeTip.map(function(n, k){ return '<span><i style="background:' + AN_CULORI[k] + '"></i>' + n + '</span>'; }).join('') + '</div>' +
+      '<div class="an-leg">' + vizibile.map(function(k){ return '<span><i style="background:' + AN_CULORI[k] + '"></i>' + numeTip[k] + '</span>'; }).join('') + '</div>' +
       '<details class="an-tab"><summary>Arată ca tabel</summary><table><thead><tr><th>An</th>' +
-        numeTip.map(function(n){ return '<th>' + n + '</th>'; }).join('') + '<th>Total</th></tr></thead><tbody>' +
+        vizibile.map(function(k){ return '<th>' + numeTip[k] + '</th>'; }).join('') + '<th>Total</th></tr></thead><tbody>' +
         ani.slice().reverse().filter(function(a){ return perAn[a].some(Boolean); }).map(function(a){
-          var r = perAn[a]; return '<tr><td>' + a + '</td>' + r.map(function(v){ return '<td>' + (v||'') + '</td>'; }).join('') +
+          var r = perAn[a]; return '<tr><td>' + a + '</td>' + vizibile.map(function(k){ return '<td>' + (r[k]||'') + '</td>'; }).join('') +
             '<td><b>' + r.reduce(function(s,v){ return s+v; }, 0) + '</b></td></tr>'; }).join('') +
       '</tbody></table></details>';
     var tip = document.createElement('div'); tip.className = 'an-tipbox'; tip.hidden = true;

@@ -66,6 +66,79 @@ def test_clasificare():
         egal("clasificare: " + titlu[:48], mw.classify(titlu), asteptat)
 
 
+def test_rambursare():
+    """Asistența financiară se împarte după rambursare (HG 377/2018, anexa 1, pct. 9):
+    nerambursabilă = grant, rambursabilă = împrumut (credit)."""
+    cazuri = [
+        ("Împrumut", "Lege pentru ratificarea Acordului privind asistența financiară "
+                     "rambursabilă dintre Republica Moldova și România"),
+        ("Grant", "Hotărâre cu privire la aprobarea semnării Acordului privind asistența "
+                  "financiară nerambursabilă dintre Republica Moldova și Guvernul Japoniei"),
+        # formele gramaticale din titluri: genitiv, plural
+        ("Grant", "Hotărâre cu privire la aprobarea Acordului dintre Guvernul Republicii "
+                  "Moldova și Guvernul Japoniei privind acordarea asistenței financiare nerambursabile"),
+        ("Grant", "Hotărâre cu privire la aprobarea Acordului dintre Guvernul Republicii "
+                  "Moldova și Guvernul României privind acordarea unui ajutor financiar nerambursabil"),
+        # asistența TEHNICĂ nerambursabilă rămâne asistență tehnică
+        ("Asistență tehnică", "Ordin cu privire la intrarea în vigoare a Acordului de asistență "
+                              "tehnică nerambursabilă dintre Ministerul Muncii și Programul Alimentar Mondial"),
+        # cuvântul din titlu bate finanțatorul, în ambele sensuri
+        ("Grant", "Lege pentru ratificarea Acordului de grant dintre Republica Moldova și "
+                  "Banca Internațională pentru Reconstrucție și Dezvoltare"),
+        ("Împrumut", "Hotărâre cu privire la aprobarea Acordului de credit dintre Republica "
+                     "Moldova și Guvernul Republicii Cehe"),
+        # un titlu cu credit și grant e despre un credit: o parte din bani se întorc
+        ("Împrumut", "Lege pentru ratificarea Acordului de credit și a Acordului de grant dintre "
+                     "Republica Moldova și Asociația Internațională de Dezvoltare"),
+    ]
+    for asteptat, titlu in cazuri:
+        egal("rambursare: " + titlu[:48], mw.classify(titlu), asteptat)
+
+    regim = [
+        ("nerambursabil", "asistenței financiare nerambursabile"),
+        ("nerambursabil", "ajutor financiar non-rambursabil"),
+        ("rambursabil", "asistență financiară rambursabilă"),
+        ("mixt", "grant nerambursabil și credit rambursabil"),
+        (None, "asistență tehnică nerambursabilă"),
+        (None, "Acord de finanțare cu Uniunea Europeană"),
+    ]
+    for asteptat, titlu in regim:
+        egal("regim de rambursare: " + titlu, mw.regim_rambursare(titlu), asteptat)
+
+    # Finanțatorul hotărăște doar când titlul tace; KfW a dat și grant, și credit
+    egal("finanțator: Banca Mondială împrumută",
+         mw.dupa_finantator("Acordul de finanțare cu Banca Internațională pentru Reconstrucție și Dezvoltare"), "Împrumut")
+    egal("finanțator: Bulgaria donează",
+         mw.dupa_finantator("Acordul de asistență financiară", lambda t: "Bulgaria"), "Grant")
+    egal("finanțator: KfW nu se ghicește, nici singur, nici cu Germania",
+         [mw.dupa_finantator("Acordul de finanțare", lambda t, p=p: p) for p in ("KfW", "KfW / Germania")],
+         ["Asistență financiară", "Asistență financiară"])
+    egal("finanțator necunoscut: categoria-părinte",
+         mw.dupa_finantator("Acord de finanțare*"), "Asistență financiară")
+
+
+def test_reclasificare():
+    """Un act mai vechi își ia categoria după regulile de azi; unul nerecunoscut o păstrează."""
+    db = {"acte": {
+        "a": {"act": "HG1/2020", "categorie": "Asistență financiară",
+              "titlu": "Hotărâre cu privire la aprobarea Acordului privind asistența financiară "
+                       "rambursabilă dintre Republica Moldova și România"},
+        "b": {"act": "HG2/2020", "categorie": "Grant",
+              "titlu": "Hotărâre cu privire la aprobarea Acordului de grant cu Swedfund"},
+        "c": {"act": "HG3/2020", "categorie": "Împrumut",
+              "titlu": "Hotărâre cu privire la aprobarea Regulamentului de organizare internă"},
+    }}
+    schimbate = mw.reclasifica(db)
+    egal("reclasificare: un singur act se schimbă", schimbate, [("HG1/2020", "Asistență financiară", "Împrumut")])
+    egal("reclasificare: categoria nouă e scrisă în registru", db["acte"]["a"]["categorie"], "Împrumut")
+    egal("reclasificare: actul care rămâne la fel nu se atinge", db["acte"]["b"]["categorie"], "Grant")
+    egal("reclasificare: actul nerecunoscut își păstrează categoria", db["acte"]["c"]["categorie"], "Împrumut")
+    egal("reclasificare: a doua trecere nu mai schimbă nimic", mw.reclasifica(db), [])
+    # registrul adevărat e deja la zi
+    adevarat = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "date.json"), encoding="utf-8"))
+    egal("reclasificare: date.json e la zi cu regulile", mw.reclasifica(adevarat), [])
+
+
 def test_neclasificate():
     """Ce NU trebuie să intre în registru."""
     capcane = [

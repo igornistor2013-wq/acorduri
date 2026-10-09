@@ -9,7 +9,7 @@ import json, re, sys, datetime
 from pathlib import Path
 AICI = Path(__file__).resolve().parent
 sys.path.insert(0, str(AICI))
-from legis_clasifica import clasifica, partener, norm
+from legis_clasifica import clasifica, partener, norm, decizii_manuale
 import monitor_watch as mw
 
 SRC = AICI / 'acorduri.html'
@@ -208,11 +208,18 @@ def main(BRUT=None, OUT=None):
     OUT = OUT or str(AICI / 'legis_acorduri.html')
     brut = json.load(open(BRUT, encoding='utf-8'))
     acte, ids, titluri = {}, {}, {}
+    # Categorii hotărâte de mână pentru actele pe care titlul nu le lămurește
+    # (date/categorii_manual.json). Testele dau alte căi: ele nu citesc fișierul adevărat.
+    decizii = decizii_manuale() if rulare_reala else {}
+    decizii_folosite = set()
     for r in brut:
         t = repara(re.sub(r'^(Modificat|Abrogat|Suspendat)\s*', '', r['t']).strip())
         cat = clasifica(t)
         if not cat:
             continue
+        if r['c'] in decizii:
+            cat = decizii[r['c']]['categorie']
+            decizii_folosite.add(r['c'])
         titlu = tip(r['c']) + ' ' + t
         pub = r['pub'].replace('-', '.')
         acte[r['c'] + '|' + r['id']] = {
@@ -304,6 +311,18 @@ def main(BRUT=None, OUT=None):
         if rezumat:
             with open(rezumat, 'a', encoding='utf-8') as g:
                 g.write('### ⚠️ Sume puse de mână fără act\n\n' + mesaj + '\n')
+
+    # O decizie din categorii_manual.json care nu mai corespunde niciunui act e o categorie
+    # care a încetat să se aplice pe tăcute (cod scris greșit, act scos din registru).
+    orfane_cat = sorted(set(decizii) - decizii_folosite)
+    if orfane_cat and rulare_reala:
+        mesaj = ('ATENȚIE: %d chei din date/categorii_manual.json nu corespund niciunui act din registru, '
+                 'deci categoriile lor nu se aplică: %s' % (len(orfane_cat), ', '.join(orfane_cat[:30])))
+        print(mesaj)
+        rezumat = __import__('os').environ.get('GITHUB_STEP_SUMMARY')
+        if rezumat:
+            with open(rezumat, 'a', encoding='utf-8') as g:
+                g.write('### ⚠️ Categorii puse de mână fără act\n\n' + mesaj + '\n')
 
     # Data încrustată = ultima colectare din Monitor. Ea se schimbă la fiecare rulare
     # (are și ora), așa că pagina întreagă — peste un megaoctet — era rescrisă și urcată

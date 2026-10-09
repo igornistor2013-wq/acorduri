@@ -156,9 +156,16 @@ def citeste_pdf(octeti, instrument, ocr=True, pagini_ocr=25):
 
 # ------------------------------------------------------------ unirea cu baza
 
-def instrument(titlu):
-    from legis_clasifica import clasifica
-    return 'imprumut' if clasifica(titlu) == 'Împrumut' else 'grant'
+def instrument(titlu, cod=None, decizii=None):
+    """'imprumut' dacă actul e un împrumut (credit), altfel 'grant' — după categoria de azi.
+
+    Se calculează din categorie la fiecare rulare, nu se ia din ce a rămas notat în
+    date/legis_sume.json: când regulile de categorie se schimbă (asistența financiară
+    rambursabilă = împrumut, nerambursabilă = grant), un „instr" vechi ar citi din
+    atașamente suma greșită — cea de grant pentru un credit, ori invers."""
+    from legis_clasifica import categorie_act
+    titlu = re.sub(r'^(?:Modificat|Abrogat|Suspendat)\s*', '', titlu or '').strip()
+    return 'imprumut' if categorie_act(cod, titlu, decizii) == 'Împrumut' else 'grant'
 
 
 def uneste(vechi, noi):
@@ -180,8 +187,11 @@ def uneste(vechi, noi):
     return out
 
 
-def are_nevoie(r, reincearca=False, tot=False):
-    """Actul trebuie (re)deschis?"""
+def are_nevoie(r, reincearca=False, tot=False, instr=None):
+    """Actul trebuie (re)deschis?
+
+    instr: instrumentul de azi al actului ('imprumut' sau 'grant', vezi instrument()).
+    Fără el se folosește cel notat la ultima citire."""
     if r is None or r.get('eroare'):
         return False                      # încă necitit de legis_sume.py
     if tot or 'atas_citit' not in r:
@@ -193,7 +203,7 @@ def are_nevoie(r, reincearca=False, tot=False):
     # marcate așa rămâneau neverificate pentru cine rulează doar legis_local.bat.
     if not (r.get('atas') or []) and not r.get('fisa_ok'):
         return True
-    if any(not ls.suma_atas_tine(x, r.get('instr') or 'grant') for x in r.get('atas') or []):
+    if any(not ls.suma_atas_tine(x, instr or r.get('instr') or 'grant') for x in r.get('atas') or []):
         return True                       # o sumă veche nu mai rezistă regulilor de azi
     if reincearca:
         return bool(r.get('atas_eroare')) or any(
@@ -292,6 +302,8 @@ def main():
     brut = json.load(open(AICI / 'legis_brut.json', encoding='utf-8'))
     toate = ls.tinte(brut)
     titluri = {str(r['id']): r.get('t', '') for r in brut}
+    from legis_clasifica import decizii_manuale
+    decizii = decizii_manuale()                    # categorii hotărâte de mână (date/categorii_manual.json)
     baza = ls.incarca()
     acte = baza.setdefault('acte', {})
 
@@ -301,7 +313,8 @@ def main():
         if lipsa:
             print('Sar peste', ', '.join(lipsa), '— nu sunt încă în date/legis_sume.json (rulează întâi legis_sume.py).')
     else:
-        de_citit = [d for d in toate if are_nevoie(acte.get(d), a.reincearca, a.tot)]
+        de_citit = [d for d in toate
+                    if are_nevoie(acte.get(d), a.reincearca, a.tot, instrument(titluri.get(d, ''), toate.get(d), decizii))]
     de_citit.sort(key=lambda d: -int(d) if d.isdigit() else 0)
     necitite = sum(1 for d in toate if d not in acte)
     print(f'{len(toate)} acte de acord în registru · {len(de_citit)} de deschis acum'
@@ -441,7 +454,7 @@ def main():
                 fise_esuate = 0
                 r.pop('atas_eroare', None)
                 r['fisa_ok'] = 1                            # conținutul fișei a fost citit cu adevărat
-                instr = r.get('instr') or instrument(titluri.get(d, ''))
+                instr = instrument(titluri.get(d, ''), toate.get(d), decizii)
                 for x in r.get('atas') or []:           # suma veche care nu mai rezistă regulilor: o recitim
                     if not ls.suma_atas_tine(x, instr):
                         x['suma'] = None

@@ -160,7 +160,7 @@ verifica('Răspuns de urgență la COVID-19 (AID) se leagă de 8721150613679',
 const drumuri = R.rezultate.filter(x => /drumurilor din moldova . proiectul (v|vi)$/i.test(x.acord.scurt));
 verifica('fazele V și VI ale proiectului de drumuri nu primesc legături „suma" spre același proiect',
          drumuri.length < 2 || !drumuri.every(x => x.legaturi.some(l => l.nivel === 'suma' && l.idProiect === drumuri[0].legaturi[0].idProiect)));
-verifica('cele 562 de acorduri din registru sunt toate în rezultat', R.rezultate.length === G.length);
+verifica('toate cele ' + G.length + ' de acorduri din registru sunt în rezultat', R.rezultate.length === G.length);
 
 console.log('\n' + (esuate.length ? esuate.length + ' teste au picat: ' + esuate.join('; ') : 'Toate testele au trecut (' + ok + ').'));
 process.exit(esuate.length ? 1 : 0);

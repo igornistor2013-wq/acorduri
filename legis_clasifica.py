@@ -4,8 +4,10 @@ Pornește de la monitor_watch.classify() și acoperă golurile găsite la
 compararea cu legis.md: acord-cadru, acord de facilitate, înțelegeri prin
 schimb de note, memorandumuri cu agenții de dezvoltare, Canada ca partener.
 """
-import re, sys
-sys.path.insert(0, str(__import__('pathlib').Path(__file__).resolve().parent))
+import json, re, sys
+from pathlib import Path
+AICI = Path(__file__).resolve().parent
+sys.path.insert(0, str(AICI))
 import monitor_watch as mw
 
 norm = mw.norm
@@ -96,9 +98,11 @@ INCLUDE_CU_PARTENER = [
     # Proiectului…", „Acordul de asistență cu Guvernul SUA", „Acord de avans",
     # „Acord de restructurare a împrumutului", schimb de scrisori cu Japonia.
     (r"(?:acord|memorand|intelege|schimb\s+de\s+(?:note|scrisori)|protocol)\w*.{0,300}"
-     r"(?:finantar|imprumut|credit|grant|avans|asistent\w*\s+(?:umanitar|tehnic|financiar)|donati|suport\w*\s+al\s+proiect|proiect)",
+     r"(?:finantar|imprumut|\bcredit|\bgrant|avans|asistent\w*\s+(?:umanitar|tehnic|financiar)|donati|suport\w*\s+al\s+proiect|proiect)",
      "Asistență financiară"),
     (r"acord\w*\s+de\s+asistenta\b(?!\s+(?:juridic|reciproc|administrativ))", "Asistență financiară"),
+    # garanția de stat acordată pentru un împrumut extern: stă lângă împrumut, nu lângă proiect
+    (r"\bacord(?:ul|ului|uri|urile|urilor)?\b.{0,200}garanti\w*\s+de\s+stat", "Împrumut"),
     (r"memorandum\w*\s+de\s+intelegere.{0,250}(?:proiect|dezvoltare|cooperare)", "Asistență tehnică"),
     (r"acord\w*.{0,200}(?:implementare|realizare)a?\s+proiect", "Asistență tehnică"),
 ]
@@ -189,40 +193,79 @@ def clasifica(title):
         return None
     if not re.search(DOCUMENT_ACORD, n) or any(re.search(x, n) for x in EXCLUDE_CADRU):
         return None
-    cat = _categorie(title, n)
-    if cat and cat != "Împrumut" and re.search(IMPRUMUT, n) and not re.search(r"acord\w*\s+de\s+grant", n):
-        return "Împrumut"
-    return cat
+    return _categorie(title, n)
 
 
-# Împrumutul/creditul numit în titlu bate clasificarea după partener: „Acordul
-# cu Guvernul României referitor la împrumut" e împrumut, deși România e donator.
-IMPRUMUT = r"(?:acord|contract|conventi)\w*[- ]*(?:cadru\s+)?de\s+(?:imprumut|credit)|\bimprumut\w*\b|\bcredit(?:ul|ului|e|ele)?\b"
+# ------------------------------------------------------------ decizii de mână
+#
+# Rămân puține acte pe care titlul nu le lămurește și nici finanțatorul: „Acord de
+# finanțare*" fără nimic altceva, ori un acord cu KfW, care a dat Moldovei și grant,
+# și credit. Pentru ele nu ghicim — fie categoria rămâne „Asistență financiară", fie
+# cineva a verificat actul și a scris ce a găsit în date/categorii_manual.json:
+#
+#     "HG241/2023": {"categorie": "Împrumut", "motiv": "...", "sursa": "https://..."}
+#
+# Cheia e codul actului din legis.md, ca în date/sume_manual.json. Decizia bate
+# clasificarea automată, dar numai pentru un act pe care registrul îl primește: nu
+# adaugă acte noi. „motiv" și „sursa" sunt obligatorii — o categorie pusă fără temei
+# n-are ce căuta într-un registru de care atârnă totaluri.
+CATEGORII = ("Grant", "Împrumut", "Asistență tehnică", "Asistență financiară")
+FISIER_DECIZII = AICI / 'date' / 'categorii_manual.json'
+
+
+def decizii_manuale(cale=None):
+    """Deciziile din date/categorii_manual.json, {cod_act: {"categorie", "motiv", "sursa"}}.
+
+    Fișierul lipsă sau ilizibil nu oprește nimic (registrul merge pe clasificarea
+    automată), dar o intrare fără categorie validă, fără motiv ori fără sursă e lăsată
+    deoparte și spusă pe ecran: altfel ar schimba o categorie fără să se poată verifica."""
+    try:
+        brut = json.load(open(cale or FISIER_DECIZII, encoding='utf-8'))
+    except FileNotFoundError:
+        return {}
+    except Exception as e:
+        print('ATENȚIE: date/categorii_manual.json nu a putut fi citit (%s); folosesc clasificarea automată.' % e)
+        return {}
+    out = {}
+    for cod, d in (brut or {}).items():
+        if cod.startswith('_'):
+            continue
+        if (isinstance(d, dict) and d.get('categorie') in CATEGORII
+                and str(d.get('motiv') or '').strip() and str(d.get('sursa') or '').strip()):
+            out[cod] = d
+        else:
+            print('ATENȚIE: decizia pentru %s din date/categorii_manual.json nu are categorie validă, '
+                  'motiv și sursă; o ignor.' % cod)
+    return out
+
+
+def categorie_act(cod, title, decizii=None):
+    """Categoria unui act din registrul legis.md: decizia de mână, dacă există, altfel clasifica()."""
+    cat = clasifica(title)
+    if not cat:
+        return None
+    d = (decizii_manuale() if decizii is None else decizii).get(cod)
+    return d['categorie'] if d else cat
 
 
 def _categorie(title, n):
-    c = mw.classify(title)
-    if c:
-        return c
-    hits = [cat for pat, cat in INCLUDE_EXTRA if re.search(pat, n)]
-    if not hits and partener(title):
-        hits = [cat for pat, cat in INCLUDE_CU_PARTENER if re.search(pat, n)]
-        # memorandumurile de cooperare intră doar cu un partener de asistență cunoscut
-        if hits and not partener(title, doar_baza=True) and not re.search(
-                r"\bimprumut|\bcredit|\bgrant|finantar|asistent\w*\s+(?:financiar|tehnic|umanitar)|\bavans|restructurare", n):
-            hits = []
-    if not hits:
-        return None
-    for pref in ("Împrumut", "Grant", "Asistență tehnică", "Asistență financiară"):
-        if pref in hits:
-            if pref == "Asistență financiară":
-                parti = [x for x in partener(title).split(' / ') if x]
-                if parti and all(x in mw.CREDITORI or x in ("Canada", "OFID", "BSTDB", "IFC", "Kuweit", "CEB", "Japonia (JBIC)", "Bancă comercială străină") for x in parti):
-                    return "Împrumut"
-                if parti and all(x in mw.DONATORI or x in ("Cehia", "Austria", "Olanda", "Coreea", "SUA (MCC)", "Fondul Global", "Regatul Unit", "Nordici", "Baltici") for x in parti):
-                    return "Grant"
-            return pref
-    return hits[0]
+    """Categoria brută din tipare (cele din Monitor, apoi cele extinse), rezolvată apoi de
+    mw.corecteaza(): rambursabil → Împrumut, nerambursabil → Grant, iar „Asistență
+    financiară" rămasă se judecă după finanțator — cu lista de parteneri de aici, mai largă
+    decât a Monitorului (denumirile vechi din legis.md)."""
+    c = mw.categorie_bruta(title)
+    if not c:
+        hits = [cat for pat, cat in INCLUDE_EXTRA if re.search(pat, n)]
+        if not hits and partener(title):
+            hits = [cat for pat, cat in INCLUDE_CU_PARTENER if re.search(pat, n)]
+            # memorandumurile de cooperare intră doar cu un partener de asistență cunoscut
+            if hits and not partener(title, doar_baza=True) and not re.search(
+                    r"\bimprumut|\bcredit|\bgrant|finantar|asistent\w*\s+(?:financiar|tehnic|umanitar)|\bavans|restructurare", n):
+                hits = []
+        if not hits:
+            return None
+        c = next((pref for pref in mw.ORDINE_CATEGORII if pref in hits), hits[0])
+    return mw.corecteaza(title, c, partener)
 
 
 # Tipul actului după prefixul codului legis

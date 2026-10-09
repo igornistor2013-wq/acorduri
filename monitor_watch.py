@@ -84,7 +84,18 @@ INCLUDE = [
     (ACORD + r"\s+de\s+grant", "Grant"),
     (r"grant(?:ul|ului|uri|urile|urilor)?\s+investi", "Grant"),
     (r"din\s+contul\s+grantului", "Grant"),
-    (r"asistent[aă]\s+financiara\s+nerambursabila", "Grant"),
+    # Asistența financiară se împarte după rambursare (HG 377/2018, anexa 1, pct. 9):
+    # nerambursabilă = grant, rambursabilă = împrumut („credit"). Tiparele de aici țin
+    # de PRIMIREA actului în registru; ce categorie primește o hotărăște corecteaza(),
+    # mai jos. Formele gramaticale contează: titlurile scriu „asistenței financiare
+    # nerambursabile" (genitiv, plural), nu doar „asistența financiară nerambursabilă".
+    (r"asistent\w*\s+financiar\w*\s+nerambursabil\w*", "Grant"),
+    (r"asistent\w*\s+financiar\w*\s+rambursabil\w*", "Împrumut"),
+    # „ajutor nerambursabil" cere și un cuvânt de acord: hotărârile despre primirea ori
+    # vămuirea unui ajutor nu sunt acorduri.
+    # („acordarea" și „acordat" nu sunt acorduri, de aceea lista de forme e închisă.)
+    (r"(?=.*\b(?:acord(?:ul|ului|uri|urile|urilor)|memorand\w*|intelegeri\w*|conventi\w*)\b)"
+     r".*\bajutor\w*\s+(?:financiar\w*\s+)?nerambursabil\w*", "Grant"),
     # împrumuturi
     (ACORD + r"\s+de\s+imprumut", "Împrumut"),
     (CONTRACT + r"\s+de\s+imprumut", "Împrumut"),
@@ -246,17 +257,43 @@ ITEM_RE = re.compile(
 )
 
 
+# Unele titluri din legis.md au litere chirilice în loc de cele latine, în două feluri:
+#
+#   • cod de pagină greșit — textul în cp1250 citit ca cp1251: „оmprumut" (împrumut),
+#     „finanюare" (finanțare), „Germanг" (Germană), „fьr" (für): о=î, ю=ț, г=ă, ь=ü;
+#   • litere care arată la fel, strecurate la tastare: „сu" (cu), „сredit" (credit),
+#     „sеmnаrеа" (semnarea), „sеmпаrеа" (п în loc de n).
+#
+# Fără reparație, „сredit" sau „оmprumut" scapă tiparelor și actul rămâne necategorisit
+# sau ajunge, după finanțator, în altă categorie decât cea din titlu.
+_CHIRILIC = str.maketrans({
+    "ю": "t", "г": "a", "ь": "u",                                   # cp1250 citit ca cp1251
+    "а": "a", "с": "c", "е": "e", "р": "p", "п": "n", "х": "x", "у": "y",
+    "і": "i", "ѕ": "s", "ј": "j", "к": "k", "м": "m", "т": "t", "н": "h",
+    "о": "o",
+})
+
+
 def norm(text):
     """Text cu diacritice reduse, pentru potrivire robustă."""
     t = text.lower()
+    if re.search("[\u0400-\u04ff]", t):
+        # „о" la început de cuvânt, înaintea lui n/m, e „î" cu cod de pagină greșit: „оn", „оmprumut"
+        t = re.sub(r"(?<![\w])о(?=[nm])", "i", t)
+        t = t.translate(_CHIRILIC)
     for a, b in (("ă", "a"), ("â", "a"), ("î", "i"), ("ș", "s"),
                  ("ş", "s"), ("ț", "t"), ("ţ", "t")):
         t = t.replace(a, b)
     return t
 
 
-def classify(title):
-    """Returnează categoria actului, sau None dacă nu e relevant."""
+def categorie_bruta(title):
+    """Categoria după tiparele din titlu, ÎNAINTE de a ține seama de rambursare și de finanțator.
+
+    „Asistență financiară" apare aici ca atare când titlul numește doar finanțarea;
+    classify() o transformă în Grant sau Împrumut. Separarea e pentru registrul legis.md,
+    care are o listă de parteneri mai largă și trebuie să rezolve aceeași categorie-părinte
+    cu ea, nu cu lista de aici."""
     n = norm(title)
     for pat in EXCLUDE:
         if re.search(norm(pat), n):
@@ -286,12 +323,95 @@ def classify(title):
     #
     # „Asistență financiară" e ultima, fiind categoria-părinte din pct. 9.2: o
     # folosim doar când titlul nu spune dacă banii sunt rambursabili sau nu.
-    for pref in ("Împrumut", "Grant", "Asistență tehnică", "Asistență financiară"):
+    for pref in ORDINE_CATEGORII:
         if pref in hits:
-            if pref == "Asistență financiară":
-                return dupa_finantator(title)
             return pref
     return hits[0]
+
+
+# Ordinea de preferință între categorii, de la cea mai specifică. Folosită la alegerea
+# categoriei unui act (aici) și a unui acord cu acte de categorii diferite (acorduri.html).
+ORDINE_CATEGORII = ("Împrumut", "Grant", "Asistență tehnică", "Asistență financiară")
+
+
+def classify(title, partner_fn=None):
+    """Returnează categoria actului, sau None dacă nu e relevant.
+
+    partner_fn: funcția care spune cine e finanțatorul; registrul legis.md o dă pe a lui,
+    cu o listă de parteneri mai largă (vezi dupa_finantator)."""
+    cat = categorie_bruta(title)
+    return corecteaza(title, cat, partner_fn) if cat else None
+
+
+# ------------------------------------------------------------------ rambursare
+#
+# Asistența financiară se împarte, după HG 377/2018 (anexa 1, pct. 9), în două:
+#
+#   nerambursabilă  →  Grant     (pct. 9.13)
+#   rambursabilă    →  Împrumut  (pct. 9.2), în vorbirea curentă „credit"
+#
+# Titlul spune adesea care din ele e: „asistența financiară rambursabilă",
+# „ajutor financiar nerambursabil", „grantul danez", „acordul de credit". Cuvântul
+# acela hotărăște, înaintea oricărei deducții după cine dă banii: Guvernul României
+# a dat și grant (programul de asistență tehnică și financiară „în baza unui ajutor
+# financiar nerambursabil"), și credit („asistența financiară rambursabilă"), iar
+# după finanțator singur cele două s-ar fi numit la fel.
+#
+# Doar când titlul nu spune nimic despre rambursare se judecă după finanțator —
+# băncile de dezvoltare împrumută, agențiile de cooperare donează — și, dacă nici
+# finanțatorul nu lămurește, categoria rămâne „Asistență financiară".
+
+# Nerambursabil, în toate formele („nerambursabil", „-ă", „-e", „-ei"), plus formulările
+# care spun același lucru fără cuvântul acela.
+RX_NERAMB = (r"\bnon-?rambursabil\w*|\bnerambursabil\w*|fara\s+rambursare|"
+             r"cu\s+titlu\s+(?:gratuit|de\s+donatie)")
+# Rambursabil. „non-rambursabil" nu e rambursabil.
+RX_RAMB = r"(?<!non-)\brambursabil\w*"
+# „Asistența tehnică nerambursabilă" spune că expertiza vine gratuit, nu că banii sunt
+# grant: rămâne asistență tehnică. „Asistență tehnică și financiară ... ajutor financiar
+# nerambursabil" e altceva — acolo nerambursabil stă lângă „financiar".
+RX_TEHNIC_NERAMB = r"(?:asistent|cooperar|ajutor)\w*\s+tehnic\w*\s+(?:\w+\s+)?(?:" + RX_NERAMB + ")"
+# Instrumentul numit direct. Împrumutul/creditul numit în titlu bate clasificarea după
+# partener: „Acordul cu Guvernul României referitor la împrumut" e împrumut, deși
+# România e de obicei donator.
+RX_IMPRUMUT = (r"(?:acord|contract|conventi)\w*[- ]*(?:cadru\s+)?de\s+(?:imprumut|credit)|"
+               r"\bimprumut\w*\b|\bcredit(?:ul|ului|e|ele)?\b")
+RX_GRANT = r"\bgrant(?:ul|ului|uri|urile|urilor|e)?\b|\bgrand\b"      # „grand" e o greșeală de scriere din titluri
+RX_ACORD_GRANT = r"acord\w*\s+de\s+gran[dt]"
+
+
+def regim_rambursare(title):
+    """Ce spune titlul despre rambursare: 'nerambursabil', 'rambursabil', 'mixt' sau None."""
+    n = norm(title)
+    neramb = bool(re.search(RX_NERAMB, re.sub(RX_TEHNIC_NERAMB, " ", n)))
+    ramb = bool(re.search(RX_RAMB, n))
+    if neramb and ramb:
+        return "mixt"
+    return "nerambursabil" if neramb else "rambursabil" if ramb else None
+
+
+def corecteaza(title, cat, partner_fn=None):
+    """Categoria finală a unui act, din categoria găsită de tipare (cat).
+
+    Ordinea: 1. rambursabil (sau amestec) → Împrumut; 2. împrumut/credit numit în titlu
+    → Împrumut (un titlu care numește și un „acord de grant" rămâne grant doar dacă
+    tiparele nu l-au găsit deja împrumut: „Acordul de credit … și Acordul de grant …"
+    e un act despre un credit); 3. nerambursabil → Grant; 4. grantul numit în titlu →
+    Grant; 5. „Asistență financiară" rămasă → după finanțator."""
+    n = norm(title)
+    rg = regim_rambursare(title)
+    acord_grant = bool(re.search(RX_ACORD_GRANT, n))
+    if rg in ("rambursabil", "mixt"):
+        return "Împrumut"
+    if re.search(RX_IMPRUMUT, n) and (cat == "Împrumut" or not acord_grant):
+        return "Împrumut"
+    if rg == "nerambursabil":
+        return "Grant"
+    if acord_grant or re.search(RX_GRANT, n):
+        return "Grant"
+    if cat == "Asistență financiară":
+        return dupa_finantator(title, partner_fn)
+    return cat
 
 
 # Suportul bugetar e un mod de livrare, nu un instrument.
@@ -329,20 +449,55 @@ def e_suport_bugetar(title):
 # sunt granturi, la fel acordurile de cooperare și finanțare cu Federația
 # Internațională de Cruce Roșie.
 #
-# Pentru un finanțator necunoscut rămânem la categoria-părinte: mai bine
-# neclasificat decât clasificat greșit.
-CREDITORI = {"AID", "BIRD", "BERD", "BEI", "CEB", "AFD", "KfW", "FMI", "Belgia"}
+# Doar o regulă de rezervă: cuvintele din titlu (rambursabil, nerambursabil, grant,
+# împrumut, credit) trec înaintea ei — vezi corecteaza().
+#
+# Pentru un finanțator necunoscut, sau care face și una, și alta (KfW: a dat Moldovei
+# și grant — infrastructură socială, 5 mil. euro —, și credit; Agenția Japoneză JICA),
+# rămânem la categoria-părinte: mai bine neclasificat decât clasificat greșit. De aceea
+# KfW nu stă în nicio listă, iar un act cu KfW se lămurește doar din cuvintele titlului
+# sau dintr-o hotărâre scrisă în date/categorii_manual.json.
+#
+# Banca Mondială și FIDA (IFAD) împrumută; granturile lor — „grant danez", fondul
+# fiduciar ASAP — își spun grant în titlu și sunt prinse de regula grantului.
+# Hewlett-Packard și Siemens au finanțat în rate (leasing, credit furnizor): se
+# întorc. Băncile comerciale străine la fel. Bulgaria dă Moldovei doar granturi
+# (portalul AMP trece asistența bulgară ca grant), deci stă între donatori.
+CREDITORI = {"AID", "BIRD", "BERD", "BEI", "CEB", "AFD", "FMI", "Belgia",
+             "Banca Mondială", "FIDA",
+             "Canada", "OFID", "BSTDB", "Kuweit", "Japonia (JBIC)",
+             "Bancă comercială străină", "Hewlett-Packard", "Siemens (Germania)"}
 DONATORI  = {"UE", "FICR", "PNUD", "UNICEF", "UNHCR", "GIZ", "Suedia", "Elveția",
              "SUA", "PAM", "UNOPS", "Consiliul Europei", "România", "Polonia",
-             "Turcia", "Japonia", "Germania"}
+             "Turcia", "Japonia", "Germania",
+             "Cehia", "Austria", "Olanda", "Coreea", "SUA (MCC)", "Fondul Global",
+             "Regatul Unit", "Nordici", "Baltici", "Bulgaria"}
+# Corporația Financiară Internațională împrumută firmelor private, nu statului. Acordurile
+# ei cu Guvernul (proiectul „Reforma climatului investițional”, finanțat de donatori și
+# implementat de IFC; statul contribuie în natură, nu din buget) sunt de consultanță: nu
+# sunt credit, deși numele ei sună a bancă.
+CONSULTANTI = {"IFC"}
+# Băncile chineze care au împrumutat drumurile (ICBC, Citic, Bank of Communications) apar
+# ca „China", iar China dă și granturi: le recunoaștem după numele băncii.
+RX_BANCA_CREDITOARE = (r"\bicbc\b|citic bank|bank of communication|bank of china|"
+                       r"banca industriala si comerciala|export[- ]credit|exim\s?bank")
 
 
-def dupa_finantator(title):
-    parti = [p.strip() for p in (partner(title) or "").split(" / ") if p.strip()]
+def dupa_finantator(title, partner_fn=None):
+    """Împrumut sau Grant după finanțator; „Asistență financiară" când nu se poate spune.
+
+    partner_fn: cine e finanțatorul. Registrul legis.md își dă lista lui de parteneri
+    (denumiri vechi: „Asociația Internațională de Dezvoltare", „Comisia Comunităților
+    Europene"), pe care partner() de aici n-o cunoaște."""
+    parti = [p.strip() for p in ((partner_fn or partner)(title) or "").split(" / ") if p.strip()]
     if parti and all(p in CREDITORI for p in parti):
         return "Împrumut"
     if parti and all(p in DONATORI for p in parti):
         return "Grant"
+    if parti and all(p in CONSULTANTI for p in parti):
+        return "Asistență tehnică"
+    if re.search(RX_BANCA_CREDITOARE, norm(title)) and not any(p in DONATORI for p in parti):
+        return "Împrumut"
     return "Asistență financiară"
 
 
@@ -558,6 +713,24 @@ def cheie_libera(db, act):
     return key
 
 
+def reclasifica(db):
+    """Aplică regulile de azi și actelor mai vechi din registru.
+
+    culege() rescrie doar actele din edițiile de pe prima pagină (ultimele zece). Un act
+    mai vechi își păstra la nesfârșit categoria de la data când a intrat, chiar dacă
+    regulile s-au schimbat între timp: „asistența financiară" rămânea așa, deși azi se
+    hotărăște în grant sau împrumut. Un act pe care regulile de azi nu-l mai recunosc își
+    păstrează categoria — îl scoate din registru un om, nu o regulă care se schimbă.
+    Întoarce [(act, categoria veche, categoria nouă)]."""
+    schimbate = []
+    for a in db["acte"].values():
+        cat = classify(a.get("titlu", ""))
+        if cat and cat != a.get("categorie"):
+            schimbate.append((a.get("act"), a.get("categorie"), cat))
+            a["categorie"] = cat
+    return schimbate
+
+
 def culege(db, eid, label):
     """Citește o ediție și adaugă/actualizează actele în registru.
 
@@ -626,6 +799,13 @@ def goluri(db):
             if i not in vazute and i not in renuntat]
 
 
+def spune_schimbari(schimbate):
+    if schimbate:
+        print(f"\n{len(schimbate)} acte își schimbă categoria după regulile de azi:")
+        for act, veche, noua in schimbate[:40]:
+            print(f"   ~ {act}: {veche} → {noua}")
+
+
 def main():
     db = load()
 
@@ -647,6 +827,7 @@ def main():
                 db["editii_vazute"].append(eid)
             time.sleep(1)
         db["ultima_rulare"] = acum().strftime("%d.%m.%Y %H:%M")
+        spune_schimbari(reclasifica(db))
         save(db)
         print(f"\n{noi} acte noi. Total în registru: {len(db['acte'])}.")
         return
@@ -739,6 +920,7 @@ def main():
     if renuntate:
         print(f"{len(renuntate)} ediții inaccesibile, verificate de "
               f"{MAX_INCERCARI} ori: " + ", ".join(sorted(renuntate)))
+    spune_schimbari(reclasifica(db))
     save(db)
 
     total = len(db["acte"])

@@ -257,6 +257,7 @@
   /* De la lege la bani: acordurile legate de proiectele AMP */
   .leg-status{font-size:12.5px;padding:9px 12px;border-radius:6px;background:var(--blue-bg);color:var(--navy);font-weight:600;margin:0 0 12px;}
   .leg-status.err{background:var(--red-bg);color:var(--red);}
+  .leg-err-det{font-weight:400;margin-top:4px;line-height:1.5;}
   .leg-kpis{margin:0 0 4px !important;grid-template-columns:repeat(5,1fr);}
   @media (max-width:1100px){.leg-kpis{grid-template-columns:repeat(3,1fr);}}
   @media (max-width:800px){.leg-kpis{grid-template-columns:repeat(2,1fr);}}
@@ -7305,7 +7306,7 @@ function iatiQuickExport(rows, statusElId, filenamePrefix){
         if(statusEl) statusEl.textContent = en ? 'No activities to export.' : 'Nicio activitate de exportat.';
         return;
       }
-      const ws = XLSX.utils.json_to_sheet(rows);
+      const ws = xlsxLegaturi(XLSX.utils.json_to_sheet(rows));
       ws['!cols'] = [{wch:34},{wch:60},{wch:30},{wch:22},{wch:24},{wch:16},{wch:40},{wch:10},{wch:10},{wch:18},{wch:18},{wch:60},{wch:46}];
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'IATI Moldova');
@@ -8203,7 +8204,7 @@ document.getElementById('backFromDportalBtn').addEventListener('click', showMain
 const LEG = {
   date: null, oficiale: {}, pending: { confirmate: {}, respinse: {}, fara_proiect: [] },
   rez: null, pr: {}, proj: new Map(), semn: '', tab: 'acorduri', limit: 50,
-  deschise: new Set(), incarcare: null, eroare: false, partenere: false,
+  deschise: new Set(), incarcare: null, eroare: null, notaSursa: null, partenere: false,
   /* Crește la fiecare schimbare a confirmărilor (ale omului sau cele din fișier). Semnătura de mai jos
      folosea înainte lungimea JSON-ului lor — dar „confirmă" apoi „respinge" aceeași legătură mută
      un element dintr-o listă în alta fără să schimbe lungimea, iar rezultatul rămânea cel vechi. */
@@ -8214,16 +8215,64 @@ try{
   if(s && s.confirmate && s.respinse) LEG.pending = { confirmate: s.confirmate, respinse: s.respinse, fara_proiect: s.fara_proiect || [] };
 }catch(e){}
 function legSalveaza(){ try{ localStorage.setItem('legaturiAmpPending', JSON.stringify(LEG.pending)); }catch(e){} }
+/* Cere un fișier JSON. Dacă nu merge, spune DE CE (nu doar „n-a mers"): pagina deschisă de pe disc,
+   fișier lipsă de pe site (404), rețea căzută sau fișier stricat sunt lucruri diferite de reparat. */
 function legCere(u){
-  return fetch(u + '?_=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null);
+  if(location.protocol === 'file:') return Promise.resolve({ date: null, motiv: 'file' });
+  return fetch(u + '?_=' + Date.now(), { cache: 'no-store' }).then(r => {
+    if(!r.ok) return { date: null, motiv: 'http', cod: r.status };
+    return r.text().then(txt => {
+      try{ return { date: JSON.parse(txt.replace(/^\uFEFF/, '')) }; }catch(e){ return { date: null, motiv: 'json' }; }
+    });
+  }).catch(() => ({ date: null, motiv: 'retea' }));
+}
+/* Dacă date/acorduri_legare.json lipsește sau nu se poate citi, lista acordurilor se ia direct din
+   pagina registrului (legis_acorduri.html), într-un cadru nevăzut: e pagina din care se scrie și
+   fișierul, deci aceleași rânduri. Merge doar pe același domeniu (nu de pe disc). */
+function legDinRegistru(){
+  return new Promise((rezolva, respinge) => {
+    if(location.protocol === 'file:') return respinge({ motiv: 'file' });
+    fetch('legis_acorduri.html', { method: 'HEAD', cache: 'no-store' }).then(r => {
+      if(!r.ok){ respinge({ motiv: 'http', cod: r.status }); return; }
+      const f = document.createElement('iframe'), t0 = Date.now();
+      f.src = 'legis_acorduri.html';
+      f.setAttribute('aria-hidden', 'true'); f.tabIndex = -1;
+      f.style.cssText = 'position:absolute;left:-9999px;top:0;width:1200px;height:800px;border:0;visibility:hidden;';
+      let gata = false, ultim = '', stabil = 0, incarcat = 0, iv = null;
+      const termina = (ok, v) => { if(gata) return; gata = true; clearInterval(iv); try{ f.remove(); }catch(e){} ok ? rezolva(v) : respinge(v); };
+      f.addEventListener('load', () => { incarcat = Date.now(); });
+      iv = setInterval(() => {
+        try{
+          if(!incarcat){ if(Date.now() - t0 > 30000) termina(false, { motiv: 'timp' }); return; }
+          const w = f.contentWindow;
+          if(!w || typeof w.__ACORDURI__ !== 'function'){
+            if(Date.now() - incarcat > 3000) termina(false, { motiv: 'faraExport' });
+            return;
+          }
+          // sumele și legăturile sosesc după încărcare și redesenează pagina: așteptăm să se oprească
+          const l = w.__ACORDURI__();
+          const sem = l.length + ':' + l.filter(x => x.suma).length + ':' + l.reduce((z, x) => z + x.alte.length + (x.cost ? 1 : 0), 0);
+          stabil = sem === ultim ? stabil + 1 : 0; ultim = sem;
+          if(stabil >= 3 && l.length) termina(true, { actualizat: '', curs_data: w.__ACORDURI__.curs || '', numar: l.length, acorduri: JSON.parse(JSON.stringify(l)) });
+          else if(Date.now() - incarcat > 40000) termina(false, { motiv: 'timp' });
+        }catch(e){ termina(false, { motiv: 'blocat' }); }
+      }, 600);
+      document.body.appendChild(f);
+    }).catch(() => respinge({ motiv: 'retea' }));
+  });
 }
 function legIncarca(){
   if(LEG.incarcare) return LEG.incarcare;
   LEG.incarcare = Promise.all([legCere('date/acorduri_legare.json'), legCere('date/legaturi_amp.json')]).then(r => {
-    LEG.date = r[0] && r[0].acorduri ? r[0] : null;
-    LEG.eroare = !LEG.date;
-    LEG.oficiale = r[1] || {};
-    LEG.versiune++;
+    const d = r[0].date;
+    LEG.oficiale = r[1].date || {};
+    if(d && Array.isArray(d.acorduri) && d.acorduri.length){ LEG.date = d; LEG.eroare = null; LEG.notaSursa = null; LEG.versiune++; return; }
+    const motiv = d ? { motiv: 'format' } : r[0];
+    return legDinRegistru().then(x => {
+      LEG.date = x; LEG.eroare = null; LEG.notaSursa = motiv; LEG.versiune++;
+    }, e2 => {
+      LEG.date = null; LEG.eroare = { fisier: motiv, registru: e2 }; LEG.versiune++;
+    });
   });
   return LEG.incarcare;
 }
@@ -8284,6 +8333,12 @@ const LEG_LUNI_EN = { ianuarie: 'January', februarie: 'February', martie: 'March
 function legData(s){
   const m = /^(\d{1,2}) (\S+) (\d{4})$/.exec(String(s || ''));
   return currentLang === 'en' && m && LEG_LUNI_EN[m[2]] ? m[1] + ' ' + LEG_LUNI_EN[m[2]] + ' ' + m[3] : (s || '—');
+}
+/* Motivul unei încărcări eșuate, în cuvinte (m = {motiv, cod}). */
+function legMotiv2(m){
+  m = m || {};
+  if(m.motiv === 'http') return t(m.cod === 404 ? 'legM_http404' : 'legM_http').replace('{c}', m.cod);
+  return t('legM_' + m.motiv) || String(m.motiv || '?');
 }
 function legFold(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
 function legBadge(n){ return '<span class="leg-badge ' + (n === 'fara-confirmat' ? 'fara' : n) + '">' + esc(t(LEG_ETICHETA[n])) + '</span>'; }
@@ -8446,10 +8501,26 @@ function legaturiRender(){
   const status = document.getElementById('legStatus'), corp = document.getElementById('legCorp'), cap = document.getElementById('legCap');
   if(!status) return;
   legPopuleazaFiltre();
-  if(!window.LegaturaAmp){ status.className = 'leg-status err'; status.textContent = t('legEroareModul'); return; }
+  if(!window.LegaturaAmp){
+    /* legatura-amp.js e încărcat după scriptul mare al paginii, deci la prima desenare (de ex. când adresa
+       are #legaturi) nu există încă. Dacă lista acordurilor se încarcă înainte să ruleze — de pe disc sau
+       dintr-un cache — pagina rămânea pe „modulul nu s-a încărcat" pentru totdeauna. Așteptăm încărcarea
+       paginii; abia după ea, un modul lipsă e o eroare adevărată. */
+    if(document.readyState !== 'complete'){
+      status.className = 'leg-status'; status.innerHTML = '<span class="spin"></span>' + esc(t('legSeIncarca'));
+      if(!LEG.asteaptaModul){ LEG.asteaptaModul = true; window.addEventListener('load', () => { LEG.asteaptaModul = false; legaturiRender(); }, { once: true }); }
+      return;
+    }
+    status.className = 'leg-status err'; status.textContent = t('legEroareModul'); return;
+  }
   document.querySelectorAll('#legaturiView .leg-tabs button').forEach(b => b.classList.toggle('activ', b.dataset.tab === LEG.tab));
   if(LEG.eroare){
-    status.className = 'leg-status err'; status.textContent = t('legEroare');
+    status.className = 'leg-status err';
+    status.innerHTML = '<div>' + esc(t('legEroare')) + '</div>' +
+      '<div class="leg-err-det">• ' + esc(t('legErFisier').replace('{m}', legMotiv2(LEG.eroare.fisier))) + '</div>' +
+      '<div class="leg-err-det">• ' + esc(t('legErRegistru').replace('{m}', legMotiv2(LEG.eroare.registru))) + '</div>' +
+      '<div class="leg-err-det">' + esc(t('legErCe').replace('{u}', new URL('date/acorduri_legare.json', location.href).href)) + '</div>' +
+      '<button type="button" class="leg-btn" id="legReincearca" style="margin-top:8px;">' + esc(t('legReincearca')) + '</button>';
     corp.innerHTML = ''; cap.innerHTML = ''; document.getElementById('legKpis').innerHTML = ''; document.getElementById('legCount').textContent = '';
     return;
   }
@@ -8459,6 +8530,7 @@ function legaturiRender(){
   status.className = 'leg-status';
   status.textContent = t('legStatus').replace('{p}', fmtNum(PROJECTS.length)).replace('{src}', window.__liveLaOra ? t('legSursaLive') : t('legSursaArhiva'))
     .replace('{a}', fmtNum(LEG.date.numar)).replace('{d}', legData(LEG.date.curs_data));
+  if(LEG.notaSursa) status.textContent += ' · ' + t('legNotaRegistru').replace('{m}', legMotiv2(LEG.notaSursa));
   const idAcorduri = new Set(LEG.date.acorduri.map(a => a.id)), jc = legUneste(LEG.oficiale, LEG.pending);
   const orfane = Object.keys(jc.confirmate).concat(Object.keys(jc.respinse), jc.fara_proiect).filter(id => !idAcorduri.has(id));
   if(orfane.length) status.textContent += ' · ⚠ ' + t('legOrfane').replace('{n}', orfane.length).replace('{ids}', orfane.slice(0, 5).join(', '));
@@ -8524,6 +8596,11 @@ function legCsv(){
   sel('legNivel').addEventListener('change', refa);
   sel('legPartener').addEventListener('change', refa);
   sel('legCsvBtn').addEventListener('click', () => { if(LEG.rez) legCsv(); });
+  sel('legStatus').addEventListener('click', e => {
+    if(!e.target.closest('#legReincearca')) return;
+    LEG.incarcare = null; LEG.eroare = null; LEG.date = null; LEG.rez = null; LEG.semn = '';
+    legaturiRender(); legIncarca().then(legaturiRender);
+  });
   document.querySelectorAll('#legaturiView .leg-tabs button').forEach(b => b.addEventListener('click', () => { LEG.tab = b.dataset.tab; LEG.limit = 50; legaturiRender(); }));
   sel('legCorp').addEventListener('click', e => {
     const mm = e.target.closest('#legMaiMult'); if(mm){ LEG.limit += 50; legaturiRender(); return; }
@@ -8773,6 +8850,17 @@ document.getElementById('exportColsNoneBtn').addEventListener('click', () => {
 });
 
 const EXPORT_PREVIEW_MAX = 300;   // plafon de randare, ca previzualizarea să rămână instantă
+/* O adresă scrisă într-o celulă ca text simplu nu e un link: Excel și LibreOffice o afișează, dar nu o
+   deschid la clic. Coloanele „Link AMP" și „Link IATI" din exporturi arătau ca linkuri și nu se deschideau.
+   Orice celulă care e doar o adresă http(s) devine hyperlink (SheetJS: câmpul l al celulei). */
+function xlsxLegaturi(ws){
+  Object.keys(ws).forEach(k => {
+    if(k[0] === '!') return;
+    const c = ws[k];
+    if(c && c.t === 's' && typeof c.v === 'string' && c.v.length <= 2000 && /^https?:\/\/[^\s<>"']+$/.test(c.v)) c.l = { Target: c.v };
+  });
+  return ws;
+}
 function exportRenderPreview(){
   const head = document.getElementById('exportPreviewHead');
   const body = document.getElementById('exportPreviewBody');
@@ -8934,7 +9022,7 @@ document.getElementById('exportExcelBtn').addEventListener('click', ()=>{
         activeCols.forEach(c => { o[colLabel(c)] = r[c]; });
         return o;
       });
-      const ws = XLSX.utils.json_to_sheet(trimmedRows);
+      const ws = xlsxLegaturi(XLSX.utils.json_to_sheet(trimmedRows));
       const fullColWidths = isIati
         ? [{wch:34},{wch:60},{wch:30},{wch:22},{wch:24},{wch:16},{wch:40},{wch:10},{wch:10},{wch:18},{wch:18},{wch:60},{wch:46}]
         : [{wch:18},{wch:8},{wch:55},{wch:55},{wch:32},{wch:32},{wch:14},{wch:14},{wch:28},{wch:24},{wch:24},{wch:32},{wch:32},{wch:22},{wch:18},{wch:18}];
@@ -9103,7 +9191,21 @@ Object.assign(I18N.ro, {
  "legFiltruFara": "Fără proiect",
  "legFiltruPartener": "Toți finanțatorii",
  "legJsonCum": "Confirmări făcute de oameni. „confirmate”: id-ul acordului (din registru) → lista AMP ID ale proiectelor lui. „respinse”: legături automate care nu sunt corecte. „fara_proiect”: acorduri despre care s-a verificat că nu au proiect în AMP.",
- "legEroare": "Lista acordurilor nu s-a putut încărca (date/acorduri_legare.json). Deschide site-ul de pe adresa lui publică sau generează fișierul cu legatura_acorduri.py.",
+ "legEroare": "Lista acordurilor nu s-a putut încărca.",
+ "legErFisier": "date/acorduri_legare.json: {m}.",
+ "legErRegistru": "Citirea directă din legis_acorduri.html: {m}.",
+ "legErCe": "Ce poți face: deschide în browser {u} (dacă dă „404\", fișierul nu e încă pe site: urcă-l din arhivă sau pornește din Actions workflow-ul „Legături acord ↔ proiect AMP\"); verifică dacă ai urcat și legis_acorduri.html din arhivă; sau așteaptă un minut după publicare și apasă „Reîncearcă\".",
+ "legReincearca": "Reîncearcă",
+ "legNotaRegistru": "lista acordurilor a fost citită direct din legis_acorduri.html, fiindcă date/acorduri_legare.json nu s-a putut folosi ({m})",
+ "legM_file": "pagina e deschisă de pe disc (file://), iar browserul nu lasă paginile să citească alte fișiere. Deschide site-ul de pe adresa lui publică sau dintr-un server local (python -m http.server)",
+ "legM_http404": "serverul a răspuns 404: fișierul nu e pe site",
+ "legM_http": "serverul a răspuns cu eroarea {c}",
+ "legM_retea": "cererea nu s-a putut face (rețea căzută sau cerere blocată)",
+ "legM_json": "fișierul nu e JSON valid",
+ "legM_format": "fișierul nu conține lista de acorduri",
+ "legM_faraExport": "pagina există, dar e o versiune veche, fără funcția de export (urcă legis_acorduri.html din arhiva nouă)",
+ "legM_blocat": "browserul nu permite citirea paginii",
+ "legM_timp": "pagina nu și-a terminat încărcarea în timp util",
  "legSeIncarca": "Se încarcă acordurile…",
  "legStatus": "Proiecte AMP comparate: {p} ({src}) · acorduri: {a} · sume în euro la cursul din {d}",
  "legSursaLive": "arhivă + raport live",
@@ -9266,7 +9368,21 @@ Object.assign(I18N.en, {
  "legFiltruFara": "No project",
  "legFiltruPartener": "All funders",
  "legJsonCum": "Confirmations made by people. “confirmate”: agreement id (from the register) → list of its AMP IDs. “respinse”: automatic links that are wrong. “fara_proiect”: agreements verified to have no project in AMP.",
- "legEroare": "The list of agreements could not be loaded (date/acorduri_legare.json). Open the site from its public address, or generate the file with legatura_acorduri.py.",
+ "legEroare": "The list of agreements could not be loaded.",
+ "legErFisier": "date/acorduri_legare.json: {m}.",
+ "legErRegistru": "Reading it directly from legis_acorduri.html: {m}.",
+ "legErCe": "What you can do: open {u} in the browser (if it shows “404”, the file is not on the site yet: upload it from the archive, or start the workflow “Legături acord ↔ proiect AMP” from Actions); check that legis_acorduri.html from the archive was uploaded too; or wait a minute after publishing and press “Retry”.",
+ "legReincearca": "Retry",
+ "legNotaRegistru": "the list of agreements was read directly from legis_acorduri.html, because date/acorduri_legare.json could not be used ({m})",
+ "legM_file": "the page is opened from disk (file://), and the browser does not let pages read other files. Open the site from its public address or from a local server (python -m http.server)",
+ "legM_http404": "the server answered 404: the file is not on the site",
+ "legM_http": "the server answered with error {c}",
+ "legM_retea": "the request could not be made (network down or request blocked)",
+ "legM_json": "the file is not valid JSON",
+ "legM_format": "the file does not contain the list of agreements",
+ "legM_faraExport": "the page exists, but it is an old version without the export function (upload legis_acorduri.html from the new archive)",
+ "legM_blocat": "the browser does not allow reading the page",
+ "legM_timp": "the page did not finish loading in time",
  "legSeIncarca": "Loading agreements…",
  "legStatus": "AMP projects compared: {p} ({src}) · agreements: {a} · amounts in euro at the rate of {d}",
  "legSursaLive": "archive + live report",

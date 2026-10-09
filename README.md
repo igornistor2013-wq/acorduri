@@ -52,6 +52,48 @@ Două acte cu același număr și aceeași dată, dar de la emitenți diferiți 
 hotărâre de Guvern nr. 10 și un ordin nr. 10 din aceeași zi — sunt ținute ca
 două acte: registrul le deosebește și după tip, nu doar după număr și dată.
 
+## Categoriile: grant, împrumut (credit), asistență tehnică
+
+Fiecare act primește o categorie din titlu (`monitor_watch.classify`, extinsă pentru
+legis.md în `legis_clasifica.py`). Regula, după HG 377/2018, anexa 1, pct. 9:
+
+- **asistența financiară nerambursabilă** (și „ajutorul financiar nerambursabil”) este
+  **Grant**;
+- **asistența financiară rambursabilă** este **Împrumut** — „credit”, în vorbirea curentă;
+  eticheta rămâne „Împrumut”, ca în regulament;
+- **Asistență tehnică** rămâne asistență tehnică și când titlul o numește „nerambursabilă”:
+  expertiza gratuită nu e bani dați în grant.
+
+Ordinea în care se hotărăște (`monitor_watch.corecteaza`): 1. titlul spune „rambursabil”
+sau amestecă credit și grant → Împrumut; 2. titlul numește un împrumut sau un credit →
+Împrumut; 3. titlul spune „nerambursabil” → Grant; 4. titlul numește un grant → Grant;
+5. doar când titlul nu spune nimic despre rambursare, **finanțatorul**: băncile de
+dezvoltare (AID, BIRD, BERD, BEI, FIDA…) împrumută, agențiile de cooperare și donatorii
+(UE, ONU, Suedia, Bulgaria, Guvernul României…) donează. Cuvintele din titlu bat deci
+finanțatorul: grantul danez al FIDA e grant, creditul Guvernului României e împrumut.
+Excepția e IFC (Corporația Financiară Internațională): ea împrumută firme private, iar
+acordurile ei de cooperare cu Guvernul sunt proiecte de consultanță plătite de IFC, la care
+statul contribuie în natură — deci **Asistență tehnică** (`CONSULTANTI` în `monitor_watch.py`).
+
+„Asistență financiară” nu mai e o categorie în care rămân acte. Un act pe care nici titlul,
+nici finanțatorul nu-l lămuresc — KfW, de pildă, a dat Moldovei și grant, și credit — rămâne
+însă la „Asistență financiară” (mai bine neclasificat decât clasificat greșit), până îl
+verifică cineva și scrie ce a găsit în **`date/categorii_manual.json`**:
+
+    "HG241/2023": {"categorie": "Împrumut", "motiv": "...", "sursa": "https://..."}
+
+Cheia e codul actului din legis.md, ca în `date/sume_manual.json`. „motiv” și „sursa” sunt
+obligatorii (fără ele intrarea e ignorată și spusă pe ecran), iar decizia nu adaugă acte în
+registru, doar le recategorizează. O cheie care nu mai corespunde niciunui act e semnalată la
+fiecare rulare a `legis_pagina.py`. La ultima verificare erau trei: HG1108/2010 (KfW,
+grant de 5 mil. EUR), HG241/2023 (Franța, calea ferată Chișinău–Ungheni: credit) și
+AMAEIE8/2015 (acord de finanțare cu UE: grant).
+
+Actele deja ținute în `date.json` și în `date/gov_sume.json` se pun la zi la fiecare rulare
+(`monitor_watch.reclasifica`, o trecere în `gov_sume.py`): o regulă schimbată nu mai lasă
+acte vechi pe categoria de ieri. La fel, sumele din atașamente se citesc după instrumentul
+de azi al actului (împrumut sau grant, din categorie), nu după cel notat la prima citire.
+
 ## Fișiere
 
 | Fișier | Rol |
@@ -78,7 +120,7 @@ două acte: registrul le deosebește și după tip, nu doar după număr și dat
 | `donatori.html` | Redirecționare către `index.html`, pentru linkurile vechi |
 | `date.json` | Registrul acordurilor. Actualizat automat de workflow |
 | `amp-arhiva.json` | Arhiva AMP, doar câmpurile de care are nevoie `hg246.html` |
-| `monitor_watch.py` | Colectarea zilnică din Monitorul Oficial |
+| `monitor_watch.py` | Colectarea zilnică din Monitorul Oficial și regula categoriilor (grant / împrumut / asistență tehnică) |
 | `import_pdf.py` | Importul din arhivele PDF ale Monitorului. Se rulează local |
 | `teste.py` | Testele colectorului. Rulate de workflow înaintea colectării |
 | `.github/workflows/monitor.yml` | Programarea rulării |
@@ -87,7 +129,8 @@ două acte: registrul le deosebește și după tip, nu doar după număr și dat
 | `legis_brut.json` | Istoricul: toate actele găsite pe legis.md, 1992–2026 |
 | `legis_watch.py` | Reîmprospătarea istoricului de pe legis.md, cu browser (ocazional, de pe calculator) |
 | `legis_extrage.js` | Căutările rulate în pagina legis.md |
-| `legis_clasifica.py` | Ce e asistență externă, categoria, partenerul (extinde `monitor_watch.py`) |
+| `legis_clasifica.py` | Ce e asistență externă, categoria, partenerul (extinde `monitor_watch.py`); citește și deciziile de mână din `date/categorii_manual.json` |
+| `date/categorii_manual.json` | Categoria actelor pe care nici titlul, nici finanțatorul nu le lămuresc, hotărâtă de mână, cu motiv și sursă: `{"categorie": "Grant"\|"Împrumut"\|"Asistență tehnică", "motiv": "…", "sursa": "https://…"}`, pe codul actului din legis.md. Ce e aici bate clasificarea automată, dar nu adaugă acte; cheile care încep cu `_` sunt ignorate. Citit de `legis_pagina.py` și `legis_atasamente.py` |
 | `legis_pagina.py` | Construiește `legis_acorduri.html` din `acorduri.html` + istoric + `date.json`; rulat de `monitor.yml` |
 | `teste_legis.py` | Testele verificării legis.md |
 | `legis_local.bat` | Aceeași verificare, rulată de pe calculatorul tău (Windows) |
@@ -163,6 +206,11 @@ acord" arată ce scrie AMP, nu rata reală.
 `date/legaturi_amp.json` și publici fișierul. Acordurile sunt identificate prin id-ul din linkul
 registrului (`#acord=…`); dacă un id din fișier nu mai corespunde niciunui acord, pagina o spune.
 
+**Linkuri în exporturile Excel.** Coloanele cu adrese („Link" din foaia „Acte" a registrelor, „Link AMP"
+și linkul IATI din exportul dashboardului) se scriu ca hyperlinkuri adevărate. O adresă pusă într-o celulă ca
+text simplu nu se deschide la clic în Excel sau LibreOffice, deși arată ca un link.
+`python teste_legis.py --browser` verifică asta pe ambele registre.
+
 **De unde vine lista acordurilor.** Regulile de grupare, de denumire și de sumă ale registrului sunt
 lungi și potrivite pe date reale; nu le repetăm. `legatura_acorduri.py` deschide pagina
 `legis_acorduri.html` într-un browser fără ecran și îi cere lista pe care ea o folosește
@@ -171,6 +219,15 @@ colectare din Monitor și după fiecare citire a notelor Guvernului. Dacă lista
 puține acorduri sau prea puține sume), nu scrie nimic și rularea apare roșie; fișierul bun rămâne.
 Pe calculatorul tău: `pip install playwright`, `python -m playwright install chromium`, apoi
 `python legatura_acorduri.py` (`--dry-run` arată ce ar scrie).
+
+**Dacă pagina spune „Lista acordurilor nu s-a putut încărca".** Mesajul arată și cauza. Dacă
+`date/acorduri_legare.json` nu poate fi folosit (nu e încă pe site, nu e JSON valid sau e gol), pagina
+încearcă singură să citească lista direct din `legis_acorduri.html` și spune asta în rândul de stare;
+eroarea apare doar când nici asta nu merge. Cauzele obișnuite: fișierul nu a fost urcat (verifică
+adresa lui pe site: dacă dă 404, urcă-l sau pornește din Actions workflow-ul „Legături acord ↔ proiect
+AMP"); `legis_acorduri.html` e versiunea veche, fără funcția de export; publicarea pe GitHub Pages nu s-a
+terminat (durează un minut-două: apasă „Reîncearcă"); sau pagina e deschisă de pe disc (`file://`),
+unde browserul nu lasă paginile să citească alte fișiere — deschide site-ul de pe adresa lui publică.
 
 **Teste.** `node teste_legatura.js` (rulat și de `legaturi.yml`) și `python teste_legis.py --browser`
 (include citirea listei din registrul real).
