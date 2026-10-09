@@ -1,0 +1,18 @@
+{
+ "_cum_se_foloseste": "Categoria unor acte pe care nici titlul, nici finanțatorul nu o lămuresc, hotărâtă de mână după ce actul a fost verificat. Cheia e codul actului din registrul legis.md, ca în sume_manual.json. {\"categorie\": \"Grant\" | \"Împrumut\" | \"Asistență tehnică\", \"motiv\": \"ce spune actul\", \"sursa\": \"linkul unde se verifică\"}. Fără motiv și sursă, intrarea e ignorată și spusă pe ecran. Decizia bate clasificarea automată, dar nu adaugă acte în registru. O cheie care nu mai corespunde niciunui act e semnalată la fiecare rulare. Cheile care încep cu _ sunt ignorate.",
+ "HG1108/2010": {
+  "categorie": "Grant",
+  "motiv": "Acordul de finanțare cu KfW pentru „Infrastructura socială și eficiența energetică” (prin FISM) este un grant de 5 mil. EUR. Titlul hotărârii nu spune dacă banii se rambursează, iar KfW a dat Moldovei și grant, și credit.",
+  "sursa": "https://fism.gov.md/en/content/social-infrastructure-and-energy-efficiency-project-grant-provided-kfw"
+ },
+ "HG241/2023": {
+  "categorie": "Împrumut",
+  "motiv": "Protocolul financiar cu Guvernul Franței pentru calea ferată Chișinău–Ungheni: 75,77 mil. EUR, din care până la 35 mil. EUR credit de la Trezoreria franceză și un credit bancar garantat de Bpifrance Assurance Export. Titlul hotărârii spune doar „finanțarea proiectului”.",
+  "sursa": "https://www.old.ipn.md/en/76m-loan-from-french-government-for-railroad-infrastructure-7966_1096560.html"
+ },
+ "AMAEIE8/2015": {
+  "categorie": "Grant",
+  "motiv": "Acord de finanțare cu Uniunea Europeană: articolul 2 se numește „Costul total și contribuția financiară a UE” și prevede suport bugetar de 25 mil. EUR (contribuțiile UE din acordurile de finanțare sunt granturi). Titlul din registru e doar „ACORD DE FINANȚARE*”, fără partener.",
+  "sursa": "https://www.legis.md/cautare/getResults?doc_id=79440&lang=ro"
+ }
+}
