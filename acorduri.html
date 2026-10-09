@@ -732,9 +732,12 @@
        'Ca și categorie separată, ascundea tocmai ce contează: dacă statul are de rambursat.'},
     {cat:'Asistență tehnică', legal:'Consultanță, instruire, expertiză (pct. 9.3)',
      nota:'Acord sau contract de asistență ori cooperare tehnică, memorandum privind ' +
-       'consultanța sau instruirea. Tot aici intră acordurile de colaborare prin care o ' +
-       'agenție de dezvoltare implementează un proiect: aduc expertiză și capacitate de ' +
-       'execuție, nu bani rambursabili. Ajung în Monitor prin ordinul autorității semnatare.'},
+       'consultanța sau instruirea. Cooperarea tehnică dintre guverne — de pildă un expert ' +
+       'german detașat pe lângă un viceprim-ministru — e tot asistență tehnică: statul ' +
+       'primește expertiză, nu bani, chiar dacă donatorul dă și granturi. Tot aici intră ' +
+       'acordurile de colaborare prin care o agenție de dezvoltare implementează un proiect: ' +
+       'aduc expertiză și capacitate de execuție, nu bani rambursabili. Ajung în Monitor ' +
+       'prin ordinul autorității semnatare.'},
     {cat:'Asistență financiară', legal:'Categoria-părinte (pct. 9.2)',
      nota:'Nu rămâne categorie de sine stătătoare: asistența financiară se împarte după ' +
        'rambursare — nerambursabilă înseamnă grant, rambursabilă înseamnă împrumut (credit). ' +
@@ -1076,14 +1079,14 @@
   window.__ACORDURI__ = function(){
     var eur = function(s){ return s && PER_EUR[s.val] ? Math.round(s.v / PER_EUR[s.val]) : null; };
     var sursa = function(g, s){
-      return s === g.sumaA ? 'acord' : s === g.suma ? 'titlu' : s === g.sumaT ? 'text' : s === g.sumaG ? 'guvern' : '';
+      return s === g.sumaA ? (g.sumaA.extern ? 'extern' : 'acord') : s === g.suma ? 'titlu' : s === g.sumaT ? 'text' : s === g.sumaG ? 'guvern' : '';
     };
     var plat = function(g, s, nume){
       return s ? { v: s.v, val: s.val, eur: eur(s), sursa: nume || sursa(g, s), act: s.act || '' } : null;
     };
     return (window.__GRUPURI__ || []).map(function(g){
       var s = sumaAfisata(g), alte = [], vazut = {};
-      [['acord', g.sumaA], ['titlu', g.suma], ['text', g.sumaT], ['guvern', g.sumaG]].forEach(function(p){
+      [[g.sumaA && g.sumaA.extern ? 'extern' : 'acord', g.sumaA], ['titlu', g.suma], ['text', g.sumaT], ['guvern', g.sumaG]].forEach(function(p){
         var x = plat(g, p[1], p[0]);
         if (!x || x === s) return;
         var k = x.v + ' ' + x.val;
@@ -2068,7 +2071,9 @@
           ultima ? ultima.n + '. ' + ultima.cap : '', g.semnat || ''
         ].concat(STEPS.map(function(s){ return g.et[s.k] ? 'da' : ''; }))
          .concat([v ? v.data : '', v ? v.ce : ''])
-         .concat(g.sumaA ? [g.sumaA.v, g.sumaA.val, 'textul acordului (atașat la ' + g.sumaA.act + ')', g.sumaA.f]
+         .concat(g.sumaA ? [g.sumaA.v, g.sumaA.val,
+                  g.sumaA.extern ? 'sursă externă (nu din actele din registru)' : 'textul acordului (atașat la ' + g.sumaA.act + ')',
+                  g.sumaA.f + (g.sumaA.extern && g.sumaA.u ? ' · ' + g.sumaA.u : '')]
                : g.suma ? [g.suma.v, g.suma.val, 'titlul actului', '']
                : g.sumaT ? [g.sumaT.v, g.sumaT.val, 'textul ' + g.sumaT.act, g.sumaT.f]
                : g.sumaG ? [g.sumaG.v, g.sumaG.val, 'nota Guvernului, ședința din ' + dataRo(g.sumaG.data) + ' (' + g.sumaG.nr + ')', g.sumaG.f]
@@ -3191,7 +3196,7 @@
     document.getElementById('tabel').className = 'v-acorduri';
     document.getElementById('cap').innerHTML = '<tr>' +
       '<th>Partener</th><th>Acordul</th><th>Categorie</th>' +
-      '<th title="Suma acordului: din titlul actului oficial sau din textul lui integral (legea de ratificare, hotărârea de aprobare). Clic pe rând pentru fragmentul din act.">Suma</th>' +
+      '<th title="Suma acordului: din titlul actului oficial, din textul lui integral (legea de ratificare, hotărârea de aprobare) sau din acordul atașat; marcată „ext.”, dintr-o sursă din afara actelor (finanțatorul, Guvernul). Clic pe rând pentru fragment și sursă.">Suma</th>' +
       '<th>Etape parcurse</th><th>Semnat</th></tr>';
 
     var out = grupuri.filter(function(g){
@@ -3251,8 +3256,9 @@
             'sectorială, sau împrumut, ca la Facilitatea de reformă și creștere.">' +
             'suport bugetar</span>' : '') + '</td>' +
         '<td data-l="Suma" class="c-suma">' +
-          (g.sumaA ? '<span class="din-text" title="' + esc('Din textul acordului, atașat la ' + g.sumaA.act + ': ' + g.sumaA.f) + '">' +
-               esc(fmtSuma(g.sumaA)) + '</span>'
+          (g.sumaA ? '<span class="din-text" title="' + esc((g.sumaA.extern ? 'Sursă externă (nu din actele din registru): '
+                 : 'Din textul acordului, atașat la ' + g.sumaA.act + ': ') + g.sumaA.f) + '">' +
+               esc(fmtSuma(g.sumaA)) + (g.sumaA.extern ? ' <sup>ext.</sup>' : '') + '</span>'
            : g.suma ? '<span title="Suma scrisă în titlul actului oficial">' + esc(fmtSuma(g.suma)) + '</span>'
            : g.sumaT ? '<span class="din-text" title="' + esc('Din textul integral al actului ' + g.sumaT.act + ': ' + g.sumaT.f) + '">' +
                esc(fmtSuma(g.sumaT)) + '</span>'
@@ -3266,8 +3272,10 @@
           : '<span class="nil">—</span>') + '</td></tr>' +
         '<tr class="detalii hid" data-d="' + i + '"><td colspan="6">' +
           '<div class="det-nume">' + esc(g.nume) + '</div>' +
-          (g.sumaA ? '<div class="det-suma">Suma acordului: <b>' + esc(fmtSuma(g.sumaA)) + '</b> — din textul acordului atașat la ' + esc(g.sumaA.act) +
-               ': <q>' + esc(g.sumaA.f) + '</q> · <a href="' + esc(g.sumaA.u) + '" target="_blank" rel="noopener">documentul (PDF, legis.md)</a></div>'
+          (g.sumaA ? '<div class="det-suma">Suma acordului: <b>' + esc(fmtSuma(g.sumaA)) + '</b> — ' +
+               (g.sumaA.extern ? 'dintr-o sursă din afara actelor din registru (nu din textul acordului)' : 'din textul acordului atașat la ' + esc(g.sumaA.act)) +
+               ': <q>' + esc(g.sumaA.f) + '</q> · <a href="' + esc(g.sumaA.u) + '" target="_blank" rel="noopener">' +
+               (g.sumaA.extern ? 'sursa sumei' : 'documentul (PDF, legis.md)') + '</a></div>'
            : g.suma ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.suma)) + '</b> — scrisă în titlul actului oficial.</div>'
            : g.sumaT ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.sumaT)) + '</b> — din textul actului ' + esc(g.sumaT.act) +
                ': <q>' + esc(g.sumaT.f) + '</q>' +
@@ -3359,10 +3367,26 @@
        luat chiar un cont bancar. Ce scrie aici bate orice sumă citită automat:
        {"v": 184297.33, "val": "EUR", "nota": "…"} pune suma acordului; cu
        "unde": "text" o pune ca sumă din textul actului; {"ascunde": true} ascunde
-       suma citită din atașament, {"fara_text": true} pe cea din textul actului. */
-    Promise.all([cere('date/legis_sume.json'), cere('date/sume_manual.json')]).then(function(rez){
-        var j = rez[0], manual = rez[1] || {};
-        if (!db || !db.acte) return;
+       suma citită din atașament, {"fara_text": true} pe cea din textul actului,
+       {"fara_cost": true} costul proiectului citit din atașament,
+       {"fara_guvern": true} suma luată din nota Guvernului. Cu {"extern": true} suma
+       vine dintr-o sursă din afara actelor din registru (decizia de finanțare a UE,
+       pagina oficială a finanțatorului, un comunicat al Guvernului): pagina o marchează
+       „ext." și pune în loc de „documentul (PDF, legis.md)" legătura spre sursă, în
+       câmpul „u". */
+    /* Registrul din Monitor nu avea sume decât din titluri și din notele Guvernului: 74 din cele
+       98 de acorduri arătau „—", deși aceleași acte au fișă pe legis.md, iar textul lor, acordul
+       atașat și sumele verificate de mână stau deja în cele două fișiere de mai jos. Fișa fiecărui
+       act din Monitor o dă date/legaturi_legis.json; codul actului pe legis.md, intrarea lui din
+       legis_sume.json. Cu ele, același act primește aceeași sumă în ambele registre. */
+    var peLegis = !!window.__LEGIS__;
+    Promise.all([cere('date/legis_sume.json'), cere('date/sume_manual.json'),
+                 peLegis ? null : cere('date/legaturi_legis.json')]).then(function(rez){
+        var j = rez[0], manual = rez[1] || {}, leg = rez[2] || {}, incercari = 0;
+        /* Pagina Monitorului își ia actele din date.json, printr-o cerere aparte: sumele pot
+           sosi înaintea lor. Le așteptăm (cel mult 15 secunde), ca să nu se piardă pe tăcute. */
+        (function aplica(){
+        if (!db || !db.acte){ if (incercari++ < 60) setTimeout(aplica, 250); return; }
         var n = 0;
         /* Ordinele venite din Monitorul Oficial apar în registrul legis.md cu un cod
            provizoriu („O147/2026"): din cuprins nu se vede care minister l-a emis. Când
@@ -3385,10 +3409,15 @@
         Object.keys(db.acte).forEach(function(k){
           var a = db.acte[k];
           var dinLegis = a.editie === 'legis.md';
-          // în registrul din Monitor actele nu au cod legis, deci nici sume puse de mână;
-          // în registrul legis.md, și actele venite din Monitor pot avea una
-          if (!dinLegis && !window.__LEGIS__) return;
-          var r = dinLegis && j && j.acte ? j.acte[String(a.editie_id)] : null;
+          /* Fișa actului pe legis.md: în registrul legis.md o au actele de acolo (editie_id), iar
+             cele venite din Monitor nu o au; în registrul din Monitor o dă date/legaturi_legis.json.
+             Fără fișă n-avem de unde lua sumele actului. */
+          var idLegis = dinLegis ? String(a.editie_id) : (!peLegis && leg[k] ? String(leg[k]) : '');
+          if (!peLegis && !idLegis) return;
+          var r = idLegis && j && j.acte ? j.acte[idLegis] : null;
+          // codul actului pe legis.md („LP203/2022"), cheia din sume_manual.json; în Monitor îl spune intrarea lui
+          var cod = peLegis ? a.act : ((r && r.act) || '');
+          var fisa = peLegis ? (a.url || '') : 'https://www.legis.md/cautare/getResults?doc_id=' + idLegis + '&lang=ro';
           if (r && r.sume && r.sume.length){
             a.sume = r.sume.slice(0, 2).map(function(s){ return [s.v, s.val, String(s.f || '').slice(0, 180)]; });
             n++;
@@ -3403,16 +3432,18 @@
             else if (a.acord){ delete a.acord; n++; }
             if (cuC){ a.cost = {v: cuC.cost.v, val: cuC.cost.val, f: String(cuC.cost.f || '').slice(0, 220), u: cuC.u}; n++; }
           }
-          var m = manualPentru(a.act);
+          var m = cod ? manualPentru(cod) : null;
           if (m && typeof m === 'object'){
             if (m.fara_text && a.sume){ delete a.sume; n++; }
+            if (m.fara_cost && a.cost){ delete a.cost; n++; }
             if (m.fara_guvern && !a.faraG){ a.faraG = 1; n++; }
             if (m.v > 0 && m.unde === 'text'){ a.sume = [[m.v, m.val || 'EUR', String(m.nota || 'Sumă introdusă de mână.').slice(0, 180)]]; n++; }
-            else if (m.v > 0){ a.acord = {v: m.v, val: m.val || 'EUR', f: String(m.nota || 'Sumă introdusă de mână.').slice(0, 220), u: m.u || a.url || '', manual: true, faraTotal: !!m.fara_total}; n++; }
+            else if (m.v > 0){ a.acord = {v: m.v, val: m.val || 'EUR', f: String(m.nota || 'Sumă introdusă de mână.').slice(0, 220), u: m.u || fisa, manual: true, faraTotal: !!m.fara_total, extern: !!m.extern}; n++; }
             else if (m.ascunde && a.acord){ delete a.acord; n++; }
           }
         });
         if (n) paint();
+        })();
       })
       .catch(function(){});
   }

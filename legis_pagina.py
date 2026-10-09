@@ -288,6 +288,8 @@ def main(BRUT=None, OUT=None):
             nota = str(m.get('nota') or 'Sumă introdusă de mână.')
             if m.get('fara_text'):
                 a.pop('sume', None)
+            if m.get('fara_cost'):
+                a.pop('cost', None)
             if m.get('fara_guvern'):
                 a['faraG'] = 1
             if (m.get('v') or 0) > 0 and m.get('unde') == 'text':
@@ -296,6 +298,10 @@ def main(BRUT=None, OUT=None):
                 a['acord'] = {'v': m['v'], 'val': m.get('val', 'EUR'), 'f': nota[:220], 'u': m.get('u') or a.get('url', ''), 'manual': True}
                 if m.get('fara_total'):
                     a['acord']['faraTotal'] = True
+                if m.get('extern'):
+                    # suma vine din afara actelor din registru (decizie UE, pagina finanțatorului…):
+                    # pagina o marchează „ext." și trimite la sursă, nu la un PDF de pe legis.md
+                    a['acord']['extern'] = True
             elif m.get('ascunde'):
                 a.pop('acord', None)
     if sume:

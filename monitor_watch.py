@@ -137,7 +137,10 @@ INCLUDE = [
     (ACORD + r"\s+de\s+asistenta\s+tehnica", "Asistență tehnică"),
     (CONTRACT + r"\s+de\s+asistenta\s+tehnica", "Asistență tehnică"),
     (ACORD + r"\s+de\s+cooperare\s+tehnica", "Asistență tehnică"),
-    (r"facilitat\w*\s+de\s+cooperare\s+tehnica", "Asistență tehnică"),
+    # „Facilitatea de cooperare tehnică 2016" și „Facilitatea pentru cooperare tehnică" sunt
+    # același instrument al Uniunii Europene; titlurile au scris-o în ambele feluri, iar
+    # forma cu „pentru" ajungea, după finanțator, la Grant.
+    (r"facilitat\w*\s+(?:de|pentru)\s+cooperare\s+tehnica", "Asistență tehnică"),
     (r"memorandum[^.]{0,60}?asistenta\s+tehnica", "Asistență tehnică"),
     (r"proiect(?:ul|ului)?\s+de\s+asistenta\s+tehnica", "Asistență tehnică"),
 ]

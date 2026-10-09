@@ -80,6 +80,13 @@ INCLUDE_EXTRA = [
     (r"acord\w*\s+de\s+facilitate\b", "Asistență financiară"),
     (r"mecanismului\s+de\s+reforma\s+si\s+crestere", "Asistență financiară"),
     (r"schimb\s+de\s+note.{0,200}(?:cooperar\w*\s+financiar|cooperar\w*\s+tehnic|finantar|grant|asistent)", "Asistență financiară"),
+    # „Cooperarea tehnică" dintre guverne — Înțelegerea prin schimb de note pentru detașarea
+    # unui expert german, pentru un proiect de consultanță — e transfer de expertiză, nu bani:
+    # asistență tehnică, ca „cooperarea tehnică pentru finanțarea proiectului" de mai jos.
+    # Regula de mai sus o trimitea la „Asistență financiară", iar de acolo, după finanțator
+    # (Germania dă granturi), la Grant. Doar „cooperarea tehnică și financiară" e și una, și
+    # alta și rămâne la finanțator (\b oprește \w* să dea înapoi și să ocolească excepția).
+    (r"schimb\s+de\s+note.{0,200}cooperar\w*\s+tehnic\w*\b(?!\s+(?:si|sau)\s+financiar)", "Asistență tehnică"),
     (r"cooperar\w*\s+financiar\w*\s+pentru\s+finantare", "Asistență financiară"),
     (r"cooperar\w*\s+tehnic\w*\s+pentru\s+finantare", "Asistență tehnică"),
     (r"acord\w*\s+de\s+cooperare\s+tehnica\s+si\s+financiara", "Asistență financiară"),
@@ -105,6 +112,14 @@ INCLUDE_CU_PARTENER = [
     (r"\bacord(?:ul|ului|uri|urile|urilor)?\b.{0,200}garanti\w*\s+de\s+stat", "Împrumut"),
     (r"memorandum\w*\s+de\s+intelegere.{0,250}(?:proiect|dezvoltare|cooperare)", "Asistență tehnică"),
     (r"acord\w*.{0,200}(?:implementare|realizare)a?\s+proiect", "Asistență tehnică"),
+    # Același lucru când agenția de dezvoltare își spune acordul „acord", nu „memorandum":
+    # „Acordul dintre Ministerul Sănătății și Agenția Elvețiană pentru Dezvoltare și Cooperare
+    # privind a doua fază a Proiectului…". Agenția implementează proiectul, deci tot asistență
+    # tehnică — ca memorandumurile aceleiași agenții și ca prima fază a aceluiași proiect;
+    # fără regula asta, după un singur cuvânt din titlu ajungea la Grant. Un „acord de grant"
+    # sau „de finanțare" cu aceeași agenție își păstrează cuvântul (vezi mw.corecteaza).
+    (r"(?=.*\bagenti\w*\s+(?:elvetian\w*|austriac\w*|ceh\w*)\s+(?:pentru|de)\s+dezvoltare)(?=.*\bproiect).*\bacord\w*",
+     "Asistență tehnică"),
 ]
 
 EXCLUDE_EXTRA = [

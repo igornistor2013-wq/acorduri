@@ -180,8 +180,8 @@
       'Government decision approving the signature, then a ratification law passed by Parliament. Enters into force on the date of the last notification between the parties.',
     '„Acord de grant", grant investițional, „asistență financiară nerambursabilă" sau „ajutor financiar nerambursabil" — aceeași categorie, scrisă altfel. Un grant care plătește servicii de consultanță rămâne grant: contează instrumentul.':
       '"Grant agreement", investment grant, "non-reimbursable financial assistance" or "non-reimbursable financial aid" — the same category, worded differently. A grant that pays for consultancy is still a grant: the instrument is what counts.',
-    'Acord sau contract de asistență ori cooperare tehnică, memorandum privind consultanța sau instruirea. Tot aici intră acordurile de colaborare prin care o agenție de dezvoltare implementează un proiect: aduc expertiză și capacitate de execuție, nu bani rambursabili. Ajung în Monitor prin ordinul autorității semnatare.':
-      'Technical assistance or cooperation agreement or contract, memorandum on consultancy or training. Also cooperation agreements through which a development agency implements a project: they bring expertise and delivery capacity, not reimbursable money. They reach the Gazette through the signing authority\'s order.',
+    'Acord sau contract de asistență ori cooperare tehnică, memorandum privind consultanța sau instruirea. Cooperarea tehnică dintre guverne — de pildă un expert german detașat pe lângă un viceprim-ministru — e tot asistență tehnică: statul primește expertiză, nu bani, chiar dacă donatorul dă și granturi. Tot aici intră acordurile de colaborare prin care o agenție de dezvoltare implementează un proiect: aduc expertiză și capacitate de execuție, nu bani rambursabili. Ajung în Monitor prin ordinul autorității semnatare.':
+      'Technical assistance or cooperation agreement or contract, memorandum on consultancy or training. Technical cooperation between governments — for example a German expert seconded to a deputy prime minister — is still technical assistance: the State receives expertise, not money, even when the donor also gives grants. Also cooperation agreements through which a development agency implements a project: they bring expertise and delivery capacity, not reimbursable money. They reach the Gazette through the signing authority\'s order.',
     ': acorduri care nu se supun dreptului internațional public sau care prevăd chiar în text că nu constituie tratat. Ele urmează un traseu propriu, stabilit de anexa nr. 1¹ la HG 377/2018, iar categoria contractului decide cine îl aprobă și când intră în vigoare. Banca Națională a Moldovei aplică proceduri proprii, iar contractele fără impact financiar pot fi încheiate prin schimb de scrisori.':
       ': agreements not governed by public international law, or that state in their text that they are not a treaty. They follow their own route, set by annex no. 1¹ to Government Decision 377/2018, and the contract category decides who approves it and when it enters into force. The National Bank of Moldova applies its own procedures, and contracts with no financial impact may be concluded by exchange of letters.',
     // meniu (index are propriul sistem)
@@ -191,14 +191,16 @@
     'Suma': 'Amount', 'Suma:': 'Amount:', 'Suma acordului:': 'Agreement amount:', 'Costul total al proiectului:': 'Total project cost:',
     '— scrisă în titlul actului oficial.': '— stated in the title of the official act.',
     '— din textul acordului:': '— from the text of the agreement:',
+    '— dintr-o sursă din afara actelor din registru (nu din textul acordului):': '— from a source outside the acts in the registry (not from the text of the agreement):',
+    'sursa sumei': 'the source of the amount',
     'documentul (PDF, legis.md)': 'the document (PDF, legis.md)', 'nota (PDF, gov.md)': 'the note (PDF, gov.md)',
     '(căutare)': '(search)', 'Deschide actul pe legis.md': 'Open the act on legis.md',
     'Linkul duce la o căutare, nu direct la act': 'The link leads to a search, not straight to the act',
     'Actul nu are încă fișă legată pe legis.md: se deschide căutarea după număr și dată': 'The act has no linked page on legis.md yet: a search by number and date opens instead',
     'Suma scrisă în titlul actului oficial': 'The amount stated in the title of the official act',
     'Suma nu apare nici în actele publicate, nici în notele Guvernului citite până acum': 'The amount appears neither in the published acts nor in the Government notes read so far',
-    'Suma acordului: din titlul actului oficial sau din textul lui integral (legea de ratificare, hotărârea de aprobare). Clic pe rând pentru fragmentul din act.':
-      'Agreement amount: from the title of the official act or from its full text (the ratification law, the approval decision). Click the row for the passage in the act.',
+    'Suma acordului: din titlul actului oficial, din textul lui integral (legea de ratificare, hotărârea de aprobare) sau din acordul atașat; marcată „ext.”, dintr-o sursă din afara actelor (finanțatorul, Guvernul). Clic pe rând pentru fragment și sursă.':
+      'Agreement amount: from the title of the official act, from its full text (the ratification law, the approval decision) or from the attached agreement; marked "ext.", from a source outside the acts (the financier, the Government). Click the row for the passage and the source.',
     'Sumele acordurilor, pe tipuri de finanțare': 'Agreement amounts, by type of financing',
     'Acordurile cu sumă cunoscută adună': 'Agreements with a known amount add up to',
     'Arată în listă acordurile de acest tip': 'Show agreements of this type in the list',
@@ -290,6 +292,7 @@
       '— from the explanatory note submitted to the Government meeting of $1 (unique number $2):'],
     [/^Alte sume în actele acordului: (.+)$/, function(m, x){ return "Other amounts in the agreement's acts: " + sume(x); }],
     [/^Din textul acordului, atașat la (\S+): ([\s\S]*)$/, 'From the text of the agreement, attached to $1: $2'],
+    [/^Sursă externă \(nu din actele din registru\): ([\s\S]*)$/, 'External source (not from the acts in the registry): $1'],
     [/^Din textul integral al actului (\S+): ([\s\S]*)$/, 'From the full text of act $1: $2'],
     [new RegExp('^Din nota de argumentare a Guvernului \\(ședința din ' + DATA + '\\): ([\\s\\S]*)$'), "From the Government's explanatory note (meeting of $1): $2"],
     [/^Costul total al proiectului, din textul acordului atașat la (\S+): ([\s\S]*)$/, 'Total project cost, from the text of the agreement attached to $1: $2'],

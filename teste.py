@@ -56,6 +56,14 @@ def test_clasificare():
         ("Asistență tehnică", "Ordin privind intrarea în vigoare a Acordului de colaborare dintre "
                               "Organizația pentru Dezvoltarea Antreprenoriatului și Programul "
                               "Națiunilor Unite pentru Dezvoltare pentru implementarea proiectului"),
+        # Facilitatea de cooperare tehnică a UE e asistență tehnică, scrisă cu „de" ori cu „pentru"
+        # (cu „pentru" ajungea, după finanțator, la Grant)
+        ("Asistență tehnică", "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării "
+                              "Acordului de finanțare dintre Guvernul Republicii Moldova și Uniunea "
+                              "Europeană privind Facilitatea de cooperare tehnică 2016"),
+        ("Asistență tehnică", "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării "
+                              "Acordului de finanțare dintre Guvernul Republicii Moldova și Uniunea "
+                              "Europeană privind Facilitatea pentru cooperare tehnică"),
         # deduse din finanțator, când titlul spune doar „finanțare"
         ("Împrumut", "Lege pentru ratificarea Acordului de finanțare dintre Republica Moldova "
                      "și Asociația Internațională pentru Dezvoltare"),

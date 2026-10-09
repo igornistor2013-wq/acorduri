@@ -67,6 +67,26 @@ CAZURI = [
     # titlu cu litere chirilice în loc de cele latine (cod de pagină greșit), fără reparația din legis_pagina
     ('pentru ratificarea Acordului de оmprumut, finanюare şi proiect dintre Banca Germanг "Kreditanstalt fьr Wiederaufbau (KfW)", Republica Moldova şi Fondul de Investiюii Sociale din Moldova (FISM)', 'Împrumut', 'KfW'),
     ('pentru ratificarea Acordului de сredit dintre Republica Moldova și Banca Europeană de Investiții', 'Împrumut', 'BEI'),
+    # cooperarea TEHNICĂ dintre guverne e transfer de expertiză, nu bani: asistență tehnică, deși
+    # Germania dă granturi (HG238/2026: un expert german detașat pe lângă viceprim-ministru)
+    ('cu privire la inițierea negocierilor și aprobarea semnării Înțelegerii, întocmite prin schimb de note, dintre Guvernul Republicii Moldova și Guvernul Republicii Federale Germania privind cooperarea tehnică pentru detașarea unui expert german în cadrul Cabinetului viceprim-ministrului pentru integrare europeană al Republicii Moldova', 'Asistență tehnică', 'Germania'),
+    ('pentru inițierea negocierilor și aprobarea semnării Înțelegerii, întocmite prin schimb de note, dintre Guvernul Republicii Moldova și Guvernul Republicii Federale Germania privind cooperarea tehnică', 'Asistență tehnică', 'Germania'),
+    ('cu privire la inițierea negocierilor și aprobarea semnării Înțelegerii, întocmite prin schimb de note, dintre Guvernul Republicii Moldova și Guvernul Republicii Federale Germania cu privire la cooperarea tehnică ce vizează proiectul „Modernizarea serviciilor comunale”', 'Asistență tehnică', 'Germania'),
+    ('cu privire la inițierea negocierilor și aprobarea semnării Înțelegerii, întocmite prin schimb de note, dintre Guvernul Republicii Moldova și Guvernul Republicii Federale Germania privind cooperarea tehnică pentru finanțarea proiectului „Suport comunităților moldovenești”', 'Asistență tehnică', 'Germania'),
+    # cooperarea FINANCIARĂ cu Germania (KfW) rămâne grant
+    ('pentru inițierea negocierilor și aprobarea semnării Înțelegerii, întocmite prin schimb de note, dintre Guvernul Republicii Moldova și Guvernul Republicii Federale Germania privind cooperarea financiară', 'Grant', 'Germania'),
+    # „cooperarea tehnică și financiară" e și una, și alta: nu se mută la asistență tehnică, o hotărăște finanțatorul
+    ('pentru inițierea negocierilor și aprobarea semnării Înțelegerii, întocmite prin schimb de note, dintre Guvernul Republicii Moldova și Guvernul Republicii Federale Germania privind cooperarea tehnică și financiară', 'Grant', 'Germania'),
+    # Facilitatea de cooperare tehnică a UE: același instrument, scris cu „de" ori cu „pentru"
+    ('cu privire la inițierea negocierilor și aprobarea semnării Acordului de finanțare dintre Guvernul Republicii Moldova și Uniunea Europeană privind Facilitatea de cooperare tehnică 2016', 'Asistență tehnică', 'UE'),
+    ('cu privire la inițierea negocierilor și aprobarea semnării Acordului de finanțare dintre Guvernul Republicii Moldova și Uniunea Europeană privind Facilitatea pentru cooperare tehnică', 'Asistență tehnică', 'UE'),
+    # agenția elvețiană implementează proiecte: „acord" ca și „memorandum" = asistență tehnică; „acord de grant" rămâne grant
+    ('privind inițierea negocierilor și aprobarea semnării Acordului dintre Ministerul Sănătății al Republicii Moldova și Agenția Elvețiană pentru Dezvoltare și Cooperare privind a doua fază a Proiectului „Progresul cu privire la acoperirea universală cu servicii de sănătate în Moldova”', 'Asistență tehnică', 'Elveția'),
+    ('cu privire la Acordul între Parlamentul Republicii Moldova și Agenția Elvețiană pentru Dezvoltare și Cooperare privind prima fază a proiectului „Consolidarea Democrației Parlamentare în Moldova (PADEM)”', 'Asistență tehnică', 'Elveția'),
+    ('cu privire la inițierea negocierilor și aprobarea semnării Memorandumului de înțelegere dintre Ministerul Sănătății al Republicii Moldova și Agenția Elvețiană pentru Dezvoltare și Cooperare privind prima fază a Proiectului „Progresul cu privire la acoperirea universală cu servicii de sănătate în Moldova”', 'Asistență tehnică', 'Elveția'),
+    ('cu privire la aprobarea semnării Acordului de grant dintre Ministerul Sănătății al Republicii Moldova și Agenția Elvețiană pentru Dezvoltare și Cooperare privind a doua fază a Proiectului „X”', 'Grant', 'Elveția'),
+    # un acord cu aceeași agenție care nu e despre un proiect nu devine asistență tehnică pe baza numelui ei
+    ('pentru ratificarea Acordului de finanțare dintre Republica Moldova și Agenția Elvețiană pentru Dezvoltare și Cooperare', 'Grant', 'Elveția'),
 ]
 for t, cat, part in CAZURI:
     c = clasifica(t)
@@ -268,12 +288,21 @@ try:
     (_tmp / 'date').mkdir()
     json.dump([{'id': '9', 'c': 'OMDED182/2025', 'pub': '26-12-2025', 'kw': [],
                 't': 'cu privire la intrarea în vigoare a Acordului de grant dintre Organizația pentru Dezvoltarea Antreprenoriatului și Agenția Executivă pentru Consiliul European pentru Inovare'},
-               {'id': '8', 'c': 'LP115/2025', 'pub': '01-06-2025', 'kw': [], 't': 'pentru ratificarea Acordului de finanțare dintre Republica Moldova și Comisia Europeană pentru Programul Interreg Europe'}],
+               {'id': '8', 'c': 'LP115/2025', 'pub': '01-06-2025', 'kw': [], 't': 'pentru ratificarea Acordului de finanțare dintre Republica Moldova și Comisia Europeană pentru Programul Interreg Europe'},
+               {'id': '7', 'c': 'LP155/2026', 'pub': '10-04-2026', 'kw': [], 't': 'pentru ratificarea Acordului de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare (Livada Moldovei II)'},
+               {'id': '6', 'c': 'LP156/2026', 'pub': '10-04-2026', 'kw': [], 't': 'pentru ratificarea Acordului de împrumut dintre Republica Moldova și Banca Europeană de Investiții (Drumuri)'},
+               {'id': '5', 'c': 'HG45/2009', 'pub': '27-01-2009', 'kw': [],
+                't': 'privind inițierea negocierilor asupra proiectului Acordului de finanțare dintre Guvernul Republicii Moldova și Comisia Comunităților Europene pentru Proiectul „Evaluarea capacității și modernizarea Spitalului Clinic Republican din Chișinău”'}],
               open(_tmp / 'legis_brut.json', 'w', encoding='utf-8'))
     json.dump({'acte': {'9': {'act': 'OMDED182/2025', 'sume': [], 'atas': [{'u': 'u', 'suma': {'v': 22240300000368, 'val': 'EUR', 'f': 'cont'}, 'cost': None}]},
-                        '8': {'act': 'LP115/2025', 'sume': [], 'atas': [{'u': 'u', 'suma': {'v': 493103338, 'val': 'EUR', 'f': 'buget'}, 'cost': None}]}}},
+                        '8': {'act': 'LP115/2025', 'sume': [], 'atas': [{'u': 'u', 'suma': {'v': 493103338, 'val': 'EUR', 'f': 'buget'}, 'cost': None}]},
+                        '7': {'act': 'LP155/2026', 'sume': [], 'atas': [{'u': 'u', 'suma': {'v': 150000000, 'val': 'EUR', 'f': 'împrumut'}, 'cost': {'v': 500000, 'val': 'EUR', 'f': 'prag studiu de fezabilitate'}}]},
+                        '6': {'act': 'LP156/2026', 'sume': [], 'atas': [{'u': 'u', 'suma': {'v': 80000000, 'val': 'EUR', 'f': 'împrumut'}, 'cost': {'v': 120000000, 'val': 'EUR', 'f': 'costul proiectului'}}]}}},
               open(_tmp / 'date' / 'legis_sume.json', 'w', encoding='utf-8'))
-    json.dump({'_nota': 'x', 'OMDED182/2025': {'v': 184297.33, 'val': 'EUR', 'nota': 'partea Moldovei'}, 'LP115/2025': {'ascunde': True}},
+    json.dump({'_nota': 'x', 'OMDED182/2025': {'v': 184297.33, 'val': 'EUR', 'nota': 'partea Moldovei'}, 'LP115/2025': {'ascunde': True},
+               'LP155/2026': {'fara_cost': True, 'nota': 'pragul de 500 000 EUR nu e costul proiectului'},
+               'HG45/2009': {'v': 3000000, 'val': 'EUR', 'u': 'https://eu4moldova.eu/projects/eu-project-page/?id=1365',
+                             'nota': 'Pagina proiectului pe eu4moldova.eu', 'extern': True}},
               open(_tmp / 'date' / 'sume_manual.json', 'w', encoding='utf-8'))
     _p = subprocess.run([sys.executable, str(_tmp / 'legis_pagina.py')], capture_output=True, text=True, timeout=120)
     _pag = (_tmp / 'legis_acorduri.html').read_text(encoding='utf-8') if (_tmp / 'legis_acorduri.html').exists() else ''
@@ -282,6 +311,17 @@ try:
     verifica('suma pusă de mână (date/sume_manual.json) înlocuiește suma citită greșit',
              (_a.get('OMDED182/2025', {}).get('acord') or {}).get('v') == 184297.33, _p.stdout[-300:] + _p.stderr[-300:])
     verifica('„ascunde" scoate suma greșită din pagină', 'acord' not in _a.get('LP115/2025', {'acord': 1}))
+    verifica('„fara_cost" scoate doar costul citit greșit, suma acordului rămâne',
+             'cost' not in _a.get('LP155/2026', {'cost': 1}) and (_a.get('LP155/2026', {}).get('acord') or {}).get('v') == 150000000,
+             str(_a.get('LP155/2026')))
+    verifica('„extern" ajunge în pagină: suma are steagul și adresa sursei, nu o fișă legis.md',
+             (_a.get('HG45/2009', {}).get('acord') or {}).get('extern') is True
+             and (_a.get('HG45/2009', {}).get('acord') or {}).get('u') == 'https://eu4moldova.eu/projects/eu-project-page/?id=1365'
+             and (_a.get('HG45/2009', {}).get('acord') or {}).get('v') == 3000000, str(_a.get('HG45/2009')))
+    verifica('o sumă pusă de mână fără „extern" nu primește steagul',
+             'extern' not in (_a.get('OMDED182/2025', {}).get('acord') or {'extern': 1}), str(_a.get('OMDED182/2025')))
+    verifica('costul unui alt act, fără „fara_cost", nu se atinge',
+             (_a.get('LP156/2026', {}).get('cost') or {}).get('v') == 120000000, str(_a.get('LP156/2026')))
 finally:
     shutil.rmtree(_tmp, ignore_errors=True)
 
@@ -512,6 +552,22 @@ if '--browser' in sys.argv:
     verifica('lista scoasă acum are același număr de acorduri ca fișierul din repository', len(_lista) == _real['numar'], (len(_lista), _real['numar']))
 
     print()
+    print('Browser, registrul din Monitorul Oficial: preia sumele deja citite pe legis.md (acorduri.html)')
+    _mon, _ = lga.citeste_acorduri(pagina='acorduri.html')
+    _dupa_nume = lambda n: next((a for a in _mon if a['nume'].strip().lower().startswith(n.lower())), None)
+    verifica('registrul Monitor are sume la majoritatea acordurilor (înainte aveau doar o doime: 24 din 98)',
+             sum(1 for a in _mon if a['suma']) >= 0.6 * len(_mon), (sum(1 for a in _mon if a['suma']), len(_mon)))
+    _scoli = _dupa_nume('Reabilitarea și modernizarea școlilor din Moldova')
+    verifica('suma citită din acordul atașat (legis.md) apare și în registrul Monitor: școlile = 40 000 000 EUR',
+             _scoli and _scoli['suma'] and _scoli['suma']['eur'] == 40000000, _scoli and _scoli['suma'])
+    _livada = _dupa_nume('Livada Moldovei II')
+    verifica('Livada Moldovei II = 150 000 000 EUR (suma acordului), nu pragul de 500 000 EUR citit ca „cost"',
+             _livada and _livada['suma'] and _livada['suma']['eur'] == 150000000 and not _livada['cost'], _livada and (_livada['suma'], _livada['cost']))
+    _urbact = [a for a in _mon if 'urbact' in json.dumps(a, ensure_ascii=False).lower()]
+    verifica('suma de program a URBACT (86,8 mil. EUR pentru toate țările) nu e atribuită Moldovei',
+             bool(_urbact) and all(not a['suma'] or a['suma']['eur'] != 86769799 for a in _urbact), [a['suma'] for a in _urbact])
+
+    print()
     print('Browser: exportul Excel din registru are linkuri clicabile')
     import zipfile, xml.dom.minidom, functools, html as _html
     from playwright.sync_api import sync_playwright
@@ -554,6 +610,66 @@ if '--browser' in sys.argv:
             _b.close()
     finally:
         _srv.shutdown()
+
+    print()
+    print('Browser: sumele din surse externe — marcajul „ext.", legătura spre sursă, exportul Excel')
+    _lista_l, _ = lga.citeste_acorduri()
+    _ext_l = [a for a in _lista_l if a['suma'] and a['suma']['sursa'] == 'extern']
+    verifica('registrul legis are acorduri cu suma dintr-o sursă externă, fiecare cu sumă în euro',
+             len(_ext_l) >= 20 and all(a['suma']['eur'] and a['suma']['eur'] > 0 for a in _ext_l), len(_ext_l))
+    _mc = next((a for a in _lista_l if a['nume'].strip() == 'Compact'), None)
+    verifica('Compactul MCC: 262 mil. USD, sursă externă, convertit în euro',
+             _mc and _mc['suma']['v'] == 262000000 and _mc['suma']['val'] == 'USD' and _mc['suma']['sursa'] == 'extern' and 150e6 < _mc['suma']['eur'] < 300e6,
+             _mc and _mc['suma'])
+    _sib = next((a for a in _lista_l if a['nume'].strip() == 'Siemens'), None)
+    verifica('creditul german din 1995: 30 mil. DEM din textul legii, nu „extern"',
+             _sib and _sib['suma']['v'] == 30000000 and _sib['suma']['val'] == 'DEM' and _sib['suma']['sursa'] == 'text', _sib and _sib['suma'])
+    _mon2, _ = lga.citeste_acorduri(pagina='acorduri.html')
+    _ui = next((a for a in _mon2 if a['nume'].strip() == 'Sprijin pentru integrarea în UE'), None)
+    verifica('registrul Monitor: „Sprijin pentru integrarea în UE" = 25 mil. EUR, sursă externă',
+             _ui and _ui['suma'] and _ui['suma']['eur'] == 25000000 and _ui['suma']['sursa'] == 'extern', _ui and _ui['suma'])
+
+    import zipfile, functools, html as _html
+    from playwright.sync_api import sync_playwright
+    _srv2 = lga._Server(('127.0.0.1', 0), functools.partial(lga._Liniste, directory=str(AICI)))
+    threading.Thread(target=_srv2.serve_forever, daemon=True).start()
+    _baza2 = 'http://127.0.0.1:%d/' % _srv2.server_address[1]
+    try:
+        with sync_playwright() as _p:
+            _b = _p.chromium.launch()
+            for _pagina, _cauta, _gazda in (('acorduri.html', 'Sprijin pentru integrarea în UE', 'enlargement.ec.europa.eu'),
+                                            ('legis_acorduri.html', 'Compact', 'assets.mcc.gov')):
+                _pg = _b.new_page()
+                _erori = []
+                _pg.on('pageerror', lambda e: _erori.append(str(e)[:200]))
+                _pg.route('**/*', lambda r: r.continue_() if r.request.url.startswith(_baza2) else r.abort())
+                _pg.goto(_baza2 + _pagina, wait_until='networkidle', timeout=90000)
+                _pg.wait_for_timeout(3000)
+                _pg.fill('#seek', _cauta)
+                _pg.wait_for_timeout(1200)
+                _r = _pg.evaluate('''() => {
+                    const tr = [...document.querySelectorAll('tr.acord')].find(t => /ext\\./.test(t.querySelector('td.c-suma').innerText));
+                    if (!tr) return null;
+                    const sp = tr.querySelector('td.c-suma .din-text');
+                    tr.click();
+                    const a = tr.nextElementSibling.querySelector('.det-suma a');
+                    return {sup: sp.querySelector('sup') ? sp.querySelector('sup').textContent : '', titlu: sp.title, link: a ? a.href : '', textLink: a ? a.textContent : '',
+                            detaliu: tr.nextElementSibling.querySelector('.det-suma').innerText};
+                }''')
+                _nume = _pagina.split('.')[0]
+                verifica(_nume + ': suma din sursă externă are „ext." și explicația în titlu', _r and _r['sup'] == 'ext.' and _r['titlu'].startswith('Sursă externă'), _r)
+                verifica(_nume + ': detaliul trimite la sursă, nu la un PDF legis.md',
+                         _r and _gazda in _r['link'] and _r['textLink'] == 'sursa sumei' and 'din afara actelor din registru' in _r['detaliu'], _r)
+                with _pg.expect_download(timeout=30000) as _d:
+                    _pg.click('#export')    # vederea implicită: acordurile
+                _foaie2 = _html.unescape(zipfile.ZipFile(_d.value.path()).read('xl/worksheets/sheet1.xml').decode('utf-8'))
+                verifica(_nume + ': exportul Excel numește sursa („sursă externă") și pune adresa ei lângă fragment',
+                         'sursă externă (nu din actele din registru)' in _foaie2 and _gazda in _foaie2, _foaie2[-600:])
+                verifica(_nume + ': pagina nu a dat erori JavaScript', not _erori, _erori)
+                _pg.close()
+            _b.close()
+    finally:
+        _srv2.shutdown()
 
 print()
 if picat:
