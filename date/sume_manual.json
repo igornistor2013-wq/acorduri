@@ -1,5 +1,5 @@
 {
- "_cum_se_foloseste": "Sume puse de mână, pe codul actului din registrul legis.md. {\"v\": suma, \"val\": \"EUR\", \"nota\": \"de unde e\"} pune suma acordului; cu \"unde\": \"text\" o pune ca sumă din textul actului. {\"ascunde\": true} ascunde suma citită greșit din atașament; {\"fara_text\": true} pe cea citită greșit din textul actului. {\"fara_guvern\": true} ascunde suma luată din nota Guvernului. \"fara_total\": true lasă suma pe rând, dar n-o adună în totalurile pe tipuri de finanțare. Ce e aici bate citirea automată. Cheile care încep cu _ sunt ignorate.",
+ "_cum_se_foloseste": "Sume puse de mână, pe codul actului din registrul legis.md. {\"v\": suma, \"val\": \"EUR\", \"nota\": \"de unde e\"} pune suma acordului; cu \"unde\": \"text\" o pune ca sumă din textul actului. {\"ascunde\": true} ascunde suma citită greșit din atașament; {\"fara_text\": true} pe cea citită greșit din textul actului; {\"fara_cost\": true} costul proiectului citit greșit din atașament. {\"fara_guvern\": true} ascunde suma luată din nota Guvernului. \"fara_total\": true lasă suma pe rând, dar n-o adună în totalurile pe tipuri de finanțare. \"extern\": true marchează suma luată dintr-o sursă din afara actelor din registru (decizia de finanțare a UE, pagina finanțatorului, un comunicat oficial): \"u\" = adresa sursei, \"nota\" = citatul. Ce e aici bate citirea automată. Cheile care încep cu _ sunt ignorate. Registrul din Monitor folosește aceleași sume: codul actului îl ia din date/legis_sume.json, prin fișa legis.md a actului (date/legaturi_legis.json).",
  "OMDED182/2025": {
   "v": 184297.33,
   "val": "EUR",
@@ -53,7 +53,8 @@
  },
  "LP378/2023": {
   "ascunde": true,
-  "nota": "Suma citită automat (18 mil. EUR) era plafonul de 15 % din împrumutul BEI, nu suma împrumutului."
+  "nota": "Suma citită automat (18 mil. EUR) era plafonul de 15 % din împrumutul BEI, nu suma împrumutului. Costul citit automat (25 mil. EUR) era plafonul pentru un sub-proiect („Costul total al fiecărui Sub-proiect nu trebuie să depășească 25 000 000 EUR”), nu costul proiectului.",
+  "fara_cost": true
  },
  "LP309/2023": {
   "ascunde": true,
@@ -223,7 +224,8 @@
  },
  "LP20/2025": {
   "ascunde": true,
-  "nota": "Suma citită automat (86 769 799 EUR) era contribuția fondurilor Interreg la tot programul, pentru toate țările."
+  "nota": "Suma citită automat (86 769 799 EUR) era contribuția fondurilor Interreg la tot programul, pentru toate țările. Aceeași sumă apărea și din nota Guvernului (33/CS/2025): „grant în mărime de 86,769,799 EUR” e resursa programului pentru toate țările participante, nu partea Republicii Moldova.",
+  "fara_guvern": true
  },
  "OMM23/2026": {
   "v": 7903975,
@@ -979,5 +981,176 @@
   "u": "https://www.legis.md/cautare/getResults?doc_id=112808&lang=ro",
   "nota": "Introdus manual: 15 mil. USD e suma estimată la inițierea negocierilor (februarie 2019). Acordul semnat la 26 septembrie 2019 e de 13,1 mil. EUR, potrivit Legii nr. 177/2019. Împrumutul e numărat deja la LP177/2019, deci rândul acesta nu intră în totaluri.",
   "fara_total": true
+ },
+ "LP155/2026": {
+  "fara_cost": true,
+  "nota": "Costul citit automat (500 000 EUR) era pragul de la care se cere studiu de fezabilitate („cost estimat care depășește 500.000 EUR”), nu costul proiectului."
+ },
+ "HG45/2009": {
+  "v": 3000000,
+  "val": "EUR",
+  "u": "https://eu4moldova.eu/projects/eu-project-page/?id=1365",
+  "nota": "Pagina proiectului pe eu4moldova.eu — «Subvenția UE […] în valoare de 3 milioane de euro». Protocolul adițional din 2011 nu a fost verificat.",
+  "extern": true
+ },
+ "HG181/2012": {
+  "v": 10000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/system/files/2017-03/enpi_2011_c2011_4969_annual_action_programme_for_moldova_justicesectorreform.pdf",
+  "nota": "Fișa acțiunii ENPI/2011/22680 din programul anual de acțiune 2011 al UE pentru Moldova — «Total cost EUR10 million EU contribution».",
+  "extern": true
+ },
+ "HG6/2014": {
+  "v": 25000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/system/files/2017-03/enpi_2013_c2013_5199_annual_action_programme_for_moldova_support_to_the_implementation_of_the_vocational_education.pdf",
+  "nota": "Fișa acțiunii ENPI/2013/024-404 din programul anual de acțiune 2013 al UE — «Total amount of EU budget contribution: EUR 25,000,000 (budget support)». Suma inițială.",
+  "extern": true
+ },
+ "HG12/2014": {
+  "v": 21000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/document/download/6ea1705f-3fad-4f6c-80f2-3491294d3a17_en",
+  "nota": "Fișa acțiunii ENPI/2013/024-405 din programul anual de acțiune 2013 al UE — «Total amount of EU budget contribution: EUR 21,000,000». Suma inițială; addendumul din 2017 nu a fost verificat.",
+  "extern": true
+ },
+ "HG885/2014": {
+  "v": 30000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/news/european-union-signed-memorandum-understanding-single-support-framework-republic-moldova-and-new-2014-11-06_en",
+  "nota": "Comunicatul Comisiei Europene din 6.11.2014, la semnarea acordului — «DCFTA support to the Republic of Moldova (€30 million)».",
+  "extern": true
+ },
+ "HG857/2014": {
+  "v": 37000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/system/files/2017-03/eni_2014_c2014_5140_final_annual_action_program_for_moldova_public_finance_policy_reforms.pdf",
+  "nota": "Fișa acțiunii ENI/2014/033-684 (Decizia Comisiei C(2014) 5140) — «Total amount of EU budget contribution is EUR 37 million».",
+  "extern": true
+ },
+ "HG8/2014": {
+  "v": 26000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/document/download/13736be8-7c43-4ea5-b436-1c9fe4a4c3bb_en",
+  "nota": "Fișa acțiunii ENPI 2013/024-403 din programul anual de acțiune 2013 al UE — «Total amount of EU budget contribution: EUR 26,000,000».",
+  "extern": true
+ },
+ "HG512/2017": {
+  "v": 29000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/document/download/5135b80b-a8c3-459f-899f-14c3d041f969_en?filename=eni_2016_c2016_7752_ad2_technicalcooperation.pdf",
+  "nota": "Fișa acțiunii ENI/2016/039-553 (Decizia C(2016) 7752) — «Total amount of EU budget contribution EUR 29 million». E facilitatea din 2016; HG1363/2016 pare să vizeze cea din 2015 (5 mil. EUR).",
+  "extern": true
+ },
+ "HG1257/2016": {
+  "v": 57000000,
+  "val": "EUR",
+  "u": "https://old.igp.gov.md/sites/default/files/raport_implementare_program_sb_in_2019_en.pdf",
+  "nota": "Raportul Inspectoratului General al Poliției (2019) — acordul de finanțare «Support to Police Reform» (ENI/2015/038-144), semnat în decembrie 2016, «amounting to 57 million EUR».",
+  "extern": true
+ },
+ "HG1366/2016": {
+  "v": 8000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/document/download/47d1de26-8c46-4cf6-b394-a861d1d0c78a_en?filename=eni_2015_c2015_7150_annual_action_programme_for_moldova_civilsociety.pdf",
+  "nota": "Fișa acțiunii ENI/2015/038-137 «Civil Society Facility (Moldova)», programul anual de acțiune 2015 al UE — «Total amount of EU budget contribution: EUR 8 million».",
+  "extern": true
+ },
+ "HG513/2017": {
+  "v": 60000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/document/download/b9479329-9e48-4992-a38d-91368c55d216_en?filename=eni_2016_c2016_7752_ad1_ruralareasdevelopment.pdf",
+  "nota": "Fișa acțiunii ENI/2016/039-554 (Decizia Comisiei C(2016) 7752) — «Total amount of EU budget contribution EUR 60 000 000». Suma inițială; addendumurile din 2020 și 2023 nu au sumă găsită.",
+  "extern": true
+ },
+ "HG752/2018": {
+  "v": 5000000,
+  "val": "EUR",
+  "u": "https://old.gov.md/en/content/eu-provide-over-12-million-euros-back-economic-growth-moldova",
+  "nota": "Comunicatul Guvernului din 25.07.2018, la aprobarea negocierii acordului cu Comisia Europeană — «provides for the earmarking of five million euros». Semnarea nu a fost verificată.",
+  "extern": true
+ },
+ "HG351/2019": {
+  "v": 8000000,
+  "val": "EUR",
+  "u": "https://www.mf.gov.md/sites/default/files/3.1%20Suprematia%20legi.%20SC_0.pdf",
+  "nota": "Textul acordului de finanțare ENI/2018/041-244, publicat de Ministerul Finanțelor — «the maximum EU contribution to this action is set at EUR 8 000 000».",
+  "extern": true
+ },
+ "HG352/2019": {
+  "v": 23000000,
+  "val": "EUR",
+  "u": "https://www.mf.gov.md/sites/default/files/2.1%20Regiuni%20focale.%20SC_0.pdf",
+  "nota": "Textul acordului de finanțare ENI/2018/041-300, publicat de Ministerul Finanțelor — «the maximum EU contribution to this action is set at EUR 23 000 000».",
+  "extern": true
+ },
+ "HG786/2024": {
+  "v": 25000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/document/download/c14ac0ba-87fa-496f-9ccf-304f111ecd71_en?filename=C_2024_5378_F1_ANNEX_EN_V2_P1_3581835.PDF",
+  "nota": "Documentul de acțiune «Support for EU Integration» (Decizia Comisiei C(2024) 5378) — «Total amount of EU budget contribution EUR 25 000 000.00». Suma inițială, înaintea amendamentului din 2025.",
+  "extern": true
+ },
+ "HG110/2024": {
+  "v": 31000000,
+  "val": "EUR",
+  "u": "https://enlargement.ec.europa.eu/document/download/c73f9b8d-dd3b-44da-8229-f4d6685dbe79_en?filename=C_2023_9067_ANNEX.PDF",
+  "nota": "Documentul de acțiune «EU4 Moldova Integration and Stability» (Decizia Comisiei C(2023) 9067) — «Total amount of EU budget contribution EUR 31 000 000».",
+  "extern": true
+ },
+ "HG677/2009": {
+  "v": 262000000,
+  "val": "USD",
+  "u": "https://assets.mcc.gov/content/uploads/2017/05/cn-012810-moldova-compactsigning.pdf",
+  "nota": "Notificarea Millennium Challenge Corporation către Congres (ianuarie 2010), Compactul semnat la 22.01.2010 — «will provide up to $262 million». Plafon.",
+  "extern": true
+ },
+ "HG1299/2002": {
+  "v": 41400000,
+  "val": "JPY",
+  "u": "https://www.mofa.go.jp/mofaj/gaiko/oda/data/zyoukyou/h_14/021011_1.html",
+  "nota": "Ministerul japonez de Externe, schimbul de note din 11.10.2002 (echipament audio pentru Palatul Național) — «4,140万円を限度とする額» (până la 41,4 mil. yeni).",
+  "extern": true
+ },
+ "HG246/2005": {
+  "v": 300000000,
+  "val": "JPY",
+  "u": "https://www.mofa.go.jp/mofaj/gaiko/oda/data/zyoukyou/h_16/050309_2.html",
+  "nota": "Ministerul japonez de Externe, schimbul de note din 9.03.2005 (grant fără proiect) — «3億円の無償資金協力» (300 mil. yeni).",
+  "extern": true
+ },
+ "HG229/2006": {
+  "v": 220000000,
+  "val": "JPY",
+  "u": "https://www.mofa.go.jp/mofaj/gaiko/oda/data/zyoukyou/h_17/060303_2.html",
+  "nota": "Ministerul japonez de Externe, schimbul de note din 3.03.2006 (grant 2KR pentru fermieri) — «2億2,000万円を限度とする額» (până la 220 mil. yeni).",
+  "extern": true
+ },
+ "HG230/2006": {
+  "v": 400000000,
+  "val": "JPY",
+  "u": "https://www.mofa.go.jp/mofaj/gaiko/oda/data/zyoukyou/h_17/060303_1.html",
+  "nota": "Ministerul japonez de Externe, schimbul de note din 3.03.2006 (grant pentru program sectorial) — «4億円の無償資金協力» (400 mil. yeni).",
+  "extern": true
+ },
+ "HG1211/2007": {
+  "v": 530000000,
+  "val": "JPY",
+  "u": "https://www.mofa.go.jp/mofaj/gaiko/oda/data/zyoukyou/h19/071112_1.html",
+  "nota": "Ministerul japonez de Externe, schimbul de note din 12.11.2007 (echipament pentru Centrul de mecanizare agricolă) — «5億3,000万円を限度とする» (până la 530 mil. yeni).",
+  "extern": true
+ },
+ "HG91/2006": {
+  "v": 6350000,
+  "val": "USD",
+  "u": "https://www.gefieo.org/sites/default/files/documents/projects/tes/2508-terminal-evaluation.pdf",
+  "nota": "Raportul de închidere al Băncii Mondiale (ICR, 2011), grant GEF TF-55875 — «Global Environment Facility grant in the amount of US$6.35 million».",
+  "extern": true
+ },
+ "HP543/1995": {
+  "v": 30000000,
+  "val": "DEM",
+  "unde": "text",
+  "nota": "Art. 1: «în valoare de 30 milioane mărci germane» (acordul de împrumut cu banca germană KfW, pentru tehnică medicală; titlul inițial numea creditor concernul Siemens)."
  }
 }
