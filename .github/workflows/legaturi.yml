@@ -26,10 +26,13 @@ on:
     paths:
       - acorduri.html
       - legis_pagina.py
+      - legis_clasifica.py
+      - monitor_watch.py
       - legatura_acorduri.py
       - legis_brut.json
       - date/legis_sume.json
       - date/sume_manual.json
+      - date/categorii_manual.json
       - date/legaturi_legis.json
 
 permissions:
