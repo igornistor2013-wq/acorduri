@@ -1,5 +1,5 @@
 {
- "_cum_se_foloseste": "Sume puse de mână, pe codul actului din registrul legis.md. {\"v\": suma, \"val\": \"EUR\", \"nota\": \"de unde e\"} pune suma acordului; cu \"unde\": \"text\" o pune ca sumă din textul actului. {\"ascunde\": true} ascunde suma citită greșit din atașament; {\"fara_text\": true} pe cea citită greșit din textul actului; {\"fara_cost\": true} costul proiectului citit greșit din atașament. {\"fara_guvern\": true} ascunde suma luată din nota Guvernului. \"fara_total\": true lasă suma pe rând, dar n-o adună în totalurile pe tipuri de finanțare. \"extern\": true marchează suma luată dintr-o sursă din afara actelor din registru (decizia de finanțare a UE, pagina finanțatorului, un comunicat oficial): \"u\" = adresa sursei, \"nota\" = citatul. Ce e aici bate citirea automată. Cheile care încep cu _ sunt ignorate. Registrul din Monitor folosește aceleași sume: codul actului îl ia din date/legis_sume.json, prin fișa legis.md a actului (date/legaturi_legis.json).",
+ "_cum_se_foloseste": "Sume puse de mână, pe codul actului din registrul legis.md. {\"v\": suma, \"val\": \"EUR\", \"nota\": \"de unde e\"} pune suma acordului; cu \"unde\": \"text\" o pune ca sumă din textul actului. {\"ascunde\": true} ascunde suma citită greșit din atașament; {\"fara_text\": true} pe cea citită greșit din textul actului; {\"fara_cost\": true} costul proiectului citit greșit din atașament. {\"fara_guvern\": true} ascunde suma luată din nota Guvernului. \"fara_total\": true lasă suma pe rând, dar n-o adună în totalurile pe tipuri de finanțare. \"extern\": true marchează suma luată dintr-o sursă din afara actelor din registru (decizia de finanțare a UE, pagina finanțatorului, un comunicat oficial): \"u\" = adresa sursei, \"nota\" = citatul; când sursa e un document oficial nepublicat online (o notă a Cancelariei de Stat primită de la minister), \"u\" lipsește, iar nota spune ce document e. Ce e aici bate citirea automată. Cheile care încep cu _ sunt ignorate. Registrul din Monitor folosește aceleași sume: codul actului îl ia din date/legis_sume.json, prin fișa legis.md a actului (date/legaturi_legis.json); un act foarte nou, care n-are încă fișă pe legis.md, primește codul scos din numărul și tipul lui (HG430/2026; ordinul — O147/2026).",
  "OMDED182/2025": {
   "v": 184297.33,
   "val": "EUR",
@@ -1152,5 +1152,11 @@
   "val": "DEM",
   "unde": "text",
   "nota": "Art. 1: «în valoare de 30 milioane mărci germane» (acordul de împrumut cu banca germană KfW, pentru tehnică medicală; titlul inițial numea creditor concernul Siemens)."
+ },
+ "HG430/2026": {
+  "v": 386910,
+  "val": "USD",
+  "nota": "Nota Cancelariei de Stat nr. CS-2684-25-78-1755 din 15.07.2026: «PNUD va acorda asistență externă nerambursabilă (sub formă de grant) în sumă de 6 693 543 MDL (echivalentul aproximativ la 386 910 dolari SUA)»",
+  "extern": true
  }
 }

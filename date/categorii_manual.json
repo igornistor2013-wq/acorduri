@@ -1,5 +1,5 @@
 {
- "_cum_se_foloseste": "Categoria unor acte pe care nici titlul, nici finanțatorul nu o lămuresc, hotărâtă de mână după ce actul a fost verificat. Cheia e codul actului din registrul legis.md, ca în sume_manual.json. {\"categorie\": \"Grant\" | \"Împrumut\" | \"Asistență tehnică\", \"motiv\": \"ce spune actul\", \"sursa\": \"linkul unde se verifică\"}. Fără motiv și sursă, intrarea e ignorată și spusă pe ecran. Decizia bate clasificarea automată, dar nu adaugă acte în registru. O cheie care nu mai corespunde niciunui act e semnalată la fiecare rulare. Cheile care încep cu _ sunt ignorate.",
+ "_cum_se_foloseste": "Categoria unor acte pe care nici titlul, nici finanțatorul nu o lămuresc, hotărâtă de mână după ce actul a fost verificat. Cheia e codul actului din registrul legis.md, ca în sume_manual.json; un act foarte nou, venit doar din Monitorul Oficial (fără fișă pe legis.md), are codul scos din numărul și tipul lui (HG430/2026; ordinul — O147/2026, codul provizoriu, fără emitent). Toate actele unui acord au nevoie de aceeași decizie, altfel acordul apare pe două rânduri. {\"categorie\": \"Grant\" | \"Împrumut\" | \"Asistență tehnică\", \"motiv\": \"ce spune actul\", \"sursa\": \"linkul unde se verifică; pentru un document nepublicat online, descrierea lui\"}. Fără motiv și sursă, intrarea e ignorată și spusă pe ecran. Decizia bate clasificarea automată, dar nu adaugă acte în registru. O cheie care nu mai corespunde niciunui act e semnalată la fiecare rulare. Cheile care încep cu _ sunt ignorate.",
  "HG1108/2010": {
   "categorie": "Grant",
   "motiv": "Acordul de finanțare cu KfW pentru „Infrastructura socială și eficiența energetică” (prin FISM) este un grant de 5 mil. EUR. Titlul hotărârii nu spune dacă banii se rambursează, iar KfW a dat Moldovei și grant, și credit.",
@@ -14,5 +14,15 @@
   "categorie": "Grant",
   "motiv": "Acord de finanțare cu Uniunea Europeană: articolul 2 se numește „Costul total și contribuția financiară a UE” și prevede suport bugetar de 25 mil. EUR (contribuțiile UE din acordurile de finanțare sunt granturi). Titlul din registru e doar „ACORD DE FINANȚARE*”, fără partener.",
   "sursa": "https://www.legis.md/cautare/getResults?doc_id=79440&lang=ro"
+ },
+ "HG430/2026": {
+  "categorie": "Grant",
+  "motiv": "Acordul de colaborare dintre IP Organizația pentru Dezvoltarea Antreprenoriatului și PNUD (proiectul „Comunități reziliente prin abilitarea femeilor”): nota Cancelariei de Stat spune că „PNUD va acorda asistență externă nerambursabilă (sub formă de grant)”. Titlul hotărârii nu spune dacă banii se rambursează, de aceea regula automată îl pune la asistență tehnică. Aceeași decizie pentru Ordinul O147/2026 (intrarea în vigoare a acordului): cu două categorii, acordul ar apărea pe două rânduri.",
+  "sursa": "Nota Cancelariei de Stat nr. CS-2684-25-78-1755 din 15.07.2026 către Ministerul Dezvoltării Economice și Digitalizării (document oficial, nepublicat online). Proiectul de hotărâre: ședința Guvernului din 5 august 2026, număr unic 713/MDED/2026."
+ },
+ "O147/2026": {
+  "categorie": "Grant",
+  "motiv": "Acordul de colaborare dintre IP Organizația pentru Dezvoltarea Antreprenoriatului și PNUD (proiectul „Comunități reziliente prin abilitarea femeilor”): nota Cancelariei de Stat spune că „PNUD va acorda asistență externă nerambursabilă (sub formă de grant)”. Titlul hotărârii nu spune dacă banii se rambursează, de aceea regula automată îl pune la asistență tehnică. Aceeași decizie pentru Ordinul O147/2026 (intrarea în vigoare a acordului): cu două categorii, acordul ar apărea pe două rânduri.",
+  "sursa": "Nota Cancelariei de Stat nr. CS-2684-25-78-1755 din 15.07.2026 către Ministerul Dezvoltării Economice și Digitalizării (document oficial, nepublicat online). Proiectul de hotărâre: ședința Guvernului din 5 august 2026, număr unic 713/MDED/2026."
  }
 }
