@@ -3272,10 +3272,13 @@
           : '<span class="nil">—</span>') + '</td></tr>' +
         '<tr class="detalii hid" data-d="' + i + '"><td colspan="6">' +
           '<div class="det-nume">' + esc(g.nume) + '</div>' +
+          deciziaCategoriei(g) +
           (g.sumaA ? '<div class="det-suma">Suma acordului: <b>' + esc(fmtSuma(g.sumaA)) + '</b> — ' +
                (g.sumaA.extern ? 'dintr-o sursă din afara actelor din registru (nu din textul acordului)' : 'din textul acordului atașat la ' + esc(g.sumaA.act)) +
-               ': <q>' + esc(g.sumaA.f) + '</q> · <a href="' + esc(g.sumaA.u) + '" target="_blank" rel="noopener">' +
-               (g.sumaA.extern ? 'sursa sumei' : 'documentul (PDF, legis.md)') + '</a></div>'
+               ': <q>' + esc(g.sumaA.f) + '</q>' +
+               (g.sumaA.u ? ' · <a href="' + esc(g.sumaA.u) + '" target="_blank" rel="noopener">' +
+                  (g.sumaA.extern ? 'sursa sumei' : 'documentul (PDF, legis.md)') + '</a>'
+                : g.sumaA.extern ? ' · <span class="nil">document oficial nepublicat online</span>' : '') + '</div>'
            : g.suma ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.suma)) + '</b> — scrisă în titlul actului oficial.</div>'
            : g.sumaT ? '<div class="det-suma">Suma: <b>' + esc(fmtSuma(g.sumaT)) + '</b> — din textul actului ' + esc(g.sumaT.act) +
                ': <q>' + esc(g.sumaT.f) + '</q>' +
@@ -3353,6 +3356,42 @@
     legaMaiMult();
   }
 
+  /* Codul actului în forma din legis.md („HG430/2026"), scos din ce spune Monitorul: numărul și
+     anul din „nr. 430, 5 august 2026" și tipul din primul cuvânt al titlului. Ordinul iese cu codul
+     provizoriu, fără emitent („O147/2026"), ca în registrul legis.md (legis_pagina.cod_legis).
+     Pentru actele care n-au încă fișă legată pe legis.md; fără cod, nu se aplică nicio decizie de mână. */
+  var PREFIX_ACT = {lege: 'LP', hotarare: 'HG', decret: 'DP', ordin: 'O'};
+  var LUNI_RO = {ianuarie: 1, februarie: 1, martie: 1, aprilie: 1, mai: 1, iunie: 1, iulie: 1,
+                 august: 1, septembrie: 1, octombrie: 1, noiembrie: 1, decembrie: 1};
+  function codDinMonitor(a){
+    var m = /nr\.\s*(\d+)(?:-[IVXLC]+)?\s*,\s*(\d{1,2})\s+(\S+)\s+(\d{4})/.exec((a && a.act) || ''),
+        p = PREFIX_ACT[fold((a && a.titlu) || '').split(' ')[0]];
+    return m && p && LUNI_RO[fold(m[3])] ? p + m[1] + '/' + m[4] : '';
+  }
+
+  /* Deciziile de mână din date/categorii_manual.json care se pot aplica: categorie dintre cele patru,
+     plus motiv și sursă (o categorie fără temei nu are ce căuta într-un registru de care atârnă
+     totaluri). Cheile care încep cu „_" sunt note, nu decizii. */
+  function deciziiValide(brut){
+    var out = {};
+    Object.keys(brut || {}).forEach(function(c){
+      var d = brut[c];
+      if (c.charAt(0) === '_' || !d || typeof d !== 'object') return;
+      if (ORDINE_CAT.indexOf(d.categorie) < 0 || !String(d.motiv || '').trim() || !String(d.sursa || '').trim()) return;
+      out[c] = d;
+    });
+    return out;
+  }
+
+  /* Rândul din fișa acordului care spune că categoria e hotărâtă de mână, nu dedusă din titlu,
+     cu motivul și sursa ei. O sursă care nu e adresă web (un document nepublicat) apare ca text. */
+  function deciziaCategoriei(g){
+    var a = (g.acte || []).filter(function(x){ return x.decizie; })[0], d = a && a.decizie;
+    if (!d) return '';
+    return '<div class="det-suma">Categorie: <b>' + esc(d.categorie || g.categorie) + '</b> — hotărâtă de mână: <q>' + esc(d.motiv) + '</q>' +
+      (d.sursa ? ' · ' + (/^https?:\/\//.test(d.sursa) ? '<a href="' + esc(d.sursa) + '" target="_blank" rel="noopener">sursa</a>' : esc(d.sursa)) : '') + '</div>';
+  }
+
   /* Sumele citite din textul integral al actelor (date/legis_sume.json, scris de
      legis_sume.py). Le citim la fiecare deschidere a paginii, nu doar când se
      reconstruiește: ajunge să urci fișierul pe GitHub și sumele apar. */
@@ -3373,7 +3412,14 @@
        vine dintr-o sursă din afara actelor din registru (decizia de finanțare a UE,
        pagina oficială a finanțatorului, un comunicat al Guvernului): pagina o marchează
        „ext." și pune în loc de „documentul (PDF, legis.md)" legătura spre sursă, în
-       câmpul „u". */
+       câmpul „u"; când sursa e un document oficial nepublicat online (o notă a Cancelariei
+       de Stat, primită de la minister), „u" lipsește, iar nota spune ce document e. */
+    /* date/categorii_manual.json: categoria hotărâtă de mână, tot pe codul actului. Citirea
+       din titlu nu poate ști dacă banii se rambursează când titlul nu spune („Acord de
+       colaborare cu PNUD" iese asistență tehnică), iar o notă oficială poate spune că e grant.
+       Se aplică numai intrările complete (categorie validă, motiv, sursă), ca în
+       legis_clasifica.decizii_manuale(). Toate actele unui acord au nevoie de aceeași decizie:
+       cu două categorii, grupul s-ar despărți pe două rânduri. */
     /* Registrul din Monitor nu avea sume decât din titluri și din notele Guvernului: 74 din cele
        98 de acorduri arătau „—", deși aceleași acte au fișă pe legis.md, iar textul lor, acordul
        atașat și sumele verificate de mână stau deja în cele două fișiere de mai jos. Fișa fiecărui
@@ -3381,8 +3427,8 @@
        legis_sume.json. Cu ele, același act primește aceeași sumă în ambele registre. */
     var peLegis = !!window.__LEGIS__;
     Promise.all([cere('date/legis_sume.json'), cere('date/sume_manual.json'),
-                 peLegis ? null : cere('date/legaturi_legis.json')]).then(function(rez){
-        var j = rez[0], manual = rez[1] || {}, leg = rez[2] || {}, incercari = 0;
+                 peLegis ? null : cere('date/legaturi_legis.json'), cere('date/categorii_manual.json')]).then(function(rez){
+        var j = rez[0], manual = rez[1] || {}, leg = rez[2] || {}, incercari = 0, decizii = deciziiValide(rez[3]);
         /* Pagina Monitorului își ia actele din date.json, printr-o cerere aparte: sumele pot
            sosi înaintea lor. Le așteptăm (cel mult 15 secunde), ca să nu se piardă pe tăcute. */
         (function aplica(){
@@ -3397,15 +3443,21 @@
            acel număr și an și o singură cheie în sume_manual.json care i se potrivește. */
         var formaOrdin = function(c){ var x = /^O[A-Z]*(\d+)\/(\d{4})$/.exec(c || ''); return x ? 'O' + x[1] + '/' + x[2] : null; };
         var cateOrdine = {};
-        Object.keys(db.acte).forEach(function(k){ var f = formaOrdin(db.acte[k].act); if (f) cateOrdine[f] = (cateOrdine[f] || 0) + 1; });
-        var manualPentru = function(cod){
-          var m = manual[cod];
+        /* În registrul din Monitor numărul actului e „nr. 147, 24 august 2026", nu un cod: ordinele se
+           numără după codul lor provizoriu, scos din el (codDinMonitor). */
+        Object.keys(db.acte).forEach(function(k){
+          var f = formaOrdin(peLegis ? db.acte[k].act : codDinMonitor(db.acte[k]));
+          if (f) cateOrdine[f] = (cateOrdine[f] || 0) + 1;
+        });
+        var cautaIn = function(dict, cod){
+          var m = dict[cod];
           if (m && typeof m === 'object') return m;
           var f = formaOrdin(cod);
           if (!f || cateOrdine[f] !== 1) return null;
-          var cand = Object.keys(manual).filter(function(c){ return c !== cod && manual[c] && typeof manual[c] === 'object' && formaOrdin(c) === f; });
-          return cand.length === 1 ? manual[cand[0]] : null;
+          var cand = Object.keys(dict).filter(function(c){ return c !== cod && dict[c] && typeof dict[c] === 'object' && formaOrdin(c) === f; });
+          return cand.length === 1 ? dict[cand[0]] : null;
         };
+        var manualPentru = function(cod){ return cautaIn(manual, cod); };
         Object.keys(db.acte).forEach(function(k){
           var a = db.acte[k];
           var dinLegis = a.editie === 'legis.md';
@@ -3413,11 +3465,19 @@
              cele venite din Monitor nu o au; în registrul din Monitor o dă date/legaturi_legis.json.
              Fără fișă n-avem de unde lua sumele actului. */
           var idLegis = dinLegis ? String(a.editie_id) : (!peLegis && leg[k] ? String(leg[k]) : '');
-          if (!peLegis && !idLegis) return;
           var r = idLegis && j && j.acte ? j.acte[idLegis] : null;
-          // codul actului pe legis.md („LP203/2022"), cheia din sume_manual.json; în Monitor îl spune intrarea lui
-          var cod = peLegis ? a.act : ((r && r.act) || '');
-          var fisa = peLegis ? (a.url || '') : 'https://www.legis.md/cautare/getResults?doc_id=' + idLegis + '&lang=ro';
+          /* Codul actului pe legis.md („LP203/2022"), cheia din sume_manual.json și din categorii_manual.json.
+             În Monitor îl spune intrarea actului în legis_sume.json; un act foarte nou (Monitorul îl are, legis.md
+             încă nu) nu are fișă legată, așa că îl scoatem din numărul și tipul lui. Fără asta, un act nou
+             nu putea primi nicio decizie de mână până nu ajungea în istoricul legis.md. */
+          var cod = peLegis ? a.act : ((r && r.act) || codDinMonitor(a));
+          var fisa = peLegis ? (a.url || '') : (idLegis ? 'https://www.legis.md/cautare/getResults?doc_id=' + idLegis + '&lang=ro' : '');
+          var dc = cod ? cautaIn(decizii, cod) : null;
+          if (dc && (a.categorie !== dc.categorie || !a.decizie)){
+            a.categorie = dc.categorie;
+            a.decizie = {categorie: dc.categorie, motiv: String(dc.motiv).trim(), sursa: String(dc.sursa).trim()};
+            n++;
+          }
           if (r && r.sume && r.sume.length){
             a.sume = r.sume.slice(0, 2).map(function(s){ return [s.v, s.val, String(s.f || '').slice(0, 180)]; });
             n++;
@@ -3438,7 +3498,7 @@
             if (m.fara_cost && a.cost){ delete a.cost; n++; }
             if (m.fara_guvern && !a.faraG){ a.faraG = 1; n++; }
             if (m.v > 0 && m.unde === 'text'){ a.sume = [[m.v, m.val || 'EUR', String(m.nota || 'Sumă introdusă de mână.').slice(0, 180)]]; n++; }
-            else if (m.v > 0){ a.acord = {v: m.v, val: m.val || 'EUR', f: String(m.nota || 'Sumă introdusă de mână.').slice(0, 220), u: m.u || fisa, manual: true, faraTotal: !!m.fara_total, extern: !!m.extern}; n++; }
+            else if (m.v > 0){ a.acord = {v: m.v, val: m.val || 'EUR', f: String(m.nota || 'Sumă introdusă de mână.').slice(0, 220), u: m.u || (m.extern ? '' : fisa), manual: true, faraTotal: !!m.fara_total, extern: !!m.extern}; n++; }
             else if (m.ascunde && a.acord){ delete a.acord; n++; }
           }
         });

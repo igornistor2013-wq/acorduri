@@ -29,9 +29,11 @@ def tip(titlu):
     return (titlu or '').split(' ')[0]
 
 
-def randuri(acte, legaturi=None):
+def randuri(acte, legaturi=None, decizii=None):
     """legaturi: cheia actului din date.json → doc_id pe legis.md (date/legaturi_legis.json).
-    Cu ea, linkul duce direct la act, nu la ediția Monitorului sau la o căutare."""
+    Cu ea, linkul duce direct la act, nu la ediția Monitorului sau la o căutare.
+    decizii: cheia actului → decizia de mână din date/categorii_manual.json (legis_pagina.decizii_pe_monitor);
+    categoria hotărâtă de mână bate cea din date.json, ca datele deschise să spună ce arată pagina."""
     out = []
     for k, a in acte.items():
         direct = (legaturi or {}).get(k)
@@ -40,7 +42,7 @@ def randuri(acte, legaturi=None):
             'data_editie': a.get('data_editie', ''),
             'tip': tip(a.get('titlu', '')),
             'titlu': a.get('titlu', ''),
-            'categorie': a.get('categorie', ''),
+            'categorie': ((decizii or {}).get(k) or {}).get('categorie') or a.get('categorie', ''),
             'partener': a.get('partener', ''),
             'semnat': a.get('semnat', ''),
             'editie': a.get('editie', ''),
@@ -173,7 +175,13 @@ def main():
         legaturi = json.load(open(AICI / 'date' / 'legaturi_legis.json', encoding='utf-8'))
     except Exception:
         legaturi = {}
-    mo = randuri(db.get('acte', {}), legaturi)
+    try:
+        import legis_pagina
+        decizii = legis_pagina.decizii_pe_monitor(db.get('acte', {}), legis_pagina.decizii_manuale())
+    except Exception as e:                       # fără ele, datele deschise rămân pe categoria din date.json
+        print('Deciziile de mână (date/categorii_manual.json) nu s-au aplicat la datele deschise:', e)
+        decizii = {}
+    mo = randuri(db.get('acte', {}), legaturi, decizii)
     scrie('acorduri_monitor', mo)
     legis = randuri(acte_legis())
     scrie('acorduri_legis', legis)

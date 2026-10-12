@@ -120,9 +120,11 @@ _real = json.load(open(AICI / 'date' / 'categorii_manual.json', encoding='utf-8'
 verifica('date/categorii_manual.json: toate intrările au categorie validă, motiv și sursă (altfel ar fi ignorate)',
          set(lc.decizii_manuale()) == {k for k in _real if not k.startswith('_')}, sorted({k for k in _real if not k.startswith('_')} - set(lc.decizii_manuale())))
 _brut = {r['c']: r for r in json.load(open(AICI / 'legis_brut.json', encoding='utf-8'))}
-verifica('fiecare decizie de mână privește un act din registru',
-         all(k in _brut and clasifica(pagina.repara(re.sub(r'^(Modificat|Abrogat|Suspendat)\s*', '', _brut[k]['t']).strip())) for k in lc.decizii_manuale()),
-         [k for k in lc.decizii_manuale() if k not in _brut])
+_coduri_mo = {pagina.cod_legis(a)[0] for a in json.load(open(AICI / 'date.json', encoding='utf-8')).get('acte', {}).values()}
+verifica('fiecare decizie de mână privește un act din registru (din istoricul legis.md sau, dacă e foarte nou, doar din Monitor)',
+         all((k in _brut and clasifica(pagina.repara(re.sub(r'^(Modificat|Abrogat|Suspendat)\s*', '', _brut[k]['t']).strip()))) or k in _coduri_mo
+             for k in lc.decizii_manuale()),
+         [k for k in lc.decizii_manuale() if k not in _brut and k not in _coduri_mo])
 
 print('Diacritice stricate')
 verifica('„оmprumut, finanюare, Germanг” reparat',
@@ -302,8 +304,25 @@ try:
     json.dump({'_nota': 'x', 'OMDED182/2025': {'v': 184297.33, 'val': 'EUR', 'nota': 'partea Moldovei'}, 'LP115/2025': {'ascunde': True},
                'LP155/2026': {'fara_cost': True, 'nota': 'pragul de 500 000 EUR nu e costul proiectului'},
                'HG45/2009': {'v': 3000000, 'val': 'EUR', 'u': 'https://eu4moldova.eu/projects/eu-project-page/?id=1365',
-                             'nota': 'Pagina proiectului pe eu4moldova.eu', 'extern': True}},
+                             'nota': 'Pagina proiectului pe eu4moldova.eu', 'extern': True},
+               'HG430/2026': {'v': 386910, 'val': 'USD', 'nota': 'Nota Cancelariei de Stat, document nepublicat online', 'extern': True}},
               open(_tmp / 'date' / 'sume_manual.json', 'w', encoding='utf-8'))
+    # Un acord foarte nou: Monitorul îl are (hotărârea și ordinul), legis.md încă nu. Titlul nu spune dacă banii se
+    # rambursează, deci regula automată dă „Asistență tehnică"; o notă oficială spune că e grant.
+    _acord_nou = ('Acordului de colaborare dintre Instituția Publică Organizația pentru Dezvoltarea '
+                  'Antreprenoriatului și Programul Națiunilor Unite pentru Dezvoltare pentru implementarea proiectului „Comunități reziliente prin abilitarea femeilor”')
+    _t_hg = 'Hotărâre cu privire la aprobarea semnării ' + _acord_nou
+    json.dump({'acte': {
+        'nr. 430, 5 august 2026|3314': {'act': 'nr. 430, 5 august 2026', 'titlu': _t_hg, 'categorie': 'Asistență tehnică', 'partener': 'PNUD',
+                                        'editie': '359-362', 'data_editie': '06.08.2026', 'editie_id': '3314', 'semnat': '', 'suport': False},
+        'nr. 147, 24 august 2026|3327': {'act': 'nr. 147, 24 august 2026', 'categorie': 'Asistență tehnică', 'partener': 'PNUD',
+                                         'titlu': 'Ordin cu privire la aducerea la cunoștința publică a datei intrării în vigoare a ' + _acord_nou,
+                                         'editie': '407-409', 'data_editie': '02.09.2026', 'editie_id': '3327', 'semnat': '', 'suport': False}},
+        'ultima_rulare': '10.10.2026'}, open(_tmp / 'date.json', 'w', encoding='utf-8'), ensure_ascii=False)
+    # ordinul e dat sub codul întreg (OMDED147/2026), cum îl va avea în legis.md; decizia trebuie să-l prindă și sub codul provizoriu din Monitor
+    _dec_t = {'categorie': 'Grant', 'motiv': 'nota spune „grant"', 'sursa': 'Nota CS-2684 din 15.07.2026 (document nepublicat)'}
+    json.dump({'_nota': 'ignorat', 'HG430/2026': _dec_t, 'OMDED147/2026': _dec_t, 'HG999/2026': _dec_t},
+              open(_tmp / 'date' / 'categorii_manual.json', 'w', encoding='utf-8'), ensure_ascii=False)
     _p = subprocess.run([sys.executable, str(_tmp / 'legis_pagina.py')], capture_output=True, text=True, timeout=120)
     _pag = (_tmp / 'legis_acorduri.html').read_text(encoding='utf-8') if (_tmp / 'legis_acorduri.html').exists() else ''
     _m = re.search(r'window\.__LEGIS__ = (\{.*?\});</script>', _pag, re.S)
@@ -322,6 +341,22 @@ try:
              'extern' not in (_a.get('OMDED182/2025', {}).get('acord') or {'extern': 1}), str(_a.get('OMDED182/2025')))
     verifica('costul unui alt act, fără „fara_cost", nu se atinge',
              (_a.get('LP156/2026', {}).get('cost') or {}).get('v') == 120000000, str(_a.get('LP156/2026')))
+    verifica('o sumă externă fără adresă (document nepublicat) rămâne fără adresă, nu trimite la fișa de pe legis.md',
+             (_a.get('HG430/2026', {}).get('acord') or {}).get('u') == '' and (_a.get('HG430/2026', {}).get('acord') or {}).get('extern') is True
+             and (_a.get('HG430/2026', {}).get('acord') or {}).get('v') == 386910, str(_a.get('HG430/2026')))
+    verifica('o sumă pusă de mână, fără „extern" și fără adresă, trimite la fișa actului',
+             str((_a.get('OMDED182/2025', {}).get('acord') or {}).get('u', '')).startswith('https://www.legis.md/'), str(_a.get('OMDED182/2025')))
+    verifica('decizia de categorie se aplică și unui act venit doar din Monitor (fără fișă pe legis.md)',
+             _a.get('HG430/2026', {}).get('categorie') == 'Grant' and (_a.get('HG430/2026', {}).get('decizie') or {}).get('sursa', '').startswith('Nota CS-2684'),
+             str(_a.get('HG430/2026')))
+    verifica('ordinul provizoriu din Monitor (O147/2026) primește decizia scrisă sub codul întreg (OMDED147/2026): acordul rămâne pe un rând',
+             _a.get('O147/2026', {}).get('categorie') == 'Grant' and _a.get('HG430/2026', {}).get('categorie') == _a.get('O147/2026', {}).get('categorie'),
+             str(_a.get('O147/2026')))
+    verifica('un act fără decizie își păstrează categoria din titlu și nu primește „decizie"',
+             'decizie' not in _a.get('LP156/2026', {'decizie': 1}) and _a.get('LP156/2026', {}).get('categorie') == 'Împrumut', str(_a.get('LP156/2026')))
+    verifica('o decizie care nu mai corespunde niciunui act e spusă pe ecran',
+             'HG999/2026' in _p.stdout and 'categorii_manual.json' in _p.stdout and 'HG430/2026' not in _p.stdout.split('HG999/2026')[0].split('ATENȚIE')[-1],
+             _p.stdout[-400:])
 finally:
     shutil.rmtree(_tmp, ignore_errors=True)
 
@@ -629,6 +664,19 @@ if '--browser' in sys.argv:
     verifica('registrul Monitor: „Sprijin pentru integrarea în UE" = 25 mil. EUR, sursă externă',
              _ui and _ui['suma'] and _ui['suma']['eur'] == 25000000 and _ui['suma']['sursa'] == 'extern', _ui and _ui['suma'])
 
+    # Un acord foarte nou, doar în Monitorul Oficial (HG430/2026 + Ordinul 147/2026), încă fără fișă pe legis.md:
+    # titlul nu spune dacă banii se rambursează, dar nota Cancelariei de Stat spune „grant" și dă suma (în lei, cu
+    # echivalentul în dolari). Decizia de categorie și suma pusă de mână trebuie să ajungă la el în ambele registre.
+    for _nume_reg, _lista_reg in (('legis', _lista_l), ('Monitor', _mon2)):
+        _pn = [a for a in _lista_reg if 'Comunități reziliente prin abilitarea femeilor' in a['nume']]
+        verifica('acordul IP ODA – PNUD (%s): un singur rând, „Grant", 386 910 USD dintr-o sursă externă, trecut în euro' % _nume_reg,
+                 len(_pn) == 1 and _pn[0]['categorie'] == 'Grant' and _pn[0]['suma'] and _pn[0]['suma']['v'] == 386910
+                 and _pn[0]['suma']['val'] == 'USD' and _pn[0]['suma']['sursa'] == 'extern' and 300e3 < _pn[0]['suma']['eur'] < 400e3,
+                 [(a['categorie'], a['suma']) for a in _pn])
+    _pn_l = next((a for a in _lista_l if 'Comunități reziliente prin abilitarea femeilor' in a['nume']), None)
+    verifica('acordul IP ODA – PNUD: hotărârea și ordinul stau pe același rând (aceeași categorie)',
+             _pn_l and {x['act'] for x in _pn_l['acte']} == {'HG430/2026', 'O147/2026'}, _pn_l and [x['act'] for x in _pn_l['acte']])
+
     import zipfile, functools, html as _html
     from playwright.sync_api import sync_playwright
     _srv2 = lga._Server(('127.0.0.1', 0), functools.partial(lga._Liniste, directory=str(AICI)))
@@ -666,6 +714,33 @@ if '--browser' in sys.argv:
                 verifica(_nume + ': exportul Excel numește sursa („sursă externă") și pune adresa ei lângă fragment',
                          'sursă externă (nu din actele din registru)' in _foaie2 and _gazda in _foaie2, _foaie2[-600:])
                 verifica(_nume + ': pagina nu a dat erori JavaScript', not _erori, _erori)
+                # acordul foarte nou (IP ODA – PNUD): rândul, eticheta și fișa lui
+                _pg.fill('#seek', 'Comunități reziliente')
+                _pg.wait_for_timeout(1200)
+                _n = _pg.evaluate('''() => {
+                    const rows = [...document.querySelectorAll('tr.acord')].filter(t => t.innerText.indexOf('Comunități reziliente') >= 0);
+                    if (rows.length !== 1) return {randuri: rows.length};
+                    const tr = rows[0];
+                    const tag = tr.querySelector('td[data-l="Categorie"] .tag');
+                    const sp = tr.querySelector('td.c-suma .din-text');
+                    tr.click();
+                    const det = tr.nextElementSibling;
+                    const ps = [...det.querySelectorAll('.det-suma')];
+                    const dsuma = ps.find(x => x.innerText.indexOf('Suma acordului') === 0);
+                    const dcat = ps.find(x => x.innerText.indexOf('Categorie:') === 0);
+                    return {randuri: 1, eticheta: tag ? tag.innerText : '', clasa: tag ? tag.className : '', suma: tr.querySelector('td.c-suma').innerText,
+                            sup: sp && sp.querySelector('sup') ? sp.querySelector('sup').textContent : '', titlu: sp ? sp.title : '',
+                            dsuma: dsuma ? dsuma.innerText : '', dsumaLinkuri: dsuma ? dsuma.querySelectorAll('a').length : -1,
+                            dcat: dcat ? dcat.innerText : ''};
+                }''')
+                verifica(_nume + ': acordul IP ODA – PNUD apare o dată, ca „Grant", cu 386 910 USD marcat „ext."',
+                         _n and _n.get('randuri') == 1 and _n['eticheta'].strip() == 'Grant' and 't-grant' in _n['clasa']
+                         and _n['suma'].replace('\xa0', ' ').startswith('386 910 USD') and _n['sup'] == 'ext.', _n)
+                verifica(_nume + ': fișa spune că suma e dintr-o sursă externă, citează nota și arată că documentul nu e online, fără link spre legis.md',
+                         _n and 'din afara actelor din registru' in _n['dsuma'] and '6 693 543 MDL' in _n['dsuma'] and 'nepublicat online' in _n['dsuma']
+                         and _n['dsumaLinkuri'] == 0 and '6 693 543 MDL' in _n['titlu'], _n)
+                verifica(_nume + ': fișa spune că categoria e hotărâtă de mână, cu motivul și sursa (nota Cancelariei de Stat)',
+                         _n and 'hotărâtă de mână' in _n['dcat'] and 'Cancelariei de Stat' in _n['dcat'] and 'sub formă de grant' in _n['dcat'], _n)
                 _pg.close()
             _b.close()
     finally:

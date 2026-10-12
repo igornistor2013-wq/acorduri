@@ -193,6 +193,9 @@
     '— din textul acordului:': '— from the text of the agreement:',
     '— dintr-o sursă din afara actelor din registru (nu din textul acordului):': '— from a source outside the acts in the registry (not from the text of the agreement):',
     'sursa sumei': 'the source of the amount',
+    'document oficial nepublicat online': 'official document, not published online',
+    // categoria hotărâtă de mână (fișa acordului): date/categorii_manual.json
+    'Categorie:': 'Category:', '— hotărâtă de mână:': '— decided by hand:', 'sursa': 'source',
     'documentul (PDF, legis.md)': 'the document (PDF, legis.md)', 'nota (PDF, gov.md)': 'the note (PDF, gov.md)',
     '(căutare)': '(search)', 'Deschide actul pe legis.md': 'Open the act on legis.md',
     'Linkul duce la o căutare, nu direct la act': 'The link leads to a search, not straight to the act',

@@ -104,6 +104,25 @@ def manual_pentru(cod, manual, cate_ordine):
     return (manual[cand[0]], cand[0]) if len(cand) == 1 else (None, None)
 
 
+def decizii_pe_monitor(mo, decizii):
+    """Actele din date.json (Monitorul Oficial) care au o decizie de mână în date/categorii_manual.json:
+    {cheia actului din date.json: decizia}. Același cod ca în registrul legis („HG430/2026"; ordinul
+    venit din Monitor — „O147/2026") și aceeași regulă pentru ordine ca la sumele puse de mână.
+    O folosesc datele deschise (date_deschise.py): categoria din CSV/JSON trebuie să fie cea din pagină."""
+    coduri = {k: cod_legis(a)[0] for k, a in mo.items()}
+    cate_ordine = {}
+    for c in coduri.values():
+        f = forma_ordin(c)
+        if f:
+            cate_ordine[f] = cate_ordine.get(f, 0) + 1
+    out = {}
+    for k, c in coduri.items():
+        d, _ = manual_pentru(c, decizii, cate_ordine)
+        if d:
+            out[k] = d
+    return out
+
+
 def legaturi_monitor(brut, cale=None, iesire=None):
     """date/legaturi_legis.json: actul din Monitorul Oficial → doc_id-ul fișei lui pe legis.md.
     Registrul din Monitor (acorduri.html) îl citește ca numărul actului să ducă direct la act,
@@ -210,6 +229,8 @@ def main(BRUT=None, OUT=None):
     acte, ids, titluri = {}, {}, {}
     # Categorii hotărâte de mână pentru actele pe care titlul nu le lămurește
     # (date/categorii_manual.json). Testele dau alte căi: ele nu citesc fișierul adevărat.
+    # Se aplică mai jos, tuturor actelor — și celor venite din Monitorul Oficial, care nu
+    # sunt încă în istoricul legis.md —, ca sumele puse de mână.
     decizii = decizii_manuale() if rulare_reala else {}
     decizii_folosite = set()
     for r in brut:
@@ -217,9 +238,6 @@ def main(BRUT=None, OUT=None):
         cat = clasifica(t)
         if not cat:
             continue
-        if r['c'] in decizii:
-            cat = decizii[r['c']]['categorie']
-            decizii_folosite.add(r['c'])
         titlu = tip(r['c']) + ' ' + t
         pub = r['pub'].replace('-', '.')
         acte[r['c'] + '|' + r['id']] = {
@@ -281,6 +299,14 @@ def main(BRUT=None, OUT=None):
                     a['acord']['manual'] = True
             if x.get('cost') and x['cost']['v'] < 1e12 and 'cost' not in a:
                 a['cost'] = {'v': x['cost']['v'], 'val': x['cost']['val'], 'f': x['cost'].get('f', '')[:220], 'u': x.get('u', '')}
+        # categoria hotărâtă de mână (date/categorii_manual.json) bate clasificarea automată; același
+        # cod și aceeași regulă pentru ordine ca la sume. Toate actele unui acord au nevoie de aceeași
+        # decizie: două categorii diferite le-ar despărți pe două rânduri.
+        d, ck = manual_pentru(a.get('act'), decizii, cate_ordine)
+        if d:
+            decizii_folosite.add(ck)
+            a['categorie'] = d['categorie']
+            a['decizie'] = {'motiv': str(d['motiv']).strip(), 'sursa': str(d['sursa']).strip()}
         # sumele puse de mână (date/sume_manual.json) bat orice sumă citită automat
         m, cheia = manual_pentru(a.get('act'), manual, cate_ordine)
         if isinstance(m, dict):
@@ -295,7 +321,10 @@ def main(BRUT=None, OUT=None):
             if (m.get('v') or 0) > 0 and m.get('unde') == 'text':
                 a['sume'] = [[m['v'], m.get('val', 'EUR'), nota[:180]]]
             elif (m.get('v') or 0) > 0:
-                a['acord'] = {'v': m['v'], 'val': m.get('val', 'EUR'), 'f': nota[:220], 'u': m.get('u') or a.get('url', ''), 'manual': True}
+                # o sumă din afara actelor nu trimite la fișa actului de pe legis.md, unde nu stă: fără
+                # „u", sursa e un document oficial nepublicat online, iar nota spune care
+                a['acord'] = {'v': m['v'], 'val': m.get('val', 'EUR'), 'f': nota[:220],
+                              'u': m.get('u') or ('' if m.get('extern') else a.get('url', '')), 'manual': True}
                 if m.get('fara_total'):
                     a['acord']['faraTotal'] = True
                 if m.get('extern'):
