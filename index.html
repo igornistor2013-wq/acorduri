@@ -1572,7 +1572,7 @@
         <input type="text" id="iatiSearchInput" placeholder="Caută după denumire sau AMP ID..." data-i18n-placeholder="iatiSearchPh" style="flex:1;min-width:220px;padding:8px 10px;border:1px solid var(--line-strong);border-radius:6px;font-size:13px;"/>
         <label style="font-size:12px;display:inline-flex;align-items:center;gap:6px;"><input type="checkbox" id="iatiOnlyMatches"/> <span data-i18n="iatiOnlyMatches">arată doar proiectele cu potrivire</span></label>
         <label style="font-size:12px;display:inline-flex;align-items:center;gap:6px;" title="Proiectele potrivite la care debursările din AMP și cele din IATI diferă cu peste 1% (și cu peste 1.000 EUR), de la diferența cea mai mare" data-i18n-title="iatiOnlyDiffTitle"><input type="checkbox" id="iatiOnlyDiff"/> <span data-i18n="iatiOnlyDiff">doar unde debursările diferă</span></label>
-        <button id="iatiDiffCsvBtn" type="button" style="background:var(--panel);color:var(--navy);border:1px solid var(--line-strong);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;" data-i18n="iatiDiffCsvBtn">Descarcă diferențele (CSV)</button>
+        <button id="iatiDiffCsvBtn" type="button" style="background:var(--panel);color:var(--navy);border:1px solid var(--line-strong);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;" data-i18n="iatiDiffCsvBtn">Descarcă diferențele (Excel)</button>
         <span id="iatiCount" style="font-size:12px;color:var(--ink-dim);white-space:nowrap;"></span>
       </div>
       <div class="table-scroll" style="max-height:640px;">
@@ -1632,7 +1632,7 @@
         <input type="text" id="legSearch" placeholder="Caută după denumire, finanțator, act sau AMP ID..." data-i18n-placeholder="legSearchPh"/>
         <select id="legNivel" aria-label="Legătura"></select>
         <select id="legPartener" aria-label="Finanțator"></select>
-        <button type="button" class="leg-btn" id="legCsvBtn" data-i18n="legCsvBtn">Descarcă tabelul (CSV)</button>
+        <button type="button" class="leg-btn" id="legCsvBtn" data-i18n="legCsvBtn">Descarcă tabelul (Excel)</button>
         <span id="legCount" style="font-size:12px;color:var(--ink-dim);white-space:nowrap;"></span>
       </div>
       <div class="table-scroll" style="max-height:680px;">
@@ -2072,12 +2072,50 @@ function esc(s){
    le-a desenat. Butonul CSV le descarcă de acolo; nu reconstruiește nimic din ecran,
    unde sumele sunt deja prescurtate („1.09 mld"). */
 function __L(ro, en){ return __limbaEn() ? en : ro; }
-function __csvInreg(el, cols, rows){
+/* A patra parte, „opt", descrie exportul Excel al panoului (unelte.js + xlsx-stil.js). Câmpuri:
+     tip        un caracter pe coloană: t text · i identificator · e sumă (EUR) · n număr întreg · y an ·
+                k loc în clasament · p procent (în puncte, 83,5) · x diferență cu semn · v variație % cu semn ·
+                d două zecimale · z dată
+     total      { eticheta, suma:[coloane], raport:{coloană:[numărător, numitor]} }  rând de total cu formule
+     randTotal  un rând de total dat gata (cu proiectele numărate o singură dată), doar pentru Excel
+     totalFinal true = ultimul rând din „rows" este deja totalul (apare și în CSV)
+     grafic     { tip:'bar'|'col'|'colst'|'line', cat, serii:[coloane], n, ultimele, culori, titlu }
+     bare       coloane cu bare în celule · harta { de, pana }: scară de culoare · linkuri { coloană: rând => adresă }
+     nota       note sub tabel · context  rândul „selecție" din antet, dacă diferă de cel obișnuit */
+function __csvInreg(el, cols, rows, opt){
   try{
     const node = typeof el === 'string' ? document.getElementById(el) : el;
     const panel = node && node.closest ? node.closest('.panel') : null;
-    if(panel) panel.__dateCsv = { cols: cols, rows: rows || [] };
+    if(panel) panel.__dateCsv = { cols: cols, rows: rows || [], opt: opt || null };
   }catch(e){}
+}
+/* La fel, dar panoul păstrează doar o funcție care întoarce { cols, rows, opt }: pentru date scumpe de
+   calculat, pe care le cerem abia la export. */
+function __csvInregLazy(el, fn){
+  try{
+    const node = typeof el === 'string' ? document.getElementById(el) : el;
+    const panel = node && node.closest ? node.closest('.panel') : null;
+    if(panel) panel.__dateCsv = fn;
+  }catch(e){}
+}
+const __CUL_ANG = '9DB8DF', __CUL_DEB = '1E4B8C', __CUL_PALETA = ['1E4B8C', 'C8871A', '2DD4BF', 'C0402C', '6B7284', '155A52', '7A5A1A', '16294A', '9DB8DF'];
+/* Totalul „adevărat": fiecare proiect o singură dată, indiferent câți donatori, sectoare sau beneficiari are. */
+function __totalUnic(proiecte){
+  return { ang: proiecte.reduce((s, p) => s + p.ang, 0), deb: proiecte.reduce((s, p) => s + p.deb, 0), proj: countUniqueProjects(proiecte) };
+}
+const __DUBLU = {
+  donor:   ['Un proiect cofinanțat apare cu suma întreagă la fiecare donator', 'A co-financed project appears with its full amount under each donor'],
+  sector:  ['Un proiect cu mai multe sectoare apare cu suma întreagă la fiecare sector', 'A project with several sectors appears with its full amount under each sector'],
+  benef:   ['Un proiect cu mai mulți beneficiari apare cu suma întreagă la fiecare beneficiar', 'A project with several beneficiaries appears with its full amount under each beneficiary'],
+  tara:    ['Un proiect cu donatori din mai multe țări apare cu suma întreagă la fiecare țară', 'A project with donors from several countries appears with its full amount under each country'],
+  tip:     ['Un proiect cu mai multe tipuri de asistență apare cu suma întreagă la fiecare tip', 'A project with several types of assistance appears with its full amount under each type']
+};
+function __notaDublu(dim, cuTotal, scurt){
+  const e = __limbaEn(), d = __DUBLU[dim] || __DUBLU.donor;
+  /* „scurt": panoul are deja în pagină nota despre sumele care se dublează (chart-note), deci în Excel o spunem doar pe cea despre „Total". */
+  if(scurt) return e ? 'The “Total” row counts each project once.' : 'Rândul „Total” numără fiecare proiect o singură dată.';
+  return e ? d[1] + ', so the rows can add up to more than the real total' + (cuTotal ? '; the “Total” row counts each project once.' : '.')
+           : d[0] + ', deci suma rândurilor poate depăși totalul real' + (cuTotal ? '; rândul „Total” numără fiecare proiect o singură dată.' : '.');
 }
 
 
@@ -2824,8 +2862,12 @@ function renderChart(byDonor){
   const top = [...byDonor].sort((a,b)=>b[metric]-a[metric]).slice(0,12);
   const max = Math.max(1,...top.map(d=>d[metric]));
   const body = document.getElementById('chartBody');
+  const __tu = byDonor.length ? __totalUnic(getFilteredProjects()) : null;
   __csvInreg(body, [t('colDonor'), t('colCommitments'), t('colDisbursements'), t('colProjects')],
-    [...byDonor].sort((a,b)=>b[metric]-a[metric]).map(d=>[donorLabel(d.donator), Math.round(d.Angajamente), Math.round(d.Debursari), d.Proiecte]));
+    [...byDonor].sort((a,b)=>b[metric]-a[metric]).map(d=>[donorLabel(d.donator), Math.round(d.Angajamente), Math.round(d.Debursari), d.Proiecte]),
+    { tip: 'teen', randTotal: __tu ? [t('totalUniqueRow'), Math.round(__tu.ang), Math.round(__tu.deb), __tu.proj] : null,
+      bare: [metric === 'Angajamente' ? 1 : 2], nota: [__notaDublu('donor', true)],
+      grafic: { tip: 'bar', cat: 0, serii: [1, 2], n: 15, culori: [__CUL_ANG, __CUL_DEB] } });
   if(top.length===0){ body.innerHTML = `<div class="empty-state">${t('emptyCurrentSelection')}</div>`; return; }
   body.innerHTML = top.map(d=>{
     const w = Math.max(1,(d[metric]/max)*100);
@@ -2855,7 +2897,8 @@ function renderTable(byDonor, trueTotals){
     rows.map(r=>[donorLabel(r.donator),
       r.anMin==='NA' ? (currentLang==='en' ? 'unspecified' : 'nespecificat') : (r.anMin===r.anMax ? r.anMin : r.anMin+'–'+r.anMax),
       r.Proiecte, Math.round(r.Angajamente), Math.round(r.Debursari), Math.round(r.pct*10)/10])
-    .concat(rows.length ? [[t('totalUniqueRow'), '', trueTotals.proj, Math.round(trueTotals.ang), Math.round(trueTotals.deb), 100]] : []));
+    .concat(rows.length ? [[t('totalUniqueRow'), '', trueTotals.proj, Math.round(trueTotals.ang), Math.round(trueTotals.deb), 100]] : []),
+    { tip: 'ttneep', totalFinal: rows.length > 0, nota: [__notaDublu('donor', true, true)] });
   if(rows.length===0){
     tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">${t('emptyAdjustFilters')}</div></td></tr>`;
   } else {
@@ -2945,7 +2988,8 @@ function renderProjects(){
   __csvInreg(tbody, ['AMP ID', t('colProjectName'), t('colDonor'), t('colPeriod'), t('colCommitments'), t('colDisbursements')],
     rows.map(p=>[p.id || '', projectLabel(p), donorLabelList(p.donator),
       p.minYear==='NA' ? '' : (p.minYear===p.maxYear ? p.minYear : p.minYear+'–'+p.maxYear),
-      Math.round(p.ang), Math.round(p.deb)]));
+      Math.round(p.ang), Math.round(p.deb)]),
+    { tip: 'itttee', total: { eticheta: __L('Total', 'Total'), suma: [4, 5] }, linkuri: { 0: r => window.ampProjectUrl ? window.ampProjectUrl(r[0]) : null } });
   if(state.selectedDonors.size===0){
     tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">${t('emptySelectDonor')}</div></td></tr>`;
     return;
@@ -3051,8 +3095,12 @@ function renderMiniBarChart(containerId, items, metric, n){
   {
     const eSector = containerId==='sectorChartBody', eBenef = containerId==='beneficiaryChartBody';
     const lab = d => eSector ? sectorLabel(d.nume) : (eBenef ? beneficiaryLabel(d.nume) : d.nume);
+    const __tu = items.length ? __totalUnic(getFilteredProjects()) : null;
     __csvInreg(body, [eSector ? 'Sector' : __L('Beneficiar', 'Beneficiary'), t('colCommitments'), t('colDisbursements'), t('colProjects')],
-      [...items].sort((a,b)=>b[metric]-a[metric]).map(d=>[lab(d), Math.round(d.ang), Math.round(d.deb), d.proiecte]));
+      [...items].sort((a,b)=>b[metric]-a[metric]).map(d=>[lab(d), Math.round(d.ang), Math.round(d.deb), d.proiecte]),
+      { tip: 'teen', randTotal: __tu ? [t('totalUniqueRow'), Math.round(__tu.ang), Math.round(__tu.deb), __tu.proj] : null,
+        bare: [metric === 'ang' ? 1 : 2], nota: [__notaDublu(eSector ? 'sector' : 'benef', true, true)],
+        grafic: { tip: 'bar', cat: 0, serii: [1, 2], n: 15, culori: [__CUL_ANG, __CUL_DEB] } });
   }
   if(top.length===0){ body.innerHTML = `<div class="empty-state">${t('emptyCurrentSelection')}</div>`; return; }
   body.innerHTML = top.map(d=>{
@@ -3257,8 +3305,15 @@ function renderMap(countryData){
   const en = currentLang === 'en';
   const metric = mapState.metric || 'proiecte';
   const val = d => (d ? (d[metric] || 0) : 0);
-  __csvInreg('mapPanel', [__L('Țară / organizație', 'Country / organisation'), t('colProjects'), t('colCommitments'), t('colDisbursements')],
-    [...countryData].sort((a,b)=>val(b)-val(a)).map(d=>[geoLabel(d.nume), d.proiecte, Math.round(d.ang), Math.round(d.deb)]));
+  {
+    const col = metric === 'proiecte' ? 1 : metric === 'ang' ? 2 : 3, __tu = countryData.length ? __totalUnic(getFilteredProjects()) : null;
+    __csvInreg('mapPanel', [__L('Țară / organizație', 'Country / organisation'), t('colProjects'), t('colCommitments'), t('colDisbursements')],
+      [...countryData].sort((a,b)=>val(b)-val(a)).map(d=>[geoLabel(d.nume), d.proiecte, Math.round(d.ang), Math.round(d.deb)]),
+      { tip: 'tnee', randTotal: __tu ? [t('totalUniqueRow'), __tu.proj, Math.round(__tu.ang), Math.round(__tu.deb)] : null, bare: [col],
+        nota: [__notaDublu('tara', true, true)],
+        grafic: { tip: 'bar', cat: 0, serii: [col], n: 15, culori: [metric === 'ang' ? __CUL_ANG : __CUL_DEB],
+                  titlu: __L('Top 15 țări / organizații · ', 'Top 15 countries / organisations · ') + (metric === 'proiecte' ? t('colProjects') : metric === 'ang' ? t('colCommitments') : t('colDisbursements')) } });
+  }
   const fmtV = v => metric === 'proiecte' ? fmtNum(v) : geoBani(v);
   const maxV = Math.max(1, ...countryData.map(val));
   const scalaMax = document.getElementById('mapScalaMax');
@@ -5004,27 +5059,29 @@ function renderInAfaraAnilor(el){
   const b = document.createElement('button');
   b.type = 'button';
   b.id = 'ampInAfaraCsv';
-  b.textContent = en ? 'Download the list (CSV)' : 'Descarcă lista (CSV)';
+  b.textContent = en ? 'Download the list (Excel)' : 'Descarcă lista (Excel)';
   b.style.cssText = 'margin-left:4px;background:none;border:1px solid currentColor;border-radius:5px;padding:2px 8px;font-size:11.5px;font-weight:600;color:inherit;cursor:pointer;';
-  b.addEventListener('click', inAfaraAnilorCsv);
+  b.addEventListener('click', inAfaraAnilorXlsx);
   d.appendChild(b);
   el.appendChild(d);
 }
-function inAfaraAnilorCsv(){
+function inAfaraAnilorXlsx(ev){
   const en = currentLang === 'en', lista = inAfaraAnilor();
-  const linii = [en ? ['AMP ID', 'Project', 'Donor', 'Disbursements outside the report years', 'Commitments outside the report years', 'Total disbursements', 'Total commitments', 'Start date', 'End date']
-                    : ['AMP ID', 'Proiect', 'Donator', 'Debursări în afara anilor raportului', 'Angajamente în afara anilor raportului', 'Debursări în total', 'Angajamente în total', 'Data începerii', 'Data finalizării']];
-  lista.forEach(o => {
+  const cols = en ? ['AMP ID', 'Project', 'Donor', 'Disbursements outside the report years', 'Commitments outside the report years', 'Total disbursements', 'Total commitments', 'Start date', 'End date']
+                  : ['AMP ID', 'Proiect', 'Donator', 'Debursări în afara anilor raportului', 'Angajamente în afara anilor raportului', 'Debursări în total', 'Angajamente în total', 'Data începerii', 'Data finalizării'];
+  const dd = v => { const d = v ? parseDataRo(v) : null; return d ? fmtData(d) : ''; };    // „31/12/2024" → „31.12.2024"
+  const rows = lista.map(o => {
     const dt = REAL_DATES_LOOKUP[o.id] || {};
-    linii.push([o.id, projectLabel(o.p), o.p.donator || (o.p.donatori || []).join(', '), o.deb, o.ang, Math.round(o.p.deb || 0), Math.round(o.p.ang || 0), dt.s || '', dt.e || '']);
+    return [o.id, projectLabel(o.p), o.p.donator || (o.p.donatori || []).join(', '), Math.round(o.deb), Math.round(o.ang), Math.round(o.p.deb || 0), Math.round(o.p.ang || 0), dd(dt.s), dd(dt.e)];
   });
-  const q = v => { v = String(v == null ? '' : v); return /[;"\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['\ufeff' + linii.map(l => l.map(q).join(';')).join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' }));
-  a.download = 'amp-sume-in-afara-anilor-' + new Date().toISOString().slice(0, 10) + '.csv';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-  return lista.length;
+  const B = window.__ampBrut, ani = B && B.aniRaport ? ' (' + B.aniRaport[0] + '–' + B.aniRaport[1] + ')' : '';
+  return window.__xlsxDirect({
+    titlu: en ? 'AMP amounts outside the report years' : 'Sume AMP în afara anilor raportului', nume: 'amp-sume-in-afara-anilor', vedere: 'mainView',
+    cols: cols, rows: rows, btn: ev && ev.currentTarget,
+    opt: { tip: 'itteeeezz', total: { eticheta: 'Total', suma: [3, 4] }, linkuri: { 0: r => window.ampProjectUrl ? window.ampProjectUrl(r[0]) : null },
+           context: [en ? 'All AMP projects' : 'Toate proiectele din AMP'],
+           nota: [(en ? 'Amounts that AMP reports outside the years of the report' + ani + ' — usually a year typed wrongly in AMP. They are counted in the dashboard under “year unspecified”.'
+                      : 'Sume pe care AMP le raportează în afara anilor raportului' + ani + ' — de regulă un an scris greșit în AMP. În dashboard sunt numărate la „an nespecificat”.')] } });
 }
 function onLanguageChanged(){
   if(lastStatus && lastStatus.kind === 'ok' && window.__liveLaOra) lastStatus.params.ora = __oraScurta(window.__liveLaOra);
@@ -5154,7 +5211,11 @@ function renderLineChart(){
   const years = [...byYear.keys()].sort((a,b)=>a-b);
   const maxVal = Math.max(...years.map(y=>Math.max(byYear.get(y).ang, byYear.get(y).deb)));
   __csvInreg('lineChartBody', [t('colYear'), t('colCommitments'), t('colDisbursements')],
-    years.map(y=>[y, Math.round(byYear.get(y).ang), Math.round(byYear.get(y).deb)]));
+    years.map(y=>[y, Math.round(byYear.get(y).ang), Math.round(byYear.get(y).deb)]),
+    { tip: 'yee', total: { eticheta: __L('Total (ani cunoscuți)', 'Total (known years)'), suma: [1, 2] },
+      nota: [__L('Proiectele sunt grupate după anul în care au fost lansate (angajate); cele fără an cunoscut nu sunt incluse.',
+                 'Projects are grouped by the year they were launched (committed); those with no known year are not included.')],
+      grafic: { tip: 'line', cat: 0, serii: [1, 2], culori: [__CUL_ANG, __CUL_DEB] } });
 
   const W = Math.max(900, years.length*34), H = 340;
   const padL = 70, padR = 20, padT = 20, padB = 40;
@@ -5233,9 +5294,15 @@ function renderExecRate(){
     .filter(([,v])=>v.ang>0)
     .sort((a,b)=>b[1].ang-a[1].ang)
     .slice(0,20);
+  const __tuEx = __totalUnic(PROJECTS);
   __csvInreg('execRateBody', [t('colDonor'), t('colCommitments'), t('colDisbursements'), __L('Execuție (%)', 'Execution (%)')],
     [...byDonor.entries()].filter(([,v])=>v.ang>0).sort((a,b)=>b[1].ang-a[1].ang)
-      .map(([d,v])=>[donorLabel(d), Math.round(v.ang), Math.round(v.deb), Math.round(v.deb/v.ang*1000)/10]));
+      .map(([d,v])=>[donorLabel(d), Math.round(v.ang), Math.round(v.deb), Math.round(v.deb/v.ang*1000)/10]),
+    { tip: 'teep', bare: [3],
+      randTotal: __tuEx.ang > 0 ? [t('totalUniqueRow'), Math.round(__tuEx.ang), Math.round(__tuEx.deb), Math.round(__tuEx.deb/__tuEx.ang*1000)/10] : null,
+      nota: [__L('Execuția = debursări ÷ angajamente. ', 'Execution = disbursements ÷ commitments. ') + __notaDublu('donor', true)],
+      grafic: { tip: 'bar', cat: 0, serii: [3], n: 20, culori: [__CUL_DEB],
+                titlu: __L('Execuția (%), primii 20 de donatori după angajamente', 'Execution (%), top 20 donors by commitments') } });
 
   const body = document.getElementById('execRateBody');
   body.innerHTML = '';
@@ -5319,7 +5386,10 @@ function renderSankey(){
     const sec = s => s===OTHER_SECTOR ? s : sectorLabel(s);
     __csvInreg('sankeyBody', [__L('Flux', 'Flow'), __L('De la', 'From'), __L('Către', 'To'), t('colCommitments')],
       dsLinks.map(l=>[__L('Donator → Sector', 'Donor → Sector'), donorLabel(l.source), sec(l.target), Math.round(l.value)])
-      .concat(sbLinks.map(l=>[__L('Sector → Beneficiar', 'Sector → Beneficiary'), sec(l.source), beneficiaryLabel(l.target), Math.round(l.value)])));
+      .concat(sbLinks.map(l=>[__L('Sector → Beneficiar', 'Sector → Beneficiary'), sec(l.source), beneficiaryLabel(l.target), Math.round(l.value)])),
+      { tip: 'tttte', bare: [3],
+        nota: [__L('Un proiect cu mai mulți donatori, sectoare sau beneficiari apare în mai multe fluxuri, cu suma întreagă: sumele fluxurilor nu se adună.',
+                   'A project with several donors, sectors or beneficiaries appears in several flows with its full amount: flow amounts must not be added up.')] });
   }
 
   const donorNodeTotal = new Map(topDonors.map(d=>[d, dsLinks.filter(l=>l.source===d).reduce((s,l)=>s+l.value,0)]));
@@ -5425,8 +5495,12 @@ function renderTreemap(){
   {
     const toate = [...bySector.entries()].filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
     const sum = toate.reduce((s,[,v])=>s+v,0) || 1;
+    const __tuTm = __totalUnic(PROJECTS);
     __csvInreg('treemapBody', ['Sector', t('colCommitments'), __L('% din total', '% of total')],
-      toate.map(([n,v])=>[sectorLabel(n), Math.round(v), Math.round(v/sum*1000)/10]));
+      toate.map(([n,v])=>[sectorLabel(n), Math.round(v), Math.round(v/sum*1000)/10]),
+      { tip: 'tep', bare: [1], randTotal: toate.length ? [t('totalUniqueRow'), Math.round(__tuTm.ang), ''] : null,
+        nota: [__L('„% din total” este cota sectorului în suma tuturor sectoarelor. ', '“% of total” is the sector’s share of the sum of all sectors. ') + __notaDublu('sector', true)],
+        grafic: { tip: 'bar', cat: 0, serii: [1], n: 16, culori: [__CUL_ANG], titlu: __L('Angajamente pe sector, primele 16', 'Commitments by sector, top 16') } });
   }
 
   const W = 700, H = 420;
@@ -5566,7 +5640,8 @@ function renderTreemap(){
 function renderTopProjects(){
   const top = [...PROJECTS].sort((a,b)=>b.ang-a.ang).slice(0,20);
   __csvInreg('topProjectsBody', ['#', 'AMP ID', t('advColProject'), t('colDonor'), t('colYear'), t('colCommitments')],
-    top.map((p,i)=>[i+1, p.id || '', projectLabel(p), donorLabelList(p.donator), p.an==='NA' ? '' : p.an, Math.round(p.ang)]));
+    top.map((p,i)=>[i+1, p.id || '', projectLabel(p), donorLabelList(p.donator), p.an==='NA' ? '' : p.an, Math.round(p.ang)]),
+    { tip: 'kittye', bare: [5], linkuri: { 1: r => window.ampProjectUrl ? window.ampProjectUrl(r[1]) : null } });
   const wrap = document.createElement('div');
   wrap.className = 'table-scroll';
   const table = document.createElement('table');
@@ -5607,8 +5682,18 @@ function renderHeatmap(){
   const donors = [...donorTotal.entries()].sort((a,b)=>b[1]-a[1]).slice(0,25).map(x=>x[0]);
   const years = [...new Set(PROJECTS.filter(p=>p.an!=='NA').map(p=>p.an))].sort((a,b)=>a-b);
   const maxVal = Math.max(1, ...donors.flatMap(d=>years.map(y=>donorYear.get(d+'|||'+y)||0)));
-  __csvInreg('heatmapBody', [t('colDonor')].concat(years.map(String)).concat(['Total']),
-    donors.map(d=>[donorLabel(d)].concat(years.map(y=>Math.round(donorYear.get(d+'|||'+y)||0))).concat([Math.round(donorTotal.get(d)||0)])));
+  {
+    const pe = new Map(); let tot = 0;
+    PROJECTS.forEach(p=>{ if(p.an==='NA') return; pe.set(p.an, (pe.get(p.an)||0) + p[hmMetric]); tot += p[hmMetric]; });
+    __csvInreg('heatmapBody', [t('colDonor')].concat(years.map(String)).concat(['Total']),
+      donors.map(d=>[donorLabel(d)].concat(years.map(y=>Math.round(donorYear.get(d+'|||'+y)||0))).concat([Math.round(donorTotal.get(d)||0)])),
+      { tip: 't' + 'e'.repeat(years.length + 1), harta: years.length ? { de: 1, pana: years.length } : null,
+        randTotal: donors.length ? [t('totalUniqueRow')].concat(years.map(y=>Math.round(pe.get(y)||0))).concat([Math.round(tot)]) : null,
+        nota: [__L('Măsura: ', 'Measure: ') + (hmMetric === 'ang' ? t('colCommitments') : t('colDisbursements')) + '. ' +
+               __L('Sunt afișați primii 25 de donatori; rândul „Total” cuprinde toate proiectele, fiecare o singură dată. ',
+                   'The top 25 donors are shown; the “Total” row covers all projects, each counted once. ') +
+               __notaDublu('donor', false)] });
+  }
 
   const cellW = 22, cellH = 20, labelW = 220;
   const W = labelW + years.length*cellW + 10, H = 26 + donors.length*cellH;
@@ -5754,6 +5839,9 @@ function renderOngoingProjects(){
   document.getElementById('ongoingCount').textContent = rows.length;
   const totalAng = rows.reduce((s,p)=>s+p.ang, 0);
   const totalDeb = rows.reduce((s,p)=>s+p.deb, 0);
+  __csvInreg('ongoingBody', ['AMP ID', t('advColProject'), t('colDonor'), t('advColSpan'), t('colCommitments'), t('colDisbursements')],
+    rows.map(p=>[p.id || '', projectLabel(p), donorLabelList(p.donator), p.minYear===p.maxYear ? String(p.minYear) : p.minYear+' – '+p.maxYear, Math.round(p.ang), Math.round(p.deb)]),
+    { tip: 'ittiee', total: { eticheta: t('advOngoingTotalRow'), suma: [4, 5] }, linkuri: { 0: r => window.ampProjectUrl ? window.ampProjectUrl(r[0]) : null } });
   const wrap = document.createElement('div');
   wrap.className = 'table-scroll';
   wrap.style.maxHeight = '480px';
@@ -5833,8 +5921,13 @@ function renderTypeOfAssistance(){
   const maxVal = Math.max(1, ...rows.map(([,v])=>v[toaMetric]));
 
   const body = document.getElementById('toaBody');
+  const __tuToa = __totalUnic(PROJECTS.filter(p => p.id && TYPE_OF_ASSISTANCE_LOOKUP[p.id]));
   __csvInreg(body, [__L('Tipul de asistență', 'Type of assistance'), t('colCommitments'), t('colDisbursements'), t('colProjects')],
-    rows.map(([label, v])=>[toaLabel(label), Math.round(v.ang), Math.round(v.deb), v.count]));
+    rows.map(([label, v])=>[toaLabel(label), Math.round(v.ang), Math.round(v.deb), v.count]),
+    { tip: 'teen', bare: [toaMetric === 'ang' ? 1 : 2],
+      randTotal: rows.length ? [t('totalUniqueRow'), Math.round(__tuToa.ang), Math.round(__tuToa.deb), __tuToa.proj] : null,
+      nota: [(currentLang==='en' ? `${matchedProjects} of ${totalProjects} projects have this field filled in.` : `${matchedProjects} din ${totalProjects} proiecte au acest câmp completat.`) + ' ' + __notaDublu('tip', true, true)],
+      grafic: { tip: 'bar', cat: 0, serii: [1, 2], culori: [__CUL_ANG, __CUL_DEB] } });
   body.innerHTML = '';
   const note = document.createElement('div');
   note.style.cssText = 'font-size:11.5px;color:var(--ink-dim);margin-bottom:10px;';
@@ -6162,8 +6255,14 @@ function renderRegionChart(){
     return b[1][regionMetric]-a[1][regionMetric];
   });
   const maxVal = Math.max(1, ...rows.filter(([k])=>k!==NATIONAL_LEVEL_KEY).map(([,v])=>v[regionMetric]), 1);
-  __csvInreg('regionBody', [__L('Regiune', 'Region'), t('colCommitments'), t('colDisbursements'), t('colProjects')],
-    rows.map(([k,v])=>[regionLabel(k), Math.round(v.ang), Math.round(v.deb), v.count]));
+  {
+    const nReg = rows.filter(([k]) => k !== NATIONAL_LEVEL_KEY).length;
+    __csvInreg('regionBody', [__L('Regiune', 'Region'), t('colCommitments'), t('colDisbursements'), t('colProjects')],
+      rows.map(([k,v])=>[regionLabel(k), Math.round(v.ang), Math.round(v.deb), v.count]),
+      { tip: 'teen', total: { eticheta: 'Total', suma: [1, 2, 3] }, bare: [regionMetric === 'ang' ? 1 : 2],
+        nota: nReg < rows.length ? [__L('Graficul nu include rândul „la nivel național”.', 'The chart leaves out the “national level” row.')] : [],
+        grafic: nReg >= 2 ? { tip: 'bar', cat: 0, serii: [1, 2], n: Math.min(nReg, 15), fara: nReg < rows.length ? 1 : 0, culori: [__CUL_ANG, __CUL_DEB] } : null });
+  }
 
   renderRegionMap(totals, maxVal);
   renderRegionProjectsList(consideredProjects, matchedProjects);
@@ -6325,7 +6424,10 @@ function renderSectorDonor(){
   donors.forEach(d=>sectors.forEach(s=>{ max = Math.max(max, cell.get(d+'\u0001'+s)||0); }));
   const secLab = s => (typeof sectorLabel==='function' ? sectorLabel(s) : s);
   __csvInreg(body, [en ? 'Donor \\ sector' : 'Donator \\ sector'].concat(sectors.map(secLab)).concat([en ? 'Total (all sectors)' : 'Total (toate sectoarele)']),
-    donors.map(d=>[donorLabel(d)].concat(sectors.map(s=>Math.round(cell.get(d+'\u0001'+s)||0))).concat([Math.round(perDonor.get(d)||0)])));
+    donors.map(d=>[donorLabel(d)].concat(sectors.map(s=>Math.round(cell.get(d+'\u0001'+s)||0))).concat([Math.round(perDonor.get(d)||0)])),
+    { tip: 't' + 'e'.repeat(sectors.length + 1), harta: sectors.length ? { de: 1, pana: sectors.length } : null,
+      total: { eticheta: en ? 'Total (donors shown)' : 'Total (donatorii afișați)', suma: sectors.map((_, i) => i + 1).concat([sectors.length + 1]) },
+      nota: [(en ? 'Measure: ' : 'Măsura: ') + (sdMetric === 'ang' ? t('colCommitments') : t('colDisbursements')) + '.'] });
   let h = '<div class="sd-wrap"><table class="sd-tab"><colgroup><col class="c-don">' + sectors.map(()=>'<col>').join('') + '<col class="c-tot"></colgroup><thead><tr><th class="sd-corner">' +
     (en?'Donor \\ sector':'Donator \\ sector') + '</th>' +
     sectors.map(s=>`<th class="sd-col"><span title="${esc(secLab(s))}">${esc(secLab(s))}</span></th>`).join('') +
@@ -6380,7 +6482,9 @@ function renderTipPeAni(){
   });
   const ani = [...perAn.keys()].sort((a,b)=>a-b);
   __csvInreg(body, [t('colYear')].concat(TIPURI.map(numeTip)).concat(['Total']),
-    ani.map(a=>[a].concat(TIPURI.map(k=>Math.round(perAn.get(a).v[k]||0))).concat([Math.round(perAn.get(a).tot)])));
+    ani.map(a=>[a].concat(TIPURI.map(k=>Math.round(perAn.get(a).v[k]||0))).concat([Math.round(perAn.get(a).tot)])),
+    { tip: 'y' + 'e'.repeat(TIPURI.length + 1), total: { eticheta: 'Total', suma: TIPURI.map((_, i) => i + 1).concat([TIPURI.length + 1]) },
+      grafic: { tip: 'colst', cat: 0, serii: TIPURI.map((_, i) => i + 1), culori: __CUL_PALETA.slice(0, TIPURI.length) } });
   if(!ani.length){ body.innerHTML = `<div class="panel-note">${t('emptyCurrentSelection')}</div>`; return; }
   const maxTot = Math.max(...ani.map(a=>perAn.get(a).tot));
   // lățimea reală a panoului, ca textul axelor să rămână la 10–11 px
@@ -6908,33 +7012,37 @@ function iatiDetaliuHtml(p, m){
 }
 /* Toate potrivirile, cu sumele din ambele surse și cu ce se știe despre proveniența lor.
    Fișier CSV cu BOM și „;", ca să se deschidă direct în Excel. */
-function iatiDiferenteCsv(){
+/* Rândurile comparației AMP–IATI pentru Excel: pentru fiecare proiect, ce raportează AMP și ce raportează IATI.
+   Aceleași coloane ca fișierul CSV vechi; proiectele fără potrivire au doar partea din AMP. */
+function iatiTabelExcel(proiecte){
   const en = currentLang === 'en';
-  const cap = en
+  const cols = en
     ? ['AMP ID', 'Project', 'AMP donor', 'IATI publisher', 'IATI activity', 'Match %', 'AMP commitments', 'AMP disbursements', 'IATI commitments', 'IATI disbursements',
        'Difference (AMP − IATI)', 'Differs', 'AMP source', 'Rows in AMP report', 'AMP report total (disbursements)', 'Disbursements in the archive', 'IATI activities with this title', 'IATI disbursements, all of them', 'Note']
     : ['AMP ID', 'Proiect', 'Donator AMP', 'Publicator IATI', 'Activitate IATI', 'Potrivire %', 'Angajamente AMP', 'Debursări AMP', 'Angajamente IATI', 'Debursări IATI',
        'Diferență (AMP − IATI)', 'Diferă', 'Sursa AMP', 'Rânduri în raportul AMP', 'Totalul raportului AMP (debursări)', 'Debursări în arhivă', 'Activități IATI cu această denumire', 'Debursări IATI, toate împreună', 'Observație'];
-  const linii = [cap];
-  PROJECTS.forEach(p => {
-    const m = IATI_MATCHES.get(p.id);
-    if(!m) return;
+  const rows = proiecte.map(p => {
+    const m = IATI_MATCHES.get(p.id), donor = p.donator || (p.donatori || []).join(', ');
+    if(!m) return [p.id || '', projectLabel(p), donor, '', '', '', Math.round(p.ang || 0), Math.round(p.deb || 0), '', '', '', '', '', '', '', '', '', '', ''];
     const pr = iatiProvenienta(p), frati = iatiAcelasiTitlu(m.act), dif = iatiDifera(p, m);
-    linii.push([p.id, projectLabel(p), p.donator || (p.donatori || []).join(', '), m.act.reporting || '', m.act.aid, Math.round(m.score * 100),
+    return [p.id || '', projectLabel(p), donor, m.act.reporting || '', m.act.aid, Math.round(m.score * 100),
       Math.round(p.ang || 0), Math.round(p.deb || 0), Math.round(m.act.commitment_eur || 0), Math.round(m.act.spend_eur || 0),
       Math.round((p.deb || 0) - (m.act.spend_eur || 0)), dif ? (en ? 'yes' : 'da') : '',
       pr.randuri.length ? (pr.inArhiva ? 'live + arhivă' : 'live') : 'arhivă', pr.randuri.length || '', pr.totalRaport == null ? '' : pr.totalRaport, pr.inArhiva ? pr.arhivaDeb : '',
-      frati.length, Math.round(frati.reduce((x, a) => x + (a.spend_eur || 0), 0)), dif ? iatiCauza(p, m, pr).join(' ') : '']);
+      frati.length, Math.round(frati.reduce((x, a) => x + (a.spend_eur || 0), 0)), dif ? iatiCauza(p, m, pr).join(' ') : ''];
   });
-  linii.sort((a, b) => a === cap ? -1 : b === cap ? 1 : Math.abs(b[10]) - Math.abs(a[10]));
-  const q = v => { v = String(v == null ? '' : v); return /[;"\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-  const text = '\ufeff' + linii.map(l => l.map(q).join(';')).join('\r\n') + '\r\n';
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
-  a.download = 'amp-iati-diferente-' + new Date().toISOString().slice(0, 10) + '.csv';
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-  return linii.length - 1;
+  return { cols: cols, rows: rows, opt: { tip: 'itttipeeeesttneenet',
+    linkuri: { 0: r => window.ampProjectUrl ? window.ampProjectUrl(r[0]) : null, 4: r => r[4] ? IATI_ACT_URL(r[4]) : null },
+    nota: [en ? 'Difference = AMP disbursements − IATI disbursements. “Differs” marks differences of more than 1% (and more than 1,000 EUR).'
+              : 'Diferența = debursările din AMP − debursările din IATI. „Diferă” marchează diferențele de peste 1% (și peste 1.000 EUR).'] } };
+}
+/* Butonul de sub filtre: toate proiectele potrivite, cu cea mai mare diferență întâi. */
+function iatiDiferenteXlsx(ev){
+  const potrivite = PROJECTS.filter(p => IATI_MATCHES.has(p.id)).sort((a, b) =>
+    Math.abs((b.deb || 0) - (IATI_MATCHES.get(b.id).act.spend_eur || 0)) - Math.abs((a.deb || 0) - (IATI_MATCHES.get(a.id).act.spend_eur || 0)));
+  const d = iatiTabelExcel(potrivite);
+  return window.__xlsxDirect({ titlu: currentLang === 'en' ? 'AMP – IATI differences' : 'Diferențe AMP – IATI', nume: 'amp-iati-diferente', vedere: 'iatiView',
+    cols: d.cols, rows: d.rows, opt: d.opt, btn: ev && ev.currentTarget });
 }
 
 function iatiRenderList(){
@@ -6966,6 +7074,7 @@ function iatiRenderList(){
 
   document.getElementById('iatiCount').textContent =
     rows.length.toLocaleString(t('localeTag')) + ' ' + t('iatiShown');
+  __csvInregLazy(body, () => iatiTabelExcel(rows));
 
   if(!rows.length){
     body.innerHTML = '<tr><td colspan="7" style="padding:16px;color:var(--ink-dim);">' + (currentLang==='en' ? 'No project found.' : 'Niciun proiect găsit.') + '</td></tr>';
@@ -7090,7 +7199,8 @@ function iatiRenderDiferente(){
     o.tot++; if(p.id && IATI_MATCHES.has(p.id)) o.gasite++;
     perDon.set(p.donator, o);
   });
-  const stanga = [...perDon.entries()].filter(([,o])=>o.tot>=5).sort((a,b)=>b[1].tot-a[1].tot).slice(0,15);
+  const stangaToate = [...perDon.entries()].filter(([,o])=>o.tot>=5).sort((a,b)=>b[1].tot-a[1].tot);
+  const stanga = stangaToate.slice(0,15);
   // IATI: activități fără corespondent, pe publicator
   const perPub = new Map();
   IATI_ACTIVITIES.forEach(a=>{
@@ -7098,7 +7208,13 @@ function iatiRenderDiferente(){
     o.tot++; if(!IATI_AID_TO_AMP.has(a.aid)) o.fara++;
     perPub.set(a.reporting||'—', o);
   });
-  const dreapta = [...perPub.entries()].filter(([,o])=>o.fara>0).sort((a,b)=>b[1].fara-a[1].fara).slice(0,15);
+  const dreaptaToate = [...perPub.entries()].filter(([,o])=>o.fara>0).sort((a,b)=>b[1].fara-a[1].fara);
+  const dreapta = dreaptaToate.slice(0,15);
+  __csvInreg(box, [__L('Comparația', 'Comparison'), __L('Organizație', 'Organisation'), 'Total', __L('Cu potrivire', 'Matched'), __L('Fără potrivire', 'Not matched'), __L('% cu potrivire', '% matched')],
+    stangaToate.map(([d,o])=>[__L('Proiecte AMP → IATI', 'AMP projects → IATI'), donorLabel(d), o.tot, o.gasite, o.tot - o.gasite, Math.round(o.gasite/o.tot*1000)/10])
+      .concat(dreaptaToate.map(([pub,o])=>[__L('Activități IATI → AMP', 'IATI activities → AMP'), iatiDonorLabel(pub), o.tot, o.tot - o.fara, o.fara, Math.round((o.tot - o.fara)/o.tot*1000)/10])),
+    { tip: 'ttnnnp', bare: [5], nota: [__L('Pagina arată primele 15 rânduri din fiecare comparație; fișierul le conține pe toate (donatori AMP cu cel puțin 5 proiecte; publicatori IATI cu activități fără corespondent).',
+                                           'The page shows the first 15 rows of each comparison; the file has them all (AMP donors with at least 5 projects; IATI publishers with unmatched activities).')] });
   const maxF = Math.max(1, ...dreapta.map(([,o])=>o.fara));
   const col = (titlu, rows) => `<div class="dif-col"><div class="dif-tit">${titlu}</div>${rows}</div>`;
   const rs = stanga.map(([d,o])=>{
@@ -7284,7 +7400,7 @@ async function iatiEnsureData(force){
 document.getElementById('iatiSearchInput').addEventListener('input', iatiRenderList);
 document.getElementById('iatiOnlyMatches').addEventListener('change', iatiRenderList);
 document.getElementById('iatiOnlyDiff').addEventListener('change', iatiRenderList);
-document.getElementById('iatiDiffCsvBtn').addEventListener('click', iatiDiferenteCsv);
+document.getElementById('iatiDiffCsvBtn').addEventListener('click', iatiDiferenteXlsx);
 document.getElementById('iatiThreshold').addEventListener('change', iatiApply);
 document.getElementById('iatiRefreshBtn').addEventListener('click', () => iatiEnsureData(true));
 
@@ -7710,7 +7826,9 @@ function dpRenderPublishers(rows){
   });
   const top = [...map.entries()].sort((a,b)=>b[1][dpState.metric]-a[1][dpState.metric]).slice(0,12);
   __csvInreg(body, [__L('Organizație raportoare', 'Reporting organisation'), t('colCommitments'), t('colDisbursements')],
-    [...map.entries()].sort((a,b)=>b[1][dpState.metric]-a[1][dpState.metric]).map(([n,o])=>[n, Math.round(o.ang), Math.round(o.deb)]));
+    [...map.entries()].sort((a,b)=>b[1][dpState.metric]-a[1][dpState.metric]).map(([n,o])=>[n, Math.round(o.ang), Math.round(o.deb)]),
+    { tip: 'tee', total: { eticheta: 'Total', suma: [1, 2] }, bare: [dpState.metric === 'deb' ? 2 : 1],
+      grafic: { tip: 'bar', cat: 0, serii: [1, 2], n: 12, culori: [__CUL_ANG, __CUL_DEB] } });
   if(!top.length){ body.innerHTML = '<div class="empty-state">' + t('dpNoActivities') + '</div>'; return; }
   const max = Math.max(1, ...top.map(d=>d[1][dpState.metric]));
   body.innerHTML = top.map(([name,o]) => {
@@ -7732,7 +7850,9 @@ function dpRenderStatus(rows){
     map.set(k, (map.get(k)||0)+1);
   });
   const list = [...map.entries()].sort((a,b)=>b[1]-a[1]);
-  __csvInreg(body, [__L('Stadiu', 'Status'), __L('Activități', 'Activities')], list.map(([k,v])=>[k, v]));
+  __csvInreg(body, [__L('Stadiu', 'Status'), __L('Activități', 'Activities')], list.map(([k,v])=>[k, v]),
+    { tip: 'tn', total: { eticheta: 'Total', suma: [1] }, bare: [1],
+      grafic: { tip: 'bar', cat: 0, serii: [1], culori: [__CUL_DEB] } });
   if(!list.length){ body.innerHTML = '<div class="empty-state">' + t('dpNoActivities') + '</div>'; return; }
   const max = Math.max(1, ...list.map(d=>d[1]));
   body.innerHTML = list.map(([k,v]) => `<div class="bar-row">
@@ -7746,7 +7866,9 @@ function dpRenderYearChart(rows){
   const map = new Map();
   rows.forEach(a => { const y = dpDayToYear(a.day_start); if(y!==null) map.set(y,(map.get(y)||0)+1); });
   const years = [...map.keys()].sort((a,b)=>a-b).slice(-14);
-  __csvInreg(body, [t('colYear'), __L('Activități', 'Activities')], [...map.keys()].sort((a,b)=>a-b).map(y=>[y, map.get(y)]));
+  __csvInreg(body, [t('colYear'), __L('Activități', 'Activities')], [...map.keys()].sort((a,b)=>a-b).map(y=>[y, map.get(y)]),
+    { tip: 'yn', total: { eticheta: __L('Total (ani cunoscuți)', 'Total (known years)'), suma: [1] },
+      grafic: { tip: 'col', cat: 0, serii: [1], ultimele: 14, culori: [__CUL_DEB] } });
   if(!years.length){ body.innerHTML = '<div class="empty-state">' + t('dpNoYears') + '</div>'; return; }
   const max = Math.max(1, ...years.map(y=>map.get(y)));
   body.innerHTML = years.map(y => `<div class="bar-row">
@@ -7773,7 +7895,10 @@ function dpRenderSectors(rows){
   });
   const top = [...map.entries()].sort((a,b)=>b[1][dpState.metric]-a[1][dpState.metric]).slice(0,12);
   __csvInreg(body, ['Sector', t('colCommitments'), t('colDisbursements'), __L('Activități', 'Activities')],
-    [...map.entries()].sort((a,b)=>b[1][dpState.metric]-a[1][dpState.metric]).map(([n,o])=>[n, Math.round(o.ang), Math.round(o.deb), o.n]));
+    [...map.entries()].sort((a,b)=>b[1][dpState.metric]-a[1][dpState.metric]).map(([n,o])=>[n, Math.round(o.ang), Math.round(o.deb), o.n]),
+    { tip: 'teen', bare: [dpState.metric === 'deb' ? 2 : 1],
+      randTotal: rows.length ? [t('totalUniqueRow'), Math.round(rows.reduce((x,a)=>x+(a.commitment_eur||0),0)), Math.round(rows.reduce((x,a)=>x+(a.spend_eur||0),0)), rows.length] : null,
+      grafic: { tip: 'bar', cat: 0, serii: [1, 2], n: 12, culori: [__CUL_ANG, __CUL_DEB] } });
   if(!top.length){ body.innerHTML = '<div class="empty-state">' + t('dpNoActivities') + '</div>'; return; }
   const max = Math.max(1, ...top.map(d=>d[1][dpState.metric]));
   body.innerHTML = top.map(([name,o]) => {
@@ -7817,6 +7942,12 @@ function dpRenderTable(rows){
     if(typeof va === 'string') return sd * va.localeCompare(vb, 'ro');
     return sd * (va - vb);
   });
+  {
+    const peri = o => o.ymin===null ? '' : (o.ymax && o.ymax!==o.ymin ? o.ymin+'–'+o.ymax : String(o.ymin));
+    __csvInreg(body, [t('colDonor'), t('colPeriod'), t('dpColActivities'), t('colCommitments'), t('colDisbursements'), t('colPctTotal')],
+      list.map(([name,o]) => [name, peri(o), o.n, Math.round(o.ang), Math.round(o.deb), totalDeb>0 ? Math.round(o.deb/totalDeb*1000)/10 : 0]),
+      { tip: 'tineep', total: { eticheta: 'Total', suma: [2, 3, 4, 5] }, bare: [4] });
+  }
   if(!list.length){
     body.innerHTML = '<tr><td colspan="6"><div class="empty-state">' + t('dpNoActivities') + '</div></td></tr>';
     if(foot) foot.innerHTML=''; return;
@@ -7843,6 +7974,7 @@ function dpRenderProjects(rows){
   const cnt = document.getElementById('dpCount');
   if(cnt) cnt.textContent = fmtNum(rows.length);
   if(!rows.length){
+    __csvInreg(body, [], []);          // fără rânduri: exportul nu trebuie să mai găsească datele de dinainte
     body.innerHTML = '<tr><td colspan="7"><div class="empty-state">' + t('dpNoActivities') + '</div></td></tr>';
     return;
   }
@@ -7860,6 +7992,15 @@ function dpRenderProjects(rows){
     if(typeof va === 'string') return sd * va.localeCompare(vb, 'ro');
     return sd * (va - vb);
   });
+  __csvInregLazy(body, () => ({
+    cols: [t('dpColActivityName'), t('colDonor'), t('colYear'), t('colCommitments'), t('colDisbursements'), t('dpColAmpMatch'), __L('ID IATI', 'IATI ID')],
+    rows: sorted.map(a => {
+      const y = dpDayToYear(a.day_start), sc = iatiMatchScoreFor(a.aid);
+      return [iatiTitleLabel(a), iatiDonorLabel(a.reporting) || '', y === null ? '' : y, Math.round(a.commitment_eur || 0), Math.round(a.spend_eur || 0),
+              sc === null ? t('dpAmpMatchNone') : (sc >= 1 ? t('dpAmpMatchIdentical') : '≈ ' + Math.round(sc * 100) + '%'), a.aid || ''];
+    }),
+    opt: { tip: 'ttyeeti', total: { eticheta: 'Total', suma: [3, 4] }, linkuri: { 6: r => r[6] ? IATI_ACT_URL(r[6]) : null } }
+  }));
   const frag = document.createDocumentFragment();
   sorted.slice(0,1000).forEach(a => {
     const tr = document.createElement('tr');
@@ -7923,7 +8064,11 @@ function dpRenderMap(){
   const val = o => o ? (o[metric] || 0) : 0;
   const max = Math.max(1, ...[...agg.values()].map(val));
   __csvInreg('dpMapPanel', [__L('Țară / organizație', 'Country / organisation'), __L('Activități', 'Activities'), t('colCommitments'), t('colDisbursements')],
-    [...agg.entries()].sort((a,b)=>val(b[1])-val(a[1])).map(([c,o])=>[geoLabel(c), o.n, Math.round(o.ang), Math.round(o.deb)]));
+    [...agg.entries()].sort((a,b)=>val(b[1])-val(a[1])).map(([c,o])=>[geoLabel(c), o.n, Math.round(o.ang), Math.round(o.deb)]),
+    { tip: 'tnee', total: { eticheta: 'Total', suma: [1, 2, 3] }, bare: [metric === 'n' ? 1 : metric === 'ang' ? 2 : 3],
+      grafic: { tip: 'bar', cat: 0, serii: [metric === 'n' ? 1 : metric === 'ang' ? 2 : 3], n: 15,
+                culori: [metric === 'ang' ? __CUL_ANG : __CUL_DEB],
+                titlu: __L('Top 15 țări / organizații · ', 'Top 15 countries / organisations · ') + (metric === 'n' ? __L('Activități', 'Activities') : metric === 'ang' ? t('colCommitments') : t('colDisbursements')) } });
   const scalaMaxDp = document.getElementById('dpScalaMax');
   if (scalaMaxDp) scalaMaxDp.textContent = metric === 'n' ? fmtNum(max) : geoBani(max) + ' EUR';
   const lbl = document.getElementById('dpScalaLbl');
@@ -8552,6 +8697,7 @@ function legaturiRender(){
     if(R.length > LEG.limit) h += '<tr><td colspan="5" class="mai-mult-td"><button type="button" class="mai-mult-btn" id="legMaiMult">' + esc(t('legMaiMult').replace('{n}', Math.min(50, R.length - LEG.limit))) + '</button></td></tr>';
     corp.innerHTML = h || '<tr><td colspan="5" class="leg-sub" style="padding:16px;">' + esc(t('legNimic')) + '</td></tr>';
   }
+  __csvInregLazy(corp, legTabelExcel);
   legPanouConfirmari();
 }
 /* Confirmări: se țin în browser până sunt puse în date/legaturi_amp.json. */
@@ -8570,24 +8716,44 @@ function legComuta(id){
   const r = [...document.querySelectorAll('#legCorp tr.leg-rand')].filter(x => x.dataset.id === id)[0];
   if(r) r.focus();                    // redesenarea înlocuiește rândul: păstrăm focusul pentru tastatură
 }
-function legCsv(){
-  const en = currentLang === 'en', q = v => { v = String(v == null ? '' : v); return /[;"\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-  const cap = en ? ['Agreement', 'Funders', 'Type', 'Signed', 'Agreement amount (EUR)', 'Amount in original currency', 'Link status', 'AMP ID', 'AMP project', 'AMP donors', 'AMP commitments (EUR)', 'AMP disbursements (EUR)', 'Disbursed / agreement amount', 'Candidate projects', 'Notes', 'Acts', 'Register link']
-                 : ['Acord', 'Finanțatori', 'Tip', 'Semnat', 'Suma acordului (EUR)', 'Suma în valuta originală', 'Legătura', 'AMP ID', 'Proiect AMP', 'Donatori AMP', 'Angajat în AMP (EUR)', 'Debursat în AMP (EUR)', 'Debursat / suma acordului', 'Proiecte candidate', 'Observații', 'Acte', 'Link în registru'];
-  const linii = [cap];
-  LEG.rez.rezultate.slice().sort((a, b) => LEG_RANG[a.stare] - LEG_RANG[b.stare]).forEach(x => {
+/* Tabelul „De la lege la bani" pentru Excel: toate rândurile din filtrul curent (nu doar primele 50 afișate), pe fila activă,
+   cu legături spre proiectul AMP și spre pagina acordului din registru. Îl folosesc și butonul de sub filtre, și roata panoului. */
+function legTabelExcel(){
+  const en = currentLang === 'en';
+  if(!LEG.rez) return { cols: [], rows: [] };
+  if(LEG.tab === 'proiecte'){
+    const R = legRanduriProiecte();
+    return {
+      cols: en ? ['AMP ID', 'AMP project', 'AMP donors', 'AMP commitments (EUR)', 'AMP disbursements (EUR)', 'Linked agreements', 'Agreements (link level)']
+               : ['ID AMP', 'Proiect AMP', 'Donatori AMP', 'Angajat în AMP (EUR)', 'Debursat în AMP (EUR)', 'Acorduri legate', 'Acordurile (nivelul legăturii)'],
+      rows: R.map(r => [r.id, legTitlu(r.id), r.p ? (r.p.donatori || []).join(', ') : '', r.p ? Math.round(r.p.ang) : '', r.p ? Math.round(r.p.deb) : '', r.L.length,
+                        r.L.map(z => z.acord.scurt + ' [' + t(LEG_ETICHETA[z.nivel]) + ']').join('; ')]),
+      opt: { tip: 'itteent', total: { eticheta: 'Total', suma: [3, 4] }, linkuri: { 0: r => window.ampProjectUrl && r[0] ? window.ampProjectUrl(r[0]) : null },
+             nota: [en ? 'Link level: confirmed / amount matches = sure; by title = to be verified.' : 'Nivelul legăturii: confirmat / suma se potrivește = sigur; după titlu = de verificat.'] }
+    };
+  }
+  const R = legRanduriAcorduri(), baza = new URL('legis_acorduri.html', location.href).href;
+  const rows = R.map(x => {
     const a = x.acord, l = x.legaturi[0], p = l ? LEG.pr[l.idProiect] : null, eur = a.suma && a.suma.eur;
-    linii.push([a.nume, a.parteneri, a.categorie, a.semnat, eur || '', a.suma ? a.suma.v + ' ' + a.suma.val : '', t(LEG_ETICHETA[x.stare]),
+    return [a.nume, a.parteneri, a.categorie, a.semnat || '', eur || '', a.suma ? a.suma.v + ' ' + a.suma.val : '', t(LEG_ETICHETA[x.stare]),
       l ? l.idProiect : '', l ? legTitlu(l.idProiect) : '', p ? (p.donatori || []).join(', ') : '', p ? Math.round(p.ang) : '', p ? Math.round(p.deb) : '',
-      p && eur ? (p.deb / eur).toFixed(3) : '', x.legaturi.length, l ? l.motive.map(legMotiv).join('; ') : '', a.acte.map(z => z.act).join(' '),
-      'legis_acorduri.html#acord=' + a.id]);
+      p && eur ? Math.round(p.deb / eur * 1000) / 10 : '', x.legaturi.length, l ? l.motive.map(legMotiv).join('; ') : '', a.acte.map(z => z.act).join(' · '),
+      en ? 'Open ↗' : 'Deschide ↗'];
   });
-  const text = '\ufeff' + linii.map(l => l.map(q).join(';')).join('\r\n') + '\r\n';
-  const el = document.createElement('a');
-  el.href = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
-  el.download = 'de-la-lege-la-bani-' + new Date().toISOString().slice(0, 10) + '.csv';
-  document.body.appendChild(el); el.click(); el.remove();
-  setTimeout(() => URL.revokeObjectURL(el.href), 5000);
+  return {
+    cols: en ? ['Agreement', 'Funders', 'Type', 'Signed', 'Agreement amount (EUR)', 'Amount in original currency', 'Link status', 'AMP ID', 'AMP project', 'AMP donors', 'AMP commitments (EUR)', 'AMP disbursements (EUR)', 'Disbursed / agreement amount', 'Candidate projects', 'Notes', 'Acts', 'Register link']
+             : ['Acord', 'Finanțatori', 'Tip', 'Semnat', 'Suma acordului (EUR)', 'Suma în valuta originală', 'Legătura', 'AMP ID', 'Proiect AMP', 'Donatori AMP', 'Angajat în AMP (EUR)', 'Debursat în AMP (EUR)', 'Debursat / suma acordului', 'Proiecte candidate', 'Observații', 'Acte', 'Link în registru'],
+    rows: rows,
+    opt: { tip: 'tttzettitteepnttt',
+           linkuri: { 7: r => window.ampProjectUrl && r[7] ? window.ampProjectUrl(r[7]) : null, 16: (r, i) => baza + '#acord=' + encodeURIComponent(R[i].acord.id) },
+           nota: [en ? 'Link status: confirmed / amount matches = sure; by title = to be verified; none = no AMP project found. “Disbursed / agreement amount” is in percent.'
+                     : 'Legătura: confirmată / suma se potrivește = sigură; după titlu = de verificat; fără = nu s-a găsit proiect AMP. „Debursat / suma acordului” e în procente.'] }
+  };
+}
+function legXlsx(ev){
+  const d = legTabelExcel();
+  return window.__xlsxDirect({ titlu: currentLang === 'en' ? 'From law to money' : 'De la lege la bani', nume: 'de-la-lege-la-bani', vedere: 'legaturiView',
+    cols: d.cols, rows: d.rows, opt: d.opt, btn: ev && ev.currentTarget });
 }
 (function(){
   const sel = id => document.getElementById(id);
@@ -8595,7 +8761,7 @@ function legCsv(){
   sel('legSearch').addEventListener('input', refa);
   sel('legNivel').addEventListener('change', refa);
   sel('legPartener').addEventListener('change', refa);
-  sel('legCsvBtn').addEventListener('click', () => { if(LEG.rez) legCsv(); });
+  sel('legCsvBtn').addEventListener('click', e => { if(LEG.rez) legXlsx(e); });
   sel('legStatus').addEventListener('click', e => {
     if(!e.target.closest('#legReincearca')) return;
     LEG.incarcare = null; LEG.eroare = null; LEG.date = null; LEG.rez = null; LEG.semn = '';
@@ -9130,7 +9296,7 @@ Object.assign(I18N.ro, {
  "iatiOnlyMatches": "arată doar proiectele cu potrivire",
  "iatiOnlyDiff": "doar unde debursările diferă",
  "iatiOnlyDiffTitle": "Proiectele potrivite la care debursările din AMP și cele din IATI diferă cu peste 1% (și cu peste 1.000 EUR), de la diferența cea mai mare",
- "iatiDiffCsvBtn": "Descarcă diferențele (CSV)",
+ "iatiDiffCsvBtn": "Descarcă diferențele (Excel)",
  "legH1": "De la lege la bani",
  "legTitle": "De la lege la bani: acordurile legate de proiectele din AMP",
  "legIntro": "Fiecare acord din registrul de acorduri e căutat printre proiectele din AMP: după denumire, după finanțator și după sumă. O legătură e socotită sigură doar când suma acordului coincide cu angajamentele proiectului (cel mult 15% diferență) sau când a confirmat-o un om. Restul sunt „de verificat”: de obicei sunt faze diferite ale aceluiași program sau înregistrări parțiale în AMP, iar banii unui proiect nu se pun pe un acord doar fiindcă are un nume asemănător. „Fără proiect” nu înseamnă că proiectul lipsește din AMP, ci că nu l-am putut recunoaște după denumire.",
@@ -9138,7 +9304,7 @@ Object.assign(I18N.ro, {
  "legTabAcorduri": "Pe acorduri",
  "legTabProiecte": "Pe proiecte",
  "legSearchPh": "Caută după denumire, finanțator, act sau AMP ID...",
- "legCsvBtn": "Descarcă tabelul (CSV)",
+ "legCsvBtn": "Descarcă tabelul (Excel)",
  "legPanouTitlu": "Confirmări în pregătire",
  "legPanouText": "Alegerile tale (confirmări, respingeri) rămân doar în acest browser. Ca să apară pentru toți, copiază textul de mai jos în fișierul date/legaturi_amp.json din repository și publică-l.",
  "legCopiaJson": "Copiază JSON",
@@ -9308,7 +9474,7 @@ Object.assign(I18N.en, {
  "iatiOnlyMatches": "show only projects with a match",
  "iatiOnlyDiff": "only where disbursements differ",
  "iatiOnlyDiffTitle": "Matched projects whose AMP and IATI disbursements differ by more than 1% (and by more than EUR 1,000), largest difference first",
- "iatiDiffCsvBtn": "Download the differences (CSV)",
+ "iatiDiffCsvBtn": "Download the differences (Excel)",
  "legH1": "From law to money",
  "legTitle": "From law to money: agreements linked to AMP projects",
  "legIntro": "Every agreement in the agreements register is looked up among the AMP projects: by name, by funder and by amount. A link is treated as secure only when the agreement amount matches the project’s commitments (at most 15% apart) or a person has confirmed it. The rest are “to verify”: usually different phases of the same programme or partial records in AMP, and a project’s money is not put on an agreement just because the names are alike. “No project” does not mean the project is missing from AMP, only that it could not be recognised by name.",
@@ -9316,7 +9482,7 @@ Object.assign(I18N.en, {
  "legTabAcorduri": "By agreement",
  "legTabProiecte": "By project",
  "legSearchPh": "Search by name, funder, act or AMP ID...",
- "legCsvBtn": "Download the table (CSV)",
+ "legCsvBtn": "Download the table (Excel)",
  "legPanouTitlu": "Confirmations in progress",
  "legPanouText": "Your choices (confirmations, rejections) stay in this browser only. To make them visible to everyone, copy the text below into date/legaturi_amp.json in the repository and publish it.",
  "legCopiaJson": "Copy JSON",
@@ -9988,10 +10154,10 @@ loadLiveData();
 </script>
 <script src="fisa-donator.js"></script>
 <script src="amp-linkuri.js"></script>
-<!-- ?v= se schimbă la fiecare modificare a lui unelte.js, ca browserele să nu folosească
+<!-- ?v= se schimbă la fiecare modificare a lui unelte.js (și a lui xlsx-stil.js, încărcat de el), ca browserele să nu folosească
      versiunea veche din memoria cache (GitHub Pages o păstrează până la 10 minute) -->
 <script src="legatura-amp.js?v=2026-10-07"></script>
-<script src="unelte.js?v=2026-10-02b"></script>
+<script src="unelte.js?v=2026-10-12"></script>
 
 </body>
 </html>

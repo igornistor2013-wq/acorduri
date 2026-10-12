@@ -1,5 +1,7 @@
 /* unelte.js — unelte adăugate peste pagina principală (index.html):
-     · pe fiecare panou: „📋 Copiază" (imaginea panoului) și „⬇ CSV" (datele lui);
+     · pe fiecare panou, în meniul ⚙: „📋 Copiază" (imaginea panoului), „📊 Excel" (datele lui, într-un
+       fișier .xlsx formatat, cu titlu, context, totaluri și, unde are sens, grafic Excel nativ — scris de
+       xlsx-stil.js) și „⬇ CSV" (aceleași date, brute);
      · în antet: indicatorul de prospețime a datelor, „🔗 Copiază linkul" către
        selecția curentă și „📄 Raport PDF" pe o pagină;
      · în „Analize avansate": comparația între două perioade.
@@ -11,6 +13,8 @@
 
 const en = () => (typeof currentLang !== 'undefined' && currentLang === 'en');
 const L = (ro, eng) => en() ? eng : ro;
+/* Versiunea din adresa acestui script (unelte.js?v=…): o punem și pe xlsx-stil.js, ca să nu rămână în cache o variantă veche. */
+const VERSIUNE = (document.currentScript && (/[?&]v=([^&]+)/.exec(document.currentScript.src) || [])[1]) || '';
 
 /* ---------------------------------------------------------------- stiluri */
 const css = document.createElement('style');
@@ -124,19 +128,24 @@ function titluPanou(panel){
 
 /* ============================================================ butoanele de pe panouri */
 // panouri care nu sunt diagrame: filtre, export, antetul verificării IATI, tabelul de sub hartă
+// (legTitle și legPanouTitlu: introducerea și panoul de confirmări din „De la lege la bani" — text, nu date)
 const EXCLUSE = ['mapCountryProjectsTitle', 'yearFilterTitle', 'donorFilterTitle', 'exportTitle',
-                 'exportColumnsTitle', 'exportPreviewTitle', 'iatiCheckTitle'];
+                 'exportColumnsTitle', 'exportPreviewTitle', 'iatiCheckTitle', 'legTitle', 'legPanouTitlu'];
 const ET = {
   ok:    () => L('✓ Copiat', '✓ Copied'),
   dl:    () => L('✓ Descărcat', '✓ Downloaded'),
   err:   () => L('✗ Eroare', '✗ Error'),
   gol:   () => L('Fără date', 'No data'),
   lucru: () => '⏳',
-  roata: () => L('Opțiuni: copiază imaginea sau descarcă datele (CSV)', 'Options: copy the image or download the data (CSV)'),
+  roata: () => L('Opțiuni: copiază imaginea sau descarcă datele (Excel, CSV)', 'Options: copy the image or download the data (Excel, CSV)'),
   copy:  () => L('Copiază ca imagine', 'Copy as image'),
   copySub: () => L('PNG, gata de lipit în Word sau e-mail', 'PNG, ready to paste into Word or email'),
-  csv:   () => L('Descarcă datele (CSV)', 'Download the data (CSV)'),
-  csvSub:  () => L('sumele exacte · se deschide în Excel', 'exact amounts · opens in Excel')
+  xlsx:  () => L('Descarcă Excel (.xlsx)', 'Download Excel (.xlsx)'),
+  xlsxSub: grafic => grafic
+    ? L('formatat, cu filtre și grafic Excel editabil', 'formatted, with filters and an editable Excel chart')
+    : L('formatat, cu filtre · gata de folosit', 'formatted, with filters · ready to use'),
+  csv:   () => L('Date brute (CSV)', 'Raw data (CSV)'),
+  csvSub:  () => L('fără formatare · pentru alte programe de analiză', 'unformatted · for other analysis tools')
 };
 /* Roata dințată (contur simplu, desenat cu stroke ca restul iconițelor din pagină) */
 const ROATA = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" ' +
@@ -241,7 +250,11 @@ function dinBare(bare){
   return rows.length ? { cols: [L('Nume', 'Name'), L('Valoare', 'Value')], rows: rows } : null;
 }
 function dateCsv(panel){
-  if(panel.__dateCsv) return panel.__dateCsv;
+  /* Un panou cu date scumpe de calculat (lista acordurilor, diferențele AMP–IATI) își înregistrează o
+     funcție, nu datele: se apelează abia la export. */
+  let reg = panel.__dateCsv;
+  if(typeof reg === 'function'){ try{ reg = reg(); }catch(e){ console.warn('date panou:', e); reg = null; } }
+  if(reg) return reg;
   const tabele = [...panel.querySelectorAll('table')];
   const tab = tabele.find(tb => tb.offsetParent !== null) || tabele[0];
   if(tab){ const d = dinTabel(tab); if(d) return d; }
@@ -260,6 +273,207 @@ function csvPanou(panel, btn){
   }catch(err){ console.warn('CSV:', err); rezultat(btn, ET.err()); }
 }
 
+/* ============================================================ Excel stilizat (.xlsx)
+   Aceleași date ca la CSV (panel.__dateCsv, puse de __csvInreg în index.html), dar într-un fișier
+   formatat: titlu, rând de context (sursă, selecția activă, data), antet cu filtre, formate de număr,
+   total, note și — unde are sens — un grafic Excel nativ. Fișierul îl scrie xlsx-stil.js, încărcat abia
+   la primul export. Opțiunile fiecărui panou (tipurile coloanelor, totalul, graficul) vin din
+   __csvInreg(…, opt); fără ele, tipurile se ghicesc din valori. */
+let libXlsx = null;
+function incarcaXlsxStil(){
+  if(window.XlsxStil) return Promise.resolve(window.XlsxStil);
+  if(!libXlsx) libXlsx = new Promise((ok, fail) => {
+    const sc = document.createElement('script');
+    sc.src = 'xlsx-stil.js' + (VERSIUNE ? '?v=' + VERSIUNE : '');
+    sc.onload = () => window.XlsxStil ? ok(window.XlsxStil) : fail(new Error('xlsx-stil.js nu definește XlsxStil'));
+    sc.onerror = () => { libXlsx = null; fail(new Error('xlsx-stil.js nu s-a încărcat')); };
+    document.head.appendChild(sc);
+  });
+  return libXlsx;
+}
+window.__incarcaXlsxStil = incarcaXlsxStil;
+
+function oraGenerarii(){
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear() + ', ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+window.__oraGenerarii = oraGenerarii;
+function sursaAmp(){
+  const st = (typeof lastStatus !== 'undefined' && lastStatus) ? lastStatus.kind : '';
+  const baza = L('AMP (Aid Management Platform): arhiva 1993–2022', 'AMP (Aid Management Platform): 1993–2022 archive');
+  if(st === 'ok') return baza + L(' + raportul live, preluat ', ' + live report, fetched ') + __oraScurta(window.__liveLaOra);
+  if(st === 'loading') return baza + L(' (datele live încă se încărcau)', ' (live data was still loading)');
+  return baza + L(' (datele live nu au fost disponibile)', ' (live data was unavailable)');
+}
+function sursaIati(){
+  const data = (typeof IATI_FETCH_DATE !== 'undefined' && IATI_FETCH_DATE) ? IATI_FETCH_DATE : '';
+  return 'IATI d-portal (d-portal.org)' + (data ? L(', date preluate la ', ', data fetched on ') + data : '');
+}
+/* Valoarea unui control (listă, câmp de căutare, bifă) doar dacă s-a atins: primul element al
+   listelor e „toți / toate", deci nu-l spunem. */
+function valoareControl(id){
+  const el = document.getElementById(id);
+  if(!el) return '';
+  if(el.type === 'checkbox') return el.checked ? (el.parentElement ? el.parentElement.textContent : '').replace(/\s+/g, ' ').trim() : '';
+  if(el.tagName === 'SELECT') return el.selectedIndex > 0 ? el.options[el.selectedIndex].textContent.replace(/\s+/g, ' ').trim() : '';
+  return String(el.value || '').trim();
+}
+function selectieDportal(){
+  const sel = [];
+  if(dpState.naYear) sel.push(L('Ani: an nespecificat', 'Years: year unspecified'));
+  else if(dpState.years && dpState.years.size) sel.push(L('Ani: ', 'Years: ') + [...dpState.years].sort((a, b) => a - b).join(', '));
+  else sel.push(L('Ani: toți', 'Years: all'));
+  if(typeof dpToti === 'function' && dpToti()) sel.push(L('Donatori: toți', 'Donors: all'));
+  else if(dpState.donors){
+    const nume = [...dpState.donors].map(iatiDonorLabel);
+    sel.push(L('Donatori: ', 'Donors: ') + (nume.length <= 4 ? nume.join(', ') : nume.slice(0, 3).join(', ') + ' … (' + nume.length + ')'));
+  }
+  const q = (dpState.search || '').trim();
+  if(q) sel.push(L('Căutare: „', 'Search: “') + q + '”');
+  if(dpState.onlyAmpMatches) sel.push(L('doar activitățile cu potrivire în AMP', 'only activities matched in AMP'));
+  if(dpState.mapSelected && dpState.mapSelected.size){
+    const t = [...dpState.mapSelected].map(geoLabel);
+    sel.push(L('Țări selectate pe hartă: ', 'Countries selected on the map: ') + (t.length <= 4 ? t.join(', ') : t.slice(0, 3).join(', ') + ' …'));
+  }
+  return sel;
+}
+function selectieIati(){
+  const sel = [], pr = valoareControl('iatiThreshold'), q = valoareControl('iatiSearchInput');
+  if(pr) sel.push(L('Prag de potrivire: ', 'Match threshold: ') + pr);
+  if(q) sel.push(L('Căutare: „', 'Search: “') + q + '”');
+  if(valoareControl('iatiOnlyMatches')) sel.push(L('doar proiectele cu potrivire', 'only matched projects'));
+  const dif = document.getElementById('iatiOnlyDiff');
+  if(dif && dif.checked) sel.push(L('doar proiectele cu diferențe', 'only projects with differences'));
+  return sel;
+}
+function selectieLegaturi(){
+  const sel = [], q = valoareControl('legSearch'), niv = valoareControl('legNivel'), par = valoareControl('legPartener');
+  const tabProiecte = document.getElementById('legTabProiecte');
+  sel.push(tabProiecte && tabProiecte.classList.contains('activ') ? L('Vedere: pe proiecte', 'View: by project') : L('Vedere: pe acorduri', 'View: by agreement'));
+  if(q) sel.push(L('Căutare: „', 'Search: “') + q + '”');
+  if(niv) sel.push(L('Legătura: ', 'Link: ') + niv);
+  if(par) sel.push(L('Finanțator: ', 'Funder: ') + par);
+  return sel;
+}
+function cheiePanou(panel){
+  const h = panel.querySelector('.panel-head h2');
+  if(!h) return '';
+  const sp = h.querySelector('[data-i18n]');
+  return sp ? sp.getAttribute('data-i18n') : (panel.id || '');
+}
+/* [sursa, selecția] pentru rândul de context. Graficele din „Analize avansate" lucrează pe toate
+   proiectele (nu depind de filtrele din pagina principală), iar câteva au filtre proprii. */
+function contextPanou(panel, cheie){
+  return contextVedere((panel.closest('#mainView, #advancedView, #updateView, #iatiView, #dportalView, #legaturiView') || {}).id || 'mainView', cheie);
+}
+function contextVedere(vedere, cheie){
+  if(vedere === 'dportalView') return { vedere: vedere, sursa: sursaIati(), selectie: selectieDportal() };
+  if(vedere === 'iatiView') return { vedere: vedere, sursa: sursaAmp() + L(' · comparat cu ', ' · compared with ') + 'IATI d-portal', selectie: selectieIati() };
+  if(vedere === 'legaturiView') return { vedere: vedere, sursa: L('Monitorul Oficial, legis.md și AMP', 'Monitorul Oficial, legis.md and AMP'), selectie: selectieLegaturi() };
+  const sel = [];
+  if(vedere === 'mainView'){
+    sel.push(L('Ani: ', 'Years: ') + aniText());
+    sel.push(L('Donatori: ', 'Donors: ') + donatoriText());
+    const q = (state.projSearch || '').trim();
+    if(cheie === 'projectsListTitle' && q) sel.push(L('Căutare: „', 'Search: “') + q + '”');
+  } else if(cheie === 'advRegionTitle'){
+    [['regionYearFilter', L('An', 'Year')], ['regionDonorFilter', L('Donator', 'Donor')], ['regionToaFilter', L('Tip de asistență', 'Type of assistance')],
+     ['regionRaionFilter', L('Raion', 'District')]].forEach(([id, et]) => { const v = valoareControl(id); if(v) sel.push(et + ': ' + v); });
+    if(!sel.length) sel.push(L('Toate proiectele din AMP', 'All AMP projects'));
+  } else if(cheie === 'advOngoingTitle'){
+    if(typeof ongoingYear !== 'undefined' && ongoingYear) sel.push(L('Anul: ', 'Year: ') + ongoingYear);
+    const dn = valoareControl('ongoingDonorFilter');
+    if(dn) sel.push(L('Donator: ', 'Donor: ') + dn);
+  } else {
+    sel.push(L('Toate proiectele din AMP (analizele avansate nu folosesc filtrele din pagina principală)', 'All AMP projects (the advanced analyses do not use the main-page filters)'));
+  }
+  return { vedere: vedere, sursa: sursaAmp(), selectie: sel };
+}
+/* Notele panoului, citite din pagină (sunt deja în limba aleasă), fără cele care trimit la meniul ⚙. */
+function noteDinPanou(panel){
+  const note = [];
+  panel.querySelectorAll(':scope > .panel-note, :scope > .chart-note').forEach(el => {
+    const t = (el.textContent || '').replace(/\s+/g, ' ').trim();
+    if(t && t.indexOf('⚙') < 0 && note.indexOf(t) < 0) note.push(t.charAt(0).toUpperCase() + t.slice(1));
+  });
+  return note;
+}
+/* „extra" (opțional) servește exporturilor care nu pornesc dintr-un panou, de pildă butoanele de sub tabele:
+   { titlu, vedere, cheie, nume }. Atunci titlul, vederea (de unde vin sursa și selecția) și cheia vin de acolo. */
+function specExcel(X, panel, d, extra){
+  extra = extra || {};
+  const opt = d.opt || {}, cheie = extra.cheie || (panel ? cheiePanou(panel) : '');
+  const titlu = extra.titlu || (panel ? titluPanou(panel) : '') || L('Date', 'Data');
+  const nC = d.cols.length;
+  const tipuri = (typeof opt.tip === 'string' && opt.tip.length === nC) ? opt.tip : X.deduceTipuri(d.cols, d.rows);
+  const baza = panel ? contextPanou(panel, cheie) : contextVedere(extra.vedere || 'mainView', cheie);
+  const ctx = opt.context ? { vedere: baza.vedere, sursa: baza.sursa, selectie: opt.context } : baza;
+  const cuSume = /[exs]/.test(tipuri);
+  const subtitlu = [L('Asistență externă pentru Republica Moldova', 'External assistance to the Republic of Moldova'),
+    L('Sursa: ', 'Source: ') + ctx.sursa].concat(ctx.selectie).concat(cuSume ? [L('sume în EUR', 'amounts in EUR')] : [])
+    .concat([L('Generat: ', 'Generated: ') + oraGenerarii()]).join(' · ');
+  /* Linkul din note: cu aceeași selecție de ani și donatori doar pentru vederile care o folosesc. */
+  const dinPagina = ctx.vedere === 'mainView' || ctx.vedere === 'advancedView';
+  let link = location.href;
+  if(dinPagina){ try{ link = linkSelectie(); }catch(e){} }
+  const note = (opt.nota || []).filter(Boolean).concat(panel ? noteDinPanou(panel) : []);
+  note.push({ t: dinPagina && ctx.vedere === 'mainView' ? L('Deschide dashboardul cu aceeași selecție ↗', 'Open the dashboard with the same selection ↗')
+                                                       : L('Deschide pagina în dashboard ↗', 'Open the page in the dashboard ↗'), u: link });
+  let grafic = null;
+  if(opt.grafic && d.rows.length > 1){
+    const g = opt.grafic, nr = d.rows.length - (opt.totalFinal ? 1 : 0) - (g.fara || 0);
+    grafic = Object.assign({}, g, { titlu: g.titlu || titlu });
+    if(g.n && g.n < nr && g.titlu === undefined) grafic.titlu += ' — ' + L('primele ', 'top ') + g.n;
+  }
+  /* Totalul poate veni în trei feluri: formule (opt.total), un rând dat gata doar pentru Excel (opt.randTotal)
+     sau ultimul rând din date, care apare și în CSV (opt.totalFinal). */
+  let randuri = d.rows, randTotal = !!opt.totalFinal;
+  if(Array.isArray(opt.randTotal) && !opt.total && !opt.totalFinal){ randuri = d.rows.concat([opt.randTotal]); randTotal = true; }
+  return {
+    limba: en() ? 'en' : 'ro', foaie: titlu.split(' · ')[0], titlu: titlu, subtitlu: subtitlu, antete: d.cols, tipuri: tipuri, randuri: randuri,
+    total: opt.total || null, randTotal: randTotal, note: note, bare: opt.bare, harta: opt.harta, linkuri: opt.linkuri, latimi: opt.latimi,
+    grafic: grafic, subsol: location.host, autor: location.host || 'nistor.vivi.md'
+  };
+}
+async function xlsxPanou(panel, btn){
+  if(window.__introRunning && typeof finishIntro === 'function') finishIntro();
+  btn.disabled = true;
+  rezultat(btn, ET.lucru());
+  try{
+    const d = dateCsv(panel);
+    if(!d || !d.rows || !d.rows.length){ rezultat(btn, ET.gol()); return; }
+    const X = await incarcaXlsxStil();
+    const blob = await X.construieste(specExcel(X, panel, d));
+    descarca(blob, slug(titluPanou(panel)) + '-' + dataAzi() + '.xlsx');
+    rezultat(btn, ET.dl());
+  }catch(err){ console.warn('Excel:', err); rezultat(btn, ET.err()); }
+  finally{ btn.disabled = false; }
+}
+
+/* Export Excel pentru butoanele din afara panourilor (diferențele AMP–IATI, sumele în afara anilor, „De la lege la bani"):
+     window.__xlsxDirect({ titlu, nume, vedere, cols, rows, opt, btn }) → Promise<true|false>
+   „vedere" spune de unde se iau sursa și selecția din rândul de context (mainView, iatiView, legaturiView…). */
+window.__xlsxDirect = async function(o){
+  const btn = o.btn, orig = btn ? btn.textContent : '';
+  const arata = text => {
+    if(!btn) return;
+    btn.textContent = text; clearTimeout(btn._t);
+    if(text !== ET.lucru()) btn._t = setTimeout(() => { if(btn.textContent === text) btn.textContent = orig; }, 2200);
+  };
+  try{
+    if(!o.rows || !o.rows.length){ arata(ET.gol()); return false; }
+    if(btn) btn.disabled = true;
+    arata(ET.lucru());
+    const X = await incarcaXlsxStil();
+    const d = { cols: o.cols, rows: o.rows, opt: o.opt || null };
+    const blob = await X.construieste(specExcel(X, null, d, { titlu: o.titlu, vedere: o.vedere, cheie: o.cheie }));
+    descarca(blob, (o.nume || slug(o.titlu)) + '-' + dataAzi() + '.xlsx');
+    arata(ET.dl());
+    return true;
+  }catch(err){ console.warn('Excel:', err); arata(ET.err()); return false; }
+  finally{ if(btn) btn.disabled = false; }
+};
+
 /* --- Meniul roții: unul singur pentru toată pagina, așezat în <body> cu poziție
    fixă, ca să nu fie tăiat de marginile rotunjite (overflow) ale panoului. */
 let meniu = null, roataDeschisa = null;
@@ -273,7 +487,9 @@ function construiesteMeniu(){
     const btn = roataDeschisa, panel = btn.closest('.panel');
     inchideMeniu(false);
     btn.focus();
-    if(item.dataset.actiune === 'copiaza') copiazaPanou(panel, btn);
+    const act = item.dataset.actiune;
+    if(act === 'copiaza') copiazaPanou(panel, btn);
+    else if(act === 'xlsx') xlsxPanou(panel, btn);
     else csvPanou(panel, btn);
   });
   meniu.addEventListener('keydown', e => {
@@ -289,7 +505,11 @@ function construiesteMeniu(){
     if(roataDeschisa && !meniu.contains(e.target) && !roataDeschisa.contains(e.target)) inchideMeniu(false);
   }, true);
   document.addEventListener('keydown', e => { if(e.key === 'Escape' && roataDeschisa) inchideMeniu(true); });
-  window.addEventListener('scroll', () => { if(roataDeschisa) inchideMeniu(false); }, true);
+  /* Se închide doar când derulează pagina (meniul are poziție fixă sub roată). O derulare în interiorul unui
+     tabel sau al unei diagrame nu mută roata, deci nu are de ce să-l închidă. */
+  window.addEventListener('scroll', e => {
+    if(roataDeschisa && (e.target === document || e.target === document.documentElement || e.target === document.body)) inchideMeniu(false);
+  }, true);
   window.addEventListener('resize', () => { if(roataDeschisa) inchideMeniu(false); });
 }
 function deschideMeniu(btn, dinTastatura){
@@ -297,7 +517,10 @@ function deschideMeniu(btn, dinTastatura){
   const item = (act, ico, titlu, sub) =>
     '<button type="button" role="menuitem" data-actiune="' + act + '"><span class="mp-ico" aria-hidden="true">' + ico + '</span>' +
     '<span><b>' + esc(titlu) + '</b><small>' + esc(sub) + '</small></span></button>';
-  meniu.innerHTML = item('copiaza', '📋', ET.copy(), ET.copySub()) + item('csv', '⬇', ET.csv(), ET.csvSub());
+  const reg = btn.closest('.panel') && btn.closest('.panel').__dateCsv;
+  const cuGrafic = !!(reg && typeof reg === 'object' && reg.opt && reg.opt.grafic && reg.rows && reg.rows.length > 1);
+  meniu.innerHTML = item('copiaza', '📋', ET.copy(), ET.copySub()) + item('xlsx', '📊', ET.xlsx(), ET.xlsxSub(cuGrafic)) +
+    item('csv', '⬇', ET.csv(), ET.csvSub());
   meniu.classList.add('deschis');
   roataDeschisa = btn;
   btn.setAttribute('aria-expanded', 'true');
@@ -694,9 +917,6 @@ window.renderComparatie = function(){
   const numeDim = cmp.d === 'donor' ? t('colDonor') : cmp.d === 'sector' ? 'Sector' : L('Beneficiar', 'Beneficiary');
   const numeM = cmp.m === 'ang' ? L('Angajamente', 'Commitments') : L('Debursări', 'Disbursements');
 
-  __csvInreg(body, [numeDim, numeM + ' ' + etA + ' (EUR)', numeM + ' ' + etB + ' (EUR)', L('Diferență (EUR)', 'Difference (EUR)'), L('Variație (%)', 'Change (%)')],
-    randuri.map(r => { const p = varPct(r.a, r.b); return [etich(r.k), Math.round(r.a), Math.round(r.b), Math.round(r.d), p === null ? '' : Math.round(p * 10) / 10]; }));
-
   const dif = totB - totA, pTot = varPct(totA, totB);
   const cls = v => v > 0 ? 'cmp-sus' : v < 0 ? 'cmp-jos' : '';
   const pctTxt = p => p === null ? L('nou', 'new') : semn(p, Math.abs(p).toFixed(1).replace('.', en() ? '.' : ',') + '%');
@@ -731,7 +951,7 @@ window.renderComparatie = function(){
         'Amounts are placed in the year they were actually committed or disbursed (the AMP financial year); "projects" = projects with amounts in the period.')
     : L('Fiecare proiect intră cu toate sumele lui în anul de început, ca în restul paginii — perioadele recente par mai mici, pentru că proiectele lor încă debursează.',
         'Each project counts with all its amounts in its start year, as on the rest of the page — recent periods look smaller because their projects are still disbursing.'));
-  note.push(L('Primele 15 după diferența absolută; din ⚙ se descarcă lista completă (CSV).', 'Top 15 by absolute difference; the ⚙ menu downloads the full list (CSV).'));
+  note.push(L('Primele 15 după diferența absolută; din ⚙ se descarcă lista completă (Excel sau CSV).', 'Top 15 by absolute difference; the ⚙ menu downloads the full list (Excel or CSV).'));
   if((a2 - a1) !== (b2 - b1)) note.push(L('Perioadele au lungimi diferite (' + (a2 - a1 + 1) + ' vs ' + (b2 - b1 + 1) + ' ani) — se compară sume totale, nu medii anuale.',
                                           'The periods differ in length (' + (a2 - a1 + 1) + ' vs ' + (b2 - b1 + 1) + ' years) — totals are compared, not yearly averages.'));
   if(Math.max(a2, b2) >= new Date().getFullYear()) note.push(L('Anul ' + new Date().getFullYear() + ' e în curs, deci datele lui sunt incomplete.',
@@ -744,6 +964,16 @@ window.renderComparatie = function(){
           'A project with several sectors appears under each sector; the totals above count it once.')
       : L('Un proiect cu mai mulți beneficiari apare la fiecare beneficiar; totalurile de sus îl numără o singură dată.',
           'A project with several beneficiaries appears under each beneficiary; the totals above count it once.'));
+  /* Datele pentru Excel / CSV: lista completă, nu doar primele 15. Totalul numără fiecare proiect o singură dată. */
+  __csvInreg(body, [numeDim, numeM + ' ' + etA + ' (EUR)', numeM + ' ' + etB + ' (EUR)', L('Diferență (EUR)', 'Difference (EUR)'), L('Variație (%)', 'Change (%)')],
+    randuri.map(r => { const p = varPct(r.a, r.b); return [etich(r.k), Math.round(r.a), Math.round(r.b), Math.round(r.d), p === null ? '' : Math.round(p * 10) / 10]; }),
+    { tip: 'teexv', randTotal: randuri.length ? [t('totalUniqueRow'), Math.round(totA), Math.round(totB), Math.round(dif), pTot === null ? '' : Math.round(pTot * 10) / 10] : null,
+      context: [L('Perioada A: ', 'Period A: ') + etA, L('Perioada B: ', 'Period B: ') + etB, numeM,
+                cmp.baza === 'fin' ? L('pe anul financiar', 'by financial year') : L('pe anul de început al proiectului', 'by project start year'),
+                L('Toate proiectele din AMP', 'All AMP projects')],
+      nota: note.filter(x => x.indexOf('⚙') < 0),
+      grafic: { tip: 'bar', cat: 0, serii: [1, 2], n: 15, culori: [__CUL_ANG, __CUL_DEB],
+                titlu: L('Primele 15 după diferența absolută', 'Top 15 by absolute difference') } });
   const nota = document.getElementById('cmpNota');
   if(nota) nota.textContent = note.join(' ');
 };

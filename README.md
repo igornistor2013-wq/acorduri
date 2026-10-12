@@ -128,8 +128,9 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `despre.html` | Despre date și metodologie: surse, termeni, calcule, limite, date deschise, RSS (în română și engleză) |
 | `date_deschise.py` | Scrie `date/acorduri_monitor.csv/.json`, `date/acorduri_legis.csv/.json`, `date/cautare.json` (indexul căutării), `rss.xml`, `sitemap.xml` și `date/stare.json` (data ultimei verificări, citită de registrul legis.md la deschidere); rulat de `monitor.yml`. Categoria din fișierele CSV/JSON ține cont de deciziile de mână din `date/categorii_manual.json`, ca în pagini. Doar `date/stare.json` se schimbă în fiecare zi; celelalte, când apar acte noi |
 | `robots.txt` | Indică motoarelor de căutare harta site-ului (`sitemap.xml`) |
-| `xlsx.min.js` | Biblioteca SheetJS pentru Excel, încărcată doar la descărcare (nu la fiecare deschidere a paginii) |
-| `unelte.js` | Roata dințată de pe fiecare panou (meniu cu „Copiază ca imagine" și „Descarcă datele (CSV)"), linkul care păstrează filtrele (`?ani=…&don=…`), raportul PDF pe o pagină, indicatorul de prospețime a datelor și comparația între perioade din „Analize avansate" |
+| `xlsx.min.js` | Biblioteca SheetJS, încărcată doar la descărcare (nu la fiecare deschidere a paginii): pentru butonul „Export” (proiectele cu filtre și coloane alese) și pentru exportul rapid IATI. Graficele și tabelele din panouri se scriu cu `xlsx-stil.js` |
+| `unelte.js` | Roata dințată de pe fiecare panou (meniu cu „Copiază ca imagine", „Descarcă Excel (.xlsx)" și „Date brute (CSV)"; construiește foaia Excel din datele pe care panoul le-a înregistrat, vezi secțiunea „Exporturile Excel"), linkul care păstrează filtrele (`?ani=…&don=…`), raportul PDF pe o pagină, indicatorul de prospețime a datelor și comparația între perioade din „Analize avansate" |
+| `xlsx-stil.js` | Scriitorul de fișiere `.xlsx` (ZIP + XML, fără bibliotecă): titlu și context, antet cu filtre, formate de număr, dungi, bare în celule, scară de culoare, rând de total cu formule `SUBTOTAL`, hyperlinkuri, note și grafic Excel nativ. Încărcat la primul export (`unelte.js` îl cere cu aceeași versiune `?v=` ca el) |
 | `html2canvas.min.js` | Biblioteca html2canvas, care transformă un panou în imagine; încărcată doar la primul „Copiază" sau „Raport PDF" |
 | `favicon.svg`, `apple-touch-icon.png`, `og.png`, `404.html` | Iconița site-ului (logoul: harta Moldovei cu cele trei fluxuri), iconița pentru ecranul telefonului, imaginea de previzualizare a linkurilor, pagina „nu există” |
 | `donatori.html` | Redirecționare către `index.html`, pentru linkurile vechi |
@@ -156,6 +157,7 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `gov_sume.py` | Sumele acordurilor din notele de argumentare ale Guvernului: citește de pe gov.md ordinea de zi a fiecărei ședințe și, pentru punctele despre acorduri, PDF-ul notei („Aspectul financiar”). Rulat zilnic de `.github/workflows/sume.yml`; rezultatul, `date/gov_sume.json`, e citit de pagina Acorduri la deschidere (sumele marcate cu G). Ședințele din ultimele zece zile se recitesc la fiecare rulare, fiindcă ordinea de zi se completează până în ziua ședinței; o notă care n-a putut fi descărcată se reîncearcă la rulările următoare |
 | `legatura-amp.js` | Potrivirea dintre acorduri și proiectele AMP („De la lege la bani"): funcții pure, fără DOM, folosite de `index.html` și de teste |
 | `teste_legatura.js` | Testele potrivirii: funcțiile mici, scenarii construite de mână și o verificare pe arhiva AMP + registrul real. Rulare: `node teste_legatura.js` |
+| `teste_xlsx.py` | Testele exporturilor Excel. Fără argumente: generează cu Node foi de probă (grafice, totaluri, caractere speciale, 20.000 de rânduri) și le verifică (ZIP, XML, formate, formule, grafice). Cu `--browser`: deschide dashboardul în română și engleză, apasă ⚙ → „Descarcă Excel” pe 15 panouri din toate vederile și verifică fișierele descărcate. Rulare: `python teste_xlsx.py [--browser]` |
 | `legatura_acorduri.py` | Scrie `date/acorduri_legare.json`: deschide pagina registrului într-un browser fără ecran și îi cere lista acordurilor așa cum le vede ea (grupate, denumite, cu suma aleasă și trecută în euro). Are nevoie de Playwright |
 | `date/acorduri_legare.json` | Acordurile din registru, gata grupate, un acord pe linie. Citit de pagina „De la lege la bani". Se rescrie doar când se schimbă ceva |
 | `date/legaturi_amp.json` | Legăturile acord ↔ proiect AMP confirmate de oameni (vezi mai jos). Se completează de mână sau din pagină |
@@ -194,7 +196,7 @@ Testele: `python teste_legis.py` (rapid) sau `python teste_legis.py --browser`.
 Pagina **Acorduri → De la lege la bani** (`index.html#legaturi`) caută fiecare acord din registru
 printre proiectele din AMP și arată, la fiecare, cât s-a angajat și cât s-a debursat. Are și o
 vedere „pe proiecte": de la proiectul AMP la acordurile lui. Lucrează cu aceleași cifre ca restul
-dashboardului (arhivă + raportul live) și poate fi descărcată ca CSV.
+dashboardului (arhivă + raportul live) și se descarcă în Excel (butonul de sub filtre sau ⚙ de pe panou).
 
 **Cum se face o legătură.** Trei lucruri trebuie să fie de acord: *denumirea* (cuvintele rare din
 denumirea acordului se regăsesc în titlul proiectului), *finanțatorul* (BEI nu se leagă de un proiect
@@ -222,7 +224,7 @@ acord" arată ce scrie AMP, nu rata reală.
 registrului (`#acord=…`); dacă un id din fișier nu mai corespunde niciunui acord, pagina o spune.
 
 **Linkuri în exporturile Excel.** Coloanele cu adrese („Link" din foaia „Acte" a registrelor, „Link AMP"
-și linkul IATI din exportul dashboardului) se scriu ca hyperlinkuri adevărate. O adresă pusă într-o celulă ca
+și linkul IATI din exportul dashboardului și din exporturile ⚙ ale panourilor) se scriu ca hyperlinkuri adevărate. O adresă pusă într-o celulă ca
 text simplu nu se deschide la clic în Excel sau LibreOffice, deși arată ca un link.
 `python teste_legis.py --browser` verifică asta pe ambele registre.
 
@@ -251,6 +253,50 @@ unde browserul nu lasă paginile să citească alte fișiere — deschide site-u
 măsurată. Pentru acordurile fără sumă cunoscută nu există nicio confirmare automată, doar „de
 verificat". Proiectele din AMP fără angajamente apar cu zero, iar legătura prin „valoarea propusă"
 arată doar că proiectul există.
+
+## Exporturile Excel ale graficelor și tabelelor
+
+Fiecare panou cu roată dințată (⚙) are în meniu trei acțiuni: **Copiază ca imagine**, **Descarcă Excel (.xlsx)**
+și **Date brute (CSV)**. Trei butoane de sub tabele (tabelul „De la lege la bani”, diferențele AMP–IATI, proiectele
+cu perioadă în afara anilor) dau acum tot Excel, nu CSV. CSV-ul a rămas ca a doua opțiune, pentru cine îl vrea.
+
+**Ce conține fișierul.** Un rând de titlu (denumirea panoului) și un subtitlu cu sursa, selecția activă (anii și
+donatorii aleși, căutarea, raionul etc.) și data generării; apoi tabelul, cu antet colorat, filtre pe coloane și
+antet înghețat la derulare. Sumele au separator de mii (nu text), anii sunt numere întregi, procentele sunt procente,
+diferențele au semn (verde/roșu la cele în care sensul contează), iar dungile alternante rămân și după sortare.
+Unde are sens: bare în celule, scară de culoare (matricea donator × an, sector × donator), rând de total, hyperlinkuri
+spre AMP, IATI sau registru, note sub tabel și, la panourile cu grafic, același grafic ca **grafic Excel nativ**
+(bare, coloane, coloane stivuite sau linie), pe care îl poți edita. Foaia se tipărește pe lățimea unei pagini A4 pe lat, cu
+antetul repetat și numărul paginii în subsol.
+
+**Totalurile.** La donatori, sectoare, beneficiari, țări și tipuri de asistență un proiect cu mai mulți donatori
+apare la fiecare, cu suma lui întreagă; totalul e deci al **proiectelor unice** (se numără o singură dată) și poate fi
+mai mic decât suma rândurilor — o notă de sub tabel spune asta. La ani, regiuni și la statusurile din D-portal rândurile
+se adună, iar totalul e formulă `SUBTOTAL`: se recalculează când filtrezi în Excel. Graficele din „Analize avansate”
+nu folosesc filtrele din pagina principală (subtitlul o spune).
+
+**Cum se leagă un panou nou.** Randarea panoului înregistrează datele lui cu
+`__csvInreg(element, coloane, rânduri, opțiuni)` (în `index.html`); dacă tabelul e mare sau scump de construit,
+cu `__csvInregLazy(element, () => ({cols, rows, opt}))`, calculat abia la export. `unelte.js` le citește (și, dacă
+panoul n-a înregistrat nimic, ia tabelul vizibil). Opțiunile (`opt`), toate facultative:
+
+| Opțiune | Ce face |
+|---|---|
+| `tip` | Un caracter pe coloană: `t` text, `i` identificator, `e` sumă în EUR, `n` număr întreg, `y` an, `k` loc în clasament, `p` procent dat în puncte (83,5 → 83,5%), `x` diferență cu semn (verde/roșu), `s` diferență cu semn, fără culori, `v` variație procentuală (verde/roșu), `d` două zecimale, `z` dată (ISO sau zz.ll.aaaa) |
+| `total` | `{eticheta, suma:[coloane], raport:{col:[numărător, numitor]}}`: rând de total cu formule `SUBTOTAL` |
+| `randTotal` | Un rând de total scris ca atare (numai în Excel), pentru totalurile care nu sunt suma rândurilor (proiecte unice) |
+| `totalFinal` | Ultimul rând din `rows` e deja totalul (apare și în CSV); în Excel iese din filtru și devine rândul de total |
+| `grafic` | `{tip:'bar'\|'col'\|'colst'\|'line', cat, serii:[coloane], n, ultimele, culori, titlu}`: graficul Excel; `n` = primele n rânduri, `ultimele` = ultimele n, `fara` = câte rânduri nu intră în grafic (doar pentru titlul „primele n”) |
+| `bare`, `harta` | Bare în celule pe coloanele date; scară de culoare `{de, pana}` pe un bloc de coloane |
+| `linkuri` | `{coloană: (rând, i) => adresă}`: celulele devin hyperlinkuri adevărate |
+| `nota`, `context` | Note sub tabel; textul care înlocuiește „selecția” din subtitlu |
+
+Butoanele care nu pornesc dintr-un panou apelează `window.__xlsxDirect({...})`.
+
+**Teste.** `python teste_xlsx.py` (scriitorul, cu Node) și `python teste_xlsx.py --browser` (15 panouri în română și
+engleză, plus cele trei butoane). La construire, fișierele au fost validate pe schemele ISO/IEC 29500, citite cu
+openpyxl și randate cu LibreOffice; într-un Excel adevărat n-au fost deschise, așa că, dacă Excel cere „reparare”,
+păstrează fișierul și spune-ne ce panou l-a dat, ca să fie corectat.
 
 ## Importul din arhive PDF
 
