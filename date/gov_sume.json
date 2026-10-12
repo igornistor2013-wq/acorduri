@@ -1,5 +1,5 @@
 {
-"actualizat": "2026-10-09 12:57",
+"actualizat": "2026-10-12 17:00",
 "istoric_complet": true,
 "puncte": {
 "1/MDED/2026": {
@@ -1551,6 +1551,15 @@
 "sume": [],
 "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de colaborare dintre Instituția Publică Organizația pentru Dezvoltarea Antreprenoriatului și Programul Națiunilor Unite pentru Dezvoltare pentru implementarea proiectului „Comunități reziliente prin abilitarea femeilor”"
 },
+"718/MEn/2026": {
+"categorie": "Împrumut",
+"data": "2026-10-15",
+"partener": "BIRD",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-10/NU-718-MEn-2026_2.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-15-octombrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la inițierea negocierilor asupra proiectului Acordului de împrumut dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare în vederea implementării proiectului „Mecanismul de Eficiență Energetică Revolving din Moldova (MEERM)” și acordarea împuternicirilor delegației pentru negocierea acestuia"
+},
 "736/MAIA/2026": {
 "categorie": "Împrumut",
 "data": "2026-07-29",
@@ -1625,6 +1634,15 @@
 "sume": [],
 "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de grant dintre Instituția Publică Organizația pentru Dezvoltarea Antreprenorialului și Agenția Executivă pentru Consiliul European pentru Inovare și IMM-uri în vederea implementării proiectului „REC4SMEs – Sprijinirea IMM-urilor prin Comunități de Energie Regenerabilă pentru un viitor durabil”"
 },
+"860/MEC/2026": {
+"categorie": "Împrumut",
+"data": "2026-10-15",
+"partener": "CEB",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-10/NU-860-MEC-2026_0.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-15-octombrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Acordului-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei ,,Modernizarea instituțiilor de învățământ profesional tehnic”"
+},
 "876/MAIA/2026": {
 "categorie": "Împrumut",
 "data": "2026-10-07",
@@ -1672,6 +1690,15 @@
 ],
 "titlu": "Hotărâre cu privire la aprobarea proiectului de lege pentru ratificarea Amendamentului, semnat la 7 septembrie 2026, la Acordurile de finanțare dintre Republica Moldova și Asociația Internațională pentru Dezvoltare privind Proiectul de dezvoltare a sistemului electroenergetic, semnate la 26 septembrie 2019"
 },
+"939/MAIA/2026": {
+"categorie": "Împrumut",
+"data": "2026-10-15",
+"partener": "JICA",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-10/NU-939-MAIA-2026.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-15-octombrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la inițierea negocierilor asupra proiectului Acordului de împrumut dintre Guvernul Republicii Moldova și Agenția Japoneză pentru Cooperare Internațională pentru realizarea proiectului „Modernizarea tehnicii și echipamentelor agricole (etapa a II-a) și împuternicirea delegației oficiale pentru negocierea acestuia”"
+},
 "94/CS/2026": {
 "categorie": "Asistență tehnică",
 "data": "2026-03-25",
@@ -1680,6 +1707,15 @@
 "sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-25-martie-2026-ora-1000",
 "sume": [],
 "titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Înțelegerii, întocmite prin schimb de note, dintre Guvernul Republicii Moldova și Guvernul Republicii Federale Germania privind cooperarea tehnică pentru finanțarea proiectelor „Facilitarea aderării la UE prin coordonare și angajament în Moldova (FACE)”, „Economie rezilientă, inovatoare și durabilă în Moldova (RISE)”, „Servicii publice puternice pentru comunele din Moldova (SPS)” și „Consolidarea infrastructurii de calitate pentru aderarea la UE și competitivitate”"
+},
+"959/MAIA/2026": {
+"categorie": "Împrumut",
+"data": "2026-10-15",
+"partener": "Japonia",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-10/NU-959-MAIA-2026.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-15-octombrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Acordului, întocmit prin schimb de note, dintre Guvernul Republicii Moldova şi Guvernul Japoniei privind acordarea unui împrumut pentru realizarea proiectului „Modernizarea tehnicii și echipamentelor agricole (etapa a II-a)”"
 },
 "965/MIDR/2025": {
 "categorie": "Împrumut",
@@ -1813,6 +1849,10 @@
 "sedinta-guvernului-din-15-octombrie-2025-ora-1000": {
 "acorduri": 0,
 "data": "2025-10-15"
+},
+"sedinta-guvernului-din-15-octombrie-2026-ora-1000": {
+"acorduri": 4,
+"data": "2026-10-15"
 },
 "sedinta-guvernului-din-16-aprilie-2025-ora-1000": {
 "acorduri": 3,
