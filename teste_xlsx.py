@@ -182,6 +182,89 @@ try:
     # ---- gol
     ws = openpyxl.load_workbook(tmp / 'gol.xlsx').worksheets[0]
     verifica('gol: și fără rânduri iese un fișier valid, cu antetul', ws['A4'].value == 'A' and ws['B4'].value == 'B')
+
+    # ---- un fișier cu mai multe foi
+    GEN_FOI = r"""
+const X = require(process.argv[2]);
+const fs = require('fs');
+(async () => {
+  const sect = ['Educație', 'Sănătate și protecție socială (extins)', 'Agricultură/Dezvoltare rurală', 'educație'];
+  const foiSector = sect.map((nm, i) => ({
+    foaie: nm, titlu: nm, subtitlu: 'Sector ' + (i + 1), antete: ['AMP ID', 'Proiect', 'Sumă (EUR)'], tipuri: 'itn', culoareFila: i % 2 ? 'FFC8871A' : 'FF1E4B8C',
+    randuri: [['A' + i, 'Proiect ' + i + '.1', 100 * (i + 1)], ['B' + i, 'Proiect ' + i + '.2', 200 * (i + 1)]],
+    total: { eticheta: 'Total', suma: [2] }, linkuri: { 0: r => 'https://amp.gov.md/' + r[0] },
+    grafic: i === 1 ? { tip: 'col', cat: 0, serii: [2] } : null
+  }));
+  const b = await X.construieste({
+    limba: 'ro', autor: 'Test', subsol: 'nistor.vivi.md', titlu: 'Fișier cu mai multe foi',
+    foi: [
+      { foaie: 'Rezumat', titlu: 'Rezumat', subtitlu: 'x', antete: ['Sector', 'Proiecte', 'Sumă (EUR)'], tipuri: 'tin',
+        randuri: sect.map((nm, i) => [nm, 2, 300 * (i + 1)]).concat([['Fără foaie', 1, 5]]),
+        linkuri: { 0: r => r[0] === 'Fără foaie' ? '#Nu există' : '#' + r[0] },
+        total: { eticheta: 'Total', suma: [1, 2] }, grafic: { tip: 'bar', cat: 0, serii: [2], titlu: 'Pe sectoare' } },
+      { foaie: 'Toate proiectele', titlu: 'Toate', subtitlu: 'x', antete: ['An', 'Sumă'], tipuri: 'yn', randuri: [[2020, 5], [2021, 7], [2022, 9]],
+        total: { eticheta: 'Total', suma: [1] }, grafic: { tip: 'line', cat: 0, serii: [1] }, culoareFila: 'FF2E7D32' }
+    ].concat(foiSector)
+  });
+  fs.writeFileSync(process.argv[3] + '/foi.xlsx', Buffer.from(await b.arrayBuffer()));
+})().catch(e => { console.error('EROARE', e && e.stack || e); process.exit(1); });
+"""
+    (tmp / 'gen_foi.js').write_text(GEN_FOI, encoding='utf-8')
+    r = subprocess.run(['node', str(tmp / 'gen_foi.js'), str(AICI / 'xlsx-stil.js'), str(tmp)], capture_output=True, text=True, timeout=120)
+    verifica('foi: Node generează fișierul cu 6 foi', r.returncode == 0, (r.stderr or r.stdout)[-300:])
+    cale = tmp / 'foi.xlsx'
+    verifica('foi: arhivă ZIP validă, cu toate părțile XML bine formate', cale.exists() and zipfile.is_zipfile(cale) and not parti_xml_valide(cale), parti_xml_valide(cale) if cale.exists() else 'lipsă')
+    wb = openpyxl.load_workbook(cale)
+    nume = wb.sheetnames
+    verifica('foi: toate cele 6 foi, în ordine', len(nume) == 6 and nume[0] == 'Rezumat' and nume[1] == 'Toate proiectele', nume)
+    verifica('foi: numele sunt unice (fără deosebire între litere mari și mici) și de cel mult 31 de caractere',
+             len({n.lower() for n in nume}) == len(nume) and all(len(n) <= 31 for n in nume), nume)
+    verifica('foi: „educație” a doua oară primește sufixul (2)', 'Educație' in nume and 'educație (2)' in nume, nume)
+    verifica('foi: caracterele interzise din nume sunt înlocuite', not any(c in n for n in nume for c in '/\\?*[]:'), nume)
+    ws = wb['Rezumat']
+    verifica('foi: link în interiorul fișierului către foaia „Educație” (celula A1)', ws['A5'].hyperlink is not None and ws['A5'].hyperlink.location == "'Educație'!A1", ws['A5'].hyperlink and ws['A5'].hyperlink.location)
+    # foaia cu nume prea lung se numește altfel decât a fost cerută: linkul trebuie să arate spre numele final
+    final = [n for n in nume if n.startswith('Sănătate')][0]
+    verifica('foi: linkul către o foaie cu nume tăiat folosește numele final', ws['A6'].hyperlink is not None and ws['A6'].hyperlink.location == "'%s'!A1" % final, ws['A6'].hyperlink and ws['A6'].hyperlink.location)
+    verifica('foi: linkul către o foaie care nu există nu se creează', ws['A9'].hyperlink is None, ws['A9'].hyperlink)
+    ws = wb['Educație']
+    verifica('foi: hyperlinkul extern din foaia de sector rămâne extern', ws['A5'].hyperlink is not None and ws['A5'].hyperlink.target == 'https://amp.gov.md/A0', ws['A5'].hyperlink and ws['A5'].hyperlink.target)
+    ws = wb[final]
+    verifica('foi: totalul fiecărei foi are formula lui, pe zona proprie', ws['C7'].value == '=SUBTOTAL(109,C5:C6)', ws['C7'].value)
+    with zipfile.ZipFile(cale) as z:
+        parti = z.namelist()
+        sheets = {i: z.read('xl/worksheets/sheet%d.xml' % i).decode('utf-8') for i in range(1, 7)}
+        wbx = z.read('xl/workbook.xml').decode('utf-8')
+        ct = z.read('[Content_Types].xml').decode('utf-8')
+        rel1 = z.read('xl/worksheets/_rels/sheet1.xml.rels').decode('utf-8')
+        rel2 = z.read('xl/worksheets/_rels/sheet2.xml.rels').decode('utf-8')
+        rel4 = z.read('xl/worksheets/_rels/sheet4.xml.rels').decode('utf-8')
+        ch = {k: z.read('xl/charts/chart%d.xml' % k).decode('utf-8') for k in (1, 2, 3) if 'xl/charts/chart%d.xml' % k in parti}
+    verifica('foi: graficele sunt numerotate pe tot fișierul (chart1..3, drawing1..3), fără dubluri',
+             all(('xl/charts/chart%d.xml' % k) in parti and ('xl/drawings/drawing%d.xml' % k) in parti and ('xl/drawings/_rels/drawing%d.xml.rels' % k) in parti for k in (1, 2, 3))
+             and 'xl/charts/chart4.xml' not in parti, [p for p in parti if 'chart' in p or 'drawing' in p])
+    verifica('foi: fiecare foaie cu grafic îl leagă de desenul ei', 'drawing1.xml' in rel1 and 'drawing2.xml' in rel2 and 'drawing3.xml' in rel4, (rel1, rel2, rel4))
+    verifica('foi: graficele arată spre foile lor', "'Rezumat'!" in ch.get(1, '') and "'Toate proiectele'!" in ch.get(2, '') and ("'%s'!" % final) in ch.get(3, ''), {k: re.findall(r'<c:f>(.*?)</c:f>', v)[:2] for k, v in ch.items()})
+    verifica('foi: tipurile de conținut le numesc pe toate (6 foi, 3 grafice)', all(('/xl/worksheets/sheet%d.xml' % i) in ct for i in range(1, 7)) and ct.count('drawingml.chart+xml') == 3 and ct.count('drawing+xml') == 3, ct.count('chart+xml'))
+    verifica('foi: doar prima foaie e selectată', 'tabSelected="1"' in sheets[1] and not any('tabSelected' in sheets[i] for i in range(2, 7)))
+    verifica('foi: filtrul și rândurile care se repetă au localSheetId potrivit fiecărei foi',
+             all(('localSheetId="%d"' % i) in wbx for i in range(6)) and wbx.count('_xlnm._FilterDatabase') == 6 and wbx.count('_xlnm.Print_Titles') == 6, wbx[wbx.find('<definedNames>'):][:400])
+    verifica('foi: eticheta foii poate avea culoare proprie', 'tabColor rgb="FF2E7D32"' in sheets[2] and 'tabColor rgb="FF1E4B8C"' in sheets[1], re.findall(r'tabColor rgb="(\w+)"', sheets[2]))
+    verifica('foi: subsolul e pus pe fiecare foaie', all('nistor.vivi.md' in sheets[i] for i in range(1, 7)))
+    with zipfile.ZipFile(cale) as z:
+        verifica('foi: stilurile și șirurile sunt comune (un singur styles.xml și un singur sharedStrings.xml)', [p for p in z.namelist() if p.endswith('styles.xml') or p.endswith('sharedStrings.xml')] == ['xl/styles.xml', 'xl/sharedStrings.xml'])
+    # o singură foaie, cum se făcea înainte: aceeași ieșire în privința numelui și a primei foi
+    GEN_UNA = r"""
+const X = require(process.argv[2]); const fs = require('fs');
+(async () => { const b = await X.construieste({ limba: 'en', foaie: 'Sheet one', titlu: 'T', subtitlu: 's', antete: ['A', 'B'], tipuri: 'tn', randuri: [['x', 1]] });
+  fs.writeFileSync(process.argv[3] + '/una.xlsx', Buffer.from(await b.arrayBuffer())); })();
+"""
+    (tmp / 'gen_una.js').write_text(GEN_UNA, encoding='utf-8')
+    subprocess.run(['node', str(tmp / 'gen_una.js'), str(AICI / 'xlsx-stil.js'), str(tmp)], check=True, timeout=60)
+    w1 = openpyxl.load_workbook(tmp / 'una.xlsx')
+    verifica('foi: specificația cu o singură foaie merge ca înainte', w1.sheetnames == ['Sheet one'] and w1.worksheets[0]['A5'].value == 'x')
+    if '--pastreaza' in sys.argv:
+        shutil.copy(cale, AICI.parent / 'foi_probă.xlsx')
 finally:
     shutil.rmtree(tmp, ignore_errors=True)
 

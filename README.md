@@ -130,7 +130,8 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `robots.txt` | Indică motoarelor de căutare harta site-ului (`sitemap.xml`) |
 | `xlsx.min.js` | Biblioteca SheetJS, încărcată doar la descărcare (nu la fiecare deschidere a paginii): pentru butonul „Export” (proiectele cu filtre și coloane alese) și pentru exportul rapid IATI. Graficele și tabelele din panouri se scriu cu `xlsx-stil.js` |
 | `unelte.js` | Roata dințată de pe fiecare panou (meniu cu „Copiază ca imagine", „Descarcă Excel (.xlsx)" și „Date brute (CSV)"; construiește foaia Excel din datele pe care panoul le-a înregistrat, vezi secțiunea „Exporturile Excel"), linkul care păstrează filtrele (`?ani=…&don=…`), raportul PDF pe o pagină, indicatorul de prospețime a datelor și comparația între perioade din „Analize avansate" |
-| `xlsx-stil.js` | Scriitorul de fișiere `.xlsx` (ZIP + XML, fără bibliotecă): titlu și context, antet cu filtre, formate de număr, dungi, bare în celule, scară de culoare, rând de total cu formule `SUBTOTAL`, hyperlinkuri, note și grafic Excel nativ. Încărcat la primul export (`unelte.js` îl cere cu aceeași versiune `?v=` ca el) |
+| `xlsx-stil.js` | Scriitorul de fișiere `.xlsx` (ZIP + XML, fără bibliotecă): titlu și context, antet cu filtre, formate de număr, dungi, bare în celule, scară de culoare, rând de total cu formule `SUBTOTAL`, hyperlinkuri, note și grafic Excel nativ. Scrie și fișiere cu **mai multe foi** (`foi: […]`): nume de foaie unice (cel mult 31 de caractere), linkuri de la o foaie la alta (adresa `#Numele foii`), culoare pe fila foii; graficele se numerotează pe tot fișierul. Încărcat la primul export (`unelte.js` îl cere cu aceeași versiune `?v=` ca el) |
+| `sectoare.js` | Panoul „Donatori → sectoare · cu proiectele fiecărui sector” din „Analize avansate”: diagrama donatori ↔ sectoare, lista proiectelor pe fiecare sector și exportul Excel cu mai multe foi (vezi secțiunea „Donatori → sectoare”). Prima parte (agregări, filtre, diagrama ca text SVG, datele pentru Excel) nu atinge pagina și se testează cu Node; a doua desenează în pagină. Încărcat din `index.html` înaintea lui `unelte.js` |
 | `html2canvas.min.js` | Biblioteca html2canvas, care transformă un panou în imagine; încărcată doar la primul „Copiază" sau „Raport PDF" |
 | `favicon.svg`, `apple-touch-icon.png`, `og.png`, `404.html` | Iconița site-ului (logoul: harta Moldovei cu cele trei fluxuri), iconița pentru ecranul telefonului, imaginea de previzualizare a linkurilor, pagina „nu există” |
 | `donatori.html` | Redirecționare către `index.html`, pentru linkurile vechi |
@@ -157,7 +158,8 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `gov_sume.py` | Sumele acordurilor din notele de argumentare ale Guvernului: citește de pe gov.md ordinea de zi a fiecărei ședințe și, pentru punctele despre acorduri, PDF-ul notei („Aspectul financiar”). Rulat zilnic de `.github/workflows/sume.yml`; rezultatul, `date/gov_sume.json`, e citit de pagina Acorduri la deschidere (sumele marcate cu G). Ședințele din ultimele zece zile se recitesc la fiecare rulare, fiindcă ordinea de zi se completează până în ziua ședinței; o notă care n-a putut fi descărcată se reîncearcă la rulările următoare |
 | `legatura-amp.js` | Potrivirea dintre acorduri și proiectele AMP („De la lege la bani"): funcții pure, fără DOM, folosite de `index.html` și de teste |
 | `teste_legatura.js` | Testele potrivirii: funcțiile mici, scenarii construite de mână și o verificare pe arhiva AMP + registrul real. Rulare: `node teste_legatura.js` |
-| `teste_xlsx.py` | Testele exporturilor Excel. Fără argumente: generează cu Node foi de probă (grafice, totaluri, caractere speciale, 20.000 de rânduri) și le verifică (ZIP, XML, formate, formule, grafice). Cu `--browser`: deschide dashboardul în română și engleză, apasă ⚙ → „Descarcă Excel” pe 15 panouri din toate vederile și verifică fișierele descărcate. Rulare: `python teste_xlsx.py [--browser]` |
+| `teste_xlsx.py` | Testele exporturilor Excel. Fără argumente: generează cu Node foi de probă (grafice, totaluri, caractere speciale, 20.000 de rânduri) și le verifică (ZIP, XML, formate, formule, grafice). Cu `--browser`: deschide dashboardul în română și engleză, apasă ⚙ → „Descarcă Excel” pe 15 panouri din toate vederile și verifică fișierele descărcate. Rulare: `python teste_xlsx.py [--browser]`. Verifică și fișierele cu mai multe foi (nume, linkuri între foi, grafice numerotate pe tot fișierul, un singur `styles.xml`) |
+| `teste_sectoare.py` | Testele panoului „Donatori → sectoare”. Fără argumente: cu Node, calculează independent (în Python) sumele pe donator, pe sector și pe pereche pentru un set mic făcut de mână și pentru 400 de proiecte aleatoare și le compară cu `sectoare.js`; verifică diagrama SVG (XML bine format, caractere speciale, fără variabile CSS) și datele pentru Excel (foile, linkurile dintre ele, totalurile, graficul). Cu `--browser`: deschide dashboardul în română și engleză și verifică totalurile din diagramă față de „Top donatori” și „Distribuție pe sectoare” din pagina principală, perioada, selecția cu clic și cu tastatura, lista pe grupe, ⚙ → Excel/CSV și butonul „Excel” al listei (fișierele descărcate sunt deschise cu openpyxl), exportul cu o selecție făcută, „Copiază ca imagine” și lipsa erorilor JavaScript. Rulare: `python teste_sectoare.py [--browser]` |
 | `legatura_acorduri.py` | Scrie `date/acorduri_legare.json`: deschide pagina registrului într-un browser fără ecran și îi cere lista acordurilor așa cum le vede ea (grupate, denumite, cu suma aleasă și trecută în euro). Are nevoie de Playwright |
 | `date/acorduri_legare.json` | Acordurile din registru, gata grupate, un acord pe linie. Citit de pagina „De la lege la bani". Se rescrie doar când se schimbă ceva |
 | `date/legaturi_amp.json` | Legăturile acord ↔ proiect AMP confirmate de oameni (vezi mai jos). Se completează de mână sau din pagină |
@@ -290,13 +292,48 @@ panoul n-a înregistrat nimic, ia tabelul vizibil). Opțiunile (`opt`), toate fa
 | `bare`, `harta` | Bare în celule pe coloanele date; scară de culoare `{de, pana}` pe un bloc de coloane |
 | `linkuri` | `{coloană: (rând, i) => adresă}`: celulele devin hyperlinkuri adevărate |
 | `nota`, `context` | Note sub tabel; textul care înlocuiește „selecția” din subtitlu |
+| `foiExcel` | `[{foaie, titlu, cols, rows, opt}, …]`: panoul cere un fișier cu **mai multe foi**. Prima foaie primește notele panoului și linkul „Deschide dashboardul”; `cols`/`rows` ale panoului rămân lista plată pentru CSV. Un link dintr-o foaie spre alta se scrie `#Numele foii` (numele cerut; dacă la scriere s-a schimbat din cauza unui duplicat, linkul îl urmează) |
 
-Butoanele care nu pornesc dintr-un panou apelează `window.__xlsxDirect({...})`.
+Butoanele care nu pornesc dintr-un panou apelează `window.__xlsxDirect({titlu, nume, vedere, cols, rows, opt, btn})`;
+`btn` e butonul apăsat, al cărui text revine după descărcare (roata dințată își schimbă singură iconița).
 
 **Teste.** `python teste_xlsx.py` (scriitorul, cu Node) și `python teste_xlsx.py --browser` (15 panouri în română și
 engleză, plus cele trei butoane). La construire, fișierele au fost validate pe schemele ISO/IEC 29500, citite cu
 openpyxl și randate cu LibreOffice; într-un Excel adevărat n-au fost deschise, așa că, dacă Excel cere „reparare”,
 păstrează fișierul și spune-ne ce panou l-a dat, ca să fie corectat.
+
+## Donatori → sectoare, cu proiectele fiecărui sector
+
+Panou în „Analize avansate”, imediat după „Sector × donator”. A fost cerut așa: „o diagramă cu donatori și cu sectoare
+și lista de proiecte pe fiecare sector”. Are trei părți, pe aceeași alegere (măsura, perioada, donatorul, sectorul):
+
+1. **Diagrama.** Donatorii (primii 12 după măsura aleasă, plus „Alți donatori”) în stânga, sectoarele (toate cele cu
+   sumă, cel mult 30, plus „Alte sectoare”) în dreapta. **Lungimea barei = totalul donatorului sau al sectorului, cu fiecare
+   proiect numărat o singură dată**, deci cifrele sunt aceleași cu „Top donatori” și cu panoul „Distribuție pe sectoare” din
+   pagina principală (testele compară cu `RAW` și cu `aggregateBySector`). **Grosimea liniei** dintre un donator și un sector =
+   suma proiectelor donatorului în sectorul acela. Măsura se alege între angajamente și debursări; perioada e anul de
+   început al proiectului (proiectele fără an nu intră când o perioadă e aleasă). Lista „Donator” cuprinde toți
+   donatorii, cu numărul de proiecte; unul din afara primilor 12 primește un rând în plus în diagramă.
+2. **Lista „Proiectele fiecărui sector”.** Un grup pliabil pe sector (numărul de proiecte, angajamente, debursări), în
+   ordinea sumei. Grupul deschis arată tabelul proiectelor: AMP ID (link spre AMP, ca peste tot), proiect, donator,
+   perioadă, sume; câte 100 odată, cu „Încă 100”. Un clic pe un donator, pe un sector sau pe o linie din diagramă
+   filtrează lista. Dacă după un clic pe un donator perechea cu sectorul ales nu are niciun proiect, alegerea veche se lasă
+   (lista nu rămâne goală). Cu tastatura: Tab între rânduri, Enter sau Spațiu aleg, Escape scoate alegerea.
+3. **Excel.** ⚙ → „Descarcă Excel (.xlsx)” sau butonul „Excel” din antetul listei dă un fișier cu mai multe foi:
+   „Rezumat pe sectoare” (proiecte, sume, donatori și donatorul principal pe sector, cu grafic Excel și un link de la
+   fiecare sector spre foaia lui), „Donator × sector” (matricea, cu scară de culoare), „Toate proiectele” (lista plată,
+   aceeași cu CSV-ul) și câte o foaie pe sector, cu total ca formulă `SUBTOTAL` și AMP ID-uri legate de AMP. Fișierul
+   respectă alegerea din pagină: cu un sector ales conține doar acel sector, și subtitlul spune asta.
+
+**De ce bare și linii, nu un Sankey.** Un proiect cu mai multe sectoare apare cu suma lui întreagă în fiecare (așa
+numără tot dashboardul). Într-un Sankey înălțimea unui donator ar fi suma liniilor lui, deci mai mare decât totalul
+real: la FMI, 1.213 mil EUR în loc de 660 mil. Cu bare separate, totalurile rămân cele adevărate, iar liniile spun doar
+„cât din banii donatorului merge în sectorul acela”. Pentru același motiv, suma de pe rândurile unei foi de sector nu se
+adună cu a celorlalte: rândul „TOTAL (proiecte unice)” din „Rezumat” și din „Toate proiectele” numără fiecare proiect o
+singură dată, iar o notă de sub tabel spune asta.
+
+**Teste.** `python teste_sectoare.py` (logica, diagrama și datele pentru Excel, cu Node) și
+`python teste_sectoare.py --browser` (panoul în română și engleză, cu fișierele descărcate).
 
 ## Importul din arhive PDF
 

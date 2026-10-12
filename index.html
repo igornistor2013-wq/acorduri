@@ -1942,6 +1942,22 @@
     <div class="panel-body" id="sectorDonorBody"></div>
   </div>
 
+<div class="panel" id="sdgPanel">
+    <div class="panel-head">
+      <h2><svg class="ico" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 6c6 0 4 12 10 12M7 18c6 0 4-12 10-12"/></svg><span data-i18n="sdgTitle">Donatori → sectoare · cu proiectele fiecărui sector</span></h2>
+      <div class="btns seg" id="sdgMetric" role="group"><button type="button" data-m="ang" aria-pressed="true">Angajamente</button><button type="button" data-m="deb" aria-pressed="false">Debursări</button></div>
+    </div>
+    <div class="panel-note" data-i18n="sdgNote">Lungimea barei = totalul donatorului sau al sectorului, cu fiecare proiect numărat o singură dată; grosimea liniei = suma proiectelor donatorului în acel sector. Un proiect cu mai multe sectoare apare în fiecare dintre ele, deci liniile unui donator pot însuma mai mult decât bara lui. Clic pe un donator, pe un sector sau pe o linie ca să vezi proiectele dedesubt.</div>
+    <div class="sdg-bar" id="sdgBar"></div>
+    <div class="sdg-wrap" id="sdgDiagrama"></div>
+    <div class="sdg-leg" id="sdgLegenda"></div>
+    <div class="panel-head" id="sdgListaCap" style="border-top:1px solid var(--line);">
+      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span data-i18n="sdgListTitle">Proiectele fiecărui sector</span> <span id="sdgCount" class="badge"></span></h2>
+      <div class="btns"><button type="button" class="sdg-btn" id="sdgToate"></button> <button type="button" class="sdg-btn" id="sdgExcel"></button></div>
+    </div>
+    <div id="sdgLista"></div>
+  </div>
+
 <div class="panel">
     <div class="panel-head">
       <h2><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span data-i18n="advOngoingTitle">Proiecte în desfășurare · alege anul</span> <span id="ongoingCount" class="badge"></span></h2>
@@ -3757,6 +3773,8 @@ function etichetaControale(){
 document.addEventListener('DOMContentLoaded', () => { try{ etichetaControale(); }catch(e){} });
 Object.assign(I18N.ro, {"colActions": "Acțiuni", "exportH1": "Export de date", "iatiH1": "Verificare încrucișată cu IATI"});
 Object.assign(I18N.en, {"colActions": "Actions", "exportH1": "Data export", "iatiH1": "Cross-check with IATI"});
+Object.assign(I18N.ro, {"sdgTitle": "Donatori → sectoare · cu proiectele fiecărui sector", "sdgListTitle": "Proiectele fiecărui sector", "sdgNote": "Lungimea barei = totalul donatorului sau al sectorului, cu fiecare proiect numărat o singură dată; grosimea liniei = suma proiectelor donatorului în acel sector. Un proiect cu mai multe sectoare apare în fiecare dintre ele, deci liniile unui donator pot însuma mai mult decât bara lui. Clic pe un donator, pe un sector sau pe o linie ca să vezi proiectele dedesubt."});
+Object.assign(I18N.en, {"sdgTitle": "Donors → sectors · with each sector's projects", "sdgListTitle": "Projects in each sector", "sdgNote": "Bar length = the total of the donor or sector, with each project counted once; line thickness = the donor's project amount in that sector. A project with several sectors appears in each of them, so a donor's lines can add up to more than its bar. Click a donor, a sector or a line to see the projects below."});
 Object.assign(I18N.ro, {"advSdTitle": "Sector × donator · cine finanțează ce", "advSdNote": "primii 15 donatori și primele 10 sectoare după sumă; culoarea = suma, cifra = ce parte din banii donatorului merge în acel sector. Un proiect cu mai multe sectoare e numărat la fiecare.", "advTyTitle": "Tipul de asistență pe ani", "advTySume": "sume", "advTyProc": "procente", "advTyNote": "angajamentele pe anul proiectului, după tipul de asistență din AMP; un proiect cu două tipuri se împarte egal între ele. Împrumuturile și granturile, pe tipuri de acord, sunt în registrele de acorduri."});
 Object.assign(I18N.en, {"advSdTitle": "Sector × donor · who funds what", "advSdNote": "top 15 donors and top 10 sectors by amount; colour = amount, number = the share of the donor's money going to that sector. A project with several sectors is counted in each.", "advTyTitle": "Type of assistance by year", "advTySume": "amounts", "advTyProc": "percent", "advTyNote": "commitments by project year, by the type of assistance recorded in AMP; a project with two types is split equally between them. Loans and grants, by type of agreement, are in the agreement registers."});
 Object.assign(I18N.en, { mapWholeWorld: 'Whole world' });
@@ -6544,6 +6562,7 @@ document.querySelectorAll('#tyMod button').forEach(b=>b.addEventListener('click'
 
 window.__initAdvancedView = function(){ ongoingProjectsIndex = null; regionFiltersPopulated = false; selectedRegionId = null; renderLineChart(); renderExecRate(); renderSankey(); renderTreemap(); renderTopProjects(); renderHeatmap(); renderOngoing(); renderTypeOfAssistance(); renderRegionChart();
   try{ renderSectorDonor(); }catch(e){ console.warn('sector×donator', e); }
+  try{ if(window.__renderSectoare) window.__renderSectoare(); }catch(e){ console.warn('donatori → sectoare', e); }
   try{ renderTipPeAni(); }catch(e){ console.warn('tip pe ani', e); }
   try{ if(typeof renderComparatie === 'function') renderComparatie(); }catch(e){ console.warn('comparație', e); }
   try{ etichetaControale(); }catch(e){}
@@ -10157,7 +10176,8 @@ loadLiveData();
 <!-- ?v= se schimbă la fiecare modificare a lui unelte.js (și a lui xlsx-stil.js, încărcat de el), ca browserele să nu folosească
      versiunea veche din memoria cache (GitHub Pages o păstrează până la 10 minute) -->
 <script src="legatura-amp.js?v=2026-10-07"></script>
-<script src="unelte.js?v=2026-10-12"></script>
+<script src="sectoare.js?v=2026-10-13"></script>
+<script src="unelte.js?v=2026-10-13"></script>
 
 </body>
 </html>

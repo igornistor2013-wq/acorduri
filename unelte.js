@@ -130,7 +130,7 @@ function titluPanou(panel){
 // panouri care nu sunt diagrame: filtre, export, antetul verificării IATI, tabelul de sub hartă
 // (legTitle și legPanouTitlu: introducerea și panoul de confirmări din „De la lege la bani" — text, nu date)
 const EXCLUSE = ['mapCountryProjectsTitle', 'yearFilterTitle', 'donorFilterTitle', 'exportTitle',
-                 'exportColumnsTitle', 'exportPreviewTitle', 'iatiCheckTitle', 'legTitle', 'legPanouTitlu'];
+                 'exportColumnsTitle', 'exportPreviewTitle', 'iatiCheckTitle', 'legTitle', 'legPanouTitlu', 'sdgListTitle'];
 const ET = {
   ok:    () => L('✓ Copiat', '✓ Copied'),
   dl:    () => L('✓ Descărcat', '✓ Downloaded'),
@@ -402,8 +402,20 @@ function noteDinPanou(panel){
    { titlu, vedere, cheie, nume }. Atunci titlul, vederea (de unde vin sursa și selecția) și cheia vin de acolo. */
 function specExcel(X, panel, d, extra){
   extra = extra || {};
+  const opt = d.opt || {};
+  /* Un panou poate cere un fișier cu mai multe foi: opt.foiExcel = [{ foaie, titlu, cols, rows, opt }, …]. Fiecare foaie se
+     construiește ca un export obișnuit; notele panoului și linkul „Deschide dashboardul” rămân doar pe prima. */
+  if(Array.isArray(opt.foiExcel) && opt.foiExcel.length){
+    const foi = opt.foiExcel.map((f, i) => specFoaie(X, panel, { cols: f.cols, rows: f.rows, opt: f.opt || {} },
+      Object.assign({}, extra, { titlu: f.titlu || f.foaie, foaie: f.foaie }), i === 0));
+    return { limba: en() ? 'en' : 'ro', subsol: location.host, autor: location.host || 'nistor.vivi.md',
+             titlu: extra.titlu || (panel ? titluPanou(panel) : '') || L('Date', 'Data'), foi: foi };
+  }
+  return specFoaie(X, panel, d, extra, true);
+}
+function specFoaie(X, panel, d, extra, prima){
   const opt = d.opt || {}, cheie = extra.cheie || (panel ? cheiePanou(panel) : '');
-  const titlu = extra.titlu || (panel ? titluPanou(panel) : '') || L('Date', 'Data');
+  const titlu = extra.titlu || (panel && prima ? titluPanou(panel) : '') || L('Date', 'Data');
   const nC = d.cols.length;
   const tipuri = (typeof opt.tip === 'string' && opt.tip.length === nC) ? opt.tip : X.deduceTipuri(d.cols, d.rows);
   const baza = panel ? contextPanou(panel, cheie) : contextVedere(extra.vedere || 'mainView', cheie);
@@ -416,8 +428,8 @@ function specExcel(X, panel, d, extra){
   const dinPagina = ctx.vedere === 'mainView' || ctx.vedere === 'advancedView';
   let link = location.href;
   if(dinPagina){ try{ link = linkSelectie(); }catch(e){} }
-  const note = (opt.nota || []).filter(Boolean).concat(panel ? noteDinPanou(panel) : []);
-  note.push({ t: dinPagina && ctx.vedere === 'mainView' ? L('Deschide dashboardul cu aceeași selecție ↗', 'Open the dashboard with the same selection ↗')
+  const note = (opt.nota || []).filter(Boolean).concat(panel && prima ? noteDinPanou(panel) : []);
+  if(prima) note.push({ t: dinPagina && ctx.vedere === 'mainView' ? L('Deschide dashboardul cu aceeași selecție ↗', 'Open the dashboard with the same selection ↗')
                                                        : L('Deschide pagina în dashboard ↗', 'Open the page in the dashboard ↗'), u: link });
   let grafic = null;
   if(opt.grafic && d.rows.length > 1){
@@ -430,7 +442,7 @@ function specExcel(X, panel, d, extra){
   let randuri = d.rows, randTotal = !!opt.totalFinal;
   if(Array.isArray(opt.randTotal) && !opt.total && !opt.totalFinal){ randuri = d.rows.concat([opt.randTotal]); randTotal = true; }
   return {
-    limba: en() ? 'en' : 'ro', foaie: titlu.split(' · ')[0], titlu: titlu, subtitlu: subtitlu, antete: d.cols, tipuri: tipuri, randuri: randuri,
+    limba: en() ? 'en' : 'ro', foaie: extra.foaie || titlu.split(' · ')[0], titlu: titlu, subtitlu: subtitlu, antete: d.cols, tipuri: tipuri, randuri: randuri,
     total: opt.total || null, randTotal: randTotal, note: note, bare: opt.bare, harta: opt.harta, linkuri: opt.linkuri, latimi: opt.latimi,
     grafic: grafic, subsol: location.host, autor: location.host || 'nistor.vivi.md'
   };

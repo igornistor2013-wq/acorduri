@@ -347,6 +347,38 @@ function latimeColoana(c, antete, randuri, tip, setat){
 }
 const linii = (text, latime) => Math.max(1, String(text).split(/\n/).reduce((s, p) => s + Math.max(1, Math.ceil(p.length / Math.max(10, latime))), 0));
 
+/* Șirurile partajate ale registrului de lucru: aceleași pentru toate foile. */
+function RegistruSiruri(){
+  const siruri = new Map();
+  let nr = 0;
+  const sir = s => {
+    s = String(s == null ? '' : s).replace(RX_CTRL, '');
+    if(s.length > 32000) s = s.slice(0, 32000) + '…';        // Excel nu primește mai mult de 32.767 de caractere într-o celulă
+    nr++;
+    let i = siruri.get(s);
+    if(i === undefined){ i = siruri.size; siruri.set(s, i); }
+    return i;
+  };
+  const xml = () => ANTET_XML + '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="' + nr + '" uniqueCount="' + siruri.size + '">' +
+    [...siruri.keys()].map(s => '<si><t xml:space="preserve">' + xe(s) + '</t></si>').join('') + '</sst>';
+  return { sir: sir, xml: xml };
+}
+/* Numele foilor trebuie să fie unice (fără deosebire între litere mari și mici) și de cel mult 31 de caractere:
+   la a doua apariție se adaugă „ (2)”, „ (3)”… */
+function numeUnice(lista){
+  const folosite = new Set();
+  return lista.map(n => {
+    let nume = n, k = 1;
+    while(folosite.has(nume.toLowerCase())){
+      k++;
+      const sufix = ' (' + k + ')';
+      nume = n.slice(0, 31 - sufix.length).trim() + sufix;
+    }
+    folosite.add(nume.toLowerCase());
+    return nume;
+  });
+}
+
 /* spec:
      limba          'ro' | 'en'
      foaie          numele foii (max. 31 de caractere)
@@ -363,9 +395,15 @@ const linii = (text, latime) => Math.max(1, String(text).split(/\n/).reduce((s, 
      linkuri        { col: (rand, i) => url }   celula devine hyperlink
      latimi         { col: caractere }   lățime fixată
      grafic         { tip:'bar'|'col'|'colst'|'line', cat, serii:[col...], n, ultimele, culori, titlu, legenda }
-     autor, data    metadate */
-async function construieste(spec){
-  const en = spec.limba === 'en';
+     subsol         text pentru colțul din stânga jos la tipărire (de pildă adresa site-ului)
+     culoareFila    culoarea etichetei foii (ARGB, ex. 'FF1E4B8C')
+     autor, data    metadate
+
+   Un fișier cu mai multe foi: construieste({ limba, autor, subsol, foi:[spec1, spec2, …] }) — fiecare element e o specificație
+   ca mai sus. Numele foilor se fac unice automat. O celulă cu link poate duce într-o altă foaie: adresa „#Numele foii”
+   (așa cum a fost cerut în `foaie`) face un link în interiorul fișierului, către celula A1 a acelei foi. */
+function construiesteFoaie(spec, idx, ctx){
+  const en = ctx.en;
   const antete = spec.antete.map(x => String(x == null ? '' : x));
   const nC = antete.length;
   let randuri = spec.randuri.map(r => { const o = r.slice(0, nC); while(o.length < nC) o.push(''); return o; });
@@ -373,9 +411,8 @@ async function construieste(spec){
   if(spec.randTotal && randuri.length){ randTotalFinal = randuri.pop(); }
   const nR = randuri.length;
   const tipuri = (spec.tipuri && spec.tipuri.length === nC ? spec.tipuri : deduceTipuri(antete, randuri)).split('');
-  const foaie = nume_foaie(spec.foaie, en ? 'Data' : 'Date');
-  const acum = spec.data instanceof Date ? spec.data : new Date();
-  const S = RegistruStiluri();
+  const foaie = ctx.nume;
+  const S = ctx.S, sir = ctx.sir;
 
   /* ---- lățimi ---- */
   const latimi = antete.map((_, c) => latimeColoana(c, antete, randuri, tipuri[c], spec.latimi && spec.latimi[c]));
@@ -421,16 +458,15 @@ async function construieste(spec){
     return S.xf({ fmt: t.fmt, font: { b: 1, c: CUL.navyDeep }, fill: CUL.total, border: { t: ['medium', CUL.navy], b: ['thin', CUL.navy] }, al: c === 0 ? 'left' : t.al, indent: c === 0 ? 1 : 0 });
   });
 
-  /* ---- șiruri partajate ---- */
-  const siruri = new Map();
-  let nrSiruri = 0;
-  const sir = s => {
-    s = String(s == null ? '' : s).replace(RX_CTRL, '');
-    if(s.length > 32000) s = s.slice(0, 32000) + '…';
-    nrSiruri++;
-    let i = siruri.get(s);
-    if(i === undefined){ i = siruri.size; siruri.set(s, i); }
-    return i;
+  /* O adresă „https://…” duce în afara fișierului; „#Numele foii” duce la altă foaie a aceluiași fișier (la celula A1). */
+  const legatura = (celula, url) => {
+    if(!url) return null;
+    if(/^https?:\/\//i.test(url)) return { ref: celula, url: url };
+    if(url.charAt(0) === '#'){
+      const final = ctx.hartaNume.get(url.slice(1));
+      if(final) return { ref: celula, loc: citeaza_foaia(final) + '!A1', afisat: final };
+    }
+    return null;
   };
   const celText = (c, rr, st, text) => '<c r="' + ref(c, rr) + '" s="' + st + '" t="s"><v>' + sir(text) + '</v></c>';
   const celGol = (c, rr, st) => '<c r="' + ref(c, rr) + '" s="' + st + '"/>';
@@ -481,7 +517,8 @@ async function construieste(spec){
       let st = stData[c], url = null;
       if(coloaneLink.indexOf(c) >= 0 && v !== '' && v != null){
         try{ url = spec.linkuri[c](rand, i); }catch(e){ url = null; }
-        if(url && /^https?:\/\//i.test(url)){ st = stLink[c]; linkuri.push([ref(c, rr), url]); } else url = null;
+        const l = legatura(ref(c, rr), url);
+        if(l){ st = stLink[c]; linkuri.push(l); } else url = null;
       }
       if(v === '' || v == null || (typeof v === 'number' && !isFinite(v))){ x += celGol(c, rr, st); continue; }
       if(t.data){
@@ -534,12 +571,12 @@ async function construieste(spec){
   /* note */
   note.forEach((n, i) => {
     const rr = rNote0 + i, text = typeof n === 'string' ? n : n.t, url = typeof n === 'string' ? null : n.u;
-    const hl = url && /^https?:\/\//i.test(url);
+    const lnk = legatura(ref(0, rr), url), hl = !!lnk;
     let x = celText(0, rr, hl ? stBanda.notaLink : stBanda.nota, text);
     for(let c = 1; c < nC; c++) x += celGol(c, rr, hl ? stBanda.notaLink : stBanda.nota);
     rand_(rr, x, Math.min(90, 12.5 * linii(text, totalLat * 1.3) + 3));
     if(nC > 1) unirea.push(ref(0, rr) + ':' + ref(nC - 1, rr));
-    if(hl) linkuri.push([ref(0, rr), url]);
+    if(lnk) linkuri.push(lnk);
   });
   const ultimulRand = Math.max(rNote0 + note.length - 1, ultimulTabel);
 
@@ -589,11 +626,14 @@ async function construieste(spec){
   }
 
   /* ---- foaia ---- */
+  let idRel = 0;                                                           // linkurile din afara fișierului au câte o relație
+  linkuri.forEach(l => { if(l.url) l.rid = ++idRel; });
+  const kG = grafic ? ++ctx.nrGrafice : 0;                                 // graficele se numără pe tot fișierul: chart1.xml, chart2.xml…
   const sheet = ANTET_XML +
     '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="' + NS_R + '">' +
-    '<sheetPr><tabColor rgb="' + CUL.navy + '"/><pageSetUpPr fitToPage="1"/></sheetPr>' +
+    '<sheetPr><tabColor rgb="' + (spec.culoareFila || CUL.navy) + '"/><pageSetUpPr fitToPage="1"/></sheetPr>' +
     '<dimension ref="A1:' + ref(Math.max(nC - 1, 0), ultimulRand) + '"/>' +
-    '<sheetViews><sheetView showGridLines="0" tabSelected="1" workbookViewId="0">' +
+    '<sheetViews><sheetView showGridLines="0"' + (idx === 0 ? ' tabSelected="1"' : '') + ' workbookViewId="0">' +
       '<pane ySplit="' + (rAntet + 1) + '" topLeftCell="A' + (rAntet + 2) + '" activePane="bottomLeft" state="frozen"/>' +
       '<selection pane="bottomLeft" activeCell="A' + (rAntet + 2) + '" sqref="A' + (rAntet + 2) + '"/></sheetView></sheetViews>' +
     '<sheetFormatPr defaultRowHeight="15"/>' +
@@ -602,48 +642,73 @@ async function construieste(spec){
     (nR ? '<autoFilter ref="' + ref(0, rAntet) + ':' + ref(nC - 1, r1) + '"/>' : '') +
     (unirea.length ? '<mergeCells count="' + unirea.length + '">' + unirea.map(m => '<mergeCell ref="' + m + '"/>').join('') + '</mergeCells>' : '') +
     cf.join('') +
-    (linkuri.length ? '<hyperlinks>' + linkuri.map((l, i) => '<hyperlink ref="' + l[0] + '" r:id="rId' + (i + 1) + '"/>').join('') + '</hyperlinks>' : '') +
+    (linkuri.length ? '<hyperlinks>' + linkuri.map(l => l.url
+      ? '<hyperlink ref="' + l.ref + '" r:id="rId' + l.rid + '"/>'
+      : '<hyperlink ref="' + l.ref + '" location="' + xe(l.loc) + '" display="' + xe(l.afisat) + '"/>').join('') + '</hyperlinks>' : '') +
     '<printOptions horizontalCentered="1"/>' +
     '<pageMargins left="0.5" right="0.5" top="0.6" bottom="0.7" header="0.3" footer="0.3"/>' +
     '<pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/>' +
     '<headerFooter><oddFooter>&amp;L&amp;8 ' + xe(String(spec.subsol || '').replace(/&/g, '&&')) + '&amp;C&amp;8 &amp;A&amp;R&amp;8 ' + (en ? 'Page' : 'Pagina') + ' &amp;P / &amp;N</oddFooter></headerFooter>' +
     (ignora.length ? '<ignoredErrors>' + ignora.map(z => '<ignoredError sqref="' + z + '" numberStoredAsText="1"/>').join('') + '</ignoredErrors>' : '') +
-    (grafic ? '<drawing r:id="rId' + (linkuri.length + 1) + '"/>' : '') +
+    (grafic ? '<drawing r:id="rId' + (idRel + 1) + '"/>' : '') +
     '</worksheet>';
 
   const relFoaie = ANTET_XML + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
-    linkuri.map((l, i) => '<Relationship Id="rId' + (i + 1) + '" Type="' + REL + 'hyperlink" Target="' + xe(l[1]) + '" TargetMode="External"/>').join('') +
-    (grafic ? '<Relationship Id="rId' + (linkuri.length + 1) + '" Type="' + REL + 'drawing" Target="../drawings/drawing1.xml"/>' : '') +
+    linkuri.filter(l => l.url).map(l => '<Relationship Id="rId' + l.rid + '" Type="' + REL + 'hyperlink" Target="' + xe(l.url) + '" TargetMode="External"/>').join('') +
+    (grafic ? '<Relationship Id="rId' + (idRel + 1) + '" Type="' + REL + 'drawing" Target="../drawings/drawing' + kG + '.xml"/>' : '') +
     '</Relationships>';
 
-  /* ---- registru, foi, metadate ---- */
+  /* ---- numele definite ale foii (filtrul și rândurile care se repetă la tipărire) ---- */
   const nF = citeaza_foaia(foaie);
-  const nume_def = (nR ? '<definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">' + xe(nF) + '!' + ABS(0, rAntet) + ':' + ABS(nC - 1, r1) + '</definedName>' : '') +
-    '<definedName name="_xlnm.Print_Titles" localSheetId="0">' + xe(nF) + '!$' + (rAntet + 1) + ':$' + (rAntet + 1) + '</definedName>';
+  const nume_def = (nR ? '<definedName name="_xlnm._FilterDatabase" localSheetId="' + idx + '" hidden="1">' + xe(nF) + '!' + ABS(0, rAntet) + ':' + ABS(nC - 1, r1) + '</definedName>' : '') +
+    '<definedName name="_xlnm.Print_Titles" localSheetId="' + idx + '">' + xe(nF) + '!$' + (rAntet + 1) + ':$' + (rAntet + 1) + '</definedName>';
+  return { sheet: sheet, rels: relFoaie, grafic: grafic ? { xml: grafic.xml, desen: grafic.desen, k: kG } : null, defNames: nume_def };
+}
+
+async function construieste(spec){
+  const foiSpec = (Array.isArray(spec.foi) && spec.foi.length) ? spec.foi : [spec];
+  const prima = foiSpec[0];
+  const limba = spec.limba || prima.limba;
+  const en = limba === 'en';
+  const acum = spec.data instanceof Date ? spec.data : (prima.data instanceof Date ? prima.data : new Date());
+  const nume = numeUnice(foiSpec.map(f => nume_foaie(f.foaie, en ? 'Data' : 'Date')));
+  const hartaNume = new Map();                                             // numele cerut → numele final, pentru linkurile dintre foi
+  foiSpec.forEach((f, i) => { if(!hartaNume.has(String(f.foaie))) hartaNume.set(String(f.foaie), nume[i]); });
+  const registruSiruri = RegistruSiruri();
+  const ctx = { en: en, S: RegistruStiluri(), sir: registruSiruri.sir, nrGrafice: 0, hartaNume: hartaNume, nume: '' };
+  const foi = foiSpec.map((f, i) => {
+    ctx.nume = nume[i];
+    return construiesteFoaie(Object.assign({ limba: limba, subsol: spec.subsol }, f), i, ctx);
+  });
+  const n = foi.length;
+  const titlu = spec.titlu || prima.titlu || '';
+  const autor = spec.autor || prima.autor || 'nistor.vivi.md';
+
+  /* ---- registru, foi, metadate ---- */
   const workbook = ANTET_XML + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="' + NS_R + '">' +
     '<bookViews><workbookView xWindow="0" yWindow="0" windowWidth="28800" windowHeight="15000" activeTab="0"/></bookViews>' +
-    '<sheets><sheet name="' + xe(foaie) + '" sheetId="1" r:id="rId1"/></sheets>' +
-    '<definedNames>' + nume_def + '</definedNames>' +
+    '<sheets>' + nume.map((nm, i) => '<sheet name="' + xe(nm) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets>' +
+    '<definedNames>' + foi.map(f => f.defNames).join('') + '</definedNames>' +
     '<calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>';
   const relWb = ANTET_XML + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
-    '<Relationship Id="rId1" Type="' + REL + 'worksheet" Target="worksheets/sheet1.xml"/>' +
-    '<Relationship Id="rId2" Type="' + REL + 'styles" Target="styles.xml"/>' +
-    '<Relationship Id="rId3" Type="' + REL + 'sharedStrings" Target="sharedStrings.xml"/></Relationships>';
-  const sst = ANTET_XML + '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="' + nrSiruri + '" uniqueCount="' + siruri.size + '">' +
-    [...siruri.keys()].map(s => '<si><t xml:space="preserve">' + xe(s) + '</t></si>').join('') + '</sst>';
+    foi.map((f, i) => '<Relationship Id="rId' + (i + 1) + '" Type="' + REL + 'worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('') +
+    '<Relationship Id="rId' + (n + 1) + '" Type="' + REL + 'styles" Target="styles.xml"/>' +
+    '<Relationship Id="rId' + (n + 2) + '" Type="' + REL + 'sharedStrings" Target="sharedStrings.xml"/></Relationships>';
   const iso = acum.toISOString().replace(/\.\d+Z$/, 'Z');
   const core = ANTET_XML + '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" ' +
     'xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" ' +
-    'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>' + xe(spec.titlu) + '</dc:title><dc:creator>' + xe(spec.autor || 'nistor.vivi.md') + '</dc:creator>' +
+    'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>' + xe(titlu) + '</dc:title><dc:creator>' + xe(autor) + '</dc:creator>' +
     '<dcterms:created xsi:type="dcterms:W3CDTF">' + iso + '</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">' + iso + '</dcterms:modified></cp:coreProperties>';
-  const app = ANTET_XML + '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>' + xe(spec.autor || 'nistor.vivi.md') + '</Application></Properties>';
+  const app = ANTET_XML + '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>' + xe(autor) + '</Application></Properties>';
+  const grafice = foi.filter(f => f.grafic).map(f => f.grafic);
   const tipuriContinut = ANTET_XML + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
     '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>' +
     '<Override PartName="/xl/workbook.xml" ContentType="' + CT + 'spreadsheetml.sheet.main+xml"/>' +
-    '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="' + CT + 'spreadsheetml.worksheet+xml"/>' +
+    foi.map((f, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="' + CT + 'spreadsheetml.worksheet+xml"/>').join('') +
     '<Override PartName="/xl/styles.xml" ContentType="' + CT + 'spreadsheetml.styles+xml"/>' +
     '<Override PartName="/xl/sharedStrings.xml" ContentType="' + CT + 'spreadsheetml.sharedStrings+xml"/>' +
-    (grafic ? '<Override PartName="/xl/drawings/drawing1.xml" ContentType="' + CT + 'drawing+xml"/><Override PartName="/xl/charts/chart1.xml" ContentType="' + CT + 'drawingml.chart+xml"/>' : '') +
+    grafice.map(g => '<Override PartName="/xl/drawings/drawing' + g.k + '.xml" ContentType="' + CT + 'drawing+xml"/>' +
+      '<Override PartName="/xl/charts/chart' + g.k + '.xml" ContentType="' + CT + 'drawingml.chart+xml"/>').join('') +
     '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>' +
     '<Override PartName="/docProps/app.xml" ContentType="' + CT + 'extended-properties+xml"/></Types>';
   const relRadacina = ANTET_XML + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
@@ -656,17 +721,19 @@ async function construieste(spec){
     { nume: '_rels/.rels', date: relRadacina },
     { nume: 'xl/workbook.xml', date: workbook },
     { nume: 'xl/_rels/workbook.xml.rels', date: relWb },
-    { nume: 'xl/styles.xml', date: S.xml() },
-    { nume: 'xl/sharedStrings.xml', date: sst },
-    { nume: 'xl/worksheets/sheet1.xml', date: sheet },
-    { nume: 'xl/worksheets/_rels/sheet1.xml.rels', date: relFoaie }
+    { nume: 'xl/styles.xml', date: ctx.S.xml() },
+    { nume: 'xl/sharedStrings.xml', date: registruSiruri.xml() }
   ];
-  if(grafic){
-    fisiere.push({ nume: 'xl/drawings/drawing1.xml', date: grafic.desen });
-    fisiere.push({ nume: 'xl/drawings/_rels/drawing1.xml.rels', date: ANTET_XML + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
-      '<Relationship Id="rId1" Type="' + REL + 'chart" Target="../charts/chart1.xml"/></Relationships>' });
-    fisiere.push({ nume: 'xl/charts/chart1.xml', date: grafic.xml });
-  }
+  foi.forEach((f, i) => {
+    fisiere.push({ nume: 'xl/worksheets/sheet' + (i + 1) + '.xml', date: f.sheet });
+    fisiere.push({ nume: 'xl/worksheets/_rels/sheet' + (i + 1) + '.xml.rels', date: f.rels });
+  });
+  grafice.forEach(g => {
+    fisiere.push({ nume: 'xl/drawings/drawing' + g.k + '.xml', date: g.desen });
+    fisiere.push({ nume: 'xl/drawings/_rels/drawing' + g.k + '.xml.rels', date: ANTET_XML + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="' + REL + 'chart" Target="../charts/chart' + g.k + '.xml"/></Relationships>' });
+    fisiere.push({ nume: 'xl/charts/chart' + g.k + '.xml', date: g.xml });
+  });
   fisiere.push({ nume: 'docProps/core.xml', date: core }, { nume: 'docProps/app.xml', date: app });
   return zip(fisiere, acum);
 }
