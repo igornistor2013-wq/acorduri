@@ -29,5 +29,10 @@
   "categorie": "Asistență tehnică",
   "motiv": "Înțelegere prin schimb de note pentru implementarea comună a proiectului ITA-M (consolidarea rezilienței sociale împotriva dezinformării), finanțat de Ministerul Federal de Externe al Germaniei și implementat de GIZ. Pagina GIZ Moldova îl trece la „tip de asistență: tehnică”, iar HG 409/2025 numește același proiect „cooperare tehnică pentru finanțarea proiectelor”. Titlul hotărârii din 2024 nu spune dacă banii se rambursează, iar regula automată îl pusese la grant, după finanțator.",
   "sursa": "https://giz.rts.md/en/projects/infotrustalliance-moldova-ita-m"
+ },
+ "HG654/2024": {
+  "categorie": "Grant",
+  "motiv": "Proiectul moldo-elvețian în domeniul proprietății intelectuale (MSIP) e finanțat nerambursabil de Elveția: SECO dă 750.000 CHF (anunțul AGEPI), iar datele primite pentru registru îl numesc «grant», de 794 407,37 EUR. Titlul hotărârii vorbește de «acordarea asistenței tehnice» și nu spune că banii s-ar rambursa; categoria urmează aceste date.",
+  "sursa": "https://agepi.gov.md/en/news/moldovan-swiss-intellectual-property-project-was-officially-launched-chisinau"
  }
 }

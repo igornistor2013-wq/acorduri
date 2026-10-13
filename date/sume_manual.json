@@ -220,7 +220,7 @@
  "OMMPS273/2026": {
   "v": 580000,
   "val": "CHF",
-  "nota": "Introdus de autorul registrului."
+  "nota": "Total după amendamentul nr. 1 (29.07.2026): 580 000 CHF. Inițial, grant de 300 000 CHF (nota Guvernului: «sub formă de grant […] în valoare de 300.000 CHF», pentru centrele de plasament temporar pentru refugiați)."
  },
  "LP20/2025": {
   "ascunde": true,
@@ -1024,5 +1024,18 @@
   "extern": true,
   "u": "https://czechaid.gov.cz/aktivity/aktuality/cra-pomaha-v-ramci-noveho-projektu-modernizovat-v-moldavsku-socialni-system",
   "nota": "Fișa proiectului Czech Aid: «Total amount of funds for the project from the Czech Aid assistance (CZK): 22 902 012,92» (oct. 2025 – dec. 2027). Agenția Cehă de Dezvoltare (2.12.2025): «rozpočtem 22,9 milionu korun»."
+ },
+ "HG574/2025": {
+  "v": 1880000,
+  "val": "CHF",
+  "extern": true,
+  "nota": "Din documentul oficial al proiectului (nepublicat online): «1.880.000 franci elvețieni pentru implementarea Proiectului Sprijinirea Republicii Moldova în confiscarea și recuperarea bunurilor infracționale (CRESTA)»."
+ },
+ "HG654/2024": {
+  "v": 794407.37,
+  "val": "EUR",
+  "extern": true,
+  "u": "https://agepi.gov.md/en/news/moldovan-swiss-intellectual-property-project-was-officially-launched-chisinau",
+  "nota": "AGEPI anunță la lansare (24.9.2024) o finanțare totală de «750,000 Swiss Francs» de la SECO. Echivalentul în EUR, 794 407,37, e cel comunicat pentru registru; corespunde cursului din septembrie 2024."
  }
 }
