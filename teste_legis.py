@@ -603,9 +603,64 @@ if '--browser' in sys.argv:
              bool(_urbact) and all(not a['suma'] or a['suma']['eur'] != 86769799 for a in _urbact), [a['suma'] for a in _urbact])
 
     print()
-    print('Browser: exportul Excel din registru are linkuri clicabile')
-    import zipfile, xml.dom.minidom, functools, html as _html
+    print('Browser: exportul Excel din registru — stilizat, cu totalul din pagină, filtre, linkuri și rezerva fără xlsx-stil.js')
+    import zipfile, xml.dom.minidom, functools, html as _html, datetime as _dt
+    import openpyxl
     from playwright.sync_api import sync_playwright
+
+    ANTET_ACORDURI = ['Acordul', 'Partener', 'Tip de finanțare', 'Suport bugetar', 'Suma', 'Valuta', 'Echivalent EUR', 'Intră în total?', 'Semnat',
+                      'Etape parcurse (din 5)', 'Etapa atinsă', '1. Inițiere negocieri', '2. Aprobare semnare', '3. Aprobare proiect de lege',
+                      '4. Ratificare sau aprobare', '5. Decret de promulgare', 'În vigoare din', 'Temeiul datei', 'Ani', 'Nr. acte', 'Prima publicare',
+                      'Ultima publicare', 'Sursa sumei', 'Fragmentul din act', 'Link sursă', 'Costul total al proiectului', 'Valuta costului',
+                      'Denumirea completă', 'Link în registru']
+    ANTET_ACTE = ['Data ediției', 'Ediția', 'Act', 'Tip de finanțare', 'Suport bugetar', 'Partener', 'Etapa', 'Denumirea acordului',
+                  'Titlul complet al actului', 'Semnat', 'Link']
+
+    def _eur_pagina(text):
+        """„11,85 mld. EUR" → (valoarea, cât poate fi de departe de cifra reală din cauza rotunjirii afișate)."""
+        m = re.search(r'([\d,]+)\s*(mld\.|mil\.|mii)?\s*EUR', text)
+        n = float(m.group(1).replace(',', '.'))
+        u = {'mld.': 1e9, 'mil.': 1e6, 'mii': 1e3, None: 1}[m.group(2)]
+        zec = len(m.group(1).split(',')[1]) if ',' in m.group(1) else 0
+        return n * u, 0.5 * u * 10 ** (-zec) + 1
+
+    def _tabel(cale, foaie, rand_antet=5):
+        """Rândurile de date ale unei foi (de sub antet până la rândul „Total" sau până la primul rând gol), ca dicționare după antet."""
+        ws = openpyxl.load_workbook(cale)[foaie]
+        antet = [c.value for c in ws[rand_antet]]
+        rez = []
+        for r in range(rand_antet + 1, ws.max_row + 1):
+            v = [c.value for c in ws[r]]
+            if v[0] is None or (isinstance(v[0], str) and v[0].startswith('Total')):
+                break
+            rez.append(dict(zip(antet, v)))
+        return antet, rez, ws
+
+    def _descarca(pg, cale):
+        with pg.expect_download(timeout=60000) as d:
+            pg.click('#export')
+        d.value.save_as(str(cale))
+        return d.value.suggested_filename
+
+    def _asteapta_pagina(pg):
+        """Lista e în pagină, iar sumele (fișiere separate, aduse după încărcare) au sosit și s-au așezat: două citiri la fel la rând.
+        Panoul „Sumele acordurilor" există doar pe legis.md, de aceea semnătura se bazează pe datele paginii (window.__ACORDURI__)."""
+        pg.wait_for_function("() => (window.__GRUPURI__ || []).length > 50", timeout=60000)
+        ant, la_fel = None, 0
+        for _ in range(60):
+            pg.wait_for_timeout(500)
+            cur = pg.evaluate('''() => {
+                const A = window.__ACORDURI__ ? window.__ACORDURI__() : [];
+                const p = document.querySelector('#sume .sume-total');
+                return (p ? p.innerText : '-') + '|' + A.length + '|' + A.reduce((s, a) => s + (a.suma ? (a.suma.eur || 0) : 0), 0)
+                       + '|' + A.reduce((s, a) => s + a.acte.length, 0);
+            }''')
+            la_fel = la_fel + 1 if cur == ant else 0
+            if la_fel >= 2:
+                return
+            ant = cur
+
+    _dir = Path(tempfile.mkdtemp(prefix='reg_xlsx_'))
     _srv = lga._Server(('127.0.0.1', 0), functools.partial(lga._Liniste, directory=str(AICI)))
     threading.Thread(target=_srv.serve_forever, daemon=True).start()
     _baza = 'http://127.0.0.1:%d/' % _srv.server_address[1]
@@ -613,38 +668,201 @@ if '--browser' in sys.argv:
         with sync_playwright() as _p:
             _b = _p.chromium.launch()
             for _pagina in ('legis_acorduri.html', 'acorduri.html'):
+                _nume = _pagina.split('.')[0]
                 _pg = _b.new_page()
+                _erori = []
+                _pg.on('pageerror', lambda e: _erori.append(str(e)[:200]))
                 _pg.route('**/*', lambda r: r.continue_() if r.request.url.startswith(_baza) else r.abort())
                 _pg.goto(_baza + _pagina, wait_until='networkidle', timeout=90000)
-                _pg.wait_for_timeout(2500)
-                _pg.click('#vedBtns [data-ved="acte"]')
-                _pg.wait_for_timeout(500)
-                with _pg.expect_download(timeout=30000) as _d:
-                    _pg.click('#export')
-                _z = zipfile.ZipFile(_d.value.path())
-                _foaie = _z.read('xl/worksheets/sheet1.xml').decode('utf-8')
-                _cale_rel = 'xl/worksheets/_rels/sheet1.xml.rels'
-                _rel = _z.read(_cale_rel).decode('utf-8') if _cale_rel in _z.namelist() else ''     # fără hyperlinkuri, fișierul nu există
-                _nume = _pagina.split('.')[0]
-                _adrese = re.findall(r'<t xml:space="preserve">(https?://[^<\s]+)</t>', _foaie)
-                _legaturi = _foaie.count('<hyperlink ')
-                verifica(_nume + ': foaia „Acte" are adrese, și fiecare e hyperlink (nu text simplu)', len(_adrese) > 100 and len(_adrese) == _legaturi, (len(_adrese), _legaturi))
-                _tinte = re.findall(r'Target="([^"]+)" TargetMode="External"', _rel)
-                verifica(_nume + ': fiecare hyperlink are o relație externă, spre aceeași adresă',
-                         len(_tinte) == _legaturi and [_html.unescape(t) for t in _tinte] == [_html.unescape(a) for a in _adrese])
-                verifica(_nume + ': stilul „hyperlink" e declarat și folosit',
-                         'xl/styles.xml' in _z.namelist() and '/xl/styles.xml' in _z.read('[Content_Types].xml').decode() and 's="1"' in _foaie)
-                _strict = []
+                _asteapta_pagina(_pg)                # sumele sosesc pe rând (fișiere separate): așteptăm până se oprește redesenarea
+                _panou = _pg.evaluate("() => !!document.querySelector('#sume')")
+                verifica(_nume + ': panoul „Sumele acordurilor" există doar în registrul legis.md (la Monitor totalul se verifică după datele paginii)',
+                         _panou == (_nume == 'legis_acorduri'), _panou)
+                _info = _pg.evaluate('''() => {
+                    const g = window.__GRUPURI__ || [];
+                    const p = document.querySelector('#sume .sume-total');
+                    return {grupuri: g.length, acte: g.reduce((s, x) => s + x.acte.length, 0), text: p ? p.innerText : '',
+                            total: p && p.querySelector('b') ? p.querySelector('b').innerText : ''};
+                }''')
+                if _panou:
+                    _tot_pag, _toler = _eur_pagina(_info['total'])
+                    _m = re.search(r':\s*(\d+)\s+(?:de\s+)?acord\w*\s+din\s+(\d+)', _info['text'])
+                    _in_total_pag, _din_pag = (int(_m.group(1)), int(_m.group(2))) if _m else (-1, -1)
+                else:
+                    _tot_pag = _toler = _in_total_pag = _din_pag = None
+                _A = _pg.evaluate('() => window.__ACORDURI__()')
+
+                # ---- 1. vederea „Acorduri", fără filtre
+                _f1 = _dir / (_nume + '-acorduri.xlsx')
+                _nf = _descarca(_pg, _f1)
+                verifica(_nume + ': fișierul se numește registru-acorduri-<data>.xlsx', re.fullmatch(r'registru-acorduri-\d{4}-\d\d-\d\d\.xlsx', _nf) is not None, _nf)
+                _z = zipfile.ZipFile(_f1)
+                _rele = []
                 for _n in _z.namelist():
                     try:
                         xml.dom.minidom.parseString(_z.read(_n))
                     except Exception:
-                        _strict.append(_n)
-                verifica(_nume + ': toate părțile fișierului sunt XML valid', not _strict, _strict)
+                        _rele.append(_n)
+                verifica(_nume + ': toate părțile fișierului sunt XML valid', not _rele, _rele)
+                verifica(_nume + ': stilurile și șirurile sunt părți ale fișierului, iar legăturile externe au relații',
+                         {'xl/styles.xml', 'xl/sharedStrings.xml', 'xl/worksheets/_rels/sheet1.xml.rels'} <= set(_z.namelist()))
+                _wb = openpyxl.load_workbook(_f1)
+                verifica(_nume + ': trei foi — Acorduri, Sume pe tipuri, Pe valute', _wb.sheetnames == ['Acorduri', 'Sume pe tipuri', 'Pe valute'], _wb.sheetnames)
+                _antet, _rand, _ws = _tabel(_f1, 'Acorduri')
+                verifica(_nume + ': antetul are cele 29 de coloane, în ordinea hotărâtă', _antet == ANTET_ACORDURI, [(a, b) for a, b in zip(_antet, ANTET_ACORDURI) if a != b])
+                verifica(_nume + ': un rând pe acord, cât în pagină (%d)' % _info['grupuri'], len(_rand) == _info['grupuri'] > 50, (len(_rand), _info['grupuri']))
+                _suma_eur = sum(r['Echivalent EUR'] for r in _rand if isinstance(r['Echivalent EUR'], (int, float)))
+                _da = sum(1 for r in _rand if r['Intră în total?'] == 'da')
+                if _panou:
+                    verifica(_nume + ': totalul în euro din coloană = totalul din panoul paginii (%s)' % _info['total'], abs(_suma_eur - _tot_pag) <= _toler, (_suma_eur, _tot_pag, _toler))
+                    verifica(_nume + ': numărul rândurilor „da" = numărul din pagină (%d din %d)' % (_in_total_pag, _din_pag), _da == _in_total_pag and len(_rand) == _din_pag, (_da, _in_total_pag, len(_rand), _din_pag))
+                # pe ambele pagini: rând cu rând, cifrele din fișier sunt cele din datele paginii (window.__ACORDURI__)
+                _gresite = []
+                for _i, (_r, _a) in enumerate(zip(_rand, _A)):
+                    _s = _a['suma']
+                    _bun = (_r['Acordul'] == _a['scurt'] and _r['Denumirea completă'] == _a['nume']
+                            and (_r['Suma'], _r['Valuta']) == ((_s['v'], _s['val']) if _s else (None, None))
+                            and (_r['Echivalent EUR'] is None or (_s and _s['eur'] is not None and abs(_r['Echivalent EUR'] - _s['eur']) <= 0.5 + 1e-6))
+                            and (_a['faraTotal'] == (_r['Intră în total?'] == 'nu: nu se adună')))
+                    if not _bun:
+                        _gresite.append((_i, _r['Acordul'][:30], _r['Suma'], _r['Valuta'], _r['Echivalent EUR'], _r['Intră în total?'], _s))
+                verifica(_nume + ': rând cu rând, numele, suma, valuta, echivalentul EUR și „nu se adună" coincid cu datele paginii', len(_A) == len(_rand) and not _gresite, _gresite[:3])
+                _tot_date = sum(a['suma']['eur'] for r, a in zip(_rand, _A) if r['Intră în total?'] == 'da')
+                verifica(_nume + ': totalul în euro din coloană = suma echivalentelor din datele paginii, pe rândurile „da"', abs(_suma_eur - _tot_date) <= 0.5 * _da + 1 and _da > 20, (_suma_eur, _tot_date, _da))
+                _motive = {r['Intră în total?'] for r in _rand} - {None}
+                verifica(_nume + ': motivele pentru care un rând nu intră în total sunt cele cunoscute', _motive <= {'da', 'nu: dublură', 'nu: nu se adună', 'nu: fără curs'}, _motive)
+                verifica(_nume + ': rândurile care nu intră în total nu au echivalent EUR, cele care intră îl au',
+                         all((r['Echivalent EUR'] is not None) == (r['Intră în total?'] == 'da') for r in _rand), [r['Acordul'] for r in _rand if (r['Echivalent EUR'] is not None) != (r['Intră în total?'] == 'da')][:3])
+                verifica(_nume + ': orice rând cu sumă are și valută, și o stare față de total; fără sumă — nici una',
+                         all((r['Suma'] is not None) == (r['Valuta'] is not None) == (r['Intră în total?'] is not None) for r in _rand), [r['Acordul'] for r in _rand if (r['Suma'] is None) != (r['Intră în total?'] is None)][:3])
+                verifica(_nume + ': sumele și numărul de acte sunt numere, datele sunt date adevărate (se sortează), marcajele sunt „da"',
+                         all(r['Suma'] is None or isinstance(r['Suma'], (int, float)) for r in _rand)
+                         and all(isinstance(r['Nr. acte'], int) and r['Nr. acte'] >= 1 for r in _rand)
+                         and all(r['Prima publicare'] is None or isinstance(r['Prima publicare'], _dt.datetime) for r in _rand)
+                         and all(r['Semnat'] is None or isinstance(r['Semnat'], _dt.datetime) for r in _rand)
+                         and all(r['Suport bugetar'] in (None, 'da') for r in _rand) and all(r['1. Inițiere negocieri'] in (None, 'da') for r in _rand),
+                         [(r['Acordul'][:30], r['Prima publicare'], r['Semnat']) for r in _rand[:2]])
+                verifica(_nume + ': „Etape parcurse" e un număr de la 0 la 5, egal cu numărul etapelor bifate',
+                         all(isinstance(r['Etape parcurse (din 5)'], int) and 0 <= r['Etape parcurse (din 5)'] <= 5
+                             and r['Etape parcurse (din 5)'] == sum(1 for k in ANTET_ACORDURI[11:16] if r[k] == 'da') for r in _rand), [r['Acordul'][:30] for r in _rand[:2]])
+                _ultim = 6 + len(_rand) - 1
+                verifica(_nume + ': antetul și prima coloană rămân pe loc la derulare (B6), cu filtre pe toată lista', _ws.freeze_panes == 'B6' and _ws.auto_filter.ref == 'A5:AC%d' % _ultim, (_ws.freeze_panes, _ws.auto_filter.ref))
+                verifica(_nume + ': titlul e în banda albastră închisă, antetul albastru cu text alb, grupele de coloane deasupra',
+                         _ws['A1'].fill.fgColor.rgb == 'FF14233C' and _ws['A5'].fill.fgColor.rgb == 'FF1E4B8C' and _ws['A5'].font.color.rgb == 'FFFFFFFF'
+                         and [_ws[c + '4'].value for c in ('A', 'E', 'I', 'S', 'W')] == ['ACORD', 'SUMA ȘI TOTALUL', 'PARCURSUL ACORDULUI', 'ACTELE PUBLICATE', 'SURSE ȘI DETALII'],
+                         [_ws[c + '4'].value for c in ('A', 'E', 'I', 'S', 'W')])
+                _sub = _ws['A2'].value
+                verifica(_nume + ': rândul de context spune sursa, lipsa filtrelor, numărul de acorduri și data', _sub.startswith('Sursa: ') and 'fără filtre' in _sub and ('%d de acorduri' % _info['grupuri']) in _sub.replace(' %d acorduri' % _info['grupuri'], ' %d de acorduri' % _info['grupuri']) and 'Generat: ' in _sub and 'cursul BCE din 1 iulie 2026' in _sub, _sub)
+                verifica(_nume + ': sursa din antet e cea a paginii', ('legis.md' in _sub) == (_nume == 'legis_acorduri') and ('monitorul.gov.md' in _sub) == (_nume == 'acorduri'), _sub[:120])
+                _reguli = {}
+                for _rng in _ws.conditional_formatting:
+                    for _r in _rng.rules:
+                        _reguli.setdefault(str(_rng.sqref), []).append(_r)
+                verifica(_nume + ': culori pe „Tip de finanțare" (4 tipuri) și pe „Intră în total?" (da / 3 motive de excludere)',
+                         len(_reguli.get('C6:C%d' % _ultim, [])) == 4 and len(_reguli.get('H6:H%d' % _ultim, [])) == 4, {k: len(v) for k, v in _reguli.items()})
+                _total_f = [c.value for c in _ws[_ultim + 1]]
+                verifica(_nume + ': rândul de total adună coloana „Echivalent EUR" cu SUBTOTAL (se recalculează la filtrare)', _total_f[0] == 'Total (rândurile vizibile)' and _total_f[6] == '=SUBTOTAL(109,G6:G%d)' % _ultim, _total_f[:7])
+                _wbv = openpyxl.load_workbook(_f1, data_only=True)
+                _cache = _wbv['Acorduri'].cell(row=_ultim + 1, column=7).value
+                verifica(_nume + ': valoarea calculată a totalului e trecută în fișier (se vede și fără recalculare)', _cache is not None and abs(_cache - _suma_eur) < 1, (_cache, _suma_eur))
+                # foile cu cifrele pe tipuri și pe valute
+                _a2, _r2, _w2 = _tabel(_f1, 'Sume pe tipuri', 4)
+                _a3, _r3, _w3 = _tabel(_f1, 'Pe valute', 4)
+                _t2 = sum(r['Echivalent EUR'] for r in _r2)
+                _t3 = sum(r['Echivalent EUR'] for r in _r3)
+                verifica(_nume + ': „Sume pe tipuri" are aceleași cifre ca ' + ('panoul din pagină' if _panou else 'coloana „Echivalent EUR"') + ': același total, același număr de acorduri cu sumă',
+                         abs(_t2 - _suma_eur) < 1 and (not _panou or abs(_t2 - _tot_pag) <= _toler) and sum(r['Din care cu sumă (în total)'] for r in _r2) == _da, (_t2, _suma_eur, _tot_pag, _da))
+                verifica(_nume + ': subtitlul foii „Sume pe tipuri" trimite la panoul din pagină doar acolo unde panoul există', ('panoul' in (_w2['A2'].value or '')) == _panou, _w2['A2'].value)
+                verifica(_nume + ': „Pe valute" adună același total ca „Sume pe tipuri", iar cursurile sunt cele din pagină',
+                         abs(_t3 - _t2) < 1 and sum(r['Acorduri'] for r in _r3) == _da and any(r['Valuta'] == 'EUR' and r['Unități pentru 1 EUR'] == 1 for r in _r3)
+                         and all(r['Unități pentru 1 EUR'] > 0 for r in _r3), (_t3, _t2))
+                verifica(_nume + ': „Sume pe tipuri" are un grafic cu bare', any('chart' in n for n in _z.namelist()) and _w2.freeze_panes == 'A5')
+                verifica(_nume + ': pondere pe tipuri — suma ponderilor = 100%', abs(sum(r['Pondere din total'] for r in _r2) - 1) < 1e-9, [r['Pondere din total'] for r in _r2])
+                # linkuri
+                _leg_reg = [_ws.cell(row=r, column=29).hyperlink for r in range(6, _ultim + 1)]
+                verifica(_nume + ': fiecare rând are „Link în registru", un link spre acordul din pagină (#acord=…)', all(h is not None and '#acord=' in h.target for h in _leg_reg) and _leg_reg[0].target.startswith(_baza + _pagina), (_leg_reg[0].target if _leg_reg[0] else None))
+                _cu_sursa = [r for r in range(6, _ultim + 1) if _ws.cell(row=r, column=25).value]
+                verifica(_nume + ': „Link sursă" e hyperlink doar unde există sursă, spre o adresă http(s), cu gazda ca text',
+                         len(_cu_sursa) > 5 and all(_ws.cell(row=r, column=25).hyperlink and re.match(r'https?://', _ws.cell(row=r, column=25).hyperlink.target)
+                                                     and _ws.cell(row=r, column=25).hyperlink.target.split('/')[2].replace('www.', '') == _ws.cell(row=r, column=25).value for r in _cu_sursa)
+                         and all(_ws.cell(row=r, column=25).hyperlink is None for r in range(6, _ultim + 1) if r not in _cu_sursa), len(_cu_sursa))
+                _ext = [r for r in _rand if r['Sursa sumei'] == 'sursă externă (nu din actele din registru)']
+                verifica(_nume + ': sumele din surse externe sunt marcate „sursă externă (nu din actele din registru)"', len(_ext) >= 3 and all(r['Suma'] for r in _ext), len(_ext))
+                verifica(_nume + ': pagina nu a dat erori JavaScript', not _erori, _erori)
+
+                # ---- 2. filtrat: tip „Grant" + căutare „berd"
+                _pg.fill('#seek', 'berd')
+                _pg.wait_for_timeout(700)
+                _pg.click('#catBtns button[data-cat="Grant"]')
+                _pg.wait_for_timeout(900)
+                _vizibile = _pg.evaluate("() => document.querySelectorAll('tr.acord').length")
+                _f2 = _dir / (_nume + '-filtrat.xlsx')
+                _nf2 = _descarca(_pg, _f2)
+                _a4, _r4, _w4 = _tabel(_f2, 'Acorduri')
+                verifica(_nume + ': exportul filtrat are exact rândurile de pe ecran (%d)' % _vizibile, 0 < len(_r4) == _vizibile, (len(_r4), _vizibile))
+                verifica(_nume + ': toate rândurile filtrate sunt „Grant" cu BERD', all(r['Tip de finanțare'] == 'Grant' and 'BERD' in (r['Partener'] or '') for r in _r4), {(r['Tip de finanțare'], r['Partener']) for r in _r4})
+                _sub2 = _w4['A2'].value
+                verifica(_nume + ': contextul spune filtrele active (tip: Grant; căutare: berd), iar numele fișierului — tipul', 'tip: Grant' in _sub2 and 'căutare: berd' in _sub2 and 'fără filtre' not in _sub2 and '-grant-' in _nf2, (_sub2[:160], _nf2))
+                _wb4 = openpyxl.load_workbook(_f2)
+                _a5, _r5, _w5 = _tabel(_f2, 'Sume pe tipuri', 4)
+                verifica(_nume + ': foaia „Sume pe tipuri" arată doar tipul filtrat, cu totalul rândurilor exportate',
+                         [r['Tip de finanțare'] for r in _r5] == ['Grant'] and abs(_r5[0]['Echivalent EUR'] - sum(r['Echivalent EUR'] for r in _r4 if isinstance(r['Echivalent EUR'], (int, float)))) < 1
+                         and _r5[0]['Acorduri în selecție'] == len(_r4), (_r5, len(_r4)))
+                _pg.fill('#seek', '')
+                _pg.click('#catBtns button[data-cat="all"]')
+                _pg.wait_for_timeout(500)
+                # o căutare fără rezultat: fișier valid, doar cu antetul și o notă
+                _pg.fill('#seek', 'zzzzqqqq')
+                _pg.wait_for_timeout(600)
+                _f2b = _dir / (_nume + '-gol.xlsx')
+                _descarca(_pg, _f2b)
+                _wbg = openpyxl.load_workbook(_f2b)
+                verifica(_nume + ': căutarea fără rezultate dă un fișier valid, cu antetul și fără foile de sume', _wbg.sheetnames == ['Acorduri'] and _wbg['Acorduri']['A5'].value == 'Acordul' and 'niciun acord' in _wbg['Acorduri']['A2'].value, (_wbg.sheetnames, _wbg['Acorduri']['A2'].value))
+                _pg.fill('#seek', '')
+                _pg.wait_for_timeout(400)
+
+                # ---- 3. vederea „Acte"
+                _pg.click('#vedBtns [data-ved="acte"]')
+                _pg.wait_for_timeout(600)
+                _f3 = _dir / (_nume + '-acte.xlsx')
+                _nf3 = _descarca(_pg, _f3)
+                _wb3 = openpyxl.load_workbook(_f3)
+                _a6, _r6, _w6 = _tabel(_f3, 'Acte')
+                verifica(_nume + ': vederea „Acte" — o singură foaie, „Acte", cu cele 11 coloane', _wb3.sheetnames == ['Acte'] and _a6 == ANTET_ACTE and _nf3.startswith('registru-acte-'), (_wb3.sheetnames, _a6, _nf3))
+                verifica(_nume + ': un rând pe act, cât în registru (%d)' % _info['acte'], len(_r6) == _info['acte'] > 300, (len(_r6), _info['acte']))
+                _date = [r['Data ediției'] for r in _r6]
+                verifica(_nume + ': datele sunt date adevărate, în ordinea publicării (cele mai noi primele)', all(isinstance(d, _dt.datetime) for d in _date) and _date == sorted(_date, reverse=True), _date[:3])
+                _leg = [(_w6.cell(row=r, column=11).value, _w6.cell(row=r, column=11).hyperlink) for r in range(6, 6 + len(_r6))]
+                verifica(_nume + ': „Link" e hyperlink pe fiecare act care are adresă, spre http(s), cu gazda ca text',
+                         sum(1 for t, h in _leg if h) > 300 and all((h is None) == (not t) for t, h in _leg)
+                         and all(re.match(r'https?://', h.target) and h.target.split('/')[2].replace('www.', '') == t for t, h in _leg if h), sum(1 for t, h in _leg if h))
+                verifica(_nume + ': „Ediția" nu are prefixul dublat („MO MO") și, la Monitor, începe cu „MO "', not any('MO MO' in (r['Ediția'] or '') for r in _r6) and (_nume == 'legis_acorduri' or all((r['Ediția'] or '').startswith('MO ') for r in _r6)), [r['Ediția'] for r in _r6[:3]])
+                verifica(_nume + ': prima coloană din fiecare rând (data) și identificatorul actului rămân pe loc la derulare (D6)', _w6.freeze_panes == 'D6' and _w6.auto_filter.ref == 'A5:K%d' % (5 + len(_r6)), (_w6.freeze_panes, _w6.auto_filter.ref))
+                verifica(_nume + ': etapa fiecărui act e scrisă ca etapă, nu ca cod (fără „vig", „neg", „sem"…)', not any(re.fullmatch(r'(vig|neg|sem|plg|rat|prm)', r['Etapa'] or '') for r in _r6), {r['Etapa'] for r in _r6} )
+                _pg.close()
+
+                # ---- 4. rezerva: xlsx-stil.js nu se poate încărca → foaia simplă, cu aceleași rânduri
+                _pg = _b.new_page()
+                _avert = []
+                _pg.on('console', lambda m: _avert.append(m.text[:200]) if m.type == 'warning' else None)
+                _pg.route('**/*', lambda r: r.abort() if 'xlsx-stil' in r.request.url or not r.request.url.startswith(_baza) else r.continue_())
+                _pg.goto(_baza + _pagina, wait_until='networkidle', timeout=90000)
+                _asteapta_pagina(_pg)
+                _f4 = _dir / (_nume + '-simplu.xlsx')
+                _nf4 = _descarca(_pg, _f4)
+                _wb7 = openpyxl.load_workbook(_f4)
+                _w7 = _wb7.active
+                verifica(_nume + ': fără xlsx-stil.js se descarcă totuși fișierul, ca foaie simplă („Acorduri"), cu aceleași nume', _wb7.sheetnames == ['Acorduri'] and _nf4 == _nf, (_wb7.sheetnames, _nf4))
+                verifica(_nume + ': foaia simplă are linia cu filtrele, antetul identic și un rând pe acord',
+                         'Fără filtre' in (_w7['A1'].value or '') and [c.value for c in _w7[2]] == ANTET_ACORDURI and _w7.max_row == 2 + len(_rand), (_w7['A1'].value, _w7.max_row, len(_rand)))
+                _leg7 = [c.hyperlink for c in _w7['AC'][2:] if c.hyperlink]
+                verifica(_nume + ': în foaia simplă adresele rămân hyperlinkuri adevărate, nu text', len(_leg7) == len(_rand) and all('#acord=' in h.target for h in _leg7), len(_leg7))
+                verifica(_nume + ': rezerva anunță în consolă că exportul stilizat nu e disponibil', any('Exportul stilizat nu e disponibil' in a for a in _avert), _avert)
                 _pg.close()
             _b.close()
     finally:
         _srv.shutdown()
+        shutil.rmtree(_dir, ignore_errors=True)
 
     print()
     print('Browser: sumele din surse externe — marcajul „ext.", legătura spre sursă, exportul Excel')
@@ -709,10 +927,18 @@ if '--browser' in sys.argv:
                 verifica(_nume + ': detaliul trimite la sursă, nu la un PDF legis.md',
                          _r and _gazda in _r['link'] and _r['textLink'] == 'sursa sumei' and 'din afara actelor din registru' in _r['detaliu'], _r)
                 with _pg.expect_download(timeout=30000) as _d:
-                    _pg.click('#export')    # vederea implicită: acordurile
-                _foaie2 = _html.unescape(zipfile.ZipFile(_d.value.path()).read('xl/worksheets/sheet1.xml').decode('utf-8'))
-                verifica(_nume + ': exportul Excel numește sursa („sursă externă") și pune adresa ei lângă fragment',
-                         'sursă externă (nu din actele din registru)' in _foaie2 and _gazda in _foaie2, _foaie2[-600:])
+                    _pg.click('#export')    # vederea implicită: acordurile, filtrate pe căutare
+                _fx = Path(tempfile.mkdtemp(prefix='ext_xlsx_')) / (_pagina.split('.')[0] + '-extern.xlsx')
+                _d.value.save_as(str(_fx))           # openpyxl cere extensia .xlsx; fișierul temporar al descărcării n-o are
+                _wsx = openpyxl.load_workbook(_fx)['Acorduri']
+                shutil.rmtree(_fx.parent, ignore_errors=True)
+                _ex = next((r for r in range(6, _wsx.max_row + 1) if _wsx.cell(row=r, column=23).value == 'sursă externă (nu din actele din registru)'), None)
+                _hx = _wsx.cell(row=_ex, column=25).hyperlink if _ex else None
+                verifica(_nume + ': exportul Excel numește sursa („sursă externă") și leagă adresa ei, cu gazda ca text',
+                         _ex is not None and _hx is not None and _gazda in _hx.target and _wsx.cell(row=_ex, column=25).value == _gazda,
+                         (_ex, _hx and _hx.target, _ex and _wsx.cell(row=_ex, column=25).value))
+                verifica(_nume + ': rândul cu sursă externă are suma, valuta și echivalentul în euro, iar „Fragmentul din act" citează sursa',
+                         _ex is not None and _wsx.cell(row=_ex, column=5).value and _wsx.cell(row=_ex, column=6).value and _wsx.cell(row=_ex, column=24).value, _ex)
                 verifica(_nume + ': pagina nu a dat erori JavaScript', not _erori, _erori)
                 # acordul foarte nou (IP ODA – PNUD): rândul, eticheta și fișa lui
                 _pg.fill('#seek', 'Comunități reziliente')

@@ -10,6 +10,8 @@
      · bare în celule, scară de culoare pentru matrici, culori pentru diferențe;
      · rând de total cu formule (SUBTOTAL: se recalculează când filtrezi);
      · hyperlinkuri adevărate, note sub tabel, antet repetat la tipărire;
+     · la tabelele late: prima coloană înghețată, antet pe grupe de coloane, culori pe etichete („Grant", „Împrumut"),
+       înălțime de rând limitată și un titlu care încape pe ecran;
      · un grafic Excel nativ (editabil), alături de tabel, când are sens.
    Încărcat la cerere: index.html / unelte.js îl cer abia la primul export.
 
@@ -57,10 +59,11 @@ function numar(v){
 /* --------------------------------------------------------- tipurile de coloane
    t text · i identificator (text) · e sumă · n număr întreg · y an · k loc în clasament · p procent dat în puncte
    (83,5 → 83,5%) · x diferență cu semn (verde / roșu) · s diferență cu semn, fără culori · v variație procentuală cu semn ·
-   d două zecimale · z dată */
+   d două zecimale · z dată · m marcaj centrat, verde și îngroșat (de pildă „da") · c text scurt centrat (cod de valută) ·
+   r curs de schimb, cu patru zecimale · l text lung, pe un singur rând (nu înalță rândul; textul întreg se vede în bara de formule) */
 const TIP = {
-  t: { fmt: 'General',            al: 'left',   wrap: true },
-  i: { fmt: '@',                  al: 'left',   wrap: false },
+  t: { fmt: 'General',            al: 'left',   wrap: true,  text: true },
+  i: { fmt: '@',                  al: 'left',   wrap: false, text: true },
   e: { fmt: '#,##0',              al: 'right' },
   n: { fmt: '#,##0',              al: 'right' },
   y: { fmt: '0',                  al: 'center' },
@@ -70,7 +73,11 @@ const TIP = {
   s: { fmt: '+#,##0;-#,##0;0',    al: 'right' },
   v: { fmt: '+0.0%;-0.0%;0.0%',   al: 'right',  semn: true, div: 100 },
   d: { fmt: '#,##0.00',           al: 'right' },
-  z: { fmt: 'dd.mm.yyyy',         al: 'center', data: true }
+  z: { fmt: 'dd.mm.yyyy',         al: 'center', data: true },
+  m: { fmt: 'General',            al: 'center', wrap: false, text: true, font: { b: 1, c: CUL.verde } },
+  c: { fmt: 'General',            al: 'center', wrap: false, text: true },
+  r: { fmt: '#,##0.0000',         al: 'right' },
+  l: { fmt: 'General',            al: 'left',   wrap: false, text: true }
 };
 const FMT_INCORPORATE = { 'General': 0, '0': 1, '0.00': 2, '#,##0': 3, '#,##0.00': 4, '0%': 9, '0.00%': 10, '@': 49 };
 
@@ -342,6 +349,7 @@ function latimeColoana(c, antete, randuri, tip, setat){
   let w = Math.max(max + 2, cuvintele + 3);
   if(tip === 't') w = Math.min(Math.max(w, 12), 58);
   else if(tip === 'i') w = Math.min(Math.max(w, 10), 24);
+  else if(tip === 'm' || tip === 'c') w = Math.min(Math.max(w, 8), 22);
   else w = Math.min(Math.max(w, 11), 22);
   return Math.round(w * 10) / 10;
 }
@@ -394,6 +402,11 @@ function numeUnice(lista){
      harta          { de, pana }         scară de culoare pe blocul de coloane (inclusiv)
      linkuri        { col: (rand, i) => url }   celula devine hyperlink
      latimi         { col: caractere }   lățime fixată
+     inghetaColoane n                    primele n coloane rămân pe loc la derularea spre dreapta (și se repetă la tipărire)
+     grupe          [{de, pana, text}]   bandă cu denumiri de grupe, deasupra antetului (coloane de la 0, ambele capete incluse)
+     etichete       { col: [[text, culoareText, culoareFundal], …] }   culori pentru valori exacte („Grant", „da"), ARGB
+     maxLinii       n                    rândurile cu text lung nu depășesc n linii (restul se citește în bara de formule)
+     paginiLatime   n | 'auto'           pe câte pagini în lățime încape tabelul la tipărire (implicit: una)
      grafic         { tip:'bar'|'col'|'colst'|'line', cat, serii:[col...], n, ultimele, culori, titlu, legenda }
      subsol         text pentru colțul din stânga jos la tipărire (de pildă adresa site-ului)
      culoareFila    culoarea etichetei foii (ARGB, ex. 'FF1E4B8C')
@@ -426,12 +439,27 @@ function construiesteFoaie(spec, idx, ctx){
     else latimi.forEach((w, c) => { latimi[c] = Math.round((w + lipsa / nC) * 10) / 10; });
     totalLat = latimi.reduce((a, b) => a + b, 0);
   }
+  /* La un tabel lat, un titlu unit pe toată lățimea ar ieși din ecran: textul s-ar vedea doar până la marginea ferestrei.
+     Textul (titlu, context, note) se unește deci doar peste primele coloane, cât încape pe ecran; fundalul benzii
+     rămâne pe toată lățimea. */
+  const LATIME_TEXT = 150;
+  let nT = nC, latT = totalLat;
+  if(totalLat > LATIME_TEXT * 1.15){
+    nT = 0; latT = 0;
+    while(nT < nC && latT < LATIME_TEXT){ latT += latimi[nT]; nT++; }
+  }
+  const nInghet = Math.max(0, Math.min(Math.floor(+spec.inghetaColoane || 0), nC - 1));
+  const maxLinii = Math.max(0, Math.floor(+spec.maxLinii || 0));
+  const grupe = [];
+  (spec.grupe || []).filter(g => g && g.de >= 0 && g.pana < nC && g.pana >= g.de).sort((a, b) => a.de - b.de)
+    .forEach(g => { if(!grupe.length || g.de > grupe[grupe.length - 1].pana) grupe.push(g); });
 
   /* ---- rânduri ---- */
   let r = 0;
   const rTitlu = r++;
   const rSub = spec.subtitlu ? r++ : -1;
   const rSpatiu = r++;
+  const rGrupe = grupe.length ? r++ : -1;
   const rAntet = r++;
   const r0 = r, r1 = r0 + nR - 1;                                      // rândurile de date (de la 0)
   const rTotal = (spec.total && nR) ? r1 + 1 : (randTotalFinal ? r1 + 1 : -1);
@@ -448,11 +476,14 @@ function construiesteFoaie(spec, idx, ctx){
     nota: S.xf({ font: { i: 1, sz: 9, c: CUL.dim }, al: 'left', wrap: true, v: 'top' }),
     notaLink: S.xf({ font: { u: 1, sz: 9, c: CUL.link }, al: 'left', wrap: true, v: 'top' })
   };
+  const stGrupa = [CUL.total, CUL.banda].map(f => S.xf({ font: { b: 1, sz: 10, c: CUL.navyDeep }, fill: f, border: { b: ['thin', CUL.navy] }, al: 'center', wrap: true }));
+  /* Cu înălțimea limitată (maxLinii), textul lung se taie jos: începe sus, ca să se vadă întregi primele linii. */
+  const vData = maxLinii > 1 ? 'top' : undefined;
   const stData = tipuri.map((tp, c) => {
     const t = TIP[tp] || TIP.t;
-    return S.xf({ fmt: t.fmt, border: { b: ['thin', CUL.linie] }, al: t.al, wrap: !!t.wrap, indent: t.al === 'left' ? 1 : 0 });
+    return S.xf({ fmt: t.fmt, font: t.font, border: { b: ['thin', CUL.linie] }, al: t.al, wrap: !!t.wrap, indent: t.al === 'left' ? 1 : 0, v: vData });
   });
-  const stLink = tipuri.map((tp, c) => S.xf({ font: { u: 1, c: CUL.link }, border: { b: ['thin', CUL.linie] }, al: 'left', wrap: false, indent: 1 }));
+  const stLink = tipuri.map((tp, c) => S.xf({ font: { u: 1, c: CUL.link }, border: { b: ['thin', CUL.linie] }, al: 'left', wrap: false, indent: 1, v: vData }));
   const stTotal = tipuri.map((tp, c) => {
     const t = TIP[tp] || TIP.t;
     return S.xf({ fmt: t.fmt, font: { b: 1, c: CUL.navyDeep }, fill: CUL.total, border: { t: ['medium', CUL.navy], b: ['thin', CUL.navy] }, al: c === 0 ? 'left' : t.al, indent: c === 0 ? 1 : 0 });
@@ -482,25 +513,34 @@ function construiesteFoaie(spec, idx, ctx){
   {
     let x = celText(0, rTitlu, stBanda.titlu, spec.titlu);
     for(let c = 1; c < nC; c++) x += celGol(c, rTitlu, stBanda.titlu);
-    rand_(rTitlu, x, 8 + 25 * linii(spec.titlu, totalLat / 1.7));
-    if(nC > 1) unirea.push(ref(0, rTitlu) + ':' + ref(nC - 1, rTitlu));
+    rand_(rTitlu, x, 8 + 25 * linii(spec.titlu, latT / 1.7));
+    if(nT > 1) unirea.push(ref(0, rTitlu) + ':' + ref(nT - 1, rTitlu));
   }
   /* rândul de context */
   if(rSub >= 0){
-    const nl = linii(spec.subtitlu, totalLat * 1.15);
+    const nl = linii(spec.subtitlu, latT * 1.15);
     let x = celText(0, rSub, stBanda.sub, spec.subtitlu);
     for(let c = 1; c < nC; c++) x += celGol(c, rSub, stBanda.sub);
     rand_(rSub, x, Math.min(110, 14 * nl + 6));
-    if(nC > 1) unirea.push(ref(0, rSub) + ':' + ref(nC - 1, rSub));
+    if(nT > 1) unirea.push(ref(0, rSub) + ':' + ref(nT - 1, rSub));
   }
   rand_(rSpatiu, '', 6);
+  /* grupe de coloane: o bandă deasupra antetului, cu denumirea fiecărei grupe unită peste coloanele ei */
+  if(rGrupe >= 0){
+    let x = '';
+    grupe.forEach((g, k) => {
+      for(let c = g.de; c <= g.pana; c++) x += c === g.de ? celText(c, rGrupe, stGrupa[k % 2], g.text) : celGol(c, rGrupe, stGrupa[k % 2]);
+      if(g.pana > g.de) unirea.push(ref(g.de, rGrupe) + ':' + ref(g.pana, rGrupe));
+    });
+    rand_(rGrupe, x, 21);
+  }
 
   /* antet */
   {
     let x = '';
     let maxL = 1;
     antete.forEach((h, c) => {
-      x += celText(c, rAntet, (tipuri[c] === 't' || tipuri[c] === 'i') ? stBanda.antetStanga : stBanda.antet, h);
+      x += celText(c, rAntet, (TIP[tipuri[c]] || TIP.t).al === 'left' ? stBanda.antetStanga : stBanda.antet, h);
       maxL = Math.max(maxL, linii(h, latimi[c] - 1));
     });
     rand_(rAntet, x, Math.min(78, Math.max(26, 15 * maxL + 8)));
@@ -524,7 +564,7 @@ function construiesteFoaie(spec, idx, ctx){
       if(t.data){
         const sd = typeof v === 'number' ? v : serialData(v);
         x += sd == null ? celText(c, rr, st, v) : celNum(c, rr, st, sd);
-      } else if(tp === 't' || tp === 'i'){
+      } else if(t.text){
         x += celText(c, rr, st, v);
       } else if(numar(v)){
         x += celNum(c, rr, st, t.div ? v / t.div : v);
@@ -532,7 +572,19 @@ function construiesteFoaie(spec, idx, ctx){
         x += celText(c, rr, st, v);                                // ex. „NA", „nespecificat" într-o coloană de ani
       }
     }
-    rand_(rr, x);
+    /* Rând cu text lung: înălțimea se fixează la maxLinii linii doar când textul are nevoie de mai multe. Fără ea, aplicația
+       ar înălța rândul cât cere cel mai lung text, iar o listă cu sute de rânduri ar deveni greu de parcurs. Rândurile care
+       încap în maxLinii linii nu primesc înălțime: aplicația le potrivește singură, exact, la deschidere (nu ghicim noi). */
+    let ht = 0;
+    if(maxLinii > 1){
+      let nevoie = 1;
+      for(let c = 0; c < nC; c++){
+        const t = TIP[tipuri[c]] || TIP.t, v = rand[c];
+        if(t.wrap && coloaneLink.indexOf(c) < 0 && typeof v === 'string' && v !== '') nevoie = Math.max(nevoie, linii(v, latimi[c] * 1.08));
+      }
+      if(nevoie > maxLinii) ht = maxLinii * 15;
+    }
+    rand_(rr, x, ht);
   }
   if(nR) tipuri.forEach((tp, c) => { if(tp === 'i') ignora.push(ref(c, r0) + ':' + ref(c, r1)); });
 
@@ -544,7 +596,7 @@ function construiesteFoaie(spec, idx, ctx){
       randTotalFinal.forEach((v, c) => {
         const tp = tipuri[c], t = TIP[tp] || TIP.t;
         if(v === '' || v == null) x += celGol(c, rTotal, stTotal[c]);
-        else if(numar(v) && tp !== 't' && tp !== 'i') x += celNum(c, rTotal, stTotal[c], t.div ? v / t.div : v);
+        else if(numar(v) && !t.text) x += celNum(c, rTotal, stTotal[c], t.div ? v / t.div : v);
         else x += celText(c, rTotal, stTotal[c], v);
       });
     } else {
@@ -574,8 +626,8 @@ function construiesteFoaie(spec, idx, ctx){
     const lnk = legatura(ref(0, rr), url), hl = !!lnk;
     let x = celText(0, rr, hl ? stBanda.notaLink : stBanda.nota, text);
     for(let c = 1; c < nC; c++) x += celGol(c, rr, hl ? stBanda.notaLink : stBanda.nota);
-    rand_(rr, x, Math.min(90, 12.5 * linii(text, totalLat * 1.3) + 3));
-    if(nC > 1) unirea.push(ref(0, rr) + ':' + ref(nC - 1, rr));
+    rand_(rr, x, Math.min(90, 12.5 * linii(text, latT * 1.3) + 3));
+    if(nT > 1) unirea.push(ref(0, rr) + ':' + ref(nT - 1, rr));
     if(lnk) linkuri.push(lnk);
   });
   const ultimulRand = Math.max(rNote0 + note.length - 1, ultimulTabel);
@@ -592,6 +644,15 @@ function construiesteFoaie(spec, idx, ctx){
     (spec.bare || []).forEach(c => {
       cf.push('<conditionalFormatting sqref="' + refZona(c, c) + '"><cfRule type="dataBar" priority="' + (prioritate++) + '"><dataBar>' +
         '<cfvo type="num" val="0"/><cfvo type="max"/><color rgb="FF9DB8DF"/></dataBar></cfRule></conditionalFormatting>');
+    });
+    Object.keys(spec.etichete || {}).forEach(col => {
+      const c = +col;
+      if(!(c >= 0 && c < nC)) return;
+      (spec.etichete[col] || []).forEach(reg => {
+        const dx = S.dxf('<dxf><font><b/><color rgb="' + reg[1] + '"/></font><fill><patternFill><bgColor rgb="' + reg[2] + '"/></patternFill></fill></dxf>');
+        cf.push('<conditionalFormatting sqref="' + refZona(c, c) + '"><cfRule type="cellIs" dxfId="' + dx + '" priority="' + (prioritate++) + '" operator="equal">' +
+          '<formula>"' + xe(String(reg[0]).replace(/"/g, '""')) + '"</formula></cfRule></conditionalFormatting>');
+      });
     });
     const dxVerde = S.dxf('<dxf><font><color rgb="' + CUL.verde + '"/></font></dxf>');
     const dxRosu = S.dxf('<dxf><font><color rgb="' + CUL.rosu + '"/></font></dxf>');
@@ -629,13 +690,21 @@ function construiesteFoaie(spec, idx, ctx){
   let idRel = 0;                                                           // linkurile din afara fișierului au câte o relație
   linkuri.forEach(l => { if(l.url) l.rid = ++idRel; });
   const kG = grafic ? ++ctx.nrGrafice : 0;                                 // graficele se numără pe tot fișierul: chart1.xml, chart2.xml…
+  const colInghet = lit(nInghet), celulaPane = colInghet + (rAntet + 2);
+  const panou = nInghet
+    ? '<pane xSplit="' + nInghet + '" ySplit="' + (rAntet + 1) + '" topLeftCell="' + celulaPane + '" activePane="bottomRight" state="frozen"/>' +
+      '<selection pane="topRight" activeCell="' + colInghet + '1" sqref="' + colInghet + '1"/>' +
+      '<selection pane="bottomLeft" activeCell="A' + (rAntet + 2) + '" sqref="A' + (rAntet + 2) + '"/>' +
+      '<selection pane="bottomRight" activeCell="' + celulaPane + '" sqref="' + celulaPane + '"/>'
+    : '<pane ySplit="' + (rAntet + 1) + '" topLeftCell="A' + (rAntet + 2) + '" activePane="bottomLeft" state="frozen"/>' +
+      '<selection pane="bottomLeft" activeCell="A' + (rAntet + 2) + '" sqref="A' + (rAntet + 2) + '"/>';
+  const paginiLatime = spec.paginiLatime === 'auto' ? Math.max(1, Math.ceil(totalLat / 150)) : Math.max(1, Math.floor(+spec.paginiLatime || 1));
   const sheet = ANTET_XML +
     '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="' + NS_R + '">' +
     '<sheetPr><tabColor rgb="' + (spec.culoareFila || CUL.navy) + '"/><pageSetUpPr fitToPage="1"/></sheetPr>' +
     '<dimension ref="A1:' + ref(Math.max(nC - 1, 0), ultimulRand) + '"/>' +
     '<sheetViews><sheetView showGridLines="0"' + (idx === 0 ? ' tabSelected="1"' : '') + ' workbookViewId="0">' +
-      '<pane ySplit="' + (rAntet + 1) + '" topLeftCell="A' + (rAntet + 2) + '" activePane="bottomLeft" state="frozen"/>' +
-      '<selection pane="bottomLeft" activeCell="A' + (rAntet + 2) + '" sqref="A' + (rAntet + 2) + '"/></sheetView></sheetViews>' +
+      panou + '</sheetView></sheetViews>' +
     '<sheetFormatPr defaultRowHeight="15"/>' +
     '<cols>' + latimi.map((w, c) => '<col min="' + (c + 1) + '" max="' + (c + 1) + '" width="' + (w + 0.7).toFixed(1) + '" customWidth="1"/>').join('') + '</cols>' +
     '<sheetData>' + randuriXml.map(x => x || '').join('') + '</sheetData>' +
@@ -647,7 +716,7 @@ function construiesteFoaie(spec, idx, ctx){
       : '<hyperlink ref="' + l.ref + '" location="' + xe(l.loc) + '" display="' + xe(l.afisat) + '"/>').join('') + '</hyperlinks>' : '') +
     '<printOptions horizontalCentered="1"/>' +
     '<pageMargins left="0.5" right="0.5" top="0.6" bottom="0.7" header="0.3" footer="0.3"/>' +
-    '<pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/>' +
+    '<pageSetup paperSize="9" orientation="landscape" fitToWidth="' + paginiLatime + '" fitToHeight="0"/>' +
     '<headerFooter><oddFooter>&amp;L&amp;8 ' + xe(String(spec.subsol || '').replace(/&/g, '&&')) + '&amp;C&amp;8 &amp;A&amp;R&amp;8 ' + (en ? 'Page' : 'Pagina') + ' &amp;P / &amp;N</oddFooter></headerFooter>' +
     (ignora.length ? '<ignoredErrors>' + ignora.map(z => '<ignoredError sqref="' + z + '" numberStoredAsText="1"/>').join('') + '</ignoredErrors>' : '') +
     (grafic ? '<drawing r:id="rId' + (idRel + 1) + '"/>' : '') +
@@ -661,7 +730,8 @@ function construiesteFoaie(spec, idx, ctx){
   /* ---- numele definite ale foii (filtrul și rândurile care se repetă la tipărire) ---- */
   const nF = citeaza_foaia(foaie);
   const nume_def = (nR ? '<definedName name="_xlnm._FilterDatabase" localSheetId="' + idx + '" hidden="1">' + xe(nF) + '!' + ABS(0, rAntet) + ':' + ABS(nC - 1, r1) + '</definedName>' : '') +
-    '<definedName name="_xlnm.Print_Titles" localSheetId="' + idx + '">' + xe(nF) + '!$' + (rAntet + 1) + ':$' + (rAntet + 1) + '</definedName>';
+    '<definedName name="_xlnm.Print_Titles" localSheetId="' + idx + '">' + (nInghet ? xe(nF) + '!$A:$' + lit(nInghet - 1) + ',' : '') +
+      xe(nF) + '!$' + (rAntet + 1) + ':$' + (rAntet + 1) + '</definedName>';
   return { sheet: sheet, rels: relFoaie, grafic: grafic ? { xml: grafic.xml, desen: grafic.desen, k: kG } : null, defNames: nume_def };
 }
 

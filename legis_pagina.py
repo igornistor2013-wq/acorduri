@@ -400,8 +400,7 @@ def main(BRUT=None, OUT=None):
                 '      return hit ? window.__LEGIS__.acte[hit].url : "";\n'
                 '    }\n')
 
-    # 3. „MO <ediție>" → sursa e legis.md
-    inlocuieste("'MO ' + a.editie", "a.editie")
+    # 3. „MO <ediție>" → sursa e legis.md (în listă; exportul Excel are prefixul într-o constantă, la pasul 5)
     inlocuieste('rel="noopener noreferrer">MO \' +', 'rel="noopener noreferrer">\' +')
     inlocuieste(": 'MO ' + esc(a.editie)) +", ": esc(a.editie)) +")
     inlocuieste('rel="noopener noreferrer">MO \'\n', 'rel="noopener noreferrer">\'\n')
@@ -431,8 +430,10 @@ def main(BRUT=None, OUT=None):
     inlocuieste('Sursa: cuprinsurile Monitorului Oficial al Republicii Moldova.',
                 'Sursa acestei versiuni: Registrul de stat al actelor juridice (legis.md), căutare după cuvinte-cheie în titlu, an cu an, '
                 '1990–' + AN + ', apoi filtrare cu clasificatorul registrului, extins. Numărul actului deschide fișa lui pe legis.md.')
-    inlocuieste("var antet = 'Acorduri de asistență externă — Monitorul Oficial al Republicii Moldova. ' +",
-                "var antet = 'Acorduri de asistență externă — Registrul de stat (legis.md). ' +")
+    # exportul Excel: sursa din antetul fișierului și prefixul ediției (la legis, ediția își are deja „MO " în date)
+    inlocuieste("var EXPORT_SURSA = 'Monitorul Oficial al Republicii Moldova (monitorul.gov.md)';",
+                "var EXPORT_SURSA = 'Registrul de stat al actelor juridice (legis.md)';")
+    inlocuieste("var EXPORT_PREFIX_EDITIE = 'MO ';", "var EXPORT_PREFIX_EDITIE = '';")
     # descrierea pentru motoarele de căutare și pentru previzualizarea linkului
     inlocuieste('Registrul acordurilor de împrumut, grant și asistență tehnică, act cu act, cu etapa la care a ajuns fiecare — din Monitorul Oficial, actualizat zilnic.',
                 'Registrul acordurilor de asistență externă din 1992 până azi, din Registrul de stat al actelor juridice (legis.md), act cu act, cu etapa la care a ajuns fiecare.', 2)

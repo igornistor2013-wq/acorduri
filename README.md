@@ -121,7 +121,7 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `amp-logo.png` | Sigla AMP din subsolul paginii principale |
 | `amp-linkuri.js` | Face din fiecare AMP ID un link spre fișa proiectului pe amp.gov.md. Corespondența AMP ID → identificator intern vine din raportul public AMP, prin proxy-ul amp.vivi.md, și se ține în browser o zi |
 | `amp-vechi.json` | AMP ID → activityId pe serverul vechi AMP (87.255.68.120:8888), pentru cele 3.008 proiecte ale arhivei. Construit o singură dată, deschizând paginile publice ale serverului vechi |
-| `acorduri.html` | Registrul acordurilor. Citește `date.json` la fiecare deschidere. Sumele acordurilor le ia din patru locuri, în ordinea: documentul atașat actului pe legis.md, titlul, textul actului, nota Guvernului. Primele două cercetări (`date/legis_sume.json`, `date/sume_manual.json`) sunt făcute pe actele din legis.md; ca registrul din Monitor să le folosească și el, fiecare act primește fișa lui legis.md din `date/legaturi_legis.json` (cheia actului din Monitor → `doc_id` legis.md). Un act foarte nou, încă fără fișă pe legis.md, primește sumele și categoria hotărâte de mână după codul scos din numărul și tipul lui |
+| `acorduri.html` | Registrul acordurilor. Citește `date.json` la fiecare deschidere. Sumele acordurilor le ia din patru locuri, în ordinea: documentul atașat actului pe legis.md, titlul, textul actului, nota Guvernului. Primele două cercetări (`date/legis_sume.json`, `date/sume_manual.json`) sunt făcute pe actele din legis.md; ca registrul din Monitor să le folosească și el, fiecare act primește fișa lui legis.md din `date/legaturi_legis.json` (cheia actului din Monitor → `doc_id` legis.md). Un act foarte nou, încă fără fișă pe legis.md, primește sumele și categoria hotărâte de mână după codul scos din numărul și tipul lui. Butonul „Excel” scrie un fișier stilizat cu `xlsx-stil.js` (încărcat la primul clic) sau, dacă acesta lipsește, vechea foaie simplă: vezi „Exportul Excel din registrele de acorduri” |
 | `hg246.html` | Comparația cu anexa HG 246. Citește `amp-arhiva.json` |
 | `meniu.js` | Bara de navigare comună, aceeași pe toate paginile (Donatori, Analize, Export, IATI, Acorduri, HG 246). Un buton nou se adaugă o singură dată, aici |
 | `traducere.js` | Engleza pentru paginile de acorduri, HG 246 și Despre: dicționar de fraze ale interfeței; denumirile oficiale ale actelor rămân în română |
@@ -130,7 +130,7 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `robots.txt` | Indică motoarelor de căutare harta site-ului (`sitemap.xml`) |
 | `xlsx.min.js` | Biblioteca SheetJS, încărcată doar la descărcare (nu la fiecare deschidere a paginii): pentru butonul „Export” (proiectele cu filtre și coloane alese) și pentru exportul rapid IATI. Graficele și tabelele din panouri se scriu cu `xlsx-stil.js` |
 | `unelte.js` | Roata dințată de pe fiecare panou (meniu cu „Copiază ca imagine", „Descarcă Excel (.xlsx)" și „Date brute (CSV)"; construiește foaia Excel din datele pe care panoul le-a înregistrat, vezi secțiunea „Exporturile Excel"), linkul care păstrează filtrele (`?ani=…&don=…`), raportul PDF pe o pagină, indicatorul de prospețime a datelor și comparația între perioade din „Analize avansate" |
-| `xlsx-stil.js` | Scriitorul de fișiere `.xlsx` (ZIP + XML, fără bibliotecă): titlu și context, antet cu filtre, formate de număr, dungi, bare în celule, scară de culoare, rând de total cu formule `SUBTOTAL`, hyperlinkuri, note și grafic Excel nativ. Scrie și fișiere cu **mai multe foi** (`foi: […]`): nume de foaie unice (cel mult 31 de caractere), linkuri de la o foaie la alta (adresa `#Numele foii`), culoare pe fila foii; graficele se numerotează pe tot fișierul. Încărcat la primul export (`unelte.js` îl cere cu aceeași versiune `?v=` ca el) |
+| `xlsx-stil.js` | Scriitorul de fișiere `.xlsx` (ZIP + XML, fără bibliotecă): titlu și context, antet cu filtre, formate de număr, dungi, bare în celule, scară de culoare, rând de total cu formule `SUBTOTAL`, hyperlinkuri, note și grafic Excel nativ. Scrie și fișiere cu **mai multe foi** (`foi: […]`): nume de foaie unice (cel mult 31 de caractere), linkuri de la o foaie la alta (adresa `#Numele foii`), culoare pe fila foii; graficele se numerotează pe tot fișierul. Încărcat la primul export (`unelte.js` îl cere cu aceeași versiune `?v=` ca el). Pentru tabelele late ale registrelor mai știe: coloane înghețate, benzi de grupe, culori pe etichete (formatare condițională), înălțime de rând limitată și tipărire pe mai multe pagini în lățime (vezi „Exportul Excel din registrele de acorduri”) |
 | `sectoare.js` | Panoul „Donatori → sectoare · cu proiectele fiecărui sector” din „Analize avansate”: diagrama donatori ↔ sectoare, lista proiectelor pe fiecare sector și exportul Excel cu mai multe foi (vezi secțiunea „Donatori → sectoare”). Prima parte (agregări, filtre, diagrama ca text SVG, datele pentru Excel) nu atinge pagina și se testează cu Node; a doua desenează în pagină. Încărcat din `index.html` înaintea lui `unelte.js` |
 | `html2canvas.min.js` | Biblioteca html2canvas, care transformă un panou în imagine; încărcată doar la primul „Copiază" sau „Raport PDF" |
 | `favicon.svg`, `apple-touch-icon.png`, `og.png`, `404.html` | Iconița site-ului (logoul: harta Moldovei cu cele trei fluxuri), iconița pentru ecranul telefonului, imaginea de previzualizare a linkurilor, pagina „nu există” |
@@ -149,7 +149,7 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `legis_clasifica.py` | Ce e asistență externă, categoria, partenerul (extinde `monitor_watch.py`); citește și deciziile de mână din `date/categorii_manual.json` |
 | `date/categorii_manual.json` | Categoria actelor pe care nici titlul, nici finanțatorul nu le lămuresc, hotărâtă de mână, cu motiv și sursă: `{"categorie": "Grant"\|"Împrumut"\|"Asistență tehnică", "motiv": "…", "sursa": "https://…"}`, pe codul actului din legis.md (un act foarte nou, doar din Monitor, are codul scos din număr și tip: `HG430/2026`, ordinul `O147/2026`). Ce e aici bate clasificarea automată, dar nu adaugă acte; cheile care încep cu `_` sunt ignorate. Citit de `legis_pagina.py`, `legis_atasamente.py`, `date_deschise.py` și de registrul din Monitor (`acorduri.html`); fișa acordului spune că categoria e hotărâtă de mână, cu motivul și sursa |
 | `legis_pagina.py` | Construiește `legis_acorduri.html` din `acorduri.html` + istoric + `date.json`; rulat de `monitor.yml` |
-| `teste_legis.py` | Testele verificării legis.md |
+| `teste_legis.py` | Testele verificării legis.md. Cu `--browser` deschide și cele două registre (legis.md și Monitor) și verifică exportul lor Excel: fișierele descărcate sunt citite cu openpyxl (antet, un rând pe acord, totalul în euro față de panou sau față de datele paginii, filtre, vederea „Acte”, linkuri, rezerva fără `xlsx-stil.js`). Rulare: `python teste_legis.py [--browser]` |
 | `legis_local.bat` | Aceeași verificare, rulată de pe calculatorul tău (Windows) |
 | `legis_sume.py` | Sumele acordurilor, din textul integral al actelor: descarcă PDF-ul fiecărui act de pe legis.md (legi, hotărâri, ordine; fără decrete), caută „în sumă de…”, „în valoare de…” și scrie rezultatul, cu fragmentul de text, în `date/legis_sume.json`. Rulat de `legis_local.bat`; continuă de unde a rămas |
 | `date/sume_manual.json` | Sume puse de mână, pe codul actului (`LP203/2022`). Citirea automată greșește uneori — o tranșă în locul sumei întregi, bugetul unui program întreg, o dată chiar un cont bancar. Ce e aici bate orice sumă citită automat: `{"v": …, "val": "EUR", "nota": "…"}` pune suma, `{"ascunde": true}` o ascunde pe cea greșită. Cu `{"fara_text": true}` se ascunde suma citită greșit din textul actului, cu `{"fara_cost": true}` costul proiectului citit greșit din atașament (de pildă pragul de la care se cere studiu de fezabilitate, luat drept cost), cu `{"fara_guvern": true}` suma luată din nota Guvernului când aceea e a unui program întreg (Interreg, URBACT: sute de milioane pentru toate țările participante), nu a acordului Moldovei. Cu `{"extern": true}` suma vine dintr-o sursă din afara actelor din registru — decizia de finanțare a UE, pagina oficială a finanțatorului, textul acordului publicat de Ministerul Finanțelor, un comunicat oficial: `u` e adresa sursei, `nota` e citatul din ea; pagina o marchează „ext.” și, în loc de „documentul (PDF, legis.md)”, trimite la sursă (în `date/acorduri_legare.json` are `sursa: "extern"`). Se introduce așa doar o sumă dovedită cu un citat dintr-o sursă oficială care numește același acord; când sursa dă doar costul unui program, o sumă pe mai multe tranșe sau o cifră contrazisă de altă sursă, suma nu se pune. Sumele de aici se aplică și registrului din Monitor, inclusiv actelor foarte noi care sunt doar în Monitorul Oficial (cod scos din număr și tip: `HG430/2026`). Fișierul e citit de pagină la fiecare deschidere și de `legis_pagina.py`. Dacă `extern` e pus și `u` lipsește, sursa e un document oficial nepublicat online (de pildă o notă a Cancelariei de Stat primită de la minister): pagina scrie „document oficial nepublicat online”, iar `nota` spune care document e și citează propoziția cu suma. Registrul nu are curs pentru lei și nu numără sume în lei; când nota dă suma în lei cu echivalentul aproximativ într-o valută (6 693 543 MDL ≈ 386 910 USD), se introduce valuta, iar nota păstrează propoziția întreagă. Un ordin venit din Monitorul Oficial apare cu un cod provizoriu, fără emitent (`O147/2026`), până ajunge în istoricul legis.md, unde are codul întreg (`OMMPS147/2026`); suma pusă sub oricare dintre cele două forme rămâne valabilă și sub cealaltă, cât timp în registru e un singur ordin cu acel număr și an. La fiecare construire a paginii, `legis_pagina.py` anunță cheile din fișier care nu mai corespund niciunui act |
@@ -158,7 +158,7 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `gov_sume.py` | Sumele acordurilor din notele de argumentare ale Guvernului: citește de pe gov.md ordinea de zi a fiecărei ședințe și, pentru punctele despre acorduri, PDF-ul notei („Aspectul financiar”). Rulat zilnic de `.github/workflows/sume.yml`; rezultatul, `date/gov_sume.json`, e citit de pagina Acorduri la deschidere (sumele marcate cu G). Ședințele din ultimele zece zile se recitesc la fiecare rulare, fiindcă ordinea de zi se completează până în ziua ședinței; o notă care n-a putut fi descărcată se reîncearcă la rulările următoare |
 | `legatura-amp.js` | Potrivirea dintre acorduri și proiectele AMP („De la lege la bani"): funcții pure, fără DOM, folosite de `index.html` și de teste |
 | `teste_legatura.js` | Testele potrivirii: funcțiile mici, scenarii construite de mână și o verificare pe arhiva AMP + registrul real. Rulare: `node teste_legatura.js` |
-| `teste_xlsx.py` | Testele exporturilor Excel. Fără argumente: generează cu Node foi de probă (grafice, totaluri, caractere speciale, 20.000 de rânduri) și le verifică (ZIP, XML, formate, formule, grafice). Cu `--browser`: deschide dashboardul în română și engleză, apasă ⚙ → „Descarcă Excel” pe 15 panouri din toate vederile și verifică fișierele descărcate. Rulare: `python teste_xlsx.py [--browser]`. Verifică și fișierele cu mai multe foi (nume, linkuri între foi, grafice numerotate pe tot fișierul, un singur `styles.xml`) |
+| `teste_xlsx.py` | Testele exporturilor Excel. Fără argumente: generează cu Node foi de probă (grafice, totaluri, caractere speciale, 20.000 de rânduri) și le verifică (ZIP, XML, formate, formule, grafice). Cu `--browser`: deschide dashboardul în română și engleză, apasă ⚙ → „Descarcă Excel” pe 15 panouri din toate vederile și verifică fișierele descărcate. Rulare: `python teste_xlsx.py [--browser]`. Verifică și fișierele cu mai multe foi (nume, linkuri între foi, grafice numerotate pe tot fișierul, un singur `styles.xml`) și foile registrelor (secțiunea „registru:”: grupe de coloane, coloane înghețate, etichete colorate, înălțimea rândurilor, tipărirea pe lățime) |
 | `teste_sectoare.py` | Testele panoului „Donatori → sectoare”. Fără argumente: cu Node, calculează independent (în Python) sumele pe donator, pe sector și pe pereche pentru un set mic făcut de mână și pentru 400 de proiecte aleatoare și le compară cu `sectoare.js`; verifică diagrama SVG (XML bine format, caractere speciale, fără variabile CSS) și datele pentru Excel (foile, linkurile dintre ele, totalurile, graficul). Cu `--browser`: deschide dashboardul în română și engleză și verifică totalurile din diagramă față de „Top donatori” și „Distribuție pe sectoare” din pagina principală, perioada, selecția cu clic și cu tastatura, lista pe grupe, ⚙ → Excel/CSV și butonul „Excel” al listei (fișierele descărcate sunt deschise cu openpyxl), exportul cu o selecție făcută, „Copiază ca imagine” și lipsa erorilor JavaScript. Rulare: `python teste_sectoare.py [--browser]` |
 | `legatura_acorduri.py` | Scrie `date/acorduri_legare.json`: deschide pagina registrului într-un browser fără ecran și îi cere lista acordurilor așa cum le vede ea (grupate, denumite, cu suma aleasă și trecută în euro). Are nevoie de Playwright |
 | `date/acorduri_legare.json` | Acordurile din registru, gata grupate, un acord pe linie. Citit de pagina „De la lege la bani". Se rescrie doar când se schimbă ceva |
@@ -225,7 +225,7 @@ acord" arată ce scrie AMP, nu rata reală.
 `date/legaturi_amp.json` și publici fișierul. Acordurile sunt identificate prin id-ul din linkul
 registrului (`#acord=…`); dacă un id din fișier nu mai corespunde niciunui acord, pagina o spune.
 
-**Linkuri în exporturile Excel.** Coloanele cu adrese („Link" din foaia „Acte" a registrelor, „Link AMP"
+**Linkuri în exporturile Excel.** Coloanele cu adrese („Link" din foaia „Acte" a registrelor, „Link sursă" și „Link în registru" din foaia „Acorduri", „Link AMP"
 și linkul IATI din exportul dashboardului și din exporturile ⚙ ale panourilor) se scriu ca hyperlinkuri adevărate. O adresă pusă într-o celulă ca
 text simplu nu se deschide la clic în Excel sau LibreOffice, deși arată ca un link.
 `python teste_legis.py --browser` verifică asta pe ambele registre.
@@ -301,6 +301,62 @@ Butoanele care nu pornesc dintr-un panou apelează `window.__xlsxDirect({titlu, 
 engleză, plus cele trei butoane). La construire, fișierele au fost validate pe schemele ISO/IEC 29500, citite cu
 openpyxl și randate cu LibreOffice; într-un Excel adevărat n-au fost deschise, așa că, dacă Excel cere „reparare”,
 păstrează fișierul și spune-ne ce panou l-a dat, ca să fie corectat.
+
+## Exportul Excel din registrele de acorduri
+
+Butonul „Excel” din antetul listei (în ambele registre, legis.md și Monitorul Oficial) descarcă **exact ce e pe ecran**:
+aceleași filtre (tip de finanțare, etapă, finanțator, an, suport bugetar, căutarea), aceeași ordine, aceeași vedere.
+Fișierul arată ca exporturile din dashboard: titlu și context (sursa, filtrele active, câte acorduri, cursul, data), antet
+colorat, filtre pe coloane, culori, date și sume ca valori adevărate (se sortează și se adună), linkuri care se deschid.
+Numele lui spune vederea, tipul filtrat și data: `registru-acorduri-2026-10-12.xlsx`, `registru-acorduri-grant-2026-10-12.xlsx`,
+`registru-acte-2026-10-12.xlsx`.
+
+**Vederea „Acorduri”** dă trei foi:
+
+| Foaie | Ce conține |
+|---|---|
+| Acorduri | Un rând pe acord, 29 de coloane în cinci grupe (ACORD · SUMA ȘI TOTALUL · PARCURSUL ACORDULUI · ACTELE PUBLICATE · SURSE ȘI DETALII): denumirea, partenerul, tipul de finanțare (colorat), suportul bugetar, suma și valuta, echivalentul în EUR, **„Intră în total?”**, data semnării, etapele 1–5 și etapa atinsă, intrarea în vigoare și temeiul datei, anii, numărul de acte, prima și ultima publicare, sursa sumei cu fragmentul din act, costul total al proiectului, denumirea completă, linkul spre sursă și linkul spre acordul din registru (`#acord=…`). Prima coloană și antetul rămân pe loc la derulare; la tipărire se repetă pe fiecare pagină. Rândul de total e formulă `SUBTOTAL` și se recalculează când filtrezi în Excel |
+| Sume pe tipuri | Cifrele panoului „Sumele acordurilor, pe tipuri de finanțare” (îl desenează doar legis.md; în Monitor regulile sunt aceleași), calculate pentru rândurile exportate, cu grafic Excel nativ |
+| Pe valute | Suma în valuta acordului, cursul de conversie (BCE, la data trecută în pagină) și echivalentul în EUR, pe tip și pe valută |
+
+**Vederea „Acte”** dă o singură foaie, „Acte”: un rând pe act (data ediției, ediția, actul, tipul de finanțare, suportul bugetar,
+partenerul, etapa, denumirea acordului, titlul complet, data semnării și linkul), cele mai noi primele, cu data, ediția și
+actul înghețate la derulare. O căutare fără rezultate dă un fișier valid, doar cu antetul și o notă.
+
+**De ce există „Intră în total?”.** Dacă ai aduna coloana „Echivalent EUR” pe toate rândurile care au sumă, ai obține mai mult
+decât arată pagina: unele rânduri au suma afișată, dar nu se adună (acordul e numărat la alt act sau suma nu e cea acordată),
+iar altele repetă același acord (aceeași sumă, același finanțator, aceeași denumire). De aceea echivalentul în EUR apare doar
+pe rândurile care intră în total; celelalte spun motivul: „nu: dublură”, „nu: nu se adună”, „nu: fără curs”. Același cod
+(`statSume`) hotărăște ce se adună în pagină și în fișier. Testele compară totalul din fișier cu cel din panoul legis.md și,
+rând cu rând, cu `window.__ACORDURI__`, pe ambele pagini.
+
+**Rezerva.** `xlsx-stil.js` se încarcă abia la primul clic, cu `?v=` din constanta `STIL_V` (se schimbă la fiecare modificare a
+lui, ca browserul să nu țină varianta veche). Dacă nu se poate încărca (rețea blocată, fișier lipsă), pagina scrie vechea foaie
+simplă, cu aceleași rânduri (fără stil, dar cu datele întregi și cu linkurile) și lasă un avertisment în consolă.
+
+**Șablonul și pagina generată.** `acorduri.html` e șablonul; `legis_acorduri.html` se scoate din el cu `legis_pagina.py`, prin
+înlocuiri de text exacte. Exportul n-a cerut înlocuiri în plus în afara a două constante, `EXPORT_SURSA` (sursa din subtitlu) și
+`EXPORT_PREFIX_EDITIE` (`'MO '` doar la Monitor), al căror text trebuie să apară exact o dată în șablon. După orice
+modificare în șablon se rulează `python legis_pagina.py`.
+
+**Câmpurile și tipurile adăugate lui `xlsx-stil.js`** (folosite de registre; dashboardul le poate folosi și el):
+
+| Câmp sau tip | Ce face |
+|---|---|
+| `inghetaColoane: n` | primele n coloane rămân pe loc la derularea spre dreapta, împreună cu antetul; la tipărire se repetă |
+| `grupe: [{de, pana, text}]` | o bandă cu denumirile grupelor, deasupra antetului (celule unite, culori alternante) |
+| `etichete: {coloană: [[text, culoareText, culoareFundal], …]}` | colorează celulele cu valoarea exactă dată („Grant”, „da”): formatare condițională, deci culorile urmează valoarea la sortare și la editare |
+| `maxLinii: n` | un rând cu text lung se înalță cel mult la n linii (text aliniat sus); restul se citește în bara de formule |
+| `paginiLatime: n \| 'auto'` | pe câte pagini în lățime se tipărește tabelul (`auto`: una la fiecare 150 de caractere de lățime de coloană), în loc să fie micșorat la una |
+| tip `m` | marcaj centrat, verde (de ex. „da”) |
+| tip `c` | cod scurt, centrat, ca text (valuta, „Intră în total?”) |
+| tip `r` | curs sau rată, cu patru zecimale |
+| tip `l` | text lung pe o singură linie, fără împachetare: nu înalță rândul |
+
+**Teste.** `python teste_xlsx.py` (secțiunea „registru:”: foile construite cu Node) și `python teste_legis.py --browser`
+(fișierele descărcate din ambele pagini: fără filtre, cu filtre, căutare fără rezultat, vederea „Acte” și rezerva). La construire,
+fișierele au fost validate pe schemele ISO/IEC 29500, citite cu openpyxl și randate cu LibreOffice; într-un Excel adevărat
+n-au fost deschise.
 
 ## Donatori → sectoare, cu proiectele fiecărui sector
 

@@ -263,6 +263,93 @@ const X = require(process.argv[2]); const fs = require('fs');
     subprocess.run(['node', str(tmp / 'gen_una.js'), str(AICI / 'xlsx-stil.js'), str(tmp)], check=True, timeout=60)
     w1 = openpyxl.load_workbook(tmp / 'una.xlsx')
     verifica('foi: specificația cu o singură foaie merge ca înainte', w1.sheetnames == ['Sheet one'] and w1.worksheets[0]['A5'].value == 'x')
+
+    # ---- tabele late, ca registrul acordurilor: coloane înghețate, bandă de grupe, culori pe etichete, înălțime limitată
+    GEN_REG = r"""
+const X = require(process.argv[2]); const fs = require('fs');
+const salveaza = async (nume, spec) => { const b = await X.construieste(spec); fs.writeFileSync(process.argv[3] + '/' + nume + '.xlsx', Buffer.from(await b.arrayBuffer())); };
+(async () => {
+  const lung = 'Acord cu un nume foarte lung care se întinde pe mai multe rânduri '.repeat(5);
+  const mediu = 'Un nume mediu, care încape pe două rânduri la lățimea coloanei, dar nu pe trei';
+  await salveaza('reg', {
+    limba: 'ro', foaie: 'Reg', titlu: 'Titlu registru', subtitlu: 'Subtitlu registru', subsol: 'x',
+    antete: ['Acord', 'Tip', 'Da', 'Val', 'Curs', 'Fragment', 'Suma'], tipuri: 'ttmcrle',
+    randuri: [['Scurt', 'Grant', 'da', 'EUR', 1.1383, 'text lung ' + 'x'.repeat(300), 10], [mediu, 'Împrumut', '', 'USD', 0.83998, 'f', 20],
+              [lung, 'Altceva', 'da', 'MDL', 1, 'f', 30], ['Cu "ghilimele"', 'Cu "ghilimele"', '', 'EUR', 1, 'f', 40]],
+    latimi: { 0: 40, 1: 14, 5: 30 }, inghetaColoane: 1, maxLinii: 3, paginiLatime: 'auto', total: { eticheta: 'Total', suma: [6] },
+    grupe: [{ de: 0, pana: 1, text: 'ACORD' }, { de: 2, pana: 3, text: 'MARCAJE' }, { de: 4, pana: 6, text: 'CIFRE' }],
+    etichete: { 1: [['Grant', 'FF155A52', 'FFE0F2F0'], ['Cu "ghilimele"', 'FFA3311E', 'FFFBE8E3']], 2: [['da', 'FF16794F', 'FFE3F4EC']] }
+  });
+  const nume = []; for (let i = 0; i < 12; i++) nume.push('C' + i);
+  const lat = {}; nume.forEach((_, i) => { lat[i] = 20; });
+  await salveaza('lat', { limba: 'ro', foaie: 'Lat', titlu: 'Titlu pe un tabel lat', subtitlu: 'Context pe un tabel lat', antete: nume, tipuri: 'tttttttttttt',
+    randuri: [nume.map((_, i) => 'v' + i)], latimi: lat, paginiLatime: 'auto', note: ['O notă pe un tabel lat.'] });
+  await salveaza('grupe_rele', { limba: 'ro', foaie: 'Grupe', titlu: 'T', subtitlu: 's', antete: ['A', 'B', 'C', 'D'], tipuri: 'tttt', randuri: [['1', '2', '3', '4']],
+    grupe: [{ de: 2, pana: 3, text: 'DOUA' }, { de: 0, pana: 1, text: 'UNU' }, { de: 1, pana: 2, text: 'SUPRAPUS' }, { de: 5, pana: 99, text: 'AFARA' }, { de: 3, pana: 1, text: 'INVERS' }] });
+})().catch(e => { console.error('EROARE', e && e.stack || e); process.exit(1); });
+"""
+    (tmp / 'gen_reg.js').write_text(GEN_REG, encoding='utf-8')
+    r = subprocess.run(['node', str(tmp / 'gen_reg.js'), str(AICI / 'xlsx-stil.js'), str(tmp)], capture_output=True, text=True, timeout=120)
+    verifica('registru: Node generează fișierele de probă pentru tabele late', r.returncode == 0, (r.stderr or r.stdout)[-300:])
+    for nm in ('reg', 'lat', 'grupe_rele'):
+        verifica(f'registru: {nm}: arhivă ZIP validă, cu toate părțile XML bine formate', (tmp / (nm + '.xlsx')).exists() and not parti_xml_valide(tmp / (nm + '.xlsx')), parti_xml_valide(tmp / (nm + '.xlsx')))
+    wb = openpyxl.load_workbook(tmp / 'reg.xlsx'); ws = wb.worksheets[0]
+    verifica('registru: prima coloană și antetul rămân pe loc la derulare (pane înghețat în ambele sensuri)', ws.freeze_panes == 'B6', ws.freeze_panes)
+    with zipfile.ZipFile(tmp / 'reg.xlsx') as z:
+        foaie = z.read('xl/worksheets/sheet1.xml').decode('utf-8')
+        wbx = z.read('xl/workbook.xml').decode('utf-8')
+    verifica('registru: panourile înghețate au selecția fiecărui panou (topRight, bottomLeft, bottomRight)',
+             'xSplit="1"' in foaie and 'ySplit="5"' in foaie and 'activePane="bottomRight"' in foaie and all(('<selection pane="%s"' % p) in foaie for p in ('topRight', 'bottomLeft', 'bottomRight')), re.findall(r'<pane [^>]*>', foaie))
+    verifica('registru: antetul tabelului e sub banda de grupe (rândul 5), cu filtre doar pe tabel', ws['A5'].value == 'Acord' and ws.auto_filter.ref == 'A5:G9', (ws['A5'].value, ws.auto_filter.ref))
+    verifica('registru: banda de grupe are denumirile pe rândul 4, unite peste coloanele lor',
+             [ws['A4'].value, ws['C4'].value, ws['E4'].value] == ['ACORD', 'MARCAJE', 'CIFRE'] and {'A4:B4', 'C4:D4', 'E4:G4'} <= {str(m) for m in ws.merged_cells.ranges},
+             ([ws['A4'].value, ws['C4'].value, ws['E4'].value], sorted(str(m) for m in ws.merged_cells.ranges)))
+    verifica('registru: grupele suprapuse, inversate sau în afara tabelului sunt ignorate',
+             (lambda w: [w['A4'].value, w['B4'].value, w['C4'].value, w['D4'].value] == ['UNU', None, 'DOUA', None] and w['A5'].value == 'A')(openpyxl.load_workbook(tmp / 'grupe_rele.xlsx').worksheets[0]),
+             [openpyxl.load_workbook(tmp / 'grupe_rele.xlsx').worksheets[0].cell(row=4, column=c).value for c in range(1, 5)])
+    # tipurile noi: m (marcaj), c (centrat), r (curs), l (text lung pe un rând)
+    verifica('registru: tipul „m" — marcaj centrat, îngroșat, verde', ws['C6'].alignment.horizontal == 'center' and ws['C6'].font.b and ws['C6'].font.color.rgb == 'FF16794F' and ws['C6'].value == 'da',
+             (ws['C6'].alignment.horizontal, ws['C6'].font.b, ws['C6'].font.color.rgb))
+    verifica('registru: tipul „c" — text scurt centrat, fără îngroșare', ws['D6'].alignment.horizontal == 'center' and not ws['D6'].font.b and ws['D6'].value == 'EUR', (ws['D6'].alignment.horizontal, ws['D6'].font.b))
+    verifica('registru: tipul „r" — cursul are patru zecimale și rămâne număr', ws['E6'].number_format == '#,##0.0000' and abs(ws['E6'].value - 1.1383) < 1e-9 and abs(ws['E7'].value - 0.83998) < 1e-9, (ws['E6'].number_format, ws['E6'].value))
+    verifica('registru: tipul „l" — text lung pe un singur rând (fără încadrare), „t" — cu încadrare', ws['F6'].alignment.wrap_text is not True and ws['A6'].alignment.wrap_text is True, (ws['F6'].alignment.wrap_text, ws['A6'].alignment.wrap_text))
+    verifica('registru: antetul tipurilor de text e la stânga, al celorlalte centrat', ws['A5'].alignment.horizontal == 'left' and ws['F5'].alignment.horizontal == 'left' and ws['C5'].alignment.horizontal == 'center' and ws['E5'].alignment.horizontal == 'center',
+             [ws[c + '5'].alignment.horizontal for c in 'ACEF'])
+    # înălțimea rândurilor
+    verifica('registru: rândul care încape în 3 linii nu primește înălțime fixă (o potrivește aplicația), cel cu text lung e tăiat la 3 linii (45 pt)',
+             ws.row_dimensions[6].height is None and ws.row_dimensions[7].height is None and ws.row_dimensions[8].height == 45, [ws.row_dimensions[r].height for r in (6, 7, 8)])
+    verifica('registru: coloana „l” cu 310 de caractere nu înalță rândul', ws.row_dimensions[6].height is None)
+    verifica('registru: cu înălțime limitată, celulele de date încep sus (se taie jos, nu pe mijloc)', ws['A8'].alignment.vertical == 'top' and ws['G8'].alignment.vertical == 'top', (ws['A8'].alignment.vertical, ws['G8'].alignment.vertical))
+    verifica('registru: fără înălțime limitată, celulele rămân centrate pe verticală (ca la exporturile din dashboard)',
+             openpyxl.load_workbook(tmp / 'top.xlsx').worksheets[0]['A5'].alignment.vertical == 'center' if (tmp / 'top.xlsx').exists() else True)
+    # culori pe etichete
+    reguli = {}
+    for rng in ws.conditional_formatting:
+        for r_ in rng.rules:
+            reguli.setdefault(str(rng.sqref), []).append(r_)
+    de_tip = reguli.get('B6:B9', [])
+    verifica('registru: două reguli de culoare pe coloana „Tip", pe valori exacte (cellIs / equal)', len(de_tip) == 2 and all(r_.type == 'cellIs' and r_.operator == 'equal' for r_ in de_tip), [(r_.type, r_.operator) for r_ in de_tip])
+    verifica('registru: ghilimelele din etichete sunt dublate în formulă („Cu ""ghilimele""")', [r_.formula[0] for r_ in de_tip] == ['"Grant"', '"Cu ""ghilimele"""'], [r_.formula for r_ in de_tip])
+    d0 = de_tip[0].dxf if de_tip else None
+    verifica('registru: eticheta „Grant” are textul verde-închis îngroșat și fundalul verzui', d0 is not None and d0.font.b and d0.font.color.rgb == 'FF155A52' and d0.fill.bgColor.rgb == 'FFE0F2F0', d0 and (d0.font.color.rgb, d0.fill.bgColor.rgb))
+    zebra = [r_ for r_s in reguli.values() for r_ in r_s if r_.type == 'expression']
+    verifica('registru: culorile etichetelor au prioritate peste dungile alternante (număr de prioritate mai mic)', zebra and de_tip and max(r_.priority for r_ in de_tip) < zebra[0].priority, ([r_.priority for r_ in de_tip], [r_.priority for r_ in zebra]))
+    verifica('registru: prioritățile regulilor sunt unice', len([r_.priority for r_s in reguli.values() for r_ in r_s]) == len({r_.priority for r_s in reguli.values() for r_ in r_s}))
+    # tipărirea
+    verifica('registru: la tipărire se repetă prima coloană și antetul, iar tabelul larg încape pe mai multe pagini în lățime',
+             ws.print_title_cols == '$A:$A' and ws.print_title_rows == '$5:$5' and ws.page_setup.fitToWidth >= 1, (ws.print_title_cols, ws.print_title_rows, ws.page_setup.fitToWidth))
+    verifica('registru: totalul adună doar coloana cerută, cu formulă SUBTOTAL', ws['G10'].value == '=SUBTOTAL(109,G6:G9)' and ws['A10'].value == 'Total', (ws['A10'].value, ws['G10'].value))
+    # titlul pe tabele late: unit doar peste coloanele care încap pe ecran, fundalul pe toată lățimea
+    wl = openpyxl.load_workbook(tmp / 'lat.xlsx').worksheets[0]
+    unite = sorted(str(m) for m in wl.merged_cells.ranges)
+    verifica('lat: titlul, contextul și nota sunt unite doar peste primele 8 coloane (160 de caractere), nu peste toate 12', {'A1:H1', 'A2:H2', 'A7:H7'} <= set(unite) and 'A1:L1' not in unite and 'A7:L7' not in unite, unite)
+    verifica('lat: fundalul benzii de titlu continuă pe toată lățimea (ultima coloană are aceeași culoare)', wl['L1'].fill.fgColor.rgb == wl['A1'].fill.fgColor.rgb == 'FF14233C', (wl['L1'].fill.fgColor.rgb, wl['A1'].fill.fgColor.rgb))
+    verifica('lat: tabelul de 240 de caractere se tipărește pe 2 pagini în lățime, nu pe una', wl.page_setup.fitToWidth == 2, wl.page_setup.fitToWidth)
+    verifica('lat: fără coloane înghețate, repetarea la tipărire e doar a antetului', wl.print_title_cols is None and wl.print_title_rows == '$4:$4', (wl.print_title_cols, wl.print_title_rows))
+    verifica('lat: panoul înghețat rămâne doar pe rânduri (A5), ca la exporturile obișnuite', wl.freeze_panes == 'A5', wl.freeze_panes)
+    wt = openpyxl.load_workbook(tmp / 'top.xlsx').worksheets[0]
+    verifica('top: la un tabel îngust titlul rămâne unit pe toată lățimea (A1:D1) și tipărirea e pe o pagină',
+             'A1:D1' in {str(m) for m in wt.merged_cells.ranges} and wt.page_setup.fitToWidth == 1, (sorted(str(m) for m in wt.merged_cells.ranges)[:3], wt.page_setup.fitToWidth))
     if '--pastreaza' in sys.argv:
         shutil.copy(cale, AICI.parent / 'foi_probă.xlsx')
 finally:

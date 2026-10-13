@@ -1127,17 +1127,21 @@
       .slice(0, 3).map(function(w){ return w.slice(0, 6); }).sort().join(' ');
     return s.v + '|' + s.val + '|' + (FAM_FIN[p] || p) + '|' + cuv;
   }
+  /* Întoarce și starea fiecărui rând (stare[i], pentru grupuri[i]), ca exportul Excel să poată spune de ce un rând cu sumă nu
+     intră în total: 'numarat', 'dublura' (același acord, numărat pe alt rând), 'fara_total' (marcat „nu se adună"),
+     'fara_curs' (valută fără curs) sau 'fara_suma'. */
   function statSume(grupuri){
-    var tip = {}, uniq = {}, neconv = {}, fara = 0;
-    grupuri.forEach(function(g){
+    var tip = {}, uniq = {}, uniqI = {}, neconv = {}, fara = 0, stare = [];
+    grupuri.forEach(function(g, i){
       var c = g.categorie || 'Alt tip';
       tip[c] = tip[c] || { toate: 0, n: 0, eur: 0, valute: {}, top: [] };
       tip[c].toate++;
       var s = sumaAfisata(g);
       if (!s) fara++;
-      if (!s || s.faraTotal) return;            // „fara_total": suma se vede pe rând, dar nu se adună
+      if (!s || s.faraTotal){ stare[i] = s ? 'fara_total' : 'fara_suma'; return; }   // „fara_total": suma se vede pe rând, dar nu se adună
       var k = cheieSuma(g, s);
       (uniq[k] = uniq[k] || []).push(g);
+      (uniqI[k] = uniqI[k] || []).push(i);
     });
     var dubluri = 0;
     Object.keys(uniq).forEach(function(k){
@@ -1145,6 +1149,7 @@
       dubluri += L.length - 1;
       L.forEach(function(g){ var x = g.categorie || 'Alt tip'; nr[x] = (nr[x] || 0) + 1; if (nr[x] > nr[c]) c = x; });
       var e = PER_EUR[s.val] ? s.v / PER_EUR[s.val] : null;
+      uniqI[k].forEach(function(ix, j){ stare[ix] = j ? 'dublura' : (e === null ? 'fara_curs' : 'numarat'); });
       if (e === null){ neconv[s.val] = (neconv[s.val] || 0) + 1; return; }
       var t = tip[c];
       t.n++; t.eur += e;
@@ -1153,7 +1158,7 @@
       t.top.push({ nume: L[0].numeScurt || L[0].nume, eur: e, s: s });
     });
     Object.keys(tip).forEach(function(c){ tip[c].top.sort(function(a, b){ return b.eur - a.eur; }); });
-    return { tip: tip, dubluri: dubluri, neconv: neconv, fara: fara };
+    return { tip: tip, dubluri: dubluri, neconv: neconv, fara: fara, stare: stare };
   }
   function panouSume(grupuri){
     var st = statSume(grupuri), tipuri = ORDINE_TIP.filter(function(c){ return st.tip[c]; })
@@ -2000,11 +2005,45 @@
     }).join('') + '</div>' + nota;
   }
 
-  /* Exportă exact ce e pe ecran: aceleași filtre, aceeași ordine, aceeași
-     vedere. Prima linie a foii spune ce filtre erau active, ca fișierul să
-     rămână interpretabil peste șase luni, când nimeni nu mai ține minte ce
-     era bifat în momentul descărcării. */
-  function exporta(grupuri, acte){
+  /* ---------------------------------------------------------------- export Excel stilizat
+
+     „Excel" descarcă exact ce e pe ecran: aceleași filtre, aceeași ordine, aceeași vedere. Fișierul îl scrie
+     xlsx-stil.js, încărcat abia la primul clic (aceleași fișiere ca la exporturile din dashboard): antet colorat,
+     filtre pe coloane, prima coloană înghețată, culori pe tipuri de finanțare, date și sume ca valori adevărate
+     (se sortează și se adună), total care se recalculează când filtrezi, linkuri care se deschid.
+
+     Dacă xlsx-stil.js nu se poate încărca (rețea blocată, fișier lipsă), se scrie vechea foaie simplă, cu aceleași
+     rânduri: fără stil, dar cu datele întregi. Prima linie a fișierului spune ce filtre erau active, ca el să
+     rămână de înțeles peste șase luni, când nimeni nu mai ține minte ce era bifat la descărcare.
+
+     Totalul în euro din fișier e cel din panoul „Sumele acordurilor" (care se desenează doar în registrul legis.md;
+     în cel din Monitor nu există panou, dar regulile sunt aceleași): același cod (statSume) hotărăște ce rânduri se
+     adună. Un rând care are sumă, dar nu intră în total, spune de ce în coloana „Intră în total?" — altfel suma
+     coloanei ar ieși mai mare decât cifra din pagină (rândurile repetate și cele marcate „nu se adună"). */
+
+  var EXPORT_SURSA = 'Monitorul Oficial al Republicii Moldova (monitorul.gov.md)';
+  var EXPORT_PREFIX_EDITIE = 'MO ';
+  var STIL_V = '2026-10-14';                       // se schimbă la fiecare modificare a lui xlsx-stil.js (memoria cache a browserului)
+  var XLSX_TIP = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  var CULORI_TIP = [['Grant', 'FF155A52', 'FFE0F2F0'], ['Împrumut', 'FFA3311E', 'FFFBE8E3'],
+                    ['Asistență tehnică', 'FF3D5A80', 'FFE8EEF7'], ['Asistență financiară', 'FF8A5C0D', 'FFFDF1DC']];
+  var TEXT_IN_TOTAL = { numarat: 'da', dublura: 'nu: dublură', fara_total: 'nu: nu se adună', fara_curs: 'nu: fără curs' };
+
+  var incarcareStil = null;
+  function incarcaStil(){
+    if (window.XlsxStil) return Promise.resolve(window.XlsxStil);
+    if (incarcareStil) return incarcareStil;
+    incarcareStil = new Promise(function(ok, nu){
+      var sc = document.createElement('script');
+      sc.src = 'xlsx-stil.js?v=' + STIL_V;
+      sc.onload = function(){ window.XlsxStil ? ok(window.XlsxStil) : nu(new Error('xlsx-stil.js nu definește XlsxStil')); };
+      sc.onerror = function(){ incarcareStil = null; nu(new Error('xlsx-stil.js nu s-a încărcat')); };
+      document.head.appendChild(sc);
+    });
+    return incarcareStil;
+  }
+
+  function filtreActive(){
     var filtre = [];
     if (fAn  !== 'all') filtre.push((alesi(fAn).length > 1 ? 'anii ' : 'anul ') + alesi(fAn).join(', '));
     if (fOrg !== 'all') filtre.push('partener: ' + alesi(fOrg).join(', '));
@@ -2015,89 +2054,282 @@
     }
     if (fSuport)        filtre.push('doar cu marcaj de suport bugetar');
     if (seek)           filtre.push('căutare: ' + seek);
-    var antet = 'Acorduri de asistență externă — Monitorul Oficial al Republicii Moldova. ' +
-      'Extras la ' + new Date().toLocaleDateString('ro-RO') + '. ' +
-      (filtre.length ? 'Filtre: ' + filtre.join('; ') : 'Fără filtre — toate înregistrările') + '.';
+    return filtre;
+  }
+  function dataOraRo(){
+    var d = new Date(), z = function(n){ return ('0' + n).slice(-2); };
+    return z(d.getDate()) + '.' + z(d.getMonth() + 1) + '.' + d.getFullYear() + ', ' + z(d.getHours()) + ':' + z(d.getMinutes());
+  }
+  /* În română, numeralele de la 20 în sus cer „de": 3 acorduri, dar 38 de acorduri. */
+  function nrRo(n, sg, pl){
+    var u = n % 100;
+    return n === 1 ? '1 ' + sg : n + (u === 0 || u >= 20 ? ' de ' : ' ') + pl;
+  }
+  function gazdaUrl(u){
+    var m = /^https?:\/\/([^\/?#:]+)/i.exec(u || '');
+    return m ? m[1].replace(/^www\./i, '') : '';
+  }
+  function frumos(v){ return v && v !== '0' ? v.slice(6, 8) + '.' + v.slice(4, 6) + '.' + v.slice(0, 4) : ''; }
+  function capEtapa(k){
+    var s = STEPS.filter(function(x){ return x.k === k; })[0];
+    return s ? s.n + '. ' + s.cap : (k === VIGOARE.k ? VIGOARE.cap : k);
+  }
 
-    var randuri = [[antet]], nume;
+  /* Tabelul acordurilor: un rând pe acord, în ordinea din pagină. Întoarce specificația foilor pentru xlsx-stil.js și
+     rândurile foii simple (aceleași valori, cu adresele în loc de etichetele linkurilor). */
+  function tabelAcorduri(grupuri){
+    var lista = grupuri.filter(function(g){
+      if (!trece_grup(g)) return false;
+      if (seek){
+        var hay = fold(g.nume + ' ' + g.parteneri + ' ' +
+          g.acte.map(function(a){ return a.titlu + ' ' + a.act; }).join(' '));
+        if (hay.indexOf(seek) === -1) return false;
+      }
+      return true;
+    });
+    var st = statSume(lista);                       // aceleași reguli ca în panoul de sume
+    var baza = location.href.split(/[?#]/)[0];
+    var filtre = filtreActive();
 
-    if (vedere === 'acte'){
-      nume = 'Acte';
-      randuri.push(['Data ediției','Ediția','Act','Tip de finanțare','Suport bugetar','Partener',
-                    'Etapa','Denumirea acordului','Titlul complet al actului','Semnat','Link']);
-      acte.filter(function(a){
-        if (!trece_act(a)) return false;
-        if (seek){
-          var hay = fold([a.titlu, a.act, a.partener, a.editie].join(' '));
-          if (hay.indexOf(seek) === -1) return false;
-        }
-        return true;
-      }).sort(function(x, y){ return ord(y).localeCompare(ord(x)); })
-        .forEach(function(a){
-          var caps = etapa(a).map(function(k){
-            var s = STEPS.filter(function(x){ return x.k === k; })[0];
-            return s ? s.n + '. ' + s.cap : k;
-          }).join(' + ');
-          randuri.push([a.data_editie, 'MO ' + a.editie, a.act, a.categorie,
-            a.suport ? 'da' : '', a.partener || '', caps, denumire(a.titlu), a.titlu,
-            a.semnat || '', linkDirect(a) || a.url]);
+    var cols = [];
+    function col(nume, tip, lat){ cols.push([nume, tip, lat]); return cols.length - 1; }
+    var cAcord = col('Acordul', 't', 48), cPartener = col('Partener', 't', 18), cTip = col('Tip de finanțare', 't', 22),
+        cSuport = col('Suport bugetar', 'm', 10);
+    var cSuma = col('Suma', 'e', 15), cVal = col('Valuta', 'c', 8), cEur = col('Echivalent EUR', 'e', 16),
+        cInTotal = col('Intră în total?', 'c', 16);
+    var cSemnat = col('Semnat', 'z', 12), cEtape = col('Etape parcurse (din ' + STEPS.length + ')', 'n', 11),
+        cAtinsa = col('Etapa atinsă', 't', 27), cEt0 = cols.length;
+    STEPS.forEach(function(s){ col(s.n + '. ' + s.cap, 'm', 13); });
+    var cEtN = cols.length - 1;
+    var cVig = col('În vigoare din', 'z', 13), cTemei = col('Temeiul datei', 't', 20);
+    var cAni = col('Ani', 'l', 24), cNrActe = col('Nr. acte', 'n', 8), cPrima = col('Prima publicare', 'z', 12),
+        cUltima = col('Ultima publicare', 'z', 12);
+    var cSursa = col('Sursa sumei', 'l', 38), cFrag = col('Fragmentul din act', 'l', 60), cLinkSursa = col('Link sursă', 't', 18);
+    var cCost = col('Costul total al proiectului', 'e', 16), cValCost = col('Valuta costului', 'c', 9);
+    var cNume = col('Denumirea completă', 'l', 60), cLinkReg = col('Link în registru', 't', 14);
+
+    var randuri = [], urlSursa = [], urlReg = [];
+    lista.forEach(function(g, i){
+      var atinse = STEPS.filter(function(s){ return g.et[s.k]; });
+      var ultima = atinse.length ? atinse[atinse.length - 1] : null;
+      var v = inVigoareDin(g), dt = g.acte.map(ord).sort();
+      var s = sumaAfisata(g), sursaSuma = '', fragment = '', legSursa = '';
+      if (g.sumaA){
+        sursaSuma = g.sumaA.extern ? 'sursă externă (nu din actele din registru)' : 'textul acordului (atașat la ' + g.sumaA.act + ')';
+        fragment = g.sumaA.f || ''; legSursa = linkSigur(g.sumaA.u);
+      } else if (g.suma){
+        sursaSuma = 'titlul actului';
+      } else if (g.sumaT){
+        sursaSuma = 'textul ' + g.sumaT.act; fragment = g.sumaT.f || '';
+      } else if (g.sumaG){
+        sursaSuma = 'nota Guvernului, ședința din ' + dataRo(g.sumaG.data) + ' (' + g.sumaG.nr + ')';
+        fragment = g.sumaG.f || ''; legSursa = linkSigur(g.sumaG.pdf);
+      }
+      var stare = st.stare[i];
+      var r = [];
+      r[cAcord] = g.numeScurt || g.nume; r[cPartener] = g.parteneri || ''; r[cTip] = g.categorie || '';
+      r[cSuport] = g.suport ? 'da' : '';
+      r[cSuma] = s ? s.v : ''; r[cVal] = s ? s.val : '';
+      r[cEur] = stare === 'numarat' ? s.v / PER_EUR[s.val] : '';
+      r[cInTotal] = TEXT_IN_TOTAL[stare] || '';
+      r[cSemnat] = g.semnat || ''; r[cEtape] = atinse.length; r[cAtinsa] = ultima ? ultima.n + '. ' + ultima.cap : '';
+      STEPS.forEach(function(x, k){ r[cEt0 + k] = g.et[x.k] ? 'da' : ''; });
+      r[cVig] = v ? v.data : ''; r[cTemei] = v ? v.ce : '';
+      r[cAni] = aniGrup(g).join(', '); r[cNrActe] = g.acte.length;
+      r[cPrima] = frumos(dt[0]); r[cUltima] = frumos(dt[dt.length - 1]);
+      r[cSursa] = sursaSuma; r[cFrag] = fragment; r[cLinkSursa] = legSursa ? gazdaUrl(legSursa) : '';
+      r[cCost] = g.cost ? g.cost.v : ''; r[cValCost] = g.cost ? g.cost.val : '';
+      r[cNume] = g.nume; r[cLinkReg] = 'deschide';
+      randuri.push(r); urlSursa.push(legSursa); urlReg.push(baza + '#acord=' + idAcord(g));
+    });
+
+    var cuSuma = lista.filter(function(g){ return sumaAfisata(g); }).length;
+    var subtitlu = 'Sursa: ' + EXPORT_SURSA + ' · ' + (filtre.length ? 'Filtre: ' + filtre.join('; ') : 'fără filtre') + ' · ' +
+      (lista.length ? nrRo(lista.length, 'acord', 'acorduri') + (cuSuma ? ', din care ' + cuSuma + ' cu sumă' : ', niciunul cu sumă') : 'niciun acord') +
+      ' · sume în EUR, la cursul BCE din ' + CURS_DATA + ' · Generat: ' + dataOraRo();
+    var subsol = (location.host || 'nistor.vivi.md') + location.pathname;
+
+    var foaie = {
+      foaie: 'Acorduri', titlu: 'Acorduri de asistență externă pentru Republica Moldova', subtitlu: subtitlu,
+      antete: cols.map(function(c){ return c[0]; }), tipuri: cols.map(function(c){ return c[1]; }).join(''), randuri: randuri,
+      latimi: (function(){ var o = {}; cols.forEach(function(c, k){ o[k] = c[2]; }); return o; })(),
+      total: { eticheta: 'Total (rândurile vizibile)', suma: [cEur] },
+      inghetaColoane: 1, maxLinii: 3, paginiLatime: 'auto', bare: [cEtape],
+      grupe: [{ de: cAcord, pana: cSuport, text: 'ACORD' }, { de: cSuma, pana: cInTotal, text: 'SUMA ȘI TOTALUL' },
+              { de: cSemnat, pana: cTemei, text: 'PARCURSUL ACORDULUI' }, { de: cAni, pana: cUltima, text: 'ACTELE PUBLICATE' },
+              { de: cSursa, pana: cLinkReg, text: 'SURSE ȘI DETALII' }],
+      etichete: (function(){
+        var o = {};
+        o[cTip] = CULORI_TIP;
+        o[cInTotal] = [['da', 'FF16794F', 'FFE3F4EC'], ['nu: dublură', 'FF6B7284', 'FFEEF0F4'],
+                       ['nu: nu se adună', 'FF6B7284', 'FFEEF0F4'], ['nu: fără curs', 'FF6B7284', 'FFEEF0F4']];
+        return o;
+      })(),
+      linkuri: (function(){
+        var o = {};
+        o[cLinkSursa] = function(rand, i){ return urlSursa[i]; };
+        o[cLinkReg] = function(rand, i){ return urlReg[i]; };
+        return o;
+      })(),
+      note: [
+        'Un rând = un acord: actele din registru care țin de același acord sunt grupate pe un singur rând (în vederea „Acte" se văd pe rând separat). ' +
+          'Etapele 1–' + STEPS.length + ' sunt cele care lasă un act publicat în Monitorul Oficial; „da" înseamnă că actul există în registru.',
+        'Echivalent EUR: suma acordului trecută în euro la cursurile BCE din ' + CURS_DATA + ' (foaia „Pe valute"), doar pentru rândurile care intră în total. ' +
+          'Coloana „Intră în total?" spune de ce un rând cu sumă nu se adună: „nu: dublură" = același acord apare și pe alt rând (aceeași sumă, același finanțator, ' +
+          'aceeași denumire) și se numără o singură dată; „nu: nu se adună" = suma se arată, dar nu se adună (acordul e numărat la alt act sau suma nu e cea acordată; ' +
+          'motivul e în „Fragmentul din act"); „nu: fără curs" = valută fără curs de conversie. Rândurile fără sumă n-au încă suma în registru.',
+        'Totalul de jos adună doar rândurile vizibile și se recalculează când filtrezi în Excel. Sumele din anii ’90 sunt trecute la cursul de azi: un ordin de mărime, nu valoarea de la semnare.',
+        { t: 'Registrul, online: ' + baza, u: baza }
+      ]
+    };
+    var foi = [foaie];
+
+    var tipuri = ORDINE_TIP.filter(function(c){ return st.tip[c]; })
+      .concat(Object.keys(st.tip).filter(function(c){ return ORDINE_TIP.indexOf(c) < 0; }));
+    if (tipuri.length){
+      var total = 0, nTotal = 0, laRand = [];
+      tipuri.forEach(function(c){ total += st.tip[c].eur; nTotal += st.tip[c].n; });
+      var nTipuri = tipuri.map(function(c){ var t = st.tip[c]; return [c, t.toate, t.n, t.eur, total ? 100 * t.eur / total : 0]; });
+      tipuri.forEach(function(c){
+        var top = st.tip[c].top.slice(0, 3);
+        if (top.length) laRand.push('Cele mai mari, la „' + c + '": ' + top.map(function(x){ return x.nume + ' (' + fmtSuma(x.s) + ')'; }).join('; ') + '.');
+      });
+      foi.push({
+        foaie: 'Sume pe tipuri', titlu: 'Sumele acordurilor, pe tipuri de finanțare',
+        subtitlu: (window.__LEGIS__      // panoul de sume există doar în registrul legis.md; în cel din Monitor n-avem la ce trimite
+            ? 'Aceleași cifre ca în panoul „Sumele acordurilor, pe tipuri de finanțare" din pagină, calculate pentru rândurile exportate'
+            : 'Sumele acordurilor din rândurile exportate, pe tipuri de finanțare') + ' · în euro, la cursul BCE din ' + CURS_DATA +
+          ' · ' + (filtre.length ? 'Filtre: ' + filtre.join('; ') : 'fără filtre'),
+        antete: ['Tip de finanțare', 'Acorduri în selecție', 'Din care cu sumă (în total)', 'Echivalent EUR', 'Pondere din total'], tipuri: 'tnnep', randuri: nTipuri,
+        latimi: { 0: 24, 1: 14, 2: 16, 3: 18, 4: 12 },
+        total: { eticheta: 'Total', suma: [1, 2, 3], raport: { 4: [3, 3] } }, bare: [3],
+        grafic: { tip: 'bar', cat: 0, serii: [3], titlu: 'Echivalent EUR, pe tipuri de finanțare', culori: ['1E4B8C'] },
+        culoareFila: 'FF2DD4BF', subsol: subsol,
+        note: [
+          'Acordurile cu sumă cunoscută adună ' + fmtEur(total) + ': ' + nrRo(nTotal, 'acord', 'acorduri') + ' din ' + lista.length + '. Alte ' + st.fara +
+            ' nu au încă suma în registru, deci totalurile sunt un minim, nu tot ce s-a semnat.',
+          'Fiecare acord e numărat o dată, cu suma afișată pe rândul lui' + (st.dubluri ? '; ' + st.dubluri +
+            ' rânduri care repetă același acord (aceeași sumă, același finanțator, aceeași denumire) au fost lăsate deoparte' : '') +
+            '. Un amendament care majorează un acord poate apărea totuși ca rând separat.'
+        ].concat(laRand)
+      });
+      var valute = [];
+      tipuri.forEach(function(c){
+        var V = st.tip[c].valute;
+        Object.keys(V).sort(function(a, b){ return V[b].eur - V[a].eur; }).forEach(function(val){
+          valute.push([c, val, V[val].n, Math.round(V[val].v * 100) / 100, PER_EUR[val], V[val].eur]);
         });
-    } else {
-      nume = 'Acorduri';
-      randuri.push(['Acordul','Partener','Tip de finanțare','Suport bugetar','Ani','Nr. acte',
-                    'Prima publicare','Ultima publicare','Etape parcurse',
-                    'Etapa atinsă','Semnat'].concat(STEPS.map(function(s){
-                      return s.n + '. ' + s.cap; }))
-                      .concat(['În vigoare din', 'Temeiul datei', 'Suma', 'Valuta', 'Sursa sumei', 'Fragmentul din act',
-                               'Denumirea completă', 'Costul total al proiectului', 'Valuta costului']));
-      grupuri.filter(function(g){
-        if (!trece_grup(g)) return false;
-        if (seek){
-          var hay = fold(g.nume + ' ' + g.parteneri + ' ' +
-            g.acte.map(function(a){ return a.titlu + ' ' + a.act; }).join(' '));
-          if (hay.indexOf(seek) === -1) return false;
-        }
-        return true;
-      }).forEach(function(g){
-        var atinse = STEPS.filter(function(s){ return g.et[s.k]; });
-        var v = inVigoareDin(g);
-        var ultima = atinse.length ? atinse[atinse.length - 1] : null;
-        var dt = g.acte.map(ord).sort();
-        function frumos(v){ return v && v !== '0' ? v.slice(6,8)+'.'+v.slice(4,6)+'.'+v.slice(0,4) : ''; }
-        randuri.push([g.numeScurt || g.nume, g.parteneri || '', g.categorie, g.suport ? 'da' : '',
-          aniGrup(g).join(', '),
-          String(g.acte.length), frumos(dt[0]), frumos(dt[dt.length-1]),
-          atinse.length + ' din ' + STEPS.length,
-          ultima ? ultima.n + '. ' + ultima.cap : '', g.semnat || ''
-        ].concat(STEPS.map(function(s){ return g.et[s.k] ? 'da' : ''; }))
-         .concat([v ? v.data : '', v ? v.ce : ''])
-         .concat(g.sumaA ? [g.sumaA.v, g.sumaA.val,
-                  g.sumaA.extern ? 'sursă externă (nu din actele din registru)' : 'textul acordului (atașat la ' + g.sumaA.act + ')',
-                  g.sumaA.f + (g.sumaA.extern && g.sumaA.u ? ' · ' + g.sumaA.u : '')]
-               : g.suma ? [g.suma.v, g.suma.val, 'titlul actului', '']
-               : g.sumaT ? [g.sumaT.v, g.sumaT.val, 'textul ' + g.sumaT.act, g.sumaT.f]
-               : g.sumaG ? [g.sumaG.v, g.sumaG.val, 'nota Guvernului, ședința din ' + dataRo(g.sumaG.data) + ' (' + g.sumaG.nr + ')', g.sumaG.f]
-               : ['', '', '', ''])
-         .concat([g.nume, g.cost ? g.cost.v : '', g.cost ? g.cost.val : '']));
+      });
+      var neconv = Object.keys(st.neconv).map(function(v){ return st.neconv[v] + ' în ' + v; }).join(', ');
+      foi.push({
+        foaie: 'Pe valute', titlu: 'Sumele, pe valute, și cum s-a făcut conversia în euro',
+        subtitlu: 'Cursuri de referință ale Băncii Centrale Europene din ' + CURS_DATA + ' · unități de valută pentru 1 EUR · ' +
+          (filtre.length ? 'Filtre: ' + filtre.join('; ') : 'fără filtre'),
+        antete: ['Tip de finanțare', 'Valuta', 'Acorduri', 'Suma în valuta acordului', 'Unități pentru 1 EUR', 'Echivalent EUR'], tipuri: 'tcnere', randuri: valute,
+        latimi: { 0: 24, 1: 9, 2: 11, 3: 22, 4: 14, 5: 18 },
+        total: { eticheta: 'Total', suma: [2, 5] }, culoareFila: 'FF9DB8DF', subsol: subsol,
+        note: [
+          'DST (drepturile speciale de tragere) e calculat din coșul FMI la aceleași cursuri, marca germană are cursul fix de trecere la euro, ECU e socotit 1 la 1, ' +
+            'iar leii românești vechi trec prin leul nou. Toate sumele, și cele din anii ’90, sunt trecute la cursul de azi: rezultatul e un ordin de mărime, nu valoarea de la data semnării.' +
+            (neconv ? ' Fără curs, deci neadunate: ' + neconv + '.' : '')
+        ]
       });
     }
 
-    var octeti = xlsx(nume, randuri);
-    var url = URL.createObjectURL(new Blob([octeti],
-      { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    /* foaia simplă (rezerva): aceleași coloane, cu adresele în locul etichetelor */
+    var simplu = [[(filtre.length ? 'Filtre: ' + filtre.join('; ') : 'Fără filtre — toate înregistrările') + '. ' + EXPORT_SURSA + '. Extras la ' + dataOraRo() + '.'],
+                  foaie.antete.slice()];
+    randuri.forEach(function(r, i){
+      var c = r.slice();
+      c[cLinkSursa] = urlSursa[i] || ''; c[cLinkReg] = urlReg[i];
+      simplu.push(c);
+    });
+    return { nume: 'Acorduri', registru: { limba: 'ro', autor: 'nistor.vivi.md', subsol: subsol, foi: foi }, simplu: simplu };
+  }
+
+  /* Tabelul actelor: un rând pe act, în ordinea publicării (cele mai noi primele). */
+  function tabelActe(acte){
+    var lista = acte.filter(function(a){
+      if (!trece_act(a)) return false;
+      if (seek){
+        var hay = fold([a.titlu, a.act, a.partener, a.editie].join(' '));
+        if (hay.indexOf(seek) === -1) return false;
+      }
+      return true;
+    }).sort(function(x, y){ return ord(y).localeCompare(ord(x)); });
+    var baza = location.href.split(/[?#]/)[0];
+    var filtre = filtreActive();
+
+    var cols = [];
+    function col(nume, tip, lat){ cols.push([nume, tip, lat]); return cols.length - 1; }
+    var cData = col('Data ediției', 'z', 12), cEd = col('Ediția', 'i', 14), cAct = col('Act', 'i', 26);
+    var cTip = col('Tip de finanțare', 't', 22), cSuport = col('Suport bugetar', 'm', 10), cPartener = col('Partener', 't', 16),
+        cEtapa = col('Etapa', 't', 27), cAcord = col('Denumirea acordului', 't', 48);
+    var cTitlu = col('Titlul complet al actului', 'l', 70), cSemnat = col('Semnat', 'z', 12), cLink = col('Link', 't', 18);
+
+    var urluri = [], randuri = lista.map(function(a){
+      var u = linkSigur(linkDirect(a) || a.url);
+      var r = [];
+      r[cData] = a.data_editie || ''; r[cEd] = a.editie ? EXPORT_PREFIX_EDITIE + a.editie : ''; r[cAct] = a.act || '';
+      r[cTip] = a.categorie || ''; r[cSuport] = a.suport ? 'da' : ''; r[cPartener] = a.partener || '';
+      r[cEtapa] = etapa(a).map(capEtapa).join(' + '); r[cAcord] = denumire(a.titlu); r[cTitlu] = a.titlu;
+      r[cSemnat] = a.semnat || ''; r[cLink] = gazdaUrl(u);
+      urluri.push(u);
+      return r;
+    });
+    var subtitlu = 'Sursa: ' + EXPORT_SURSA + ' · ' + (filtre.length ? 'Filtre: ' + filtre.join('; ') : 'fără filtre') + ' · ' +
+      (lista.length ? nrRo(lista.length, 'act', 'acte') : 'niciun act') + ' · în ordinea publicării, cele mai noi primele · Generat: ' + dataOraRo();
+    var subsol = (location.host || 'nistor.vivi.md') + location.pathname;
+    var foaie = {
+      foaie: 'Acte', titlu: 'Actele acordurilor de asistență externă, în ordinea publicării', subtitlu: subtitlu,
+      antete: cols.map(function(c){ return c[0]; }), tipuri: cols.map(function(c){ return c[1]; }).join(''), randuri: randuri,
+      latimi: (function(){ var o = {}; cols.forEach(function(c, k){ o[k] = c[2]; }); return o; })(),
+      inghetaColoane: 3, maxLinii: 3, paginiLatime: 'auto',
+      grupe: [{ de: cData, pana: cAct, text: 'PUBLICARE' }, { de: cTip, pana: cAcord, text: 'ACORDUL' }, { de: cTitlu, pana: cLink, text: 'ACTUL' }],
+      etichete: (function(){ var o = {}; o[cTip] = CULORI_TIP; return o; })(),
+      linkuri: (function(){ var o = {}; o[cLink] = function(rand, i){ return urluri[i]; }; return o; })(),
+      note: [
+        'Un rând = un act publicat. Coloana „Link" duce la fișa actului pe legis.md sau, când acesta nu are încă fișă, la ediția din Monitorul Oficial. ' +
+          'Actele aceluiași acord sunt grupate pe un singur rând în vederea „Acorduri".',
+        { t: 'Registrul, online: ' + baza, u: baza }
+      ]
+    };
+    var simplu = [[(filtre.length ? 'Filtre: ' + filtre.join('; ') : 'Fără filtre — toate înregistrările') + '. ' + EXPORT_SURSA + '. Extras la ' + dataOraRo() + '.'],
+                  foaie.antete.slice()];
+    randuri.forEach(function(r, i){ var c = r.slice(); c[cLink] = urluri[i] || ''; simplu.push(c); });
+    return { nume: 'Acte', registru: { limba: 'ro', autor: 'nistor.vivi.md', subsol: subsol, foi: [foaie] }, simplu: simplu };
+  }
+
+  function descarcaBlob(blob, nume){
+    var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
+    a.download = nume;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }
+
+  function exporta(grupuri, acte){
+    var t = vedere === 'acte' ? tabelActe(acte) : tabelAcorduri(grupuri);
     function bucata(v){ return '-' + fold(v).replace(/[^a-z0-9]+/g, ''); }
-    a.download = 'registru-' + nume.toLowerCase() +
+    var fisier = 'registru-' + t.nume.toLowerCase() +
       (fAn  !== 'all' ? '-' + alesi(fAn).join('_') : '') +
       (fOrg !== 'all' ? bucata(fOrg) : '') +
       (fCat !== 'all' ? bucata(fCat) : '') +
       (fSuport ? '-suportbugetar' : '') +
       '-' + new Date().toISOString().slice(0,10) + '.xlsx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+    var btn = document.getElementById('export');
+    if (btn) btn.disabled = true;                   // un al doilea clic cât se scrie fișierul ar descărca două copii
+    function gata(){ if (btn) btn.disabled = false; }
+    incarcaStil()
+      .then(function(X){ return X.construieste(t.registru); })
+      .then(null, function(e){
+        if (window.console) console.warn('Exportul stilizat nu e disponibil, scriu foaia simplă:', e);
+        return new Blob([xlsx(t.nume, t.simplu)], { type: XLSX_TIP });
+      })
+      .then(function(blob){ descarcaBlob(blob, fisier); gata(); }, function(e){ gata(); throw e; });
   }
 
   /* Cele două pagini numesc aceiași finanțatori altfel: registrul folosește
