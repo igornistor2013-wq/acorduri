@@ -1286,6 +1286,32 @@ if '--browser' in sys.argv:
              and _rs[0]['suma'] and _rs[0]['suma']['v'] == 22902012.92 and _rs[0]['suma']['val'] == 'CZK' and _rs[0]['suma']['sursa'] == 'extern'
              and _rs[0]['suma']['eur'] == round(22902012.92 / 24.254) and not _rs[0]['faraTotal'],
              [(a['scurt'], a['categorie'], a['suma'], sorted(_ac(a))) for a in _rs])
+    _cr = _rd('HG574/2025')
+    verifica('CRESTA (Elveția, Ministerul Justiției): un singur rând, asistență tehnică, 1 880 000 CHF dintr-o sursă externă, trecut în euro la cursul BCE din 1 iulie 2026',
+             len(_cr) == 1 and _ac(_cr[0]) == {'HG574/2025'} and _cr[0]['categorie'] == 'Asistență tehnică' and _cr[0]['suma']
+             and (_cr[0]['suma']['v'], _cr[0]['suma']['val'], _cr[0]['suma']['sursa']) == (1880000, 'CHF', 'extern')
+             and _cr[0]['suma']['eur'] == round(1880000 / 0.9234) and not _cr[0]['faraTotal'], [(a['scurt'], a['categorie'], a['suma']) for a in _cr])
+    _ms = _rd('HG654/2024')
+    verifica('MSIP (proiectul moldo-elvețian în domeniul proprietății intelectuale, SECO): un singur rând, Grant (decizia de mână bate „asistență tehnică" din titlu); '
+             '794 407,37 EUR dintr-o sursă externă, numărat o singură dată, fără conversie',
+             len(_ms) == 1 and _ac(_ms[0]) == {'HG654/2024'} and _ms[0]['categorie'] == 'Grant' and _ms[0]['suma']
+             and (_ms[0]['suma']['v'], _ms[0]['suma']['val'], _ms[0]['suma']['sursa']) == (794407.37, 'EUR', 'extern')
+             and _ms[0]['suma']['eur'] == 794407 and not _ms[0]['faraTotal'], [(a['scurt'], a['categorie'], a['suma']) for a in _ms])
+    _fi = _rd('HG80/2026', 'HG90/2026', 'OMMPS73/2026', 'HG416/2026', 'HG442/2026', 'OMMPS273/2026')
+    verifica('FICR (centrele de plasament temporar pentru refugiați): acordul din 2026 și amendamentul nr. 1 pe un singur rând, Grant; suma e totalul după amendament (580 000 CHF), iar nota păstrează suma inițială (300 000 CHF)',
+             len(_fi) == 1 and len(_fi[0]['acte']) == 6 and _fi[0]['categorie'] == 'Grant' and _fi[0]['suma'] and _fi[0]['suma']['v'] == 580000
+             and _fi[0]['suma']['val'] == 'CHF' and not _fi[0]['faraTotal'], [(a['scurt'][:40], a['categorie'], a['suma']) for a in _fi])
+    _sm = _rd('HG290/2025', 'HG362/2025', 'LP163/2025', 'DP281/2025')
+    verifica('BDCE (CEB), acordul-cadru de 30 mil. EUR pentru școli: hotărârile (care îl numesc „Extinderea rețelei școlilor-model"), legea de ratificare și decretul (care îl numesc „Modernizarea școlilor") '
+             'stau pe un singur rând, Împrumut, suma din textul acordului numărată o singură dată',
+             len(_sm) == 1 and {'HG290/2025', 'HG362/2025', 'LP163/2025', 'DP281/2025'} <= _ac(_sm[0]) and _sm[0]['categorie'] == 'Împrumut' and _sm[0]['suma']
+             and (_sm[0]['suma']['v'], _sm[0]['suma']['val'], _sm[0]['suma']['sursa'], _sm[0]['suma']['eur']) == (30000000, 'EUR', 'acord', 30000000)
+             and not _sm[0]['faraTotal'], [(a['scurt'], a['categorie'], a['suma']) for a in _sm])
+    _tt, _p99 = _rd('HG750/2003', 'LP301/2003'), _rd('HP418/1999')
+    verifica('AID, Facilitarea Comerțului și Transportului în Europa de Sud-Est: hotărârea din 2003 stă cu legea din 2003 (5,3 mil. DST), nu cu hotărârile Parlamentului din 1999 (15 mil. USD), care rămân pe alt rând',
+             len(_tt) == 1 and {'HG750/2003', 'LP301/2003', 'DPRM1378/2003'} <= _ac(_tt[0]) and _tt[0]['suma'] and (_tt[0]['suma']['v'], _tt[0]['suma']['val']) == (5300000, 'DST')
+             and len(_p99) == 1 and _p99[0]['id'] != _tt[0]['id'] and 'HG750/2003' not in _ac(_p99[0]) and _p99[0]['suma'] and _p99[0]['suma']['v'] == 15000000,
+             [(a['scurt'], a['suma'], sorted(_ac(a))) for a in _tt + _p99])
     _mon2, _ = lga.citeste_acorduri(pagina='acorduri.html')
     _ui = next((a for a in _mon2 if a['nume'].strip() == 'Sprijin pentru integrarea în UE'), None)
     verifica('registrul Monitor: „Sprijin pentru integrarea în UE" = 25 mil. EUR, sursă externă',
