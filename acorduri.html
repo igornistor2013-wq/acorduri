@@ -56,14 +56,44 @@
   .navbtn.away:hover{background:var(--blue-bg)}
   .navbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
+  /* Indicatorii din capul paginii. Fiecare card are o cifră mare, o pictogramă și, dedesubt, un indicator care arată
+     proporția: bară pentru „din total", fâșie pe tipuri de finanțare, trei bare pentru creditorii cei mai activi.
+     Fâșia folosește culorile tipurilor din diagrama „Acorduri noi pe an" și are legenda alături: culoarea nu e
+     singura care spune ce e fiecare segment. Textul nu poartă culoarea datelor, doar pătrățelul de lângă el. */
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-  @media (max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}}
-  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
-    box-shadow:var(--shadow);padding:16px 18px}
+  @media (max-width:980px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  @media (min-width:981px) and (max-width:1290px){.kpi .lbl{min-height:2.8em}}
+  .kpi{position:relative;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:17px 18px 15px;overflow:hidden}
+  .kpi::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;
+    background:linear-gradient(90deg,var(--navy) 0%,#2f5691 62%,var(--gold) 100%)}
   .kpi .lbl{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-dim);
-    font-weight:700;margin-bottom:7px}
-  .kpi .val{font-size:27px;font-weight:800;color:var(--navy-deep);line-height:1;letter-spacing:-.02em}
-  .kpi .sub{font-size:11.5px;color:var(--ink-dim);margin-top:6px;font-family:var(--mono)}
+    font-weight:700;line-height:1.4;margin:1px 40px 9px 0}
+  .kpi-ico{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:9px;background:var(--blue-bg);
+    display:flex;align-items:center;justify-content:center}
+  .kpi-ico svg{width:16px;height:16px;stroke:var(--navy);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .kpi-main{display:flex;align-items:baseline;gap:2px 9px;flex-wrap:wrap;margin-bottom:12px}
+  .kpi .val{font-size:34px;font-weight:800;color:var(--navy-deep);line-height:1.05;letter-spacing:-.025em}
+  .kpi-unit{font-size:12px;font-weight:600;color:var(--ink-dim)}
+  .kpi .sub{font-size:11.5px;color:var(--ink-dim);margin-top:8px;font-family:var(--mono)}
+  .kpi .doar-tel{display:none}
+  .kpi-strip i,.kpi-leg i,.kpi-meter .trk,.kpi-meter .trk i,.kpi-top3 .t,.kpi-top3 .t i,.kpi-ico{
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .kpi-meter{display:flex;align-items:center;gap:10px;margin-top:auto}
+  .kpi-meter .trk{flex:1;height:7px;border-radius:4px;background:#e8edf6;overflow:hidden}
+  .kpi-meter .trk i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--navy),#2f5691)}
+  .kpi-meter b{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy-deep);min-width:34px;text-align:right}
+  .kpi-strip{display:flex;gap:2px;height:8px;margin-top:auto;border-radius:4px;overflow:hidden}
+  .kpi-strip i{display:block;height:100%;min-width:3px;border-radius:2px}
+  .kpi-leg{display:flex;flex-wrap:wrap;gap:3px 13px;margin-top:9px;font-size:11.5px;color:var(--ink-dim)}
+  .kpi-leg span{display:inline-flex;align-items:center;gap:5px}
+  .kpi-leg i{width:8px;height:8px;border-radius:2px;flex:none}
+  .kpi-leg b{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--navy-deep)}
+  .kpi-top3{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin-top:auto}
+  .kpi-top3 .n{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy-deep)}
+  .kpi-top3 .t{height:6px;border-radius:3px;background:#e8edf6;overflow:hidden}
+  .kpi-top3 .t i{display:block;height:100%;border-radius:3px;background:var(--navy)}
+  .kpi-top3 .c{font-family:var(--mono);font-size:11px;color:var(--ink-dim);text-align:right}
 
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
     box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
@@ -488,10 +518,16 @@
     .panel:not(#lista){order:3}
 
     /* Indicatorii, mai strânși: patru casete înalte ocupau tot ecranul. */
-    .kpi{padding:12px 13px}
-    .kpi .val{font-size:21px}
-    .kpi .lbl{font-size:9.5px;margin-bottom:5px}
-    .kpi .sub{font-size:10.5px}
+    .kpi{padding:13px 13px 12px}
+    .kpi-ico{display:none}
+    .kpi .val{font-size:27px}
+    .kpi .lbl{font-size:9.5px;margin:0 0 7px}
+    .kpi-main{margin-bottom:9px}
+    .kpi-unit{font-size:11px}
+    .kpi .sub{font-size:10.5px;margin-top:6px}
+    /* fâșia, legenda și barele creditorilor rămân pentru ecranele late; pe telefon, aceleași cifre în text */
+    .kpi-strip,.kpi-leg,.kpi-top3,.kpi .doar-desk{display:none}
+    .kpi .doar-tel{display:block}
 
     /* Comutatorul de file se rupea pe două rânduri și arăta a greșeală. */
     #filaBtns{width:100%}
@@ -2450,14 +2486,16 @@
       });
     });
 
+    var nRat = dist['Ratificare sau aprobare'] || 0;
     var kpis =
-      kpi('Acorduri', grupuri.length, 'din ' + acte.length + ' acte publicate') +
+      kpi('Acorduri', grupuri.length, {ico: 'doc', din: 'din ' + acte.length + ' acte publicate', viz: kpiTipuri(cats)}) +
       kpi('Creditori', Object.keys(orgs).length,
-        Object.keys(orgs).sort(function(a,b){return orgs[b]-orgs[a];}).slice(0,3).join(' · ')) +
-      kpi('Ratificate sau aprobate', dist['Ratificare sau aprobare'] || 0,
-        'au trecut de etapa 4 din 5') +
+        {ico: 'bank', din: 'primii trei, după numărul de acorduri', dinTel: false, viz: kpiCreditori(orgs),
+         subTel: Object.keys(orgs).sort(function(a,b){return orgs[b]-orgs[a];}).slice(0,3).join(' · ')}) +
+      kpi('Ratificate sau aprobate', nRat,
+        {ico: 'check', din: 'din ' + grupuri.length, viz: kpiBara(nRat, grupuri.length), sub: 'au trecut de etapa 4 din 5'}) +
       kpi('Cu dată de intrare în vigoare', cuVigoare,
-        'din legea de ratificare sau din ordin');
+        {ico: 'cal', din: 'din ' + grupuri.length, viz: kpiBara(cuVigoare, grupuri.length), sub: 'din legea de ratificare sau din ordin'});
 
     /* Optsprezece butoane pe două rânduri, jumătate cu câte un singur acord,
        fac panoul greu de parcurs. Arătăm întâi finanțatorii cu mai multe
@@ -3226,14 +3264,53 @@
       layers:'<path d="M12 2 2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
       file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
       down:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
-      link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'
+      link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+      doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/>',
+      bank:'<path d="M3 9l9-5 9 5"/><path d="M5 9h14"/><path d="M6.5 12v5M10.5 12v5M13.5 12v5M17.5 12v5"/><path d="M4 20h16"/>',
+      check:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/>',
+      cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><polyline points="9 15 11 17 15 13"/>'
     }[t];
     return '<svg viewBox="0 0 24 24">' + p + '</svg>';
   }
 
-  function kpi(lbl, val, sub){
-    return '<div class="kpi"><div class="lbl">' + esc(lbl) + '</div><div class="val">' + val +
-      '</div><div class="sub">' + esc(sub) + '</div></div>';
+  /* Un card de indicator: eticheta, pictograma, cifra (cu „din …" lângă ea), indicatorul vizual (o.viz) și textul de
+     sub el (o.sub). Cifrele și textele sunt cele de dinainte; indicatorul vizual nu adaugă informație, o arată altfel.
+     Pe telefon fâșia, legenda și barele dispar, iar o.subTel (dacă există) ia locul lor, ca rândul să rămână scund. */
+  function kpi(lbl, val, o){
+    o = o || {};
+    return '<div class="kpi">' + (o.ico ? '<span class="kpi-ico" aria-hidden="true">' + ico(o.ico) + '</span>' : '') +
+      '<div class="lbl">' + esc(lbl) + '</div>' +
+      '<div class="kpi-main"><span class="val">' + val + '</span>' +
+        (o.din ? '<span class="kpi-unit' + (o.dinTel === false ? ' doar-desk' : '') + '">' + esc(o.din) + '</span>' : '') + '</div>' +
+      (o.viz || '') + (o.sub ? '<div class="sub">' + esc(o.sub) + '</div>' : '') +
+      (o.subTel ? '<div class="sub doar-tel">' + esc(o.subTel) + '</div>' : '') + '</div>';
+  }
+  /* Bara „n din total" cu procentul alături. Un număr nenul nu iese niciodată sub 2% din lățime, ca să se vadă. */
+  function kpiBara(n, total){
+    var p = total ? Math.round(100 * n / total) : 0, w = total ? Math.max(n ? 2 : 0, 100 * n / total) : 0;
+    return '<div class="kpi-meter"><span class="trk" aria-hidden="true"><i style="width:' + w.toFixed(1) + '%"></i></span><b>' + p + '%</b></div>';
+  }
+  /* Fâșia acordurilor pe tipuri de finanțare, cu legenda ei (numele și numărul stau în text, nu doar în culoare). */
+  function kpiTipuri(cats){
+    var nume = AN_TIPURI.concat(['Altele']), nr = [0, 0, 0, 0, 0];
+    Object.keys(cats).forEach(function(c){ var k = AN_TIPURI.indexOf(c); nr[k < 0 ? 4 : k] += cats[c]; });
+    var folosite = nume.map(function(n, k){ return k; }).filter(function(k){ return nr[k] > 0; })
+      .sort(function(a, b){ return nr[b] - nr[a] || a - b; });          // cel mai mare tip primul, în fâșie și în legendă
+    if (!folosite.length) return '';
+    return '<div class="kpi-strip" aria-hidden="true">' + folosite.map(function(k){
+        return '<i style="flex:' + nr[k] + ' 1 0;background:' + AN_CULORI[k] + '" title="' + esc(nume[k]) + ': ' + nr[k] + '"></i>'; }).join('') + '</div>' +
+      '<div class="kpi-leg">' + folosite.map(function(k){
+        return '<span><i style="background:' + AN_CULORI[k] + '"></i>' + esc(nume[k]) + ' <b>' + nr[k] + '</b></span>'; }).join('') + '</div>';
+  }
+  /* Primii trei creditori după numărul de acorduri, cu bare proporționale cu cel mai mare. */
+  function kpiCreditori(orgs){
+    var top = Object.keys(orgs).sort(function(a, b){ return orgs[b] - orgs[a]; }).slice(0, 3);
+    if (!top.length) return '';
+    var max = orgs[top[0]] || 1;
+    return '<div class="kpi-top3">' + top.map(function(o){
+      return '<span class="n"' + (NUME_PARTENER[o] ? ' title="' + esc(NUME_PARTENER[o]) + '"' : '') + '>' + esc(o) + '</span>' +
+        '<span class="t" aria-hidden="true"><i style="width:' + Math.max(4, Math.round(100 * orgs[o] / max)) + '%"></i></span>' +
+        '<span class="c">' + orgs[o] + '</span>'; }).join('') + '</div>';
   }
 
   /* Starea filtrelor trăiește în adresa paginii, ca un link să poată fi

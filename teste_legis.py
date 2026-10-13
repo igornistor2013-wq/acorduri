@@ -865,6 +865,107 @@ if '--browser' in sys.argv:
         shutil.rmtree(_dir, ignore_errors=True)
 
     print()
+    print('Browser: indicatorii (KPI) din capul paginii — cifre, proporții, fâșia pe tipuri, creditorii, telefonul, fără depășiri')
+    _srv3 = lga._Server(('127.0.0.1', 0), functools.partial(lga._Liniste, directory=str(AICI)))
+    threading.Thread(target=_srv3.serve_forever, daemon=True).start()
+    _baza3 = 'http://127.0.0.1:%d/' % _srv3.server_address[1]
+    try:
+        with sync_playwright() as _p:
+            _b = _p.chromium.launch()
+            for _pagina in ('legis_acorduri.html', 'acorduri.html'):
+                _nume = _pagina.split('.')[0]
+                _pg = _b.new_page(viewport={'width': 1400, 'height': 900})
+                _erori = []
+                _pg.on('pageerror', lambda e: _erori.append(str(e)[:200]))
+                _pg.route('**/*', lambda r: r.continue_() if r.request.url.startswith(_baza3) else r.abort())
+                _pg.goto(_baza3 + _pagina, wait_until='networkidle', timeout=90000)
+                _asteapta_pagina(_pg)
+                _k = _pg.evaluate('''() => {
+                    const G = window.__GRUPURI__ || [];
+                    const cards = [...document.querySelectorAll('.kpis .kpi')].map(k => ({
+                        lbl: k.querySelector('.lbl').innerText.trim(), val: k.querySelector('.val').innerText.trim(),
+                        unit: (k.querySelector('.kpi-unit') || {}).innerText || '', ico: !!k.querySelector('.kpi-ico svg'),
+                        pct: k.querySelector('.kpi-meter b') ? k.querySelector('.kpi-meter b').innerText : null,
+                        w: k.querySelector('.kpi-meter .trk i') ? parseFloat(k.querySelector('.kpi-meter .trk i').style.width) : null,
+                        leg: [...k.querySelectorAll('.kpi-leg span')].map(s => ({t: s.innerText.replace(/\\s+\\d+$/, '').trim(), n: +s.querySelector('b').innerText,
+                                                                                   c: getComputedStyle(s.querySelector('i')).backgroundColor})),
+                        seg: [...k.querySelectorAll('.kpi-strip i')].map(i => ({t: i.title, c: getComputedStyle(i).backgroundColor})),
+                        top: [...k.querySelectorAll('.kpi-top3 .n')].map((n, j) => ({n: n.innerText, c: +k.querySelectorAll('.kpi-top3 .c')[j].innerText})),
+                        subTel: (k.querySelector('.doar-tel') || {}).textContent || ''
+                    }));
+                    const orgs = {};
+                    G.forEach(g => Object.keys(g.orgs || {}).forEach(o => { orgs[o] = (orgs[o] || 0) + 1; }));
+                    return {cards, grupuri: G.length, acte: G.reduce((s, g) => s + g.acte.length, 0), rat: G.filter(g => g.et && g.et.rat).length, orgs,
+                            tipuri: G.reduce((m, g) => { m[g.categorie || ''] = (m[g.categorie || ''] || 0) + 1; return m; }, {})};
+                }''')
+                _c = _k['cards']
+                _rot = lambda n, t: int(100 * n / t + 0.5)          # ca Math.round din pagină
+                verifica(_nume + ': patru carduri KPI, cu etichetele și pictogramele lor',
+                         [x['lbl'].lower() for x in _c] == ['acorduri', 'creditori', 'ratificate sau aprobate', 'cu dată de intrare în vigoare'] and all(x['ico'] for x in _c),
+                         [(x['lbl'], x['ico']) for x in _c])
+                verifica(_nume + ': „Acorduri" = numărul de acorduri (%d), „din N acte publicate" = numărul de acte (%d)' % (_k['grupuri'], _k['acte']),
+                         _c[0]['val'] == str(_k['grupuri']) and _c[0]['unit'] == 'din %d acte publicate' % _k['acte'], (_c[0]['val'], _c[0]['unit']))
+                _leg = _c[0]['leg']
+                _cunoscute = ['Asistență tehnică', 'Împrumut', 'Grant', 'Asistență financiară']
+                _asteptat = {n: _k['tipuri'].get(n, 0) for n in _cunoscute}
+                _asteptat['Altele'] = sum(v for kk, v in _k['tipuri'].items() if kk not in _cunoscute)
+                verifica(_nume + ': fâșia pe tipuri — legenda are numărul real de acorduri pe tip, iar suma ei e totalul',
+                         {x['t']: x['n'] for x in _leg} == {n: v for n, v in _asteptat.items() if v > 0} and sum(x['n'] for x in _leg) == _k['grupuri'],
+                         (_leg, _asteptat))
+                verifica(_nume + ': fâșia și legenda merg împreună — același număr de segmente, aceeași ordine (cel mai mare tip primul), aceleași culori, titlu „Tip: n"',
+                         len(_c[0]['seg']) == len(_leg) > 1 and [s['c'] for s in _c[0]['seg']] == [x['c'] for x in _leg]
+                         and [x['n'] for x in _leg] == sorted((x['n'] for x in _leg), reverse=True)
+                         and all(s['t'] == '%s: %d' % (x['t'], x['n']) for s, x in zip(_c[0]['seg'], _leg)), (_c[0]['seg'], _leg))
+                verifica(_nume + ': culorile tipurilor în legendă sunt distincte (nu se confundă două tipuri)', len({x['c'] for x in _leg}) == len(_leg), [x['c'] for x in _leg])
+                _top = sorted(_k['orgs'].values(), reverse=True)[:3]
+                verifica(_nume + ': „Creditori" = numărul de finanțatori distincți (%d); primii trei, după numărul de acorduri, cu numărul real' % len(_k['orgs']),
+                         _c[1]['val'] == str(len(_k['orgs'])) and [x['c'] for x in _c[1]['top']] == _top and all(_k['orgs'].get(x['n']) == x['c'] for x in _c[1]['top']),
+                         (_c[1]['val'], _c[1]['top'], _top))
+                for _i, _eti in ((2, 'Ratificate sau aprobate'), (3, 'Cu dată de intrare în vigoare')):
+                    _x, _n = _c[_i], int(_c[_i]['val'])
+                    verifica(_nume + ': „%s" — „din %d", procent și bară potrivite cu cifra (%d)' % (_eti, _k['grupuri'], _n),
+                             0 < _n <= _k['grupuri'] and _x['unit'] == 'din %d' % _k['grupuri'] and _x['pct'] == '%d%%' % _rot(_n, _k['grupuri'])
+                             and abs(_x['w'] - 100 * _n / _k['grupuri']) < 0.06, _x)
+                verifica(_nume + ': „Ratificate sau aprobate" = acordurile cu etapa 4 atinsă, ca în „Cum se încheie un acord"', int(_c[2]['val']) == _k['rat'], (_c[2]['val'], _k['rat']))
+                # ---- lățimi: fără depășiri, cifrele pe aceeași linie într-un rând de carduri
+                _lat = {}
+                for _w in (1400, 1100, 980, 820, 520, 390, 340):
+                    _pg.set_viewport_size({'width': _w, 'height': 900})
+                    _pg.wait_for_timeout(250)
+                    _lat[_w] = _pg.evaluate('''() => {
+                        const ks = [...document.querySelectorAll('.kpis .kpi')], rows = {};
+                        ks.forEach(k => { const t = Math.round(k.getBoundingClientRect().top); (rows[t] = rows[t] || []).push(k); });
+                        const vals = Object.values(rows).map(r => r.map(k => Math.round(k.querySelector('.val').getBoundingClientRect().top - k.getBoundingClientRect().top)));
+                        return {over: ks.filter(k => k.scrollWidth > k.clientWidth + 1).length, h: Math.max(...ks.map(k => k.clientHeight)), vals,
+                                pagina: document.documentElement.scrollWidth - innerWidth, coloane: Object.values(rows)[0].length};
+                    }''')
+                verifica(_nume + ': nicio depășire (nici în card, nici pe pagină) la 340–1400 px', all(m['over'] == 0 and m['pagina'] <= 0 for m in _lat.values()), {w: (m['over'], m['pagina']) for w, m in _lat.items()})
+                verifica(_nume + ': în fiecare rând de carduri, cifrele stau pe aceeași linie (la orice lățime)', all(max(r) - min(r) <= 1 for m in _lat.values() for r in m['vals']), {w: m['vals'] for w, m in _lat.items()})
+                verifica(_nume + ': patru carduri pe rând de la 981 px, două sub; înălțimea rămâne rezonabilă (≤ 230 px)',
+                         [_lat[w]['coloane'] for w in (1400, 1100, 980, 390)] == [4, 4, 2, 2] and all(m['h'] <= 230 for m in _lat.values()), {w: (m['coloane'], m['h']) for w, m in _lat.items()})
+                # ---- telefon: aceleași cifre, fără fâșie, legendă și bare; creditorii apar ca text
+                _pg.set_viewport_size({'width': 390, 'height': 844})
+                _pg.wait_for_timeout(250)
+                _tel = _pg.evaluate('''() => {
+                    const viz = s => [...document.querySelectorAll('.kpis ' + s)].map(e => getComputedStyle(e).display);
+                    const k2 = document.querySelectorAll('.kpis .kpi')[1];
+                    const t = k2.querySelector('.doar-tel');
+                    return {strip: viz('.kpi-strip'), leg: viz('.kpi-leg'), top3: viz('.kpi-top3'), ico: viz('.kpi-ico'), subTel: t ? getComputedStyle(t).display + '|' + t.innerText : ''};
+                }''')
+                verifica(_nume + ': pe telefon dispar fâșia, legenda, barele creditorilor și pictogramele, iar creditorii se citesc ca text',
+                         set(_tel['strip'] + _tel['leg'] + _tel['top3'] + _tel['ico']) == {'none'}
+                         and _tel['subTel'] == 'block|' + ' · '.join(x['n'] for x in _c[1]['top']), _tel)
+                _pg.set_viewport_size({'width': 1400, 'height': 900})
+                _pg.wait_for_timeout(250)
+                _desk = _pg.evaluate("() => { const t = document.querySelector('.kpis .doar-tel'); return t ? getComputedStyle(t).display : 'lipsă'; }")
+                verifica(_nume + ': pe ecran lat textul doar-pentru-telefon nu se vede', _desk == 'none', _desk)
+                verifica(_nume + ': pagina nu a dat erori JavaScript', not _erori, _erori)
+                _pg.close()
+            _b.close()
+    finally:
+        _srv3.shutdown()
+
+    print()
     print('Browser: sumele din surse externe — marcajul „ext.", legătura spre sursă, exportul Excel')
     _lista_l, _ = lga.citeste_acorduri()
     _ext_l = [a for a in _lista_l if a['suma'] and a['suma']['sursa'] == 'extern']

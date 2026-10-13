@@ -567,7 +567,17 @@ if '--browser' in sys.argv:
 
                 # --- exporturile
                 def deschide_meniu():
-                    pg.locator('#sdgPanel > .panel-head .roata-panou').first.click(); pg.wait_for_timeout(300)
+                    # Meniul ⚙ se închide la orice derulare a paginii (unelte.js). Dacă roata e în afara ecranului,
+                    # Playwright o derulează în vedere *în timpul* clicului, iar evenimentul de derulare ajunge după ce
+                    # meniul s-a deschis și îl închide la loc. De aceea o aducem întâi în vedere, așteptăm să se
+                    # liniștească derularea și abia apoi facem clic; dacă totuși nu s-a deschis, mai încercăm o dată.
+                    roata = pg.locator('#sdgPanel > .panel-head .roata-panou').first
+                    for incercare in range(3):
+                        roata.scroll_into_view_if_needed(); pg.wait_for_timeout(400)
+                        roata.click(); pg.wait_for_timeout(300)
+                        if pg.locator('.meniu-panou.deschis').count() == 1:
+                            return
+                    raise AssertionError('meniul ⚙ nu s-a deschis după 3 încercări')
 
                 def descarca(actiune):
                     deschide_meniu()

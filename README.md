@@ -149,7 +149,7 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `legis_clasifica.py` | Ce e asistență externă, categoria, partenerul (extinde `monitor_watch.py`); citește și deciziile de mână din `date/categorii_manual.json` |
 | `date/categorii_manual.json` | Categoria actelor pe care nici titlul, nici finanțatorul nu le lămuresc, hotărâtă de mână, cu motiv și sursă: `{"categorie": "Grant"\|"Împrumut"\|"Asistență tehnică", "motiv": "…", "sursa": "https://…"}`, pe codul actului din legis.md (un act foarte nou, doar din Monitor, are codul scos din număr și tip: `HG430/2026`, ordinul `O147/2026`). Ce e aici bate clasificarea automată, dar nu adaugă acte; cheile care încep cu `_` sunt ignorate. Citit de `legis_pagina.py`, `legis_atasamente.py`, `date_deschise.py` și de registrul din Monitor (`acorduri.html`); fișa acordului spune că categoria e hotărâtă de mână, cu motivul și sursa |
 | `legis_pagina.py` | Construiește `legis_acorduri.html` din `acorduri.html` + istoric + `date.json`; rulat de `monitor.yml` |
-| `teste_legis.py` | Testele verificării legis.md. Cu `--browser` deschide și cele două registre (legis.md și Monitor) și verifică exportul lor Excel: fișierele descărcate sunt citite cu openpyxl (antet, un rând pe acord, totalul în euro față de panou sau față de datele paginii, filtre, vederea „Acte”, linkuri, rezerva fără `xlsx-stil.js`). Rulare: `python teste_legis.py [--browser]` |
+| `teste_legis.py` | Testele verificării legis.md. Cu `--browser` deschide și cele două registre (legis.md și Monitor) și verifică exportul lor Excel: fișierele descărcate sunt citite cu openpyxl (antet, un rând pe acord, totalul în euro față de panou sau față de datele paginii, filtre, vederea „Acte”, linkuri, rezerva fără `xlsx-stil.js`). Verifică și indicatorii (KPI) din capul paginii: cifrele față de datele paginii, fâșia pe tipuri, creditorii, lățimile de la 340 la 1400 px și varianta pentru telefon. Rulare: `python teste_legis.py [--browser]` |
 | `legis_local.bat` | Aceeași verificare, rulată de pe calculatorul tău (Windows) |
 | `legis_sume.py` | Sumele acordurilor, din textul integral al actelor: descarcă PDF-ul fiecărui act de pe legis.md (legi, hotărâri, ordine; fără decrete), caută „în sumă de…”, „în valoare de…” și scrie rezultatul, cu fragmentul de text, în `date/legis_sume.json`. Rulat de `legis_local.bat`; continuă de unde a rămas |
 | `date/sume_manual.json` | Sume puse de mână, pe codul actului (`LP203/2022`). Citirea automată greșește uneori — o tranșă în locul sumei întregi, bugetul unui program întreg, o dată chiar un cont bancar. Ce e aici bate orice sumă citită automat: `{"v": …, "val": "EUR", "nota": "…"}` pune suma, `{"ascunde": true}` o ascunde pe cea greșită. Cu `{"fara_text": true}` se ascunde suma citită greșit din textul actului, cu `{"fara_cost": true}` costul proiectului citit greșit din atașament (de pildă pragul de la care se cere studiu de fezabilitate, luat drept cost), cu `{"fara_guvern": true}` suma luată din nota Guvernului când aceea e a unui program întreg (Interreg, URBACT: sute de milioane pentru toate țările participante), nu a acordului Moldovei. Cu `{"extern": true}` suma vine dintr-o sursă din afara actelor din registru — decizia de finanțare a UE, pagina oficială a finanțatorului, textul acordului publicat de Ministerul Finanțelor, un comunicat oficial: `u` e adresa sursei, `nota` e citatul din ea; pagina o marchează „ext.” și, în loc de „documentul (PDF, legis.md)”, trimite la sursă (în `date/acorduri_legare.json` are `sursa: "extern"`). Se introduce așa doar o sumă dovedită cu un citat dintr-o sursă oficială care numește același acord; când sursa dă doar costul unui program, o sumă pe mai multe tranșe sau o cifră contrazisă de altă sursă, suma nu se pune. Sumele de aici se aplică și registrului din Monitor, inclusiv actelor foarte noi care sunt doar în Monitorul Oficial (cod scos din număr și tip: `HG430/2026`). Fișierul e citit de pagină la fiecare deschidere și de `legis_pagina.py`. Dacă `extern` e pus și `u` lipsește, sursa e un document oficial nepublicat online (de pildă o notă a Cancelariei de Stat primită de la minister): pagina scrie „document oficial nepublicat online”, iar `nota` spune care document e și citează propoziția cu suma. Registrul nu are curs pentru lei și nu numără sume în lei; când nota dă suma în lei cu echivalentul aproximativ într-o valută (6 693 543 MDL ≈ 386 910 USD), se introduce valuta, iar nota păstrează propoziția întreagă. Un ordin venit din Monitorul Oficial apare cu un cod provizoriu, fără emitent (`O147/2026`), până ajunge în istoricul legis.md, unde are codul întreg (`OMMPS147/2026`); suma pusă sub oricare dintre cele două forme rămâne valabilă și sub cealaltă, cât timp în registru e un singur ordin cu acel număr și an. La fiecare construire a paginii, `legis_pagina.py` anunță cheile din fișier care nu mai corespund niciunui act |
@@ -301,6 +301,30 @@ Butoanele care nu pornesc dintr-un panou apelează `window.__xlsxDirect({titlu, 
 engleză, plus cele trei butoane). La construire, fișierele au fost validate pe schemele ISO/IEC 29500, citite cu
 openpyxl și randate cu LibreOffice; într-un Excel adevărat n-au fost deschise, așa că, dacă Excel cere „reparare”,
 păstrează fișierul și spune-ne ce panou l-a dat, ca să fie corectat.
+
+## Indicatorii din capul registrelor (KPI)
+
+Cele patru carduri de sus, la fel în ambele registre (legis.md și Monitor), arată:
+
+| Card | Ce arată |
+|---|---|
+| **Acorduri** | numărul de acorduri, „din N acte publicate" și o fâșie pe tipuri de finanțare, cu legenda alături (numele și numărul fiecărui tip) |
+| **Creditori** | numărul de finanțatori distincți și primii trei, după numărul de acorduri, cu bare proporționale cu cel mai mare |
+| **Ratificate sau aprobate** | acordurile care au atins etapa 4 din 5 (aceeași cifră ca în „Cum se încheie un acord"), „din N", cu o bară și procentul |
+| **Cu dată de intrare în vigoare** | acordurile pentru care se cunoaște data (din legea de ratificare sau din ordin), „din N", cu bară și procent |
+
+Cifrele sunt cele de dinainte; fâșia, barele și pictogramele nu adaugă informație, o arată altfel. Culorile fâșiei sunt ale
+tipurilor din diagrama „Acorduri noi pe an” (primele patru sloturi validate pentru daltonism) și au mereu legenda alături:
+culoarea nu e singurul lucru care spune ce e un segment. Un număr nenul nu iese niciodată sub 2% din lățimea barei.
+
+**Pe ecrane mici.** Sub 700 px cardurile rămân scunde, ca înainte: fâșia, legenda, barele creditorilor și pictogramele dispar,
+iar creditorii se citesc ca text („AID · UE · BIRD"). Sub 980 px cardurile stau două pe rând. Între 981 și 1290 px etichetele
+lungi se rup pe două linii, așa că toate etichetele rezervă două linii acolo; altfel cifrele din cardurile vecine ar ieși la
+înălțimi diferite.
+
+**Unde e codul.** `kpi()`, `kpiBara()`, `kpiTipuri()` și `kpiCreditori()` în `acorduri.html` (șablonul; `legis_acorduri.html` se
+regenerează cu `python legis_pagina.py`, care nu atinge indicatorii). Testele: `python teste_legis.py --browser`, secțiunea
+„indicatorii (KPI)”.
 
 ## Exportul Excel din registrele de acorduri
 
