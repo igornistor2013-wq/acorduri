@@ -686,7 +686,7 @@ if '--browser' in sys.argv:
                 }''')
                 if _panou:
                     _tot_pag, _toler = _eur_pagina(_info['total'])
-                    _m = re.search(r':\s*(\d+)\s+(?:de\s+)?acord\w*\s+din\s+(\d+)', _info['text'])
+                    _m = re.search(r'(\d+)\s+(?:de\s+)?acord\w*\s+din\s+(\d+)', _info['text'])
                     _in_total_pag, _din_pag = (int(_m.group(1)), int(_m.group(2))) if _m else (-1, -1)
                 else:
                     _tot_pag = _toler = _in_total_pag = _din_pag = None
@@ -865,7 +865,7 @@ if '--browser' in sys.argv:
         shutil.rmtree(_dir, ignore_errors=True)
 
     print()
-    print('Browser: indicatorii (KPI) din capul paginii — cifre, proporții, fâșia pe tipuri, creditorii, telefonul, fără depășiri')
+    print('Browser: indicatorii (KPI) din capul paginii — „Acorduri” și „Creditori”: cifre, fâșia pe tipuri, creditorii, telefonul, fără depășiri')
     _srv3 = lga._Server(('127.0.0.1', 0), functools.partial(lga._Liniste, directory=str(AICI)))
     threading.Thread(target=_srv3.serve_forever, daemon=True).start()
     _baza3 = 'http://127.0.0.1:%d/' % _srv3.server_address[1]
@@ -885,8 +885,6 @@ if '--browser' in sys.argv:
                     const cards = [...document.querySelectorAll('.kpis .kpi')].map(k => ({
                         lbl: k.querySelector('.lbl').innerText.trim(), val: k.querySelector('.val').innerText.trim(),
                         unit: (k.querySelector('.kpi-unit') || {}).innerText || '', ico: !!k.querySelector('.kpi-ico svg'),
-                        pct: k.querySelector('.kpi-meter b') ? k.querySelector('.kpi-meter b').innerText : null,
-                        w: k.querySelector('.kpi-meter .trk i') ? parseFloat(k.querySelector('.kpi-meter .trk i').style.width) : null,
                         leg: [...k.querySelectorAll('.kpi-leg span')].map(s => ({t: s.innerText.replace(/\\s+\\d+$/, '').trim(), n: +s.querySelector('b').innerText,
                                                                                    c: getComputedStyle(s.querySelector('i')).backgroundColor})),
                         seg: [...k.querySelectorAll('.kpi-strip i')].map(i => ({t: i.title, c: getComputedStyle(i).backgroundColor})),
@@ -895,14 +893,19 @@ if '--browser' in sys.argv:
                     }));
                     const orgs = {};
                     G.forEach(g => Object.keys(g.orgs || {}).forEach(o => { orgs[o] = (orgs[o] || 0) + 1; }));
-                    return {cards, grupuri: G.length, acte: G.reduce((s, g) => s + g.acte.length, 0), rat: G.filter(g => g.et && g.et.rat).length, orgs,
+                    return {cards, grupuri: G.length, acte: G.reduce((s, g) => s + g.acte.length, 0), orgs,
+                            toate: [...document.querySelectorAll('.kpis .kpi .lbl')].map(e => e.innerText.trim().toLowerCase()),
+                            meter: document.querySelectorAll('.kpis .kpi-meter').length,
+                            textKpi: document.querySelector('.kpis').innerText,
                             tipuri: G.reduce((m, g) => { m[g.categorie || ''] = (m[g.categorie || ''] || 0) + 1; return m; }, {})};
                 }''')
                 _c = _k['cards']
-                _rot = lambda n, t: int(100 * n / t + 0.5)          # ca Math.round din pagină
-                verifica(_nume + ': patru carduri KPI, cu etichetele și pictogramele lor',
-                         [x['lbl'].lower() for x in _c] == ['acorduri', 'creditori', 'ratificate sau aprobate', 'cu dată de intrare în vigoare'] and all(x['ico'] for x in _c),
+                verifica(_nume + ': două carduri KPI — „Acorduri” și „Creditori”, cu pictogramele lor',
+                         [x['lbl'].lower() for x in _c] == ['acorduri', 'creditori'] and all(x['ico'] for x in _c),
                          [(x['lbl'], x['ico']) for x in _c])
+                verifica(_nume + ': „Ratificate sau aprobate” și „Cu dată de intrare în vigoare” nu mai sunt în indicatori (nici cardul, nici bara „n din total”)',
+                         not any(w in _k['textKpi'].lower() for w in ('ratificate sau aprobate', 'intrare în vigoare', 'etapa 4 din 5')) and _k['meter'] == 0
+                         and 'ratificate sau aprobate' not in _k['toate'], (_k['toate'], _k['meter']))
                 verifica(_nume + ': „Acorduri" = numărul de acorduri (%d), „din N acte publicate" = numărul de acte (%d)' % (_k['grupuri'], _k['acte']),
                          _c[0]['val'] == str(_k['grupuri']) and _c[0]['unit'] == 'din %d acte publicate' % _k['acte'], (_c[0]['val'], _c[0]['unit']))
                 _leg = _c[0]['leg']
@@ -921,12 +924,6 @@ if '--browser' in sys.argv:
                 verifica(_nume + ': „Creditori" = numărul de finanțatori distincți (%d); primii trei, după numărul de acorduri, cu numărul real' % len(_k['orgs']),
                          _c[1]['val'] == str(len(_k['orgs'])) and [x['c'] for x in _c[1]['top']] == _top and all(_k['orgs'].get(x['n']) == x['c'] for x in _c[1]['top']),
                          (_c[1]['val'], _c[1]['top'], _top))
-                for _i, _eti in ((2, 'Ratificate sau aprobate'), (3, 'Cu dată de intrare în vigoare')):
-                    _x, _n = _c[_i], int(_c[_i]['val'])
-                    verifica(_nume + ': „%s" — „din %d", procent și bară potrivite cu cifra (%d)' % (_eti, _k['grupuri'], _n),
-                             0 < _n <= _k['grupuri'] and _x['unit'] == 'din %d' % _k['grupuri'] and _x['pct'] == '%d%%' % _rot(_n, _k['grupuri'])
-                             and abs(_x['w'] - 100 * _n / _k['grupuri']) < 0.06, _x)
-                verifica(_nume + ': „Ratificate sau aprobate" = acordurile cu etapa 4 atinsă, ca în „Cum se încheie un acord"', int(_c[2]['val']) == _k['rat'], (_c[2]['val'], _k['rat']))
                 # ---- lățimi: fără depășiri, cifrele pe aceeași linie într-un rând de carduri
                 _lat = {}
                 for _w in (1400, 1100, 980, 820, 520, 390, 340):
@@ -941,8 +938,8 @@ if '--browser' in sys.argv:
                     }''')
                 verifica(_nume + ': nicio depășire (nici în card, nici pe pagină) la 340–1400 px', all(m['over'] == 0 and m['pagina'] <= 0 for m in _lat.values()), {w: (m['over'], m['pagina']) for w, m in _lat.items()})
                 verifica(_nume + ': în fiecare rând de carduri, cifrele stau pe aceeași linie (la orice lățime)', all(max(r) - min(r) <= 1 for m in _lat.values() for r in m['vals']), {w: m['vals'] for w, m in _lat.items()})
-                verifica(_nume + ': patru carduri pe rând de la 981 px, două sub; înălțimea rămâne rezonabilă (≤ 230 px)',
-                         [_lat[w]['coloane'] for w in (1400, 1100, 980, 390)] == [4, 4, 2, 2] and all(m['h'] <= 230 for m in _lat.values()), {w: (m['coloane'], m['h']) for w, m in _lat.items()})
+                verifica(_nume + ': două carduri, mereu pe același rând (de la 1400 la 340 px); înălțimea rămâne rezonabilă (≤ 230 px)',
+                         all(m['coloane'] == 2 for m in _lat.values()) and all(m['h'] <= 230 for m in _lat.values()), {w: (m['coloane'], m['h']) for w, m in _lat.items()})
                 # ---- telefon: aceleași cifre, fără fâșie, legendă și bare; creditorii apar ca text
                 _pg.set_viewport_size({'width': 390, 'height': 844})
                 _pg.wait_for_timeout(250)
@@ -964,6 +961,199 @@ if '--browser' in sys.argv:
             _b.close()
     finally:
         _srv3.shutdown()
+
+    print()
+    print('Browser: panoul „Sumele acordurilor, pe tipuri de finanțare” (legis.md) — total, bară, carduri pe tip, socoteala celor 551, telefon, engleză')
+
+    def _suma_text(text):
+        """„262 mil. USD” / „1,5 mld. EUR” / „580 000 CHF” → (valoarea, valuta)."""
+        m = re.fullmatch(r'\s*([\d ,]+?)\s*(mld\.|mil\.|mii)?\s*([A-Z]{3})\s*', text.replace(' ', ' '))
+        n = float(m.group(1).replace(' ', '').replace(',', '.'))
+        return n * {'mld.': 1e9, 'mil.': 1e6, 'mii': 1e3, None: 1}[m.group(2)], m.group(3)
+
+    _srv4 = lga._Server(('127.0.0.1', 0), functools.partial(lga._Liniste, directory=str(AICI)))
+    threading.Thread(target=_srv4.serve_forever, daemon=True).start()
+    _baza4 = 'http://127.0.0.1:%d/' % _srv4.server_address[1]
+    try:
+        with sync_playwright() as _p:
+            _b = _p.chromium.launch()
+            _pg = _b.new_page(viewport={'width': 1400, 'height': 900})
+            _erori = []
+            _pg.on('pageerror', lambda e: _erori.append(str(e)[:200]))
+            _pg.route('**/*', lambda r: r.continue_() if r.request.url.startswith(_baza4) else r.abort())
+            _pg.goto(_baza4 + 'legis_acorduri.html', wait_until='networkidle', timeout=90000)
+            _asteapta_pagina(_pg)
+            _s = _pg.evaluate("""() => {
+                const q = (s, r) => (r || document).querySelector(s), qa = (s, r) => [...(r || document).querySelectorAll(s)];
+                const rgb = e => getComputedStyle(e).backgroundColor;
+                const A = window.__ACORDURI__();
+                const cards = qa('#sume .sume-card').map(c => ({
+                    tip: c.dataset.tip, eticheta: q('.st', c).innerText.trim(), sv: q('.sv', c).innerText.trim(), sn: q('.sn', c).innerText.trim(),
+                    culoare: getComputedStyle(c, '::before').backgroundColor, ptr: c.tagName, titlu: c.title,
+                    cap: q('.sx-cap', c) ? q('.sx-cap', c).innerText.trim() : null,
+                    top: qa('.sx-r', c).map(r => ({n: q('.sx-n', r).innerText.trim(), t: q('.sx-n', r).title, s: q('.sx-s', r).innerText.trim()}))}));
+                const kpiLeg = {}; qa('.kpis .kpi-leg span').forEach(s => { kpiLeg[s.innerText.replace(/\\s+\\d+$/, '').trim()] = rgb(q('i', s)); });
+                const nota = qa('#sume .sume-nota b').map(b => +b.innerText);
+                return {
+                    nPanouri: qa('#sume').length, dupaKpi: !!(q('.kpis').nextElementSibling && q('.kpis').nextElementSibling.id === 'sume'),
+                    inainteDeLista: !!(q('#sume').compareDocumentPosition(q('#lista')) & Node.DOCUMENT_POSITION_FOLLOWING),
+                    lbl: q('#sume .sume-lbl').innerText.trim(), val: q('#sume .sume-val').innerText.trim(), acop: q('#sume .sume-acop').innerText.trim(),
+                    bara: qa('#sume .sume-bar i').map(i => ({g: parseFloat(getComputedStyle(i).flexGrow), c: rgb(i), t: i.title})),
+                    leg: qa('#sume .sume-leg span').map(s => ({t: s.innerText.replace(/\\s+\\d+%$/, '').trim(), p: parseInt(q('b', s).innerText), c: rgb(q('i', s))})),
+                    cards, kpiLeg, nota, capNota: q('#sume .sume-nota .cap').innerText.trim(), expl: q('#sume .sume-expl').innerText,
+                    nGrupuri: window.__GRUPURI__.length,
+                    fara: A.filter(a => !a.suma).length, marcate: A.filter(a => a.suma && a.faraTotal).length,
+                    A: A.map(a => ({n: a.nume, s: a.scurt, c: a.categorie, suma: a.suma, ft: a.faraTotal})),
+                    detalii: {tag: q('#sume details') ? q('#sume details').open : null, randuri: qa('#sume .sume-tab tbody tr').map(r => qa('td', r).map(c => c.textContent.trim()))},
+                    taburi: qa('#catBtns button').map(b => b.dataset.cat)};
+            }""")
+            _cards = _s['cards']
+            verifica('panoul de sume: există o singură dată, imediat sub indicatori și înaintea listei',
+                     _s['nPanouri'] == 1 and _s['dupaKpi'] and _s['inainteDeLista'], (_s['nPanouri'], _s['dupaKpi'], _s['inainteDeLista']))
+            verifica('panoul de sume: o etichetă, totalul mare în euro și „n acorduri din N”', _s['lbl'].lower() == 'acordurile cu sumă cunoscută adună'
+                     and re.fullmatch(r'[\d,]+ (?:mld\.|mil\.|mii) EUR', _s['val']) is not None and re.fullmatch(r'\d+ (?:de )?acord\w* din \d+', _s['acop']) is not None,
+                     (_s['lbl'], _s['val'], _s['acop']))
+            _tot, _tol = _eur_pagina(_s['val'])
+            _cuprins = {}
+            for _cd in _cards:
+                _v, _tl = _eur_pagina(_cd['sv']) if _cd['sv'] != '—' else (0, 0)
+                _m = re.fullmatch(r'(\d+) acorduri cu sumă din (\d+)(?: · (\d+)% din total)?', _cd['sn'])
+                _cuprins[_cd['tip']] = {'v': _v, 'tol': _tl, 'n': int(_m.group(1)), 'toate': int(_m.group(2)), 'p': int(_m.group(3)) if _m.group(3) else None} if _m else None
+            verifica('panoul de sume: câte un card pe tip (butoane, cu titlu), în ordinea tipurilor; fiecare cu suma, „n acorduri cu sumă din M · P% din total”',
+                     len(_cards) >= 3 and all(c['ptr'] == 'BUTTON' and c['titlu'] and c['eticheta'].lower() == c['tip'].lower() for c in _cards)
+                     and all(_cuprins[c['tip']] is not None for c in _cards) and {c['tip'] for c in _cards} == {x for x in _s['taburi'] if x != 'all'},
+                     [(c['tip'], c['sv'], c['sn']) for c in _cards])
+            verifica('panoul de sume: totalul mare = suma cardurilor pe tip (în limita rotunjirii afișate)',
+                     abs(sum(x['v'] for x in _cuprins.values()) - _tot) <= _tol + sum(x['tol'] for x in _cuprins.values()),
+                     (_tot, [(k, x['v']) for k, x in _cuprins.items()]))
+            verifica('panoul de sume: cardurile împart cele %d de acorduri (suma lui „din M” = numărul de acorduri), iar „n” însumat = numărul din „n acorduri din N”' % _s['nGrupuri'],
+                     sum(x['toate'] for x in _cuprins.values()) == _s['nGrupuri'] and re.search(r'(\d+)\s+(?:de\s+)?acord\w*\s+din\s+(\d+)', _s['acop']).groups()
+                     == (str(sum(x['n'] for x in _cuprins.values())), str(_s['nGrupuri'])), (_cuprins, _s['acop']))
+            verifica('panoul de sume: procentele (carduri și legendă) = partea fiecărui tip din total, rotunjită',
+                     all(x['p'] is not None and abs(x['p'] - 100 * x['v'] / _tot) <= 1.05 for x in _cuprins.values() if x['v'])
+                     and {l['t']: l['p'] for l in _s['leg']} == {k: x['p'] for k, x in _cuprins.items() if x['v']}, (_s['leg'], _cuprins))
+            _gr = [b['g'] for b in _s['bara']]
+            verifica('panoul de sume: bara are câte un segment pe tip, proporțional cu suma tipului, în ordinea cardurilor, cu legenda alături',
+                     len(_s['bara']) == len(_s['leg']) == sum(1 for x in _cuprins.values() if x['v'])
+                     and all(abs(g / sum(_gr) - _cuprins[c['tip']]['v'] / _tot) <= _cuprins[c['tip']]['tol'] / _tot + 0.002 for g, c in zip(_gr, [c for c in _cards if _cuprins[c['tip']]['v']]))
+                     and [l['t'] for l in _s['leg']] == [c['tip'] for c in _cards if _cuprins[c['tip']]['v']]
+                     and all(b['t'] == '%s: %d%%' % (l['t'], l['p']) for b, l in zip(_s['bara'], _s['leg'])), (_s['bara'], _s['leg']))
+            _col = {c['tip']: c['culoare'] for c in _cards}
+            verifica('panoul de sume: culoarea unui tip e aceeași în card, în bară, în legendă și în fâșia din indicatori; tipurile au culori distincte',
+                     all(l['c'] == _col[l['t']] for l in _s['leg']) and all(b['c'] == l['c'] for b, l in zip(_s['bara'], _s['leg']))
+                     and all(_s['kpiLeg'].get(k) == v for k, v in _col.items() if k in _s['kpiLeg']) and len(set(_col.values())) == len(_col)
+                     and len([k for k in _col if k in _s['kpiLeg']]) >= 3, (_col, _s['kpiLeg']))
+            # ---- socoteala acordurilor: se adună + au suma pe rând dar nu se adună + n-au sumă = toate
+            _a_, _b_, _c_ = _s['nota']
+            _expl = {k: int(v) for v, k in re.findall(r'(\d+) (repetă|au suma marcată|e într-o valută|sunt în valute)', _s['expl'])}
+            _dubluri = _expl.get('repetă', 0); _marcate_txt = _expl.get('au suma marcată', 0); _farcurs = _expl.get('e într-o valută', 0) + _expl.get('sunt în valute', 0)
+            verifica('panoul de sume: socoteala celor %d de acorduri — se adună + au suma pe rând, dar nu se adună + n-au încă suma = toate' % _s['nGrupuri'],
+                     _s['capNota'] == 'Din cele %d de acorduri' % _s['nGrupuri'] and _a_ + _b_ + _c_ == _s['nGrupuri']
+                     and _a_ == sum(x['n'] for x in _cuprins.values()), (_s['capNota'], _s['nota']))
+            verifica('panoul de sume: „n-au încă suma” = acordurile fără sumă din date (%d); cele „marcate nu se adună” = cele din date (%d)' % (_s['fara'], _s['marcate']),
+                     _c_ == _s['fara'] and _marcate_txt == _s['marcate'], (_c_, _s['fara'], _marcate_txt, _s['marcate']))
+            verifica('panoul de sume: cele care „nu se adună” se descompun complet în explicația de dedesubt (dubluri + marcate + fără curs = %d)' % _b_,
+                     _dubluri + _marcate_txt + _farcurs == _b_ and 'Totalul e un minim' in _s['expl'], (_b_, _expl, _s['expl']))
+            # ---- cele mai mari trei acorduri pe tip: sunt ale tipului, în ordine descrescătoare, cu suma lor reală
+            _dupa_nume = {}
+            for _a in _s['A']:
+                _dupa_nume.setdefault(_a['s'], []).append(_a)
+                _dupa_nume.setdefault(_a['n'], []).append(_a)
+            _prost = []
+            for _cd in _cards:
+                if not _cuprins[_cd['tip']]['n']:
+                    continue
+                _max_tip = max((a['suma']['eur'] for a in _s['A'] if a['c'] == _cd['tip'] and a['suma'] and not a['ft'] and a['suma']['eur'] is not None), default=None)
+                _eurs = []
+                if not (1 <= len(_cd['top']) <= 3 and (_cd['cap'] or '').lower() == 'cele mai mari'):
+                    _prost.append((_cd['tip'], 'nr/titlu', _cd['cap'], len(_cd['top'])))
+                for _r in _cd['top']:
+                    _v_r, _val_r = _suma_text(_r['s'])
+                    _cand = [a for a in _dupa_nume.get(_r['t'], []) if a['c'] == _cd['tip'] and a['suma'] and a['suma']['val'] == _val_r
+                             and abs(a['suma']['v'] - _v_r) <= 0.006 * _v_r + 1]
+                    if not _cand:
+                        _prost.append((_cd['tip'], 'rând fără acord potrivit', _r))
+                        continue
+                    _eurs.append(_cand[0]['suma']['eur'])
+                if _eurs != sorted(_eurs, reverse=True) or (_eurs and _eurs[0] != _max_tip):
+                    _prost.append((_cd['tip'], 'ordine/maxim', _eurs, _max_tip))
+            verifica('panoul de sume: „Cele mai mari” — până la trei acorduri pe tip, ale tipului respectiv, cu suma lor, în ordine descrescătoare; primul e cel mai mare din tip',
+                     not _prost, _prost)
+            verifica('panoul de sume: detaliul „Pe valute…” e închis, iar acordurile din tabelul lui se adună la fel ca în carduri',
+                     _s['detalii']['tag'] is False and sum(int(r[2]) for r in _s['detalii']['randuri']) == sum(x['n'] for x in _cuprins.values()), _s['detalii']['tag'])
+            # ---- clic pe card: filtrează lista pe tipul lui
+            _tip = _cards[0]['tip']
+            _pg.click('.sume-card[data-tip="%s"]' % _tip)
+            _pg.wait_for_timeout(900)
+            _fil = _pg.evaluate("""() => ({apasat: [...document.querySelectorAll('#catBtns button[aria-pressed=true]')].map(b => b.dataset.cat), hash: location.hash,
+                afisate: (document.querySelector('#none') || {}).innerText || '',
+                tipuri: [...new Set([...document.querySelectorAll('tr.acord')].map(r => (r.innerText.match(/(Grant|Împrumut|Asistență tehnică|Asistență financiară)/) || [])[1]))]})""")
+            verifica('panoul de sume: clic pe cardul „%s” filtrează lista pe tipul lui (butonul „Tip”, adresa paginii, rândurile)' % _tip,
+                     _fil['apasat'] == [_tip] and _fil['hash'] == '#cat=' + _tip and ('din %d afișate' % _cuprins[_tip]['toate']) in _fil['afisate'] and _fil['tipuri'] == [_tip], _fil)
+            # ---- fără depășiri, trei carduri pe un rând de la 820 px
+            _pg.evaluate("() => { const b = document.querySelector('#catBtns button[data-cat=\"all\"]'); if (b) b.click(); window.scrollTo(0, 0); }")
+            _lat = {}
+            for _w in (1400, 1100, 980, 820, 760, 390, 340):
+                _pg.set_viewport_size({'width': _w, 'height': 900})
+                _pg.wait_for_timeout(250)
+                _lat[_w] = _pg.evaluate("""() => {
+                    const cs = [...document.querySelectorAll('#sume .sume-card')];
+                    const r = e => e.getBoundingClientRect();
+                    return {pagina: document.documentElement.scrollWidth - innerWidth, cardPeste: cs.filter(c => c.scrollWidth > c.clientWidth + 1).length,
+                            panouPeste: document.querySelector('#sume').scrollWidth - document.querySelector('#sume').clientWidth,
+                            peRand: new Set(cs.map(c => Math.round(r(c).top))).size, nCarduri: cs.length,
+                            valIn: cs.every(c => { const v = c.querySelector('.sv').getBoundingClientRect(), x = r(c); return v.left >= x.left && v.right <= x.right; }),
+                            kpi: r(document.querySelector('.kpis')).bottom, sus: r(document.querySelector('#sume')).top, jos: r(document.querySelector('#sume')).bottom,
+                            h: Math.round(r(document.querySelector('#sume')).height),
+                            leg: getComputedStyle(document.querySelector('#sume .sume-leg')).display, sx: [...document.querySelectorAll('#sume .sume-card .sx')].map(e => getComputedStyle(e).display),
+                            cap: [...document.querySelectorAll('#sume .sume-card .sx-cap')].map(e => getComputedStyle(e).display)};
+                }""")
+            verifica('panoul de sume: nicio depășire (nici în card, nici în panou, nici pe pagină) la 340–1400 px',
+                     all(m['pagina'] <= 0 and m['cardPeste'] == 0 and m['panouPeste'] <= 0 and m['valIn'] for m in _lat.values()),
+                     {w: (m['pagina'], m['cardPeste'], m['panouPeste'], m['valIn']) for w, m in _lat.items()})
+            verifica('panoul de sume: pe ecran lat (≥ 820 px) cardurile stau toate pe un rând, cu „Cele mai mari” și legenda; pe telefon (≤ 390 px) stau unul sub altul, compacte',
+                     all(_lat[w]['peRand'] == 1 and _lat[w]['leg'] != 'none' and set(_lat[w]['sx']) == {'flex'} for w in (1400, 1100, 980, 820))
+                     and all(_lat[w]['peRand'] == _lat[w]['nCarduri'] and _lat[w]['leg'] == 'none' and set(_lat[w]['sx'] + _lat[w]['cap']) == {'none'} for w in (390, 340)),
+                     {w: (m['peRand'], m['leg'], m['sx']) for w, m in _lat.items()})
+            verifica('panoul de sume: pe telefon e sub indicatori și deasupra listei, iar înălțimea lui rămâne mică (≤ 700 px la 390 px)',
+                     _lat[390]['kpi'] <= _lat[390]['sus'] and _lat[390]['h'] <= 700, {w: (m['kpi'], m['sus'], m['h']) for w, m in _lat.items() if w <= 390})
+            _ord = _pg.evaluate("""() => { const y = s => document.querySelector(s).getBoundingClientRect().top + scrollY;
+                return [y('.kpis'), y('#sume'), y('#lista')]; }""")
+            verifica('panoul de sume: pe telefon ordinea pe verticală e indicatori → sume → listă', _ord == sorted(_ord) and len(set(_ord)) == 3, _ord)
+            # ---- engleză: nicio frază românească în panou (în afară de denumirile acordurilor)
+            _pg.set_viewport_size({'width': 1400, 'height': 900})
+            _pg.evaluate("() => window.Traducere.seteaza('en')")
+            _pg.wait_for_timeout(1200)
+            _en = _pg.evaluate("""() => {
+                const p = document.querySelector('#sume').cloneNode(true);
+                [...p.querySelectorAll('.sx-n')].forEach(e => e.remove());
+                const atr = [...p.querySelectorAll('[title],[aria-label]')].map(e => (e.getAttribute('title') || '') + ' ' + (e.getAttribute('aria-label') || '')).join(' | ');
+                const kpi = document.querySelector('.kpis').cloneNode(true);
+                return {text: p.textContent.replace(/\\s+/g, ' '), atr, kpi: kpi.textContent.replace(/\\s+/g, ' ')};
+            }""")
+            _ro = re.compile(r'[ăâîșțĂÂÎȘȚşţ]|\b(?:acord|acorduri|suma|sumă|din|nu au|se adună|repetă|valută)\b')
+            verifica('panoul de sume în engleză: nicio frază românească în text (denumirile acordurilor rămân ca în registru)',
+                     not _ro.search(_en['text']) and 'Agreement amounts, by type of financing' in _en['text'] and 'Largest' in _en['text']
+                     and 'are added up in the total' in _en['text'] and 'The total is a minimum' in _en['text'], _ro.findall(_en['text'])[:8])
+            verifica('panoul de sume în engleză: nici în titlurile de pe bară și carduri (title) nu rămâne română', not _ro.search(_en['atr']) and 'Loan' in _en['atr'], _en['atr'][:300])
+            verifica('indicatorii în engleză: nicio frază românească („primii trei, după numărul de acorduri” se traduce)', not re.search(r'[ăâîșțĂÂÎȘȚ]|după|acorduri|primii', _en['kpi']) and 'top three' in _en['kpi'], _en['kpi'])
+            _pg.evaluate("() => window.Traducere.seteaza('ro')")
+            _pg.wait_for_timeout(600)
+            _ro_inapoi = _pg.evaluate("() => document.querySelector('#sume .sume-lbl').innerText.trim().toLowerCase() + '|' + document.querySelector('#sume .sume-nota .cap').innerText")
+            verifica('panoul de sume: revenirea la română reface textul', _ro_inapoi == 'acordurile cu sumă cunoscută adună|Din cele %d de acorduri' % _s['nGrupuri'], _ro_inapoi)
+            verifica('panoul de sume: pagina nu a dat erori JavaScript', not _erori, _erori)
+            _pg.close()
+            # registrul din Monitorul Oficial: aceeași pagină-șablon, dar fără panoul de sume (rămâne „Cum se încheie un acord”)
+            _pm = _b.new_page(viewport={'width': 1400, 'height': 900})
+            _pm.route('**/*', lambda r: r.continue_() if r.request.url.startswith(_baza4) else r.abort())
+            _pm.goto(_baza4 + 'acorduri.html', wait_until='networkidle', timeout=90000)
+            _asteapta_pagina(_pm)
+            _mon = _pm.evaluate("() => ({sume: document.querySelectorAll('#sume').length, kpi: document.querySelectorAll('.kpis .kpi').length, cum: !!document.querySelector('#cumSeIncheie')})")
+            verifica('registrul din Monitorul Oficial: două carduri KPI, fără panoul de sume, cu „Cum se încheie un acord”', _mon == {'sume': 0, 'kpi': 2, 'cum': True}, _mon)
+            _pm.close()
+            _b.close()
+    finally:
+        _srv4.shutdown()
 
     print()
     print('Browser: sumele din surse externe — marcajul „ext.", legătura spre sursă, exportul Excel')

@@ -25,8 +25,7 @@
     ': actele sunt găsite prin căutare în titlu și filtrate automat, deci pot exista și acte în plus, și acte scăpate.':
       ': acts are found by searching their titles and filtered automatically, so some extra or missing acts are possible.',
     'Acoperă:': 'Covers:', 'Ultima verificare:': 'Last check:', 'Ediții parcurse:': 'Editions read:', 'Extras la:': 'Extracted on:', 'Sursa:': 'Source:',
-    'Acorduri': 'Agreements', 'Creditori': 'Creditors', 'Ratificate sau aprobate': 'Ratified or approved', 'Cu dată de intrare în vigoare': 'With an entry-into-force date',
-    'din legea de ratificare sau din ordin': 'from the ratification law or the order',
+    'Acorduri': 'Agreements', 'Creditori': 'Creditors', 'primii trei, după numărul de acorduri': 'top three, by number of agreements',
     // panoul etapelor
     'Cum se încheie un acord': 'How an agreement is concluded',
     'Etapele': 'Stages', 'Tipuri de finanțare': 'Types of financing', 'Contracte de stat': 'State contracts',
@@ -206,6 +205,11 @@
       'Agreement amount: from the title of the official act, from its full text (the ratification law, the approval decision) or from the attached agreement; marked "ext.", from a source outside the acts (the financier, the Government). Click the row for the passage and the source.',
     'Sumele acordurilor, pe tipuri de finanțare': 'Agreement amounts, by type of financing',
     'Acordurile cu sumă cunoscută adună': 'Agreements with a known amount add up to',
+    'Cele mai mari': 'Largest', 'Structura totalului pe tipuri de finanțare': 'Breakdown of the total by type of financing',
+    'se adună în total': 'are added up in the total',
+    'au suma pe rând, dar nu se adună': 'have an amount on the row but are not added up',
+    'nu au încă suma în registru': 'have no amount in the register yet',
+    'Totalul e un minim, nu tot ce s-a semnat.': 'The total is a minimum, not everything that was signed.',
     'Arată în listă acordurile de acest tip': 'Show agreements of this type in the list',
     'Pe valute și cum s-a făcut conversia': 'By currency, and how the conversion was done',
     'Valuta': 'Currency', 'Suma în valuta acordului': 'Amount in the agreement currency', 'Unități pentru 1 EUR': 'Units per 1 EUR', 'În euro': 'In euro',
@@ -257,7 +261,6 @@
       function(m, a, b, n, x, k){ return durata(a) + ' – ' + durata(b) + ' · ' + n + ' agreements' + (x ? ' · another ' + k + ' through a single act' : ''); }],
     [/^(\d+) acorduri$/, '$1 agreements'],
     [/^(\d)\. (.+)$/, function(m, n, e){ return ETAPA[e] ? n + '. ' + ETAPA[e] : null; }],
-    [/^au trecut de etapa (\d+) din (\d+)$/, 'passed stage $1 of $2'],
     [/^din (\d+) acte publicate$/, 'of $1 published acts'],
     [/^Ultimii (\d+) ani$/, 'Last $1 years'],
     [/^Arată cele (\d+) de acorduri care au ajuns aici$/, 'Show the $1 agreements that reached this stage'],
@@ -300,11 +303,16 @@
     [new RegExp('^Din nota de argumentare a Guvernului \\(ședința din ' + DATA + '\\): ([\\s\\S]*)$'), "From the Government's explanatory note (meeting of $1): $2"],
     [/^Costul total al proiectului, din textul acordului atașat la (\S+): ([\s\S]*)$/, 'Total project cost, from the text of the agreement attached to $1: $2'],
     [/^în euro, la cursul din (\d{1,2}) (\S+) (\d{4})$/, function(m, z, l, a){ return 'in euro, at the rate of ' + z + ' ' + (LUNA[l] || l) + ' ' + a; }],
-    [/^: (\d+) de acorduri din (\d+)\. Alte (\d+) nu au încă suma în registru, deci totalurile sunt un minim, nu tot ce s-a semnat\.$/,
-      ': $1 agreements out of $2. Another $3 have no amount in the register yet, so the totals are a minimum, not everything that was signed.'],
+    [/^(\d+)(?: de)? acord(?:uri)? din (\d+)$/, function(m, a, b){ return a + (a === '1' ? ' agreement' : ' agreements') + ' out of ' + b; }],
+    [/^Din cele (\d+)(?: de)? acorduri$/, 'Of the $1 agreements'],
+    [/^(\d+) repetă același acord pe alt rând;$/, function(m, n){ return n + (n === '1' ? ' repeats' : ' repeat') + ' the same agreement on another row;'; }],
+    [/^(\d+) (?:are|au) suma marcată „nu se adună” \(se regăsește în alt acord sau e a unui program întreg\)\.$/,
+      function(m, n){ return n + (n === '1' ? ' has' : ' have') + ' the amount marked "not added up" (it is found in another agreement or belongs to a whole programme).'; }],
+    [/^(\d+) (?:e|sunt) într-o valută fără curs de conversie \((.+)\)\.$/,
+      function(m, n, v){ return n + (n === '1' ? ' is in a currency' : ' are in currencies') + ' with no conversion rate (' + v + ').'; }],
+    [/^(Grant|Împrumut|Asistență tehnică|Asistență financiară|Alt tip|Altele): (\d+)(%?)$/, function(m, c, n, p){ return (EXACT[c] || c) + ': ' + n + p; }],
     [/^(\d+) acorduri cu sumă din (\d+)(?: · (\d+)% din total)?$/, function(m, a, b, pr){
       return a + ' agreements with an amount, out of ' + b + (pr ? ' · ' + pr + '% of the total' : ''); }],
-    [/^Cele mai mari: (.+)$/, function(m, x){ return 'Largest: ' + sume(x); }],
     [/^Cursurile sunt cele de referință ale Băncii Centrale Europene din (\d{1,2}) (\S+) (\d{4})\. DST[\s\S]*$/, function(m, z, l, a){
       return 'The rates are the European Central Bank reference rates of ' + z + ' ' + (LUNA[l] || l) + ' ' + a + '. SDR (special drawing rights) is ' +
         'computed from the IMF basket at the same rates, the German mark uses its fixed euro conversion rate, the ECU is taken at 1 to 1, and old ' +

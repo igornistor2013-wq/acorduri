@@ -149,13 +149,13 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `legis_clasifica.py` | Ce e asistență externă, categoria, partenerul (extinde `monitor_watch.py`); citește și deciziile de mână din `date/categorii_manual.json` |
 | `date/categorii_manual.json` | Categoria actelor pe care nici titlul, nici finanțatorul nu le lămuresc, hotărâtă de mână, cu motiv și sursă: `{"categorie": "Grant"\|"Împrumut"\|"Asistență tehnică", "motiv": "…", "sursa": "https://…"}`, pe codul actului din legis.md (un act foarte nou, doar din Monitor, are codul scos din număr și tip: `HG430/2026`, ordinul `O147/2026`). Ce e aici bate clasificarea automată, dar nu adaugă acte; cheile care încep cu `_` sunt ignorate. Citit de `legis_pagina.py`, `legis_atasamente.py`, `date_deschise.py` și de registrul din Monitor (`acorduri.html`); fișa acordului spune că categoria e hotărâtă de mână, cu motivul și sursa |
 | `legis_pagina.py` | Construiește `legis_acorduri.html` din `acorduri.html` + istoric + `date.json`; rulat de `monitor.yml` |
-| `teste_legis.py` | Testele verificării legis.md. Cu `--browser` deschide și cele două registre (legis.md și Monitor) și verifică exportul lor Excel: fișierele descărcate sunt citite cu openpyxl (antet, un rând pe acord, totalul în euro față de panou sau față de datele paginii, filtre, vederea „Acte”, linkuri, rezerva fără `xlsx-stil.js`). Verifică și indicatorii (KPI) din capul paginii: cifrele față de datele paginii, fâșia pe tipuri, creditorii, lățimile de la 340 la 1400 px și varianta pentru telefon. Rulare: `python teste_legis.py [--browser]` |
+| `teste_legis.py` | Testele verificării legis.md. Cu `--browser` deschide și cele două registre (legis.md și Monitor) și verifică exportul lor Excel: fișierele descărcate sunt citite cu openpyxl (antet, un rând pe acord, totalul în euro față de panou sau față de datele paginii, filtre, vederea „Acte”, linkuri, rezerva fără `xlsx-stil.js`). Verifică și indicatorii (KPI) din capul paginii (cifrele față de datele paginii, fâșia pe tipuri, creditorii, lățimile de la 340 la 1400 px, varianta pentru telefon) și panoul „Sumele acordurilor” (total, bară, carduri pe tip, socoteala acordurilor, engleza). Rulare: `python teste_legis.py [--browser]` |
 | `legis_local.bat` | Aceeași verificare, rulată de pe calculatorul tău (Windows) |
 | `legis_sume.py` | Sumele acordurilor, din textul integral al actelor: descarcă PDF-ul fiecărui act de pe legis.md (legi, hotărâri, ordine; fără decrete), caută „în sumă de…”, „în valoare de…” și scrie rezultatul, cu fragmentul de text, în `date/legis_sume.json`. Rulat de `legis_local.bat`; continuă de unde a rămas |
 | `date/sume_manual.json` | Sume puse de mână, pe codul actului (`LP203/2022`). Citirea automată greșește uneori — o tranșă în locul sumei întregi, bugetul unui program întreg, o dată chiar un cont bancar. Ce e aici bate orice sumă citită automat: `{"v": …, "val": "EUR", "nota": "…"}` pune suma, `{"ascunde": true}` o ascunde pe cea greșită. Cu `{"fara_text": true}` se ascunde suma citită greșit din textul actului, cu `{"fara_cost": true}` costul proiectului citit greșit din atașament (de pildă pragul de la care se cere studiu de fezabilitate, luat drept cost), cu `{"fara_guvern": true}` suma luată din nota Guvernului când aceea e a unui program întreg (Interreg, URBACT: sute de milioane pentru toate țările participante), nu a acordului Moldovei. Cu `{"extern": true}` suma vine dintr-o sursă din afara actelor din registru — decizia de finanțare a UE, pagina oficială a finanțatorului, textul acordului publicat de Ministerul Finanțelor, un comunicat oficial: `u` e adresa sursei, `nota` e citatul din ea; pagina o marchează „ext.” și, în loc de „documentul (PDF, legis.md)”, trimite la sursă (în `date/acorduri_legare.json` are `sursa: "extern"`). Se introduce așa doar o sumă dovedită cu un citat dintr-o sursă oficială care numește același acord; când sursa dă doar costul unui program, o sumă pe mai multe tranșe sau o cifră contrazisă de altă sursă, suma nu se pune. Sumele de aici se aplică și registrului din Monitor, inclusiv actelor foarte noi care sunt doar în Monitorul Oficial (cod scos din număr și tip: `HG430/2026`). Fișierul e citit de pagină la fiecare deschidere și de `legis_pagina.py`. Dacă `extern` e pus și `u` lipsește, sursa e un document oficial nepublicat online (de pildă o notă a Cancelariei de Stat primită de la minister): pagina scrie „document oficial nepublicat online”, iar `nota` spune care document e și citează propoziția cu suma. Registrul nu are curs pentru lei și nu numără sume în lei; când nota dă suma în lei cu echivalentul aproximativ într-o valută (6 693 543 MDL ≈ 386 910 USD), se introduce valuta, iar nota păstrează propoziția întreagă. Un ordin venit din Monitorul Oficial apare cu un cod provizoriu, fără emitent (`O147/2026`), până ajunge în istoricul legis.md, unde are codul întreg (`OMMPS147/2026`); suma pusă sub oricare dintre cele două forme rămâne valabilă și sub cealaltă, cât timp în registru e un singur ordin cu acel număr și an. La fiecare construire a paginii, `legis_pagina.py` anunță cheile din fișier care nu mai corespund niciunui act |
 | `legis_consola.js` | Aceeași citire a acordurilor atașate, dar fără nimic de instalat: se lipește în consola browserului (F12) pe www.legis.md. Citește PDF-urile cu pdf.js și pe cele scanate cu OCR (tesseract.js), ia și actele noi, și descarcă `legis_sume.json` gata de urcat în `date/`, plus `sume_lipsa.csv`. Continuă de unde a rămas. Pașii sunt scriși la începutul fișierului |
 | `legis_atasamente.py` | Sumele din acordurile atașate la acte: deschide fișa fiecărui act pe legis.md, descarcă PDF-urile atașate (textul acordului), citește cu OCR pe cele scanate (dacă Tesseract e instalat) și scrie suma acordului și costul proiectului în `date/legis_sume.json`, la „atas”. Rulat de `legis_local.bat` după `legis_sume.py`; continuă de unde a rămas. Așteaptă ca fișa să-și încarce conținutul și redeschide o dată actele notate „fără atașamente” de versiunile care nu așteptau. O descărcare eșuată se notează și se trece mai departe; dacă legis.md nu mai răspunde deloc, se oprește și reia data viitoare. Ce rămâne fără sumă ajunge în `sume_lipsa.csv`, cu motivul |
-| `gov_sume.py` | Sumele acordurilor din notele de argumentare ale Guvernului: citește de pe gov.md ordinea de zi a fiecărei ședințe și, pentru punctele despre acorduri, PDF-ul notei („Aspectul financiar”). Rulat zilnic de `.github/workflows/sume.yml`; rezultatul, `date/gov_sume.json`, e citit de pagina Acorduri la deschidere (sumele marcate cu G). Ședințele din ultimele zece zile se recitesc la fiecare rulare, fiindcă ordinea de zi se completează până în ziua ședinței; o notă care n-a putut fi descărcată se reîncearcă la rulările următoare |
+| `gov_sume.py` | Sumele acordurilor din notele de argumentare ale Guvernului: citește de pe gov.md ordinea de zi a fiecărei ședințe și, pentru punctele despre acorduri, PDF-ul notei („Aspectul financiar”). Rulat zilnic de `.github/workflows/sume.yml`; rezultatul, `date/gov_sume.json`, e citit de pagina Acorduri la deschidere (sumele marcate cu G). Ședințele din ultimele zece zile se recitesc la fiecare rulare, fiindcă ordinea de zi se completează până în ziua ședinței; o notă care n-a putut fi descărcată se reîncearcă la rulările următoare. Multe puncte au pe gov.md doar proiectul hotărârii, fără nota de argumentare; atunci `sume` rămâne gol, iar suma dintr-o notă primită pe altă cale se introduce de mână în `date/sume_manual.json`, cu `extern` |
 | `legatura-amp.js` | Potrivirea dintre acorduri și proiectele AMP („De la lege la bani"): funcții pure, fără DOM, folosite de `index.html` și de teste |
 | `teste_legatura.js` | Testele potrivirii: funcțiile mici, scenarii construite de mână și o verificare pe arhiva AMP + registrul real. Rulare: `node teste_legatura.js` |
 | `teste_xlsx.py` | Testele exporturilor Excel. Fără argumente: generează cu Node foi de probă (grafice, totaluri, caractere speciale, 20.000 de rânduri) și le verifică (ZIP, XML, formate, formule, grafice). Cu `--browser`: deschide dashboardul în română și engleză, apasă ⚙ → „Descarcă Excel” pe 15 panouri din toate vederile și verifică fișierele descărcate. Rulare: `python teste_xlsx.py [--browser]`. Verifică și fișierele cu mai multe foi (nume, linkuri între foi, grafice numerotate pe tot fișierul, un singur `styles.xml`) și foile registrelor (secțiunea „registru:”: grupe de coloane, coloane înghețate, etichete colorate, înălțimea rândurilor, tipărirea pe lățime) |
@@ -304,27 +304,58 @@ păstrează fișierul și spune-ne ce panou l-a dat, ca să fie corectat.
 
 ## Indicatorii din capul registrelor (KPI)
 
-Cele patru carduri de sus, la fel în ambele registre (legis.md și Monitor), arată:
+Cele două carduri de sus, la fel în ambele registre (legis.md și Monitor), arată:
 
 | Card | Ce arată |
 |---|---|
-| **Acorduri** | numărul de acorduri, „din N acte publicate" și o fâșie pe tipuri de finanțare, cu legenda alături (numele și numărul fiecărui tip) |
+| **Acorduri** | numărul de acorduri, „din N acte publicate” și o fâșie pe tipuri de finanțare, cu legenda alături (numele și numărul fiecărui tip) |
 | **Creditori** | numărul de finanțatori distincți și primii trei, după numărul de acorduri, cu bare proporționale cu cel mai mare |
-| **Ratificate sau aprobate** | acordurile care au atins etapa 4 din 5 (aceeași cifră ca în „Cum se încheie un acord"), „din N", cu o bară și procentul |
-| **Cu dată de intrare în vigoare** | acordurile pentru care se cunoaște data (din legea de ratificare sau din ordin), „din N", cu bară și procent |
 
-Cifrele sunt cele de dinainte; fâșia, barele și pictogramele nu adaugă informație, o arată altfel. Culorile fâșiei sunt ale
-tipurilor din diagrama „Acorduri noi pe an” (primele patru sloturi validate pentru daltonism) și au mereu legenda alături:
-culoarea nu e singurul lucru care spune ce e un segment. Un număr nenul nu iese niciodată sub 2% din lățimea barei.
+Cardurile „Ratificate sau aprobate” și „Cu dată de intrare în vigoare” au fost scoase (13 octombrie 2026). Cifra de la etapa 4
+din 5 se vede în continuare în panoul „Cum se încheie un acord” din registrul Monitor (pe legis.md panoul e ascuns, locul lui îl
+ia panoul de sume, mai jos), iar data intrării în vigoare, pe rândul fiecărui acord („În vigoare din …”) și în exportul Excel
+(coloanele „În vigoare din” și „Temeiul datei”).
 
-**Pe ecrane mici.** Sub 700 px cardurile rămân scunde, ca înainte: fâșia, legenda, barele creditorilor și pictogramele dispar,
-iar creditorii se citesc ca text („AID · UE · BIRD"). Sub 980 px cardurile stau două pe rând. Între 981 și 1290 px etichetele
-lungi se rup pe două linii, așa că toate etichetele rezervă două linii acolo; altfel cifrele din cardurile vecine ar ieși la
-înălțimi diferite.
+Culorile fâșiei sunt ale tipurilor din diagrama „Acorduri noi pe an” (primele patru sloturi validate pentru daltonism) și au
+mereu legenda alături: culoarea nu e singurul lucru care spune ce e un segment.
 
-**Unde e codul.** `kpi()`, `kpiBara()`, `kpiTipuri()` și `kpiCreditori()` în `acorduri.html` (șablonul; `legis_acorduri.html` se
+**Pe ecrane mici.** Cele două carduri stau mereu pe același rând, de la 1400 la 340 px. Sub 700 px rămân scunde: fâșia,
+legenda, barele creditorilor și pictogramele dispar, iar creditorii se citesc ca text („AID · UE · BIRD”).
+
+**Unde e codul.** `kpi()`, `kpiTipuri()` și `kpiCreditori()` în `acorduri.html` (șablonul; `legis_acorduri.html` se
 regenerează cu `python legis_pagina.py`, care nu atinge indicatorii). Testele: `python teste_legis.py --browser`, secțiunea
 „indicatorii (KPI)”.
+
+## Panoul „Sumele acordurilor, pe tipuri de finanțare” (legis.md)
+
+Panoul stă imediat sub indicatori (și pe telefon, înaintea listei). Îl desenează doar registrul legis.md; în Monitor, în locul lui,
+stă panoul „Cum se încheie un acord”. Are patru părți, în limbajul vizual al indicatorilor:
+
+1. **Totalul.** „Acordurile cu sumă cunoscută adună”, cifra mare în euro (la cursul din data trecută în titlul panoului) și
+   „n acorduri din N”.
+2. **Bara.** Structura totalului pe tipuri de finanțare într-o singură bară, cu legenda alături: numele și procentul fiecărui tip.
+3. **Cardurile pe tip.** Câte unul pentru Grant, Împrumut, Asistență tehnică (și pentru „Asistență financiară”, dacă un acord
+   rămâne neclarificat): suma tipului, „n acorduri cu sumă din M · P% din total” și cele mai mari trei acorduri ale tipului, cu
+   suma lor în valuta acordului. Un clic pe card filtrează lista pe tipul lui. Culoarea tipului e aceeași în card, în bară, în
+   legendă și în fâșia din indicatori.
+4. **Socoteala.** „Din cele 551 de acorduri: 310 se adună în total · 64 au suma pe rând, dar nu se adună · 177 nu au încă suma în
+   registru”, iar dedesubt cele 64 sunt descompuse: 10 repetă același acord pe alt rând, 53 au suma marcată „nu se adună”
+   (se regăsește în alt acord sau e a unui program întreg), 1 e într-o valută fără curs de conversie. Cele trei cifre dau mereu
+   numărul tuturor acordurilor; „Totalul e un minim, nu tot ce s-a semnat”.
+
+Sub ele, „Pe valute și cum s-a făcut conversia” (închis, cu tabelul pe tip și valută și regulile de conversie).
+
+Cifrele vin din `statSume()`, același cod care hotărăște „Intră în total?” în exportul Excel: pagina și fișierul nu pot ieși
+diferit. Dacă un acord nu e numărat, rândul lui spune de ce (dublură, „nu se adună”, fără curs).
+
+**Pe telefon** (sub 700 px) cele trei tipuri devin rânduri într-un singur chenar (tipul în stânga, cu numărul de acorduri și
+procentul dedesubt; suma în dreapta), iar „Cele mai mari” și legenda barei dispar (numele și procentul rămân pe rânduri).
+Panoul e mai scund de 700 px, ca lista să nu coboare sub un ecran de explicații.
+
+**Unde e codul.** `panouSume()` și `statSume()` în `acorduri.html`. Testele: `python teste_legis.py --browser`, secțiunea
+„panoul Sumele acordurilor”: totalul față de cardurile lui, procentele, proporțiile barei, culorile, cele 551 de acorduri
+împărțite în trei, cele mai mari trei pe tip față de `window.__ACORDURI__`, clicul pe card, lățimile de la 340 la 1400 px,
+ordinea pe telefon și traducerea în engleză.
 
 ## Exportul Excel din registrele de acorduri
 

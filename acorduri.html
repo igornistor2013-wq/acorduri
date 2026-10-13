@@ -56,13 +56,11 @@
   .navbtn.away:hover{background:var(--blue-bg)}
   .navbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
-  /* Indicatorii din capul paginii. Fiecare card are o cifră mare, o pictogramă și, dedesubt, un indicator care arată
-     proporția: bară pentru „din total", fâșie pe tipuri de finanțare, trei bare pentru creditorii cei mai activi.
+  /* Indicatorii din capul paginii: „Acorduri" și „Creditori". Fiecare card are o cifră mare, o pictogramă și, dedesubt,
+     un indicator care arată proporția: fâșie pe tipuri de finanțare, trei bare pentru creditorii cei mai activi.
      Fâșia folosește culorile tipurilor din diagrama „Acorduri noi pe an" și are legenda alături: culoarea nu e
      singura care spune ce e fiecare segment. Textul nu poartă culoarea datelor, doar pătrățelul de lângă el. */
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-  @media (max-width:980px){.kpis{grid-template-columns:repeat(2,1fr)}}
-  @media (min-width:981px) and (max-width:1290px){.kpi .lbl{min-height:2.8em}}
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px}
   .kpi{position:relative;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);
     border-radius:var(--radius);box-shadow:var(--shadow);padding:17px 18px 15px;overflow:hidden}
   .kpi::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;
@@ -77,12 +75,8 @@
   .kpi-unit{font-size:12px;font-weight:600;color:var(--ink-dim)}
   .kpi .sub{font-size:11.5px;color:var(--ink-dim);margin-top:8px;font-family:var(--mono)}
   .kpi .doar-tel{display:none}
-  .kpi-strip i,.kpi-leg i,.kpi-meter .trk,.kpi-meter .trk i,.kpi-top3 .t,.kpi-top3 .t i,.kpi-ico{
+  .kpi-strip i,.kpi-leg i,.kpi-top3 .t,.kpi-top3 .t i,.kpi-ico{
     -webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .kpi-meter{display:flex;align-items:center;gap:10px;margin-top:auto}
-  .kpi-meter .trk{flex:1;height:7px;border-radius:4px;background:#e8edf6;overflow:hidden}
-  .kpi-meter .trk i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,var(--navy),#2f5691)}
-  .kpi-meter b{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--navy-deep);min-width:34px;text-align:right}
   .kpi-strip{display:flex;gap:2px;height:8px;margin-top:auto;border-radius:4px;overflow:hidden}
   .kpi-strip i{display:block;height:100%;min-width:3px;border-radius:2px}
   .kpi-leg{display:flex;flex-wrap:wrap;gap:3px 13px;margin-top:9px;font-size:11.5px;color:var(--ink-dim)}
@@ -126,7 +120,9 @@
      — lista actelor se citea câte un cuvânt pe rând. */
   #tabel.v-acorduri th:nth-child(1), #tabel.v-acorduri tr.acord td:nth-child(1){width:112px}
   #tabel.v-acorduri th:nth-child(3), #tabel.v-acorduri tr.acord td:nth-child(3){width:130px}
-  #tabel.v-acorduri th:nth-child(4), #tabel.v-acorduri tr.acord td:nth-child(4){width:120px}
+  /* 132 px, nu 120: o sumă din sursă externă, de pildă „5,51 mil. EUR ext.", are 146 px și atingea
+     primul cerc din „Etape parcurse". */
+  #tabel.v-acorduri th:nth-child(4), #tabel.v-acorduri tr.acord td:nth-child(4){width:132px}
   #tabel.v-acorduri th:nth-child(5), #tabel.v-acorduri tr.acord td:nth-child(5){width:376px}
   #tabel.v-acorduri th:nth-child(6), #tabel.v-acorduri tr.acord td:nth-child(6){width:116px}
   .c-suma{font-family:var(--mono);font-weight:700;color:var(--navy, #1E4B8C);white-space:nowrap}
@@ -298,19 +294,47 @@
   @media (max-width:640px){.filtru-rand{flex-direction:column;gap:6px}.f-lbl{padding-top:0}}
 
   /* fluxul interactiv al etapelor */
-  .sume-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
-  @media (max-width:980px){.sume-grid{grid-template-columns:repeat(2,1fr)}}
-  @media (max-width:520px){.sume-grid{grid-template-columns:1fr}}
-  .sume-card{text-align:left;background:var(--panel);cursor:pointer;border:1.5px solid var(--line-strong);
-    border-radius:9px;padding:12px 13px;font-family:inherit;display:flex;flex-direction:column;gap:5px}
+  /* Panoul „Sumele acordurilor, pe tipuri de finanțare", în limbajul vizual al indicatorilor: totalul mare, structura lui pe
+     tipuri într-o singură bară (cu legendă) și câte un card pe tip, în culoarea tipului, cu cele mai mari trei acorduri.
+     Culorile sunt ale tipurilor din diagrama „Acorduri noi pe an"; numele și procentul stau mereu și în text. */
+  .sume-sus{display:grid;grid-template-columns:minmax(260px,auto) minmax(0,1fr);gap:16px 38px;align-items:center;margin-bottom:20px}
+  .sume-total{margin:0;display:flex;flex-direction:column;gap:4px}
+  .sume-lbl{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;line-height:1.4}
+  .sume-val{font-size:34px;font-weight:800;color:var(--navy-deep);line-height:1.05;letter-spacing:-.025em}
+  .sume-acop{font-size:11.5px;color:var(--ink-dim);font-family:var(--mono)}
+  .sume-bar{display:flex;gap:2px;height:14px;border-radius:7px;overflow:hidden}
+  .sume-bar i{display:block;height:100%;min-width:4px;border-radius:2px}
+  .sume-leg{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:10px;font-size:12px;color:var(--ink-dim)}
+  .sume-leg span{display:inline-flex;align-items:center;gap:6px}
+  .sume-leg i{width:9px;height:9px;border-radius:3px;flex:none}
+  .sume-leg b{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--navy-deep)}
+  .sume-bar i,.sume-leg i,.sume-card::before,.sume-card .st i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* flex și nu grilă: pe tabletă, când nu încap trei carduri pe rând, ultimul se întinde pe tot rândul, nu lasă un gol alături */
+  .sume-grid{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px}
+  .sume-card{--tip:var(--navy);position:relative;overflow:hidden;flex:1 1 215px;min-width:0;text-align:left;color:inherit;background:var(--panel);
+    cursor:pointer;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px 14px;
+    font-family:inherit;display:flex;flex-direction:column;gap:3px}
+  .sume-card::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:var(--tip)}
   .sume-card:hover{border-color:var(--navy-deep)}
-  .sume-card .st{font-size:12px;font-weight:700;color:var(--navy-deep)}
-  .sume-card .sv{font-size:23px;font-weight:800;color:var(--navy-deep);letter-spacing:-.02em;line-height:1.1}
-  .sume-card .sb{height:5px;border-radius:3px;background:#e8edf6;overflow:hidden}
-  .sume-card .sb i{display:block;height:100%;background:var(--navy-deep);border-radius:3px}
-  .sume-card .sn{font-size:11.5px;color:var(--ink-dim);font-family:var(--mono)}
-  .sume-card .sx{font-size:11.5px;color:var(--ink);line-height:1.4;margin-top:2px}
-  .sume-total{font-size:13.5px;margin:0 0 12px}
+  .sume-card:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .sume-card .st{display:flex;align-items:center;gap:7px;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--ink-dim);font-weight:700;line-height:1.4}
+  .sume-card .st i{width:9px;height:9px;border-radius:3px;background:var(--tip);flex:none}
+  .sume-card .sv{font-size:28px;font-weight:800;color:var(--navy-deep);letter-spacing:-.02em;line-height:1.1;margin-top:5px}
+  .sume-card .sn{font-size:11.5px;color:var(--ink-dim);font-family:var(--mono);margin-top:2px}
+  .sume-card .sx-cap{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;
+    margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+  .sume-card .sx{display:flex;flex-direction:column;gap:5px;margin-top:5px;min-width:0}
+  .sume-card .sx-r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:12px;line-height:1.35;min-width:0}
+  /* numele acordului: pe cardurile înguste (tabletă) se rupe pe două rânduri înainte să fie tăiat cu „…” */
+  .sume-card .sx-n{flex:1 1 auto;min-width:0;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;color:var(--ink)}
+  .sume-card .sx-s{flex:none;font-family:var(--mono);font-weight:700;font-size:11.5px;color:var(--navy-deep)}
+  .sume-nota{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 18px;margin:0 0 4px;font-size:12px;color:var(--ink-dim)}
+  .sume-nota .cap{font-weight:700;color:var(--ink)}
+  .sume-nota b{font-family:var(--mono);font-size:12px;color:var(--navy-deep);margin-right:4px}
+  .sume-expl{font-size:12px;color:var(--ink-dim);margin:0 0 6px}
+  #sume .panel-head .count{font-size:12px;color:var(--ink-dim)}
+  @media (max-width:760px){.sume-sus{grid-template-columns:minmax(0,1fr)}}
   .sume-tab{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0 4px}
   .sume-tab th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);
     border-bottom:1px solid var(--line-strong);padding:5px 8px}
@@ -514,8 +538,9 @@
        pentru cine chiar le caută. */
     #app{display:flex;flex-direction:column}
     .kpis{order:1}
-    #lista{order:2}
-    .panel:not(#lista){order:3}
+    #sume{order:2}
+    #lista{order:3}
+    .panel:not(#lista):not(#sume){order:4}
 
     /* Indicatorii, mai strânși: patru casete înalte ocupau tot ecranul. */
     .kpi{padding:13px 13px 12px}
@@ -528,6 +553,24 @@
     /* fâșia, legenda și barele creditorilor rămân pentru ecranele late; pe telefon, aceleași cifre în text */
     .kpi-strip,.kpi-leg,.kpi-top3,.kpi .doar-desk{display:none}
     .kpi .doar-tel{display:block}
+
+    /* Panoul de sume, sub indicatori: totalul, bara, apoi cele trei tipuri ca rânduri într-un singur chenar. Cele mai mari
+       trei acorduri și legenda (numele și procentul sunt și pe rânduri) rămân pentru ecranele late. */
+    #sume .panel-head{padding:12px 14px}
+    #sume .panel-body{padding:14px}
+    .sume-sus{gap:12px;margin-bottom:12px}
+    .sume-val{font-size:27px}
+    .sume-leg{display:none}
+    .sume-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+    .sume-card{border:0;border-radius:0;box-shadow:none;border-bottom:1px solid var(--line);padding:11px 14px 10px 18px;
+      display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:2px;align-items:baseline}
+    .sume-card:last-child{border-bottom:0}
+    .sume-card::before{right:auto;bottom:0;width:4px;height:auto}
+    .sume-card .st{grid-column:1;grid-row:1}
+    .sume-card .sv{grid-column:2;grid-row:1;font-size:20px;margin:0;text-align:right;white-space:nowrap}
+    .sume-card .sn{grid-column:1 / -1;grid-row:2;margin:0;font-size:11px}
+    .sume-card .sx-cap,.sume-card .sx{display:none}
+    .sume-nota{flex-direction:column;align-items:flex-start;gap:4px;margin-bottom:8px}
 
     /* Comutatorul de file se rupea pe două rânduri și arăta a greșeală. */
     #filaBtns{width:100%}
@@ -1196,20 +1239,40 @@
     Object.keys(tip).forEach(function(c){ tip[c].top.sort(function(a, b){ return b.eur - a.eur; }); });
     return { tip: tip, dubluri: dubluri, neconv: neconv, fara: fara, stare: stare };
   }
+  /* „n acorduri", cu „de" de la 20 în sus: 1 acord, 11 acorduri, 20 de acorduri, 111 acorduri, 120 de acorduri. */
+  function nAcorduri(n){
+    var r = n % 100;
+    return n + (n === 1 ? ' acord' : (r > 0 && r < 20) ? ' acorduri' : ' de acorduri');
+  }
+  function culoareTip(c){ var k = AN_TIPURI.indexOf(c); return AN_CULORI[k < 0 ? 4 : k]; }
+  /* Panoul „Sumele acordurilor, pe tipuri de finanțare". Cifrele vin din statSume (aceleași ca în exportul Excel);
+     aici doar se așază: totalul mare, structura lui pe tipuri într-o bară cu legendă, un card pe tip (cardul filtrează lista pe
+     tipul lui) și socoteala celor n acorduri: câte se adună, câte au suma pe rând dar nu se adună (dubluri sau marcate „nu se
+     adună"), câte n-au încă sumă. */
   function panouSume(grupuri){
     var st = statSume(grupuri), tipuri = ORDINE_TIP.filter(function(c){ return st.tip[c]; })
       .concat(Object.keys(st.tip).filter(function(c){ return ORDINE_TIP.indexOf(c) < 0; }));
-    var total = 0, cuSuma = 0, maxim = 0;
-    tipuri.forEach(function(c){ total += st.tip[c].eur; cuSuma += st.tip[c].n; maxim = Math.max(maxim, st.tip[c].eur); });
+    var total = 0, cuSuma = 0;
+    tipuri.forEach(function(c){ total += st.tip[c].eur; cuSuma += st.tip[c].n; });
+    var nr = function(s){ return st.stare.filter(function(x){ return x === s; }).length; };
+    var marcate = nr('fara_total'), farCurs = nr('fara_curs'), nuSeAduna = st.dubluri + marcate + farCurs;
+    var procent = function(c){ return total ? Math.round(100 * st.tip[c].eur / total) : 0; };
+    var cuEur = tipuri.filter(function(c){ return st.tip[c].n; });
+    var bara = total
+      ? '<div class="sume-bar" role="img" aria-label="Structura totalului pe tipuri de finanțare">' + cuEur.map(function(c){
+          return '<i style="flex:' + st.tip[c].eur.toFixed(0) + ' 1 0;background:' + culoareTip(c) + '" title="' + esc(c) + ': ' + procent(c) + '%"></i>'; }).join('') + '</div>' +
+        '<div class="sume-leg">' + cuEur.map(function(c){
+          return '<span><i style="background:' + culoareTip(c) + '"></i>' + esc(c) + ' <b>' + procent(c) + '%</b></span>'; }).join('') + '</div>'
+      : '';
     var carduri = tipuri.map(function(c){
       var t = st.tip[c];
-      return '<button class="sume-card" data-tip="' + esc(c) + '" title="Arată în listă acordurile de acest tip">' +
-        '<span class="st">' + esc(c) + '</span>' +
+      return '<button class="sume-card" data-tip="' + esc(c) + '" style="--tip:' + culoareTip(c) + '" title="Arată în listă acordurile de acest tip">' +
+        '<span class="st"><i aria-hidden="true"></i>' + esc(c) + '</span>' +
         '<span class="sv">' + (t.n ? esc(fmtEur(t.eur)) : '—') + '</span>' +
-        '<span class="sb"><i style="width:' + (maxim ? Math.max(1, Math.round(100 * t.eur / maxim)) : 0) + '%"></i></span>' +
-        '<span class="sn">' + t.n + ' acorduri cu sumă din ' + t.toate + (total && t.n ? ' · ' + Math.round(100 * t.eur / total) + '% din total' : '') + '</span>' +
-        (t.top.length ? '<span class="sx">Cele mai mari: ' + t.top.slice(0, 3).map(function(x){
-            return esc(x.nume.length > 46 ? x.nume.slice(0, 45) + '…' : x.nume) + ' (' + esc(fmtSuma(x.s)) + ')'; }).join('; ') + '</span>' : '') +
+        '<span class="sn">' + t.n + ' acorduri cu sumă din ' + t.toate + (total && t.n ? ' · ' + procent(c) + '% din total' : '') + '</span>' +
+        (t.top.length ? '<span class="sx-cap">Cele mai mari</span><span class="sx">' + t.top.slice(0, 3).map(function(x){
+            return '<span class="sx-r"><span class="sx-n" title="' + esc(x.nume) + '">' + esc(x.nume) + '</span>' +
+                   '<span class="sx-s">' + esc(fmtSuma(x.s)) + '</span></span>'; }).join('') + '</span>' : '') +
         '</button>';
     }).join('');
     var randuri = '';
@@ -1223,13 +1286,25 @@
       });
     });
     var neconv = Object.keys(st.neconv).map(function(v){ return st.neconv[v] + ' în ' + v; }).join(', ');
+    var expl = (st.dubluri ? '<span>' + st.dubluri + ' repetă același acord pe alt rând;</span> ' : '') +
+      (marcate ? '<span>' + marcate + ' au suma marcată „nu se adună” (se regăsește în alt acord sau e a unui program întreg).</span> ' : '') +
+      (farCurs ? '<span>' + farCurs + (farCurs === 1 ? ' e' : ' sunt') + ' într-o valută fără curs de conversie (' + esc(Object.keys(st.neconv).join(', ')) + ').</span> ' : '') +
+      '<span>Totalul e un minim, nu tot ce s-a semnat.</span>';
     return '<div class="panel" id="sume"><div class="panel-head"><h2>' + ico('file') + 'Sumele acordurilor, pe tipuri de finanțare</h2>' +
         '<span class="count">în euro, la cursul din ' + CURS_DATA + '</span></div>' +
       '<div class="panel-body">' +
-        '<p class="sume-total">Acordurile cu sumă cunoscută adună <b>' + esc(fmtEur(total)) + '</b>: ' + cuSuma +
-          ' de acorduri din ' + grupuri.length + '. Alte ' + st.fara +
-          ' nu au încă suma în registru, deci totalurile sunt un minim, nu tot ce s-a semnat.</p>' +
+        '<div class="sume-sus">' +
+          '<p class="sume-total"><span class="sume-lbl">Acordurile cu sumă cunoscută adună</span>' +
+            '<b class="sume-val">' + esc(fmtEur(total)) + '</b>' +
+            '<span class="sume-acop">' + nAcorduri(cuSuma) + ' din ' + grupuri.length + '</span></p>' +
+          (bara ? '<div class="sume-compozitie">' + bara + '</div>' : '') +
+        '</div>' +
         '<div class="sume-grid">' + carduri + '</div>' +
+        '<p class="sume-nota"><span class="cap">Din cele ' + nAcorduri(grupuri.length) + '</span>' +
+          '<span><b>' + cuSuma + '</b><span>se adună în total</span></span>' +
+          (nuSeAduna ? '<span><b>' + nuSeAduna + '</b><span>au suma pe rând, dar nu se adună</span></span>' : '') +
+          '<span><b>' + st.fara + '</b><span>nu au încă suma în registru</span></span></p>' +
+        '<p class="sume-expl">' + expl + '</p>' +
         '<details class="inv-wrap"><summary>Pe valute și cum s-a făcut conversia</summary>' +
           '<table class="sume-tab"><thead><tr><th>Tip</th><th>Valuta</th><th class="r">Acorduri</th><th class="r">Suma în valuta acordului</th>' +
             '<th class="r">Unități pentru 1 EUR</th><th class="r">În euro</th></tr></thead><tbody>' + randuri + '</tbody></table>' +
@@ -2470,12 +2545,11 @@
       return;
     }
 
-    var cats = {}, orgs = {}, cuVigoare = 0, cuSemnat = 0, dist = {};
+    var cats = {}, orgs = {}, cuSemnat = 0, dist = {};
     var catsA = {}, orgsA = {};      // aceleași chei, dar numărate în acte
     grupuri.forEach(function(g){
       cats[g.categorie] = (cats[g.categorie]||0)+1;
       Object.keys(g.orgs).forEach(function(o){ orgs[o] = (orgs[o]||0)+1; });
-      if (inVigoareDin(g)) cuVigoare++;
       if (g.semnat) cuSemnat++;
       STEPS.forEach(function(s){ if (g.et[s.k]) dist[s.cap] = (dist[s.cap]||0)+1; });
     });
@@ -2486,16 +2560,11 @@
       });
     });
 
-    var nRat = dist['Ratificare sau aprobare'] || 0;
     var kpis =
       kpi('Acorduri', grupuri.length, {ico: 'doc', din: 'din ' + acte.length + ' acte publicate', viz: kpiTipuri(cats)}) +
       kpi('Creditori', Object.keys(orgs).length,
         {ico: 'bank', din: 'primii trei, după numărul de acorduri', dinTel: false, viz: kpiCreditori(orgs),
-         subTel: Object.keys(orgs).sort(function(a,b){return orgs[b]-orgs[a];}).slice(0,3).join(' · ')}) +
-      kpi('Ratificate sau aprobate', nRat,
-        {ico: 'check', din: 'din ' + grupuri.length, viz: kpiBara(nRat, grupuri.length), sub: 'au trecut de etapa 4 din 5'}) +
-      kpi('Cu dată de intrare în vigoare', cuVigoare,
-        {ico: 'cal', din: 'din ' + grupuri.length, viz: kpiBara(cuVigoare, grupuri.length), sub: 'din legea de ratificare sau din ordin'});
+         subTel: Object.keys(orgs).sort(function(a,b){return orgs[b]-orgs[a];}).slice(0,3).join(' · ')});
 
     /* Optsprezece butoane pe două rânduri, jumătate cu câte un singur acord,
        fac panoul greu de parcurs. Arătăm întâi finanțatorii cu mai multe
@@ -3266,9 +3335,7 @@
       down:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
       link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
       doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/>',
-      bank:'<path d="M3 9l9-5 9 5"/><path d="M5 9h14"/><path d="M6.5 12v5M10.5 12v5M13.5 12v5M17.5 12v5"/><path d="M4 20h16"/>',
-      check:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/>',
-      cal:'<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><polyline points="9 15 11 17 15 13"/>'
+      bank:'<path d="M3 9l9-5 9 5"/><path d="M5 9h14"/><path d="M6.5 12v5M10.5 12v5M13.5 12v5M17.5 12v5"/><path d="M4 20h16"/>'
     }[t];
     return '<svg viewBox="0 0 24 24">' + p + '</svg>';
   }
@@ -3284,11 +3351,6 @@
         (o.din ? '<span class="kpi-unit' + (o.dinTel === false ? ' doar-desk' : '') + '">' + esc(o.din) + '</span>' : '') + '</div>' +
       (o.viz || '') + (o.sub ? '<div class="sub">' + esc(o.sub) + '</div>' : '') +
       (o.subTel ? '<div class="sub doar-tel">' + esc(o.subTel) + '</div>' : '') + '</div>';
-  }
-  /* Bara „n din total" cu procentul alături. Un număr nenul nu iese niciodată sub 2% din lățime, ca să se vadă. */
-  function kpiBara(n, total){
-    var p = total ? Math.round(100 * n / total) : 0, w = total ? Math.max(n ? 2 : 0, 100 * n / total) : 0;
-    return '<div class="kpi-meter"><span class="trk" aria-hidden="true"><i style="width:' + w.toFixed(1) + '%"></i></span><b>' + p + '%</b></div>';
   }
   /* Fâșia acordurilor pe tipuri de finanțare, cu legenda ei (numele și numărul stau în text, nu doar în culoare). */
   function kpiTipuri(cats){
