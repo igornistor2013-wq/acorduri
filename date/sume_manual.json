@@ -1158,5 +1158,51 @@
   "val": "USD",
   "nota": "Nota Cancelariei de Stat nr. CS-2684-25-78-1755 din 15.07.2026: «PNUD va acorda asistență externă nerambursabilă (sub formă de grant) în sumă de 6 693 543 MDL (echivalentul aproximativ la 386 910 dolari SUA)»",
   "extern": true
+ },
+ "DP666/2026": {
+  "v": 1700000,
+  "val": "USD",
+  "extern": true,
+  "nota": "Nota de argumentare a Guvernului (document oficial nepublicat online): «un grant de până la 1,7 milioane USD» prin Facilitatea GFPP, pentru pregătirea proiectului RESHAPE-Moldova (SA Termoelectrica). Plafon."
+ },
+ "HG275/2026": {
+  "v": 350000,
+  "val": "USD",
+  "extern": true,
+  "u": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-07/NU-739-MDED-MAE-2026.pdf",
+  "nota": "Nota de argumentare a Guvernului: «grant în valoare de 350 000 dolari SUA destinat dezvoltării sistemului informațional „Registrul garanțiilor reale mobiliare”». Aceeași sumă în nota Guvernului din 29.07.2026 (linkul)."
+ },
+ "HG512/2025": {
+  "v": 2113000,
+  "val": "USD",
+  "extern": true,
+  "u": "https://ms.gov.md/wp-content/uploads/2025/12/MOLDOVA_MIRS_Project_TF0C759.pdf",
+  "nota": "Scrisoarea Băncii Mondiale din 29.08.2025 (grant TF0C7597): «a grant in an amount not to exceed … (USD 2,113,000)». La fel în nota Guvernului: «sub formă de grant, în valoare totală de 2,113,000 dolari SUA»."
+ },
+ "HG425/2025": {
+  "v": 5000000,
+  "val": "EUR",
+  "extern": true,
+  "u": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-08/NU-446-MEC-2026_0.pdf",
+  "nota": "Nota de argumentare a Guvernului: «acordarea unui grant în sumă de 5 milioane euro pentru lucrări de eficiență energetică în 15 instituții de învățământ». La fel în documentele ședinței din 12.08.2026 (linkul)."
+ },
+ "HG409/2025": {
+  "v": 5512000,
+  "val": "EUR",
+  "extern": true,
+  "nota": "Nota de argumentare a Guvernului (document oficial nepublicat online): «trei proiecte prioritare finanțate de Ministerul Federal de Externe al Germaniei, în valoare totală de 5,512 milioane euro» (1 + 1,5 + 3,012)."
+ },
+ "HG90/2025": {
+  "v": 64000000,
+  "val": "EUR",
+  "extern": true,
+  "u": "https://enlargement.ec.europa.eu/document/download/daaccc43-3308-4f11-a1ac-ebfcfe908b87_en?filename=C_2024_9169_1_EN_annexe_acte_autonome_nlw_part1_v3.pdf",
+  "nota": "Decizia CE C(2024) 9169: «Total amount of EU budget contribution EUR 64 000 000.00» (57 suport bugetar + 7 complementar), ca în nota Guvernului. Suma inițială: Amendamentul nr. 1 (HG178/2025) prevede 174 mil. EUR."
+ },
+ "HG186/2025": {
+  "v": 7700000,
+  "val": "USD",
+  "extern": true,
+  "nota": "Nota de argumentare a Guvernului (document oficial nepublicat online): «7,7 mil. dolari SUA vor fi acordați suplimentar în baza Acordului de Grant … (M-GROW), în vederea cofinanțării Programului vizat»."
  }
 }
