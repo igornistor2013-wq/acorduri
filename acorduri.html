@@ -899,10 +899,14 @@
      acordul deschis dintr-un link „#acord=…" se închidea singur după o clipă,
      la fel și un rând deschis de om înainte să se termine încărcarea. */
   var deschise = {}, tintaId = '', tintaUrmareste = false;
-  function idAcord(g){
-    var a = g.acte[g.acte.length - 1] || {};
+  function slugAct(a){
     return fold((a.act || '') + ' ' + (a.data_editie || '')).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   }
+  function idAcord(g){ return slugAct(g.acte[g.acte.length - 1] || {}); }
+  /* Id-urile tuturor actelor unui acord. Când două rânduri se unesc (date/contopiri_manual.json),
+     id-ul rândului rezultat e cel al actului cel mai vechi, deci un link „#acord=…” copiat înainte
+     de unire poate purta id-ul unui act care nu mai e cel mai vechi: îl recunoaștem după oricare act. */
+  function idsActe(g){ return g.acte.map(slugAct); }
 
   /* Partenerul și anul pot avea mai multe valori: 'all' sau o listă separată
      prin „|" („BERD|BEI", „2024|2025"). Așa rămân simple și linkul, și exportul. */
@@ -1204,7 +1208,11 @@
     var cuv = (fold(g.numeScurt || g.nume || '').match(/[a-z0-9]+/g) || [])
       .filter(function(w){ return w.length > 2 && GOL_NUME.indexOf(' ' + w + ' ') < 0; })
       .slice(0, 3).map(function(w){ return w.slice(0, 6); }).sort().join(' ');
-    return s.v + '|' + s.val + '|' + (FAM_FIN[p] || p) + '|' + cuv;
+    /* Tranșele aceluiași program sunt acorduri diferite, chiar cu aceeași sumă și aceleași cuvinte în denumire:
+       grantul sectorial japonez („ajustări structurale economice") a avut câte un schimb de scrisori pe an, tranșele
+       I, III și IV de câte 300 mil. yeni. Numărul tranșei intră în cheie, ca să nu fie luate drept același acord. */
+    var tr = (fold(g.nume || '').match(/transa\s+(?:a\s+)?([a-z0-9]+)/) || [])[1] || '';
+    return s.v + '|' + s.val + '|' + (FAM_FIN[p] || p) + '|' + cuv + (tr ? '|t' + tr : '');
   }
   /* Întoarce și starea fiecărui rând (stare[i], pentru grupuri[i]), ca exportul Excel să poată spune de ce un rând cu sumă nu
      intră în total: 'numarat', 'dublura' (același acord, numărat pe alt rând), 'fara_total' (marcat „nu se adună"),
@@ -1817,6 +1825,100 @@
     return Object.keys(cats)[0] || '—';
   }
 
+  /* date/contopiri_manual.json: unificările pe care regula automată nu le poate face.
+     Titlul oficial al aceluiași acord se scrie altfel la fiecare etapă — hotărârea de inițiere a
+     negocierilor spune „Proiectul Învățământul Superior", legea spune „Învățământul superior" —,
+     iar actele unei finanțări suplimentare seamănă cu ale acordului de bază. Pe câteva zeci de
+     acorduri, același acord ajungea pe două-trei rânduri: se numărau de mai multe ori, sumele
+     stăteau departe de actele lor, iar etapele se vedeau pe jumătate. Fișierul spune, pe codul
+     actelor (ex. „LP148/2025"):
+       {"uneste": [{"acte": ["LP148/2025", "HG183/2025"], "nota": "…"}]}  — rândurile care conțin
+          actele listate devin unul singur, cu denumirea rândului primului act găsit
+          („nume", opțional, schimbă denumirea);
+       {"muta": [{"acte": ["LP58/2010"], "langa": "HG849/2009", "nota": "…"}]}  — actele listate trec
+          pe rândul care conține actul „langa" (sau pe un rând nou, dacă „langa" lipsește).
+     Se aplică întâi „muta", apoi „uneste", după grupările automate. Un act care nu mai e în
+     registru e sărit; un fișier lipsă sau stricat nu schimbă nimic. */
+  var CONTOPIRI = null;
+  function codulActului(a){ return a.cod || (window.__LEGIS__ ? a.act : '') || ''; }
+  // Refă câmpurile derivate ale unui rând după ce i s-au schimbat actele.
+  function refaGrup(g){
+    var sem = '', tit = [];
+    g.et = {}; g.orgs = {}; g.cats = {}; g.semnat = ''; g.suport = false;
+    g.acte.forEach(function(a){
+      etapa(a).forEach(function(e){ g.et[e] = true; });
+      if (a.suport) g.suport = true;
+      if (a.categorie) g.cats[a.categorie] = true;
+      (a.partener || '').split(' / ').forEach(function(o){ o = o.trim(); if (o) g.orgs[o] = true; });
+      var d = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(a.semnat || '');
+      if (d && (!sem || d[3] + d[2] + d[1] < sem)){ sem = d[3] + d[2] + d[1]; g.semnat = a.semnat; }
+      var s = sumaAct(a.titlu);
+      if (s) tit.push({ a: a, s: s });
+    });
+    // suma din titlu: a celui mai vechi act care are una — acordul de bază, nu amendamentele lui
+    tit.sort(function(x, y){ return ord(x.a).localeCompare(ord(y.a)); });
+    g.suma = tit.length ? tit[0].s : null;
+  }
+  function aplicaContopiri(map){
+    var C = CONTOPIRI;
+    if (!C || typeof C !== 'object') return map;
+    var nou = 0;
+    // rândul care conține actul cu acest cod: {k: cheia în map, g: rândul}
+    function gaseste(cod){
+      if (!cod) return null;
+      var chei = Object.keys(map);
+      for (var i = 0; i < chei.length; i++){
+        var g = map[chei[i]];
+        for (var j = 0; j < g.acte.length; j++) if (codulActului(g.acte[j]) === cod) return { k: chei[i], g: g };
+      }
+      return null;
+    }
+    (Array.isArray(C.muta) ? C.muta : []).forEach(function(m){
+      if (!m || !Array.isArray(m.acte)) return;
+      var tinta = null, mutate = [];
+      if (m.langa){ tinta = gaseste(m.langa); if (!tinta) return; }
+      m.acte.forEach(function(cod){
+        var f = gaseste(cod);
+        if (!f || (tinta && f.g === tinta.g)) return;
+        var raman = [], scoase = [], nume0 = f.g.nume;
+        f.g.acte.forEach(function(a){
+          if (codulActului(a) === cod){ mutate.push(a); scoase.push(a); } else raman.push(a);
+        });
+        f.g.acte = raman;
+        if (raman.length){
+          refaGrup(f.g);
+          /* Denumirea rândului venea de la un act mutat: o luăm de la primul act rămas, altfel
+             rândul care păstrează alt acord ar purta numele celui plecat. */
+          if (scoase.some(function(a){ return denumire(a.titlu) === nume0; }) &&
+              !raman.some(function(a){ return denumire(a.titlu) === nume0; }))
+            f.g.nume = denumire(raman[0].titlu);
+        } else delete map[f.k];
+      });
+      if (!mutate.length) return;
+      if (tinta){ tinta.g.acte = tinta.g.acte.concat(mutate); refaGrup(tinta.g); return; }
+      var g0 = { nume: denumire(mutate[0].titlu), acte: mutate, et: {}, orgs: {}, cats: {}, semnat: '' };
+      refaGrup(g0);
+      map['\u0003muta' + (nou++)] = g0;
+    });
+    (Array.isArray(C.uneste) ? C.uneste : []).forEach(function(u){
+      if (!u || !Array.isArray(u.acte)) return;
+      var gasite = [];
+      u.acte.forEach(function(cod){
+        var f = gaseste(cod);
+        if (f && !gasite.some(function(x){ return x.g === f.g; })) gasite.push(f);
+      });
+      if (!gasite.length) return;
+      var rad = gasite[0];
+      gasite.slice(1).forEach(function(f){
+        rad.g.acte = rad.g.acte.concat(f.g.acte);
+        delete map[f.k];
+      });
+      if (u.nume) rad.g.nume = String(u.nume);
+      if (gasite.length > 1) refaGrup(rad.g);
+    });
+    return map;
+  }
+
   function grupeaza(acte){
     var map = {};
     acte.forEach(function(a){
@@ -1973,6 +2075,7 @@
       });
     });
     map = despartite;
+    map = aplicaContopiri(map);        // unificări hotărâte de mână (date/contopiri_manual.json)
 
     var grupuri = Object.keys(map).map(function(k){
       var g = map[k];
@@ -3556,6 +3659,14 @@
     legaMaiMult();
   }
 
+  /* Finanțarea suplimentară (adițională) a unui proiect e un acord de sine stătător, cu suma lui: același nume ca
+     acordul de bază, dar rând separat. Când numele se repetă, o spunem sub nume, ca să nu pară o dublură. Contează
+     cel mai vechi act al rândului (acordul propriu-zis, nu amendamentele lui). */
+  function esteSuplimentara(g){
+    var a = g.acte[g.acte.length - 1] || {};
+    return /finantar(?:ea|e)\s+(?:suplimentar|aditional)/.test(fold(a.titlu || ''));
+  }
+
   function randAcorduri(grupuri){
     /* Un proiect mare are mai multe acorduri — „Eficiența energetică" are un
        grant BEI și un contract de finanțare tot de la BEI. Sunt rânduri
@@ -3583,7 +3694,9 @@
     // acordul deschis dintr-un link trebuie să fie printre rândurile desenate
     if (deepAcord){
       var poz = -1;
-      out.forEach(function(g, k){ if (poz < 0 && idAcord(g) === deepAcord) poz = k; });
+      out.forEach(function(g, k){
+        if (poz < 0 && (idAcord(g) === deepAcord || idsActe(g).indexOf(deepAcord) > -1)){ poz = k; deepAcord = idAcord(g); }
+      });
       if (poz >= limita) limita = Math.ceil((poz + 1) / PAS) * PAS;
     }
     document.getElementById('rows').innerHTML = out.slice(0, limita).map(function(g, i){
@@ -3614,7 +3727,8 @@
           '<span class="caret">▶</span>' + esc(g.numeScurt || g.nume) +
           (deCateOri[g.numeScurt || g.nume] > 1
             ? '<span class="pname-sub">' + esc(g.categorie) +
-              (g.parteneri ? ' · ' + esc(g.parteneri) : '') + '</span>'
+              (g.parteneri ? ' · ' + esc(g.parteneri) : '') +
+              (esteSuplimentara(g) ? ' · finanțare suplimentară' : '') + '</span>'
             : '') + '</div>' +
           '<div class="pmeta">' + g.acte.length + (g.acte.length === 1 ? ' act' : ' acte') +
           ' · ultimul: ' + esc(g.ultim.data_editie) + '</div></td>' +
@@ -3797,14 +3911,18 @@
        act din Monitor o dă date/legaturi_legis.json; codul actului pe legis.md, intrarea lui din
        legis_sume.json. Cu ele, același act primește aceeași sumă în ambele registre. */
     var peLegis = !!window.__LEGIS__;
+    /* date/contopiri_manual.json: rândurile care trebuie unite de mână (vezi aplicaContopiri). */
     Promise.all([cere('date/legis_sume.json'), cere('date/sume_manual.json'),
-                 peLegis ? null : cere('date/legaturi_legis.json'), cere('date/categorii_manual.json')]).then(function(rez){
+                 peLegis ? null : cere('date/legaturi_legis.json'), cere('date/categorii_manual.json'),
+                 cere('date/contopiri_manual.json')]).then(function(rez){
         var j = rez[0], manual = rez[1] || {}, leg = rez[2] || {}, incercari = 0, decizii = deciziiValide(rez[3]);
+        var cuContopiri = !!(rez[4] && typeof rez[4] === 'object' && ((rez[4].uneste || []).length || (rez[4].muta || []).length));
         /* Pagina Monitorului își ia actele din date.json, printr-o cerere aparte: sumele pot
            sosi înaintea lor. Le așteptăm (cel mult 15 secunde), ca să nu se piardă pe tăcute. */
         (function aplica(){
         if (!db || !db.acte){ if (incercari++ < 60) setTimeout(aplica, 250); return; }
         var n = 0;
+        if (cuContopiri){ CONTOPIRI = rez[4]; n++; }       // schimbă gruparea: pagina se redesenează
         /* Ordinele venite din Monitorul Oficial apar în registrul legis.md cu un cod
            provizoriu („O147/2026"): din cuprins nu se vede care minister l-a emis. Când
            actul ajunge și în istoricul legis.md, primește codul întreg („OMMPS147/2026").
@@ -3842,6 +3960,7 @@
              încă nu) nu are fișă legată, așa că îl scoatem din numărul și tipul lui. Fără asta, un act nou
              nu putea primi nicio decizie de mână până nu ajungea în istoricul legis.md. */
           var cod = peLegis ? a.act : ((r && r.act) || codDinMonitor(a));
+          if (cod) a.cod = cod;           // pentru date/contopiri_manual.json (codul actului pe legis.md)
           var fisa = peLegis ? (a.url || '') : (idLegis ? 'https://www.legis.md/cautare/getResults?doc_id=' + idLegis + '&lang=ro' : '');
           var dc = cod ? cautaIn(decizii, cod) : null;
           if (dc && (a.categorie !== dc.categorie || !a.decizie)){

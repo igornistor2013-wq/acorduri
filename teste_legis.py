@@ -361,6 +361,46 @@ finally:
     shutil.rmtree(_tmp, ignore_errors=True)
 
 print()
+print('Fișierele puse de mână din date/ — forma lor (o greșeală de tastare nu trebuie să strice registrul)')
+_COD = re.compile(r'^[A-Z]{1,8}\d+/\d{4}$')
+_VALUTE = {'EUR', 'USD', 'JPY', 'CHF', 'SEK', 'CAD', 'DKK', 'GBP', 'PLN', 'RON', 'CNY', 'DEM', 'ECU', 'ROL', 'DST', 'MDL'}
+_sm = json.loads((AICI / 'date' / 'sume_manual.json').read_text(encoding='utf-8'))
+_sm_rele = []
+for _k, _v in _sm.items():
+    if _k.startswith('_'):
+        continue
+    if not _COD.match(_k) or not isinstance(_v, dict):
+        _sm_rele.append((_k, 'cheie sau valoare')); continue
+    if _v.get('v') is not None and not (isinstance(_v['v'], (int, float)) and _v['v'] > 0 and _v.get('val', 'EUR') in _VALUTE):
+        _sm_rele.append((_k, 'suma sau valuta'))
+    if _v.get('extern'):
+        if not _v.get('nota') or len(_v['nota']) > 220:
+            _sm_rele.append((_k, 'nota lipsește sau trece de 220 de caractere (pagina o taie)'))
+        if _v.get('u') and not str(_v['u']).startswith('https://'):
+            _sm_rele.append((_k, 'adresa sursei nu începe cu https://'))
+verifica('sume_manual.json: fiecare cheie e un cod de act, sumele sunt pozitive, în valute cunoscute; sursele externe au notă (≤ 220 de caractere) și adresă https',
+         not _sm_rele, _sm_rele[:5])
+_cm = json.loads((AICI / 'date' / 'contopiri_manual.json').read_text(encoding='utf-8'))
+_cm_rele, _in_muta = [], {}
+for _tip in ('muta', 'uneste'):
+    for _i, _e in enumerate(_cm.get(_tip, [])):
+        if not isinstance(_e.get('acte'), list) or not _e['acte'] or not all(_COD.match(str(c)) for c in _e['acte']):
+            _cm_rele.append((_tip, _i, 'lista de acte')); continue
+        if not str(_e.get('nota', '')).strip():
+            _cm_rele.append((_tip, _i, 'fără notă (de ce se unește/mută)'))
+        if _tip == 'muta':
+            if _e.get('langa') is not None and not _COD.match(str(_e['langa'])):
+                _cm_rele.append((_tip, _i, 'langa'))
+            if _e.get('langa') in _e['acte']:
+                _cm_rele.append((_tip, _i, 'un act nu poate fi mutat lângă el însuși'))
+            for _c in _e['acte']:
+                if _c in _in_muta:
+                    _cm_rele.append((_tip, _i, 'actul %s e mutat de două ori (și în intrarea %d)' % (_c, _in_muta[_c])))
+                _in_muta[_c] = _i
+verifica('contopiri_manual.json: fiecare „muta"/„uneste" are lista de acte, o notă care spune de ce, și niciun act nu e mutat de două ori',
+         not _cm_rele, _cm_rele[:5])
+
+print()
 print('Ordinele: cod provizoriu din Monitor, cod întreg în legis.md')
 verifica('forma comună a codului unui ordin', pagina.forma_ordin('OMMPS147/2026') == 'O147/2026'
          and pagina.forma_ordin('O147/2026') == 'O147/2026' and pagina.forma_ordin('HG147/2026') is None)
@@ -716,6 +756,12 @@ if '--browser' in sys.argv:
                 if _panou:
                     verifica(_nume + ': totalul în euro din coloană = totalul din panoul paginii (%s)' % _info['total'], abs(_suma_eur - _tot_pag) <= _toler, (_suma_eur, _tot_pag, _toler))
                     verifica(_nume + ': numărul rândurilor „da" = numărul din pagină (%d din %d)' % (_in_total_pag, _din_pag), _da == _in_total_pag and len(_rand) == _din_pag, (_da, _in_total_pag, len(_rand), _din_pag))
+                    # tranșele aceluiași program nu sunt dubluri: grantul sectorial japonez a avut câte un schimb de scrisori pe an,
+                    # trei dintre ele de câte 300 mil. yeni (aceeași sumă, aceleași cuvinte în denumire, numai tranșa le deosebește)
+                    _sec = [r for r in _rand if 'ajustările structurale economice' in (r['Denumirea completă'] or '') and 'Japoniei' in (r['Denumirea completă'] or '')]
+                    verifica(_nume + ': granturile sectoriale japoneze (patru tranșe, trei de câte 300 mil. yeni) sunt patru rânduri, toate numărate în total',
+                             len(_sec) == 4 and all(r['Intră în total?'] == 'da' for r in _sec) and sorted(r['Suma'] for r in _sec) == [300000000, 300000000, 300000000, 400000000],
+                             [(r['Acordul'][:40], r['Suma'], r['Intră în total?']) for r in _sec])
                 # pe ambele pagini: rând cu rând, cifrele din fișier sunt cele din datele paginii (window.__ACORDURI__)
                 _gresite = []
                 for _i, (_r, _a) in enumerate(zip(_rand, _A)):
@@ -1161,13 +1207,72 @@ if '--browser' in sys.argv:
     _ext_l = [a for a in _lista_l if a['suma'] and a['suma']['sursa'] == 'extern']
     verifica('registrul legis are acorduri cu suma dintr-o sursă externă, fiecare cu sumă în euro',
              len(_ext_l) >= 20 and all(a['suma']['eur'] and a['suma']['eur'] > 0 for a in _ext_l), len(_ext_l))
-    _mc = next((a for a in _lista_l if a['nume'].strip() == 'Compact'), None)
-    verifica('Compactul MCC: 262 mil. USD, sursă externă, convertit în euro',
-             _mc and _mc['suma']['v'] == 262000000 and _mc['suma']['val'] == 'USD' and _mc['suma']['sursa'] == 'extern' and 150e6 < _mc['suma']['eur'] < 300e6,
-             _mc and _mc['suma'])
+    # Compactul MCC: legea de ratificare și hotărârea de aprobare își scriu altfel titlul („Compact" / „Provocările
+    # Mileniului") și ajungeau pe două rânduri, fiecare numărat în total. Acum sunt un singur rând (date/contopiri_manual.json),
+    # cu suma din textul legii, nu dintr-o sursă externă.
+    _mc = [a for a in _lista_l if any(x['act'] in ('LP125/2010', 'HG677/2009', 'HG499/2010') for x in a['acte'])]
+    verifica('Compactul MCC: un singur rând, cu cele patru acte (hotărârea de inițiere, cea de aprobare, legea, decretul)',
+             len(_mc) == 1 and {x['act'] for x in _mc[0]['acte']} == {'HG677/2009', 'HG499/2010', 'LP125/2010', 'DP391/2010'},
+             [(a['nume'], [x['act'] for x in a['acte']]) for a in _mc])
+    verifica('Compactul MCC: 262 mil. USD din textul legii, convertit în euro',
+             len(_mc) == 1 and _mc[0]['suma'] and _mc[0]['suma']['v'] == 262000000 and _mc[0]['suma']['val'] == 'USD'
+             and _mc[0]['suma']['sursa'] == 'text' and 150e6 < _mc[0]['suma']['eur'] < 300e6, _mc and _mc[0]['suma'])
+    _tamp = [a for a in _lista_l if any(x['act'] == 'LP225/2016' for x in a['acte'])]
+    verifica('TAMP (Banca Mondială): două acorduri ratificate prin aceeași lege, 20 mil. USD, sursă externă, convertit în euro',
+             len(_tamp) == 1 and _tamp[0]['suma'] and _tamp[0]['suma']['v'] == 20000000 and _tamp[0]['suma']['val'] == 'USD'
+             and _tamp[0]['suma']['sursa'] == 'extern' and 10e6 < _tamp[0]['suma']['eur'] < 30e6 and not _tamp[0]['faraTotal'],
+             _tamp and _tamp[0]['suma'])
     _sib = next((a for a in _lista_l if a['nume'].strip() == 'Siemens'), None)
     verifica('creditul german din 1995: 30 mil. DEM din textul legii, nu „extern"',
              _sib and _sib['suma']['v'] == 30000000 and _sib['suma']['val'] == 'DEM' and _sib['suma']['sursa'] == 'text', _sib and _sib['suma'])
+    # A doua verificare a dublurilor (date/contopiri_manual.json): același acord stătea pe două-patru rânduri, fiecare cu suma
+    # numărată în total, iar alte rânduri amestecau actele a două acorduri diferite. Unificările și mutările de mână le îndreaptă.
+    def _rd(*coduri):
+        return [a for a in _lista_l if any(x['act'] in coduri for x in a['acte'])]
+
+    def _ac(a):
+        return {x['act'] for x in a['acte']}
+    _r = _rd('DP1662/2024', 'LP264/2024', 'HG609/2024')
+    verifica('„Deșeuri solide" (BERD, grant 4,34 mil. EUR): decretul DP1662/2024, legea LP264/2024 și hotărârea HG609/2024 stau pe un rând, cu suma numărată o dată',
+             len(_r) == 1 and {'DP1662/2024', 'LP264/2024', 'HG609/2024'} <= _ac(_r[0]) and _r[0]['suma'] and _r[0]['suma']['v'] == 4340000
+             and _r[0]['suma']['val'] == 'EUR', [(a['scurt'], sorted(_ac(a))) for a in _r])
+    _r = _rd('HG226/2017', 'DPRM445/2017', 'LP278/2018')
+    verifica('asistența macrofinanciară UE din 2017 (grant 40 mil. EUR): hotărârea de inițiere și decretul stau pe un rând, cu suma din textul acordului ratificat',
+             len(_r) == 1 and {'HG226/2017', 'DPRM445/2017', 'LP278/2018'} <= _ac(_r[0]) and _r[0]['suma'] and _r[0]['suma']['v'] == 40000000
+             and _r[0]['suma']['sursa'] == 'acord', [(a['scurt'], a['suma']) for a in _r])
+    _r = _rd('HP543/1995', 'HG307/1995', 'HP1423/1997', 'HG1099/1997')
+    verifica('Siemens (1995): hotărârile din 1995 și 1997 și legile stau pe un singur rând', len(_r) == 1 and len(_r[0]['acte']) == 4, [sorted(_ac(a)) for a in _r])
+    _eib, _d4 = _rd('HG1030/2007'), _rd('HG372/2021')
+    verifica('BEI „Drumuri europene în Moldova" (2007, 30 mil. EUR, sursă externă) și „Moldova drumuri IV" (2022, 150 mil. EUR) sunt rânduri diferite, fiecare cu suma lui',
+             len(_eib) == 1 and len(_d4) == 1 and _eib[0]['id'] != _d4[0]['id'] and _eib[0]['suma'] and _d4[0]['suma']
+             and (_eib[0]['suma']['v'], _eib[0]['suma']['sursa']) == (30000000, 'extern') and _d4[0]['suma']['v'] == 150000000
+             and not ({'HG1030/2007', 'LP217/2007', 'DPRM1350/2007'} & _ac(_d4[0])) and _d4[0]['scurt'] == 'Moldova drumuri IV',
+             [(a['scurt'], a['suma'], sorted(_ac(a))) for a in _eib + _d4])
+    _jp = [_rd(c) for c in ('HG28/2007', 'HG233/2008', 'HG406/2009', 'HG103/2012')]
+    verifica('Japonia, fermierii neprivilegiați (2KR): fiecare tranșă anuală e un rând (schimb de note separat), cu suma ei în yeni',
+             all(len(x) == 1 for x in _jp) and len({x[0]['id'] for x in _jp}) == 4 and all(x[0]['suma'] and x[0]['suma']['val'] == 'JPY' for x in _jp)
+             and [x[0]['suma']['v'] for x in _jp] == [230000000, 200000000, 160000000, 130000000], [(x[0]['scurt'], x[0]['suma']) for x in _jp if x])
+    _tacis, _rural = _rd('HG824/2012', 'HG1421/2016'), _rd('HG852/2012', 'HG9/2014')
+    verifica('TACIS 2006 și programul pentru zonele rurale: addendumurile nr. 2 și 3 la TACIS stau pe rândul TACIS, cele la programul rural pe alt rând, cu denumire citibilă',
+             len(_tacis) == 1 and _ac(_tacis[0]) == {'HG824/2012', 'HG1421/2016'} and 'TACIS' in _tacis[0]['nume']
+             and len(_rural) == 1 and _ac(_rural[0]) == {'HG852/2012', 'HG9/2014'} and 'zonelor rurale' in _rural[0]['nume'] and _rural[0]['scurt'] != 'Addendumul nr',
+             [(a['scurt'], sorted(_ac(a))) for a in _tacis + _rural])
+    _ap, _apd = _rd('HP119/1998'), _rd('HG1450/2008', 'HG164/2009')
+    verifica('aeroportul Chișinău: creditul BERD din 1998 (9 mil. USD) și acordul direct BERD–BEI din 2008–2009 sunt rânduri diferite',
+             len(_ap) == 1 and len(_apd) == 1 and _ap[0]['id'] != _apd[0]['id'] and _ap[0]['suma'] and _ap[0]['suma']['v'] == 9000000 and not _apd[0]['suma'],
+             [(a['scurt'], a['suma']) for a in _ap + _apd])
+    _c3, _c2 = _rd('HG846/2002', 'LP1175/2002'), _rd('HP551/1999')
+    verifica('creditul trei pentru ajustări structurale (2002): hotărârea și legea pe un rând; creditul din 1999 (29,6 mil. DST) e alt rând',
+             len(_c3) == 1 and len(_c2) == 1 and _c3[0]['id'] != _c2[0]['id'] and {'HG846/2002', 'LP1175/2002'} <= _ac(_c3[0])
+             and _c3[0]['suma']['v'] == 24100000 and _c2[0]['suma']['v'] == 29600000, [(a['scurt'], a['suma']) for a in _c3 + _c2])
+    _cbm, _cbm2 = _rd('HG8/2012'), _rd('HG10/2014')
+    verifica('Măsuri de Consolidare a Încrederii: programul din 2011 (12 mil. EUR, sursă externă) și cel din 2013 (semnat în 2014) sunt rânduri diferite',
+             len(_cbm) == 1 and len(_cbm2) == 1 and _cbm[0]['id'] != _cbm2[0]['id'] and _ac(_cbm[0]) == {'HG8/2012'} and _cbm[0]['suma']['v'] == 12000000
+             and not _cbm2[0]['suma'], [(a['scurt'], a['suma']) for a in _cbm + _cbm2])
+    _ita = _rd('HG683/2024')
+    verifica('InfoTrustAlliance Moldova (ITA-M): cooperare tehnică, nu grant; bugetul de 1,5 mil. EUR se vede pe rând, dar „nu se adună" (sursele dau alte cifre)',
+             len(_ita) == 1 and _ita[0]['categorie'] == 'Asistență tehnică' and _ita[0]['suma'] and _ita[0]['suma']['v'] == 1500000
+             and _ita[0]['suma']['val'] == 'EUR' and _ita[0]['faraTotal'] is True, [(a['categorie'], a['suma'], a['faraTotal']) for a in _ita])
     _mon2, _ = lga.citeste_acorduri(pagina='acorduri.html')
     _ui = next((a for a in _mon2 if a['nume'].strip() == 'Sprijin pentru integrarea în UE'), None)
     verifica('registrul Monitor: „Sprijin pentru integrarea în UE" = 25 mil. EUR, sursă externă',
@@ -1195,7 +1300,7 @@ if '--browser' in sys.argv:
         with sync_playwright() as _p:
             _b = _p.chromium.launch()
             for _pagina, _cauta, _gazda in (('acorduri.html', 'Sprijin pentru integrarea în UE', 'enlargement.ec.europa.eu'),
-                                            ('legis_acorduri.html', 'Compact', 'assets.mcc.gov')):
+                                            ('legis_acorduri.html', 'TAMP', 'worldbank.org')):
                 _pg = _b.new_page()
                 _erori = []
                 _pg.on('pageerror', lambda e: _erori.append(str(e)[:200]))

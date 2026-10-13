@@ -325,8 +325,8 @@
           '. An amendment that increases an agreement may still appear as a separate row. The type is the one on the row: grant (non-reimbursable), ' +
           'loan or credit (reimbursable), or technical assistance; "financial assistance" appears only for agreements that neither the title nor the funder settles.' + (n ? ' No exchange rate, so not added up: ' + n.replace(/ în /g, ' in ') + '.' : ''); }],
     // categoria și partenerul scrise sub denumirea acordului („Împrumut · AID")
-    [/^(Grant|Împrumut|Asistență tehnică|Asistență financiară) · (.+)$/, function(m, c, pa){
-      return EXACT[c] + ' · ' + pa.split(' / ').map(function(x){ return EXACT[x] || x; }).join(' / '); }],
+    [/^(Grant|Împrumut|Asistență tehnică|Asistență financiară) · (.+?)( · finanțare suplimentară)?$/, function(m, c, pa, sup){
+      return EXACT[c] + ' · ' + pa.split(' / ').map(function(x){ return EXACT[x] || x; }).join(' / ') + (sup ? ' · additional financing' : ''); }],
     // ---- HG 246, după încărcarea anexei
     [/^Document citit: (\d+) proiecte în anexă\.$/, 'Document read: $1 projects in the annex.'],
     [/^din (\d+) expirate$/, 'of $1 expired'],
