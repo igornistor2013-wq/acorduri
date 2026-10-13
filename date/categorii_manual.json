@@ -24,5 +24,10 @@
   "categorie": "Grant",
   "motiv": "Acordul de colaborare dintre IP Organizația pentru Dezvoltarea Antreprenoriatului și PNUD (proiectul „Comunități reziliente prin abilitarea femeilor”): nota Cancelariei de Stat spune că „PNUD va acorda asistență externă nerambursabilă (sub formă de grant)”. Titlul hotărârii nu spune dacă banii se rambursează, de aceea regula automată îl pune la asistență tehnică. Aceeași decizie pentru Ordinul O147/2026 (intrarea în vigoare a acordului): cu două categorii, acordul ar apărea pe două rânduri.",
   "sursa": "Nota Cancelariei de Stat nr. CS-2684-25-78-1755 din 15.07.2026 către Ministerul Dezvoltării Economice și Digitalizării (document oficial, nepublicat online). Proiectul de hotărâre: ședința Guvernului din 5 august 2026, număr unic 713/MDED/2026."
+ },
+ "HG683/2024": {
+  "categorie": "Asistență tehnică",
+  "motiv": "Înțelegere prin schimb de note pentru implementarea comună a proiectului ITA-M (consolidarea rezilienței sociale împotriva dezinformării), finanțat de Ministerul Federal de Externe al Germaniei și implementat de GIZ. Pagina GIZ Moldova îl trece la „tip de asistență: tehnică”, iar HG 409/2025 numește același proiect „cooperare tehnică pentru finanțarea proiectelor”. Titlul hotărârii din 2024 nu spune dacă banii se rambursează, iar regula automată îl pusese la grant, după finanțator.",
+  "sursa": "https://giz.rts.md/en/projects/infotrustalliance-moldova-ita-m"
  }
 }

@@ -1,0 +1,730 @@
+{
+ "_cum_se_foloseste": "Unificări făcute de mână ale rândurilor din registru. Regula automată de grupare nu potrivește titlurile scrise diferit la fiecare etapă (hotărârea de inițiere a negocierilor, hotărârea pentru proiectul de lege, legea), iar actele finanțării suplimentare seamănă cu ale acordului de bază: același acord apărea pe două-trei rânduri. „uneste”: rândurile care conțin actele listate (coduri ca în registru, ex. LP148/2025) devin un singur rând, cu denumirea rândului primului act găsit; „nume” (opțional) schimbă denumirea; cu un singur act în listă, „uneste” doar redenumește rândul. „muta”: actele listate trec pe rândul care conține actul „langa” (sau pe un rând nou, dacă „langa” lipsește). Se aplică întâi „muta”, apoi „uneste”. Un act care nu mai e în registru e sărit; „nota” spune de ce.",
+ "muta": [
+  {
+   "acte": [
+    "LP58/2010",
+    "DP242/2010"
+   ],
+   "langa": "HG849/2009",
+   "nota": "Legea și decretul privesc a doua finanțare suplimentară SIF II (12,5 mil. DST, semnată la 22.02.2010), nu creditul din 2004 (13,8 mil. DST)."
+  },
+  {
+   "acte": [
+    "HG119/2009"
+   ],
+   "langa": "LP21/2009",
+   "nota": "Inițierea negocierilor din februarie 2009 privește prima finanțare suplimentară SIF II (3,4 mil. DST, semnată la 04.05.2009)."
+  },
+  {
+   "acte": [
+    "DP135/2017"
+   ],
+   "langa": "LP89/2013",
+   "nota": "Decretul privește amendamentul nr. 2 la acordul din 2013, nu finanțarea adițională din 2018."
+  },
+  {
+   "acte": [
+    "LP22/2009",
+    "DPRM2252/2009"
+   ],
+   "langa": "HG1300/2008",
+   "nota": "Legea și decretul ratifică finanțarea suplimentară a Proiectului Energetic II (6,7 mil. DST), nu creditul din 2003."
+  },
+  {
+   "acte": [
+    "AMAEIE144/2016"
+   ],
+   "langa": "LP182/2012",
+   "nota": "Acordul-cadru CEB din 16.06.2012 (13,4 mil. EUR) e cel pentru locuințe sociale II, nu cel din 2025 pentru școlile-model."
+  },
+  {
+   "acte": [
+    "HP119/1998"
+   ],
+   "nota": "Împrumutul BERD din 1998 către Î.S. Aeroportul Internațional Chișinău (9 mil. USD) e alt acord decât Acordul direct BERD–BEI din 2008."
+  },
+  {
+   "acte": [
+    "HG846/2002"
+   ],
+   "langa": "LP1175/2002",
+   "nota": "Hotărârea din 26.06.2002 aprobă proiectul legii de ratificare a Creditului trei pentru ajustări structurale (legea din 27.06.2002), nu creditul din 1999."
+  },
+  {
+   "acte": [
+    "DPRM1350/2007",
+    "LP217/2007",
+    "HG1030/2007"
+   ],
+   "nota": "BEI, „Drumuri europene în Moldova” (semnat la 28.06.2007): alt acord decât contractul „Moldova drumuri IV” din 2022."
+  },
+  {
+   "acte": [
+    "HG8/2012"
+   ],
+   "nota": "UE, Măsuri de Consolidare a Încrederii din programul de acțiune 2011 (ENPI/2011/22516): altul decât acordul din 2014 (PNA 2013) la care se referă celelalte acte."
+  },
+  {
+   "acte": [
+    "HG1436/2002"
+   ],
+   "nota": "Japonia, 2KR „Îmbunătățirea Producției Alimentare”, tranșa a doua (2001): altă tranșă decât a treia, din septembrie 2002."
+  },
+  {
+   "acte": [
+    "HG28/2007"
+   ],
+   "nota": "Japonia, ajutor pentru fermierii neprivilegiați (2KR) din 2007: fiecare tranșă anuală e un acord separat (schimb de note din 11.01.2007)."
+  },
+  {
+   "acte": [
+    "HG233/2008"
+   ],
+   "nota": "Japonia, ajutor pentru fermierii neprivilegiați (2KR) din 2008: acord separat (schimb de note din 05.03.2008)."
+  },
+  {
+   "acte": [
+    "HG406/2009"
+   ],
+   "nota": "Japonia, ajutor pentru fermierii neprivilegiați (2KR) din 2009: acord separat (schimb de note din 07.10.2009)."
+  },
+  {
+   "acte": [
+    "HG824/2012"
+   ],
+   "langa": "HG1421/2016",
+   "nota": "UE, Programul Regional de Acțiuni TACIS 2006 (acord din 30.10.2006): addendumul nr. 2 aparține aceluiași acord ca addendumul nr. 3, nu programului pentru zonele rurale."
+  }
+ ],
+ "uneste": [
+  {
+   "acte": [
+    "LP148/2025",
+    "HG183/2025"
+   ],
+   "nota": "BIRD, Învățământul superior (finanțare suplimentară, 30 mil. EUR): hotărârea de inițiere a negocierilor e a aceluiași acord."
+  },
+  {
+   "acte": [
+    "LP67/2025",
+    "HG526/2024"
+   ],
+   "nota": "BIRD, managementul riscurilor de dezastre (37,4 mil. EUR): inițierea negocierilor și aprobarea proiectului de lege sunt ale aceluiași acord."
+  },
+  {
+   "acte": [
+    "LP251/2024",
+    "HG348/2024"
+   ],
+   "nota": "BIRD, STEEM (46,7 mil. EUR): inițierea negocierilor și semnarea sunt ale aceluiași acord ca legea de ratificare."
+  },
+  {
+   "acte": [
+    "LP240/2018",
+    "DP793/2018"
+   ],
+   "nota": "AID, înregistrare și evaluare funciară (30,1 mil. EUR): decretul de inițiere și hotărârea de aprobare a proiectului de lege."
+  },
+  {
+   "acte": [
+    "LP68/2020",
+    "DP1541/2020"
+   ],
+   "nota": "AID, Răspuns de urgență la COVID-19 (52,9 mil. EUR): inițierea negocierilor și aprobarea proiectului de lege."
+  },
+  {
+   "acte": [
+    "LP225/2016",
+    "HG421/2019",
+    "DP1307/2019",
+    "DPRM2050/2016"
+   ],
+   "nota": "TAMP (acordul AID și împrumutul BIRD, o singură lege): hotărârile pentru amendamentele nr. 1-3, decretul de promulgare din 2019 și inițierea negocierilor din 2016."
+  },
+  {
+   "acte": [
+    "LP191/2013",
+    "HG167/2021",
+    "HG1090/2016"
+   ],
+   "nota": "BERD, construcția și reabilitarea drumurilor (acordul din 2013): hotărârile pentru acordurile de modificare nr. 1 și nr. 2."
+  },
+  {
+   "acte": [
+    "LP155/2016",
+    "DPRM1762/2015"
+   ],
+   "nota": "AID, Îmbunătățirea drumurilor locale (57 mil. DST): decretul de inițiere a negocierilor din 2015."
+  },
+  {
+   "acte": [
+    "LP166/2014",
+    "HG575/2014"
+   ],
+   "nota": "PAC II, creditul BIRD (30 mil. USD): hotărârile pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP165/2014",
+    "HG574/2014"
+   ],
+   "nota": "PAC II, finanțarea AID (9,7 mil. DST): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP72/2014",
+    "HG219/2014"
+   ],
+   "nota": "PAC II, grantul TF016060 (495 500 USD): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP179/2019",
+    "DP1106/2019"
+   ],
+   "nota": "Sistemul electroenergetic, creditul AID de 47,9 mil. EUR (55 mil. USD la negociere): decretul de inițiere a negocierilor."
+  },
+  {
+   "acte": [
+    "LP177/2019",
+    "DP1107/2019"
+   ],
+   "nota": "Sistemul electroenergetic, creditul AID de 13,1 mil. EUR (15 mil. USD la negociere): decretul de inițiere a negocierilor."
+  },
+  {
+   "acte": [
+    "LP88/2018",
+    "DPRM510/2017"
+   ],
+   "nota": "AID, Reforma învățământului, finanțare adițională (7,1 mil. DST): inițierea negocierilor și hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP138/2017",
+    "DPRM2413/2016"
+   ],
+   "nota": "FIDA, Proiectul de reziliență rurală (IFAD VII): inițierea negocierilor și hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP89/2013",
+    "HG405/2017",
+    "HG189/2013",
+    "HG889/2012"
+   ],
+   "nota": "AID, Reforma învățământului (26,1 mil. DST): inițierea negocierilor, hotărârile pentru proiectele de lege (acordul și amendamentul nr. 2)."
+  },
+  {
+   "acte": [
+    "LP225/2010",
+    "HG329/2010"
+   ],
+   "nota": "AID, politici de dezvoltare pentru recuperarea economică (16,6 mil. DST): inițierea negocierilor."
+  },
+  {
+   "acte": [
+    "LP27/2010",
+    "HG39/2010",
+    "HG424/2009"
+   ],
+   "nota": "AID, Ameliorarea competitivității, finanțare suplimentară (15,4 mil. DST): inițierea negocierilor și hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP21/2009",
+    "HG364/2009"
+   ],
+   "nota": "AID, Fondul de Investiții Sociale II, prima finanțare suplimentară (3,4 mil. DST): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP18/2009",
+    "HG230/2009"
+   ],
+   "nota": "AID, RISP II, finanțare suplimentară (6,8 mil. DST): inițierea negocierilor."
+  },
+  {
+   "acte": [
+    "LP150/2008",
+    "HG716/2008",
+    "HG651/2008"
+   ],
+   "nota": "AID, al doilea credit pentru reducerea sărăciei (6,1 mil. DST): hotărârea pentru proiectul de lege și inițierea negocierilor."
+  },
+  {
+   "acte": [
+    "LP161/2001",
+    "HG1108/2000",
+    "HCC26/2008"
+   ],
+   "nota": "AID, Fondul de Investiții în Sănătate (7,6 mil. DST): hotărârea pentru proiectul de lege din 2000 și raportul de control al Curții de Conturi."
+  },
+  {
+   "acte": [
+    "LP32/2007",
+    "HG84/2007"
+   ],
+   "nota": "AID, primul credit pentru reducerea sărăciei (6,8 mil. DST): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP301/2003",
+    "HG735/2004"
+   ],
+   "nota": "AID, creditul nr. 3783-MD, Facilitarea comerțului și transportului în Europa de Sud-Est (5,3 mil. DST): hotărârea de implementare."
+  },
+  {
+   "acte": [
+    "LP272/2012",
+    "HG832/2012",
+    "HG684/2012"
+   ],
+   "nota": "AID, Programul de creștere a competitivității (30 mil. USD): inițierea negocierilor și hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP108/2011",
+    "HG317/2011"
+   ],
+   "nota": "FIDA, servicii financiare rurale și businessul agricol (12,72 mil. DST): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP282/2008",
+    "HG969/2008"
+   ],
+   "nota": "FIDA, Servicii financiare rurale și marketing (8,44 mil. DST): inițierea negocierilor."
+  },
+  {
+   "acte": [
+    "LP45/2015",
+    "DPRM1259/2014"
+   ],
+   "nota": "FIDA, IRECR, grantul danez: decretul de inițiere a negocierilor și aprobare a semnării."
+  },
+  {
+   "acte": [
+    "HP974/1996",
+    "HG306/1996",
+    "HG206/2001"
+   ],
+   "nota": "BIRD, primul proiect agricol (10 mil. USD): hotărârea din 1996 despre împrumut și hotărârea din 2001 despre rambursare."
+  },
+  {
+   "acte": [
+    "HP880/1996",
+    "DPRM345/1995"
+   ],
+   "nota": "BIRD, dezvoltarea sectorului privat (35 mil. USD): decretul din 1995 pentru negociere și semnare."
+  },
+  {
+   "acte": [
+    "HP513/1995",
+    "HG380/1995"
+   ],
+   "nota": "BIRD, facilitatea de garanții la preexport (30 mil. USD): hotărârea pentru proiectul de hotărâre a Parlamentului."
+  },
+  {
+   "acte": [
+    "LP120/2014",
+    "DPRM1248/2014",
+    "DPRM1025/2014"
+   ],
+   "nota": "BIRD, grantul TF015873 (CDCF Plus, 170 000 USD): decretul de promulgare și decretul de inițiere a negocierilor."
+  },
+  {
+   "acte": [
+    "LP44/2015",
+    "HG552/2014"
+   ],
+   "nota": "AID, TAMP, grantul TF017415 (300 000 USD): hotărârile pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP148/2015",
+    "HG800/2014"
+   ],
+   "nota": "BIRD, eficiența alimentării cu energie termică (40,5 mil. USD): inițierea negocierilor și hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP295/2013",
+    "HG625/2013"
+   ],
+   "nota": "CEB, penitenciarul din Chișinău (49 mil. EUR cu amendamentele): inițierea negocierilor și hotărârile pentru proiectele de lege."
+  },
+  {
+   "acte": [
+    "LP279/2022",
+    "DP659/2022"
+   ],
+   "nota": "CEB, servicii de sănătate pentru persoanele afectate de criza din Ucraina (grant 900 000 EUR): decretul de promulgare."
+  },
+  {
+   "acte": [
+    "LP22/2015",
+    "HG982/2014"
+   ],
+   "nota": "BERD, achiziția locomotivelor (76 mil. EUR cu amendamentele): hotărârile pentru proiectele de lege."
+  },
+  {
+   "acte": [
+    "LP79/2011",
+    "HG160/2011"
+   ],
+   "nota": "BEI, reabilitarea drumurilor (75 mil. EUR): hotărârile pentru proiectele de lege (contractul și amendamentele nr. 1-3)."
+  },
+  {
+   "acte": [
+    "LP77/2011",
+    "HG161/2011"
+   ],
+   "nota": "BERD, reabilitarea drumurilor (75 mil. EUR): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP203/2010",
+    "HG480/2010"
+   ],
+   "nota": "BERD, aprovizionarea cu apă potabilă (10 mil. EUR): hotărârea de împuternicire pentru semnare."
+  },
+  {
+   "acte": [
+    "LP182/2012",
+    "HG46/2012"
+   ],
+   "nota": "CEB, locuințe pentru păturile vulnerabile II (13,4 mil. EUR): inițierea negocierilor și hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP298/2016",
+    "HG1272/2016",
+    "HG1079/2016"
+   ],
+   "nota": "BEI, infrastructura feroviară și materialul rulant (50 mil. EUR): hotărârile de semnare și de aprobare a proiectului de lege pentru același contract."
+  },
+  {
+   "acte": [
+    "HG444/2014",
+    "LP128/2015"
+   ],
+   "nota": "BERD, alimentarea cu apă în regiunea Nord (10 mil. EUR): inițierea negocierilor, semnarea și ratificarea împrumutului."
+  },
+  {
+   "acte": [
+    "LP129/2015",
+    "HG750/2014"
+   ],
+   "nota": "BEI, alimentarea cu apă în regiunea Nord (10 mil. EUR): hotărârile pentru proiectele de lege privind contractul de finanțare."
+  },
+  {
+   "acte": [
+    "LP43/2016",
+    "HG176/2016",
+    "DPRM181/2017"
+   ],
+   "nota": "BERD, restructurarea căilor ferate, grantul din Fondul de Investiții pentru Vecinătate (NIF): hotărârea pentru proiectul de lege și amendamentul din 2017."
+  },
+  {
+   "acte": [
+    "LP17/2016",
+    "HG115/2016"
+   ],
+   "nota": "BERD, restructurarea căilor ferate, grantul din Fondul Special BERD: hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP190/2015",
+    "HG761/2015"
+   ],
+   "nota": "BERD, Proiectul IV de reabilitare a drumurilor (grant 15 mil. EUR): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP163/2016",
+    "DPRM1952/2016"
+   ],
+   "nota": "BERD, CET-Nord (grant 3 mil. EUR): decretul de inițiere a negocierilor și aprobare a semnării."
+  },
+  {
+   "acte": [
+    "LP179/2012",
+    "HG480/2012"
+   ],
+   "nota": "BEI, Moldelectrica (17 mil. EUR): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP180/2012",
+    "HG481/2012"
+   ],
+   "nota": "BERD, Moldelectrica (20 mil. USD): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP77/2005",
+    "HG252/2005"
+   ],
+   "nota": "CEB, acordul-cadru din 2005 (ambulanțe, 6 mil. EUR): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "HG345/2000",
+    "HG1207/2000"
+   ],
+   "nota": "Export Credit Bank (Turcia), a doua tranșă (23 mil. USD): hotărârile de negociere."
+  },
+  {
+   "acte": [
+    "HP1294/1997",
+    "HG912/1998",
+    "HG408/1998"
+   ],
+   "nota": "Export Credit Bank (Turcia), aprovizionarea cu apă potabilă a sudului (15 mil. USD): hotărârile de executare și de utilizare a împrumutului."
+  },
+  {
+   "acte": [
+    "LP180/2021",
+    "HG909/2020"
+   ],
+   "nota": "IFC, Reforma climatului investițional (3,8 mil. USD): inițierea negocierilor, semnarea și hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP184/2015",
+    "HG678/2015"
+   ],
+   "nota": "România, asistența financiară rambursabilă (150 mil. EUR): hotărârea de inițiere a negocierilor."
+  },
+  {
+   "acte": [
+    "LP134/2014",
+    "HG230/2014"
+   ],
+   "nota": "Polonia, creditul de asistență (100 mil. EUR): hotărârea de inițiere a negocierilor, semnată la Varșovia la 14 mai 2014."
+  },
+  {
+   "acte": [
+    "LP135/2014",
+    "HG8/2014"
+   ],
+   "nota": "UE, programul-cadru de suport (Planul național de acțiuni 2013, 26 mil. EUR): inițierea negocierilor și semnarea."
+  },
+  {
+   "acte": [
+    "LP176/2012",
+    "HG416/2012"
+   ],
+   "nota": "AID, Agricultura competitivă: hotărârea pentru proiectul de lege privind acordul semnat la 28 mai 2012."
+  },
+  {
+   "acte": [
+    "LP125/2010",
+    "HG499/2010"
+   ],
+   "nota": "SUA (MCC), Compact (262 mil. USD): hotărârile pentru proiectul de lege și rezultatele negocierilor."
+  },
+  {
+   "acte": [
+    "LP400/2004",
+    "HG1229/2004"
+   ],
+   "nota": "KfW, Fondul de Investiții Sociale (4,65 mil. EUR): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "LP1442/2002",
+    "HG1173/2002"
+   ],
+   "nota": "KfW, Micro Enterprise Credit (2,3 mil. EUR): hotărârea pentru proiectul de lege."
+  },
+  {
+   "acte": [
+    "DPRM654/2002",
+    "HP1013/2002"
+   ],
+   "nota": "KfW, Südzucker-Moldova (10 mil. DEM): hotărârea Parlamentului asupra proiectului de lege."
+  },
+  {
+   "acte": [
+    "HP543/1995",
+    "HP1423/1997",
+    "HG1099/1997",
+    "HG307/1995"
+   ],
+   "nota": "Împrumutul din 1995 pentru tehnică medicală (30 mil. DEM; Siemens, apoi KfW): hotărârile din 1995 și 1997 aprobă și modifică același acord."
+  },
+  {
+   "acte": [
+    "LP246/2013",
+    "HG963/2012"
+   ],
+   "nota": "UE, programul-cadru de suport al acordurilor (PNA 2012, 30 mil. EUR): hotărârile pentru negocieri și addendumurile 1–3 sunt ale aceluiași acord."
+  },
+  {
+   "acte": [
+    "LP264/2024",
+    "DP1662/2024"
+   ],
+   "nota": "BERD, grantul pentru deșeuri solide (4,34 mil. EUR): decretul DP1662/2024 promulgă LP264/2024 și numește greșit banca (BIRD)."
+  },
+  {
+   "acte": [
+    "LP14/2011",
+    "HG212/2010"
+   ],
+   "nota": "România, programul de asistență de 100 mil. EUR: DP37/2011 promulgă LP14/2011, iar HG212/2010 inițiază negocierile aceluiași acord."
+  },
+  {
+   "acte": [
+    "HG885/2014",
+    "HG646/2017"
+   ],
+   "nota": "UE, suportul pentru Zona de Liber Schimb (30 mil. EUR, semnat la 06.11.2014): amendamentul din 2017 modifică același acord."
+  },
+  {
+   "acte": [
+    "HG336/2009",
+    "DP228/2012"
+   ],
+   "nota": "UE, Programul Operațional Comun Marea Neagră 2007–2013: amendamentul din 2012 la același acord de finanțare."
+  },
+  {
+   "acte": [
+    "HG46/2009",
+    "DP229/2012"
+   ],
+   "nota": "UE, Programul Operațional Comun România–Ucraina–Moldova 2007–2013: amendamentele din 2012 și 2016 la același acord."
+  },
+  {
+   "acte": [
+    "HG852/2012",
+    "HG9/2014"
+   ],
+   "nume": "Acordul de finanţare dintre Guvernul Republicii Moldova şi Uniunea Europeană cu privire la Programul de suport al politicilor sectoriale în domeniul stimulării economice a zonelor rurale",
+   "nota": "UE, suportul politicilor sectoriale pentru stimularea economică a zonelor rurale (acord din 26.11.2010): addendumurile nr. 1 și nr. 2."
+  },
+  {
+   "acte": [
+    "HG873/2011",
+    "HG744/2014"
+   ],
+   "nota": "UE, programul de suport al politicilor sectoriale în domeniul apei (acord din 13.08.2009): amendamentele nr. 1 și nr. 2."
+  },
+  {
+   "acte": [
+    "LP332/2004",
+    "HG858/2003"
+   ],
+   "nota": "Danemarca, memorandumul privind mecanismul dezvoltării nepoluante (Kyoto): inițierea negocierilor din 2003 și legea din 2004."
+  },
+  {
+   "acte": [
+    "HG682/2012",
+    "HG340/2019"
+   ],
+   "nota": "SUA (USAID), susținerea autorităților publice locale (acord din 17.09.2010): amendamentul II din 2012 ține de același acord ca amendamentele III–IX."
+  },
+  {
+   "acte": [
+    "DPRM445/2017",
+    "HG226/2017"
+   ],
+   "nota": "UE, asistența macrofinanciară 2017 (grant 40 mil. EUR): hotărârea din aprilie 2017 inițiază negocierile pachetului; era deja numărată ca dublură a grantului."
+  },
+  {
+   "acte": [
+    "HG1450/2008",
+    "HG164/2009"
+   ],
+   "nota": "BERD și BEI, Acordul direct pentru Aeroportul Internațional Chișinău (semnat la 18.12.2008): inițierea negocierilor și aprobarea."
+  },
+  {
+   "acte": [
+    "HG28/2007"
+   ],
+   "nume": "Acordul de grant, prin schimb de note, între Guvernul Republicii Moldova şi Guvernul Japoniei referitor la extinderea Proiectului de asistenţă tehnică pentru fermierii neprivilegiaţi (2KR), schimbul de note din 2007",
+   "nota": "Doar denumirea: fiecare tranșă 2KR e un acord separat (câte un schimb de note pe an); în titlul hotărârii era și numele ministrului căruia i se dădeau depline puteri."
+  },
+  {
+   "acte": [
+    "HG233/2008"
+   ],
+   "nume": "Acordul de grant, prin schimb de note, între Guvernul Republicii Moldova şi Guvernul Japoniei referitor la extinderea Proiectului de asistenţă tehnică pentru fermierii neprivilegiaţi (2KR), schimbul de note din 2008",
+   "nota": "Doar denumirea: fiecare tranșă 2KR e un acord separat (câte un schimb de note pe an); în titlul hotărârii era și numele ministrului căruia i se dădeau depline puteri."
+  },
+  {
+   "acte": [
+    "HG406/2009"
+   ],
+   "nume": "Acordul de grant, prin schimb de note, între Guvernul Republicii Moldova şi Guvernul Japoniei referitor la extinderea Proiectului de asistenţă tehnică pentru fermierii neprivilegiaţi (2KR), schimbul de note din 2009",
+   "nota": "Doar denumirea: fiecare tranșă 2KR e un acord separat (câte un schimb de note pe an); în titlul hotărârii era și numele ministrului căruia i se dădeau depline puteri."
+  },
+  {
+   "acte": [
+    "HG103/2012"
+   ],
+   "nume": "Acordul de grant, prin schimb de note, între Guvernul Republicii Moldova şi Guvernul Japoniei referitor la extinderea Proiectului de asistenţă tehnică pentru fermierii neprivilegiaţi (2KR), schimbul de note din 2012",
+   "nota": "Doar denumirea: fiecare tranșă 2KR e un acord separat (câte un schimb de note pe an); în titlul hotărârii era și numele ministrului căruia i se dădeau depline puteri."
+  },
+  {
+   "acte": [
+    "HG1436/2002"
+   ],
+   "nume": "Acordul, prin schimb de scrisori, între Guvernul Republicii Moldova şi Guvernul Japoniei pentru acordarea grantului în cadrul Programului „Îmbunătăţirea Producţiei Alimentare (2KR), tranşa a doua”",
+   "nota": "Doar denumirea: tranșa a doua și tranșa a treia (HG1150/2002) sunt acorduri separate, cu același nume de program."
+  },
+  {
+   "acte": [
+    "HG1150/2002"
+   ],
+   "nume": "Acordul, prin schimb de scrisori, între Guvernul Republicii Moldova şi Guvernul Japoniei pentru acordarea grantului în cadrul Programului „Îmbunătăţirea Producţiei Alimentare (2KR), tranşa a treia”",
+   "nota": "Doar denumirea: tranșa a treia (schimb de note din 5.09.2002); tranșa a doua e HG1436/2002."
+  },
+  {
+   "acte": [
+    "DPRM1350/2007",
+    "LP217/2007",
+    "HG1030/2007"
+   ],
+   "nume": "Acordul de finanţare între Republica Moldova şi Banca Europeană de Investiţii (Proiectul „Drumuri europene în Moldova”), semnat la Chişinău la 28 iunie 2007",
+   "nota": "Doar denumirea (titlul hotărârii avea o paranteză în plus)."
+  },
+  {
+   "acte": [
+    "HG8/2012"
+   ],
+   "nume": "Acordul de finanţare dintre Guvernul Republicii Moldova şi Uniunea Europeană privind Programul „Măsuri de Consolidare a Încrederii (programul anual de acţiune 2011)”",
+   "nota": "Doar denumirea: titlul hotărârii nu avea ghilimeaua de închidere; programul din 2011 e distinct de cel din 2013 (semnat în 2014)."
+  },
+  {
+   "acte": [
+    "HG246/2005"
+   ],
+   "nume": "Acordul, întocmit prin schimb de scrisori, între Guvernul Republicii Moldova şi Guvernul Japoniei privind acordarea grantului pentru „Promovarea eforturilor privind ajustările structurale economice (2005)”",
+   "nota": "Doar denumirea: patru tranșe ale aceluiași program (câte un schimb de scrisori pe an) arătau la fel în listă, deosebindu-se doar prin coada titlului, tăiată pe ecran."
+  },
+  {
+   "acte": [
+    "HG230/2006"
+   ],
+   "nume": "Acordul, întocmit prin schimb de scrisori, între Guvernul Republicii Moldova şi Guvernul Japoniei privind acordarea grantului pentru „Promovarea eforturilor privind ajustările structurale economice, tranşa II (2006)”",
+   "nota": "Doar denumirea: patru tranșe ale aceluiași program (câte un schimb de scrisori pe an) arătau la fel în listă, deosebindu-se doar prin coada titlului, tăiată pe ecran."
+  },
+  {
+   "acte": [
+    "HG2501/2007"
+   ],
+   "nume": "Acordul, întocmit prin schimb de scrisori, între Guvernul Republicii Moldova şi Guvernul Japoniei privind acordarea grantului pentru „Promovarea eforturilor privind ajustările structurale economice, tranşa a treia (2007)”",
+   "nota": "Doar denumirea: patru tranșe ale aceluiași program (câte un schimb de scrisori pe an) arătau la fel în listă, deosebindu-se doar prin coada titlului, tăiată pe ecran."
+  },
+  {
+   "acte": [
+    "HG232/2008"
+   ],
+   "nume": "Acordul, întocmit prin schimb de scrisori, între Guvernul Republicii Moldova şi Guvernul Japoniei privind acordarea grantului pentru „Promovarea eforturilor privind ajustările structurale economice, tranşa IV (2008)”",
+   "nota": "Doar denumirea: patru tranșe ale aceluiași program (câte un schimb de scrisori pe an) arătau la fel în listă, deosebindu-se doar prin coada titlului, tăiată pe ecran."
+  }
+ ]
+}
