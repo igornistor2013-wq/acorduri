@@ -363,7 +363,7 @@ finally:
 print()
 print('Fișierele puse de mână din date/ — forma lor (o greșeală de tastare nu trebuie să strice registrul)')
 _COD = re.compile(r'^[A-Z]{1,8}\d+/\d{4}$')
-_VALUTE = {'EUR', 'USD', 'JPY', 'CHF', 'SEK', 'CAD', 'DKK', 'GBP', 'PLN', 'RON', 'CNY', 'DEM', 'ECU', 'ROL', 'DST', 'MDL'}
+_VALUTE = {'EUR', 'USD', 'JPY', 'CHF', 'SEK', 'CAD', 'DKK', 'GBP', 'PLN', 'RON', 'CNY', 'CZK', 'DEM', 'ECU', 'ROL', 'DST', 'MDL'}
 _sm = json.loads((AICI / 'date' / 'sume_manual.json').read_text(encoding='utf-8'))
 _sm_rele = []
 for _k, _v in _sm.items():
@@ -762,6 +762,12 @@ if '--browser' in sys.argv:
                     verifica(_nume + ': granturile sectoriale japoneze (patru tranșe, trei de câte 300 mil. yeni) sunt patru rânduri, toate numărate în total',
                              len(_sec) == 4 and all(r['Intră în total?'] == 'da' for r in _sec) and sorted(r['Suma'] for r in _sec) == [300000000, 300000000, 300000000, 400000000],
                              [(r['Acordul'][:40], r['Suma'], r['Intră în total?']) for r in _sec])
+                    # coroanele cehe au curs (BCE, 1 iulie 2026): fără el, rândul ar fi rămas „nu: fără curs", în afara totalului
+                    _rst = [r for r in _rand if 'RESTART' in (r['Denumirea completă'] or '')]
+                    verifica(_nume + ': proiectul ceh RESTART (22 902 012,92 CZK) e un singur rând, numărat în total, cu echivalentul în euro la cursul BCE',
+                             len(_rst) == 1 and _rst[0]['Valuta'] == 'CZK' and _rst[0]['Intră în total?'] == 'da' and abs(_rst[0]['Suma'] - 22902012.92) < 0.01
+                             and abs(_rst[0]['Echivalent EUR'] - 22902012.92 / 24.254) <= 0.5 + 1e-6,
+                             [(r['Acordul'][:40], r['Suma'], r['Valuta'], r['Echivalent EUR'], r['Intră în total?']) for r in _rst])
                 # pe ambele pagini: rând cu rând, cifrele din fișier sunt cele din datele paginii (window.__ACORDURI__)
                 _gresite = []
                 for _i, (_r, _a) in enumerate(zip(_rand, _A)):
@@ -1273,6 +1279,13 @@ if '--browser' in sys.argv:
     verifica('InfoTrustAlliance Moldova (ITA-M): cooperare tehnică, nu grant; bugetul de 1,5 mil. EUR se vede pe rând, dar „nu se adună" (sursele dau alte cifre)',
              len(_ita) == 1 and _ita[0]['categorie'] == 'Asistență tehnică' and _ita[0]['suma'] and _ita[0]['suma']['v'] == 1500000
              and _ita[0]['suma']['val'] == 'EUR' and _ita[0]['faraTotal'] is True, [(a['categorie'], a['suma'], a['faraTotal']) for a in _ita])
+    _rs = _rd('HG115/2026', 'OMMPS264/2025', 'HG166/2026', 'OMMPS98/2026')
+    verifica('Cehia, proiectul RESTART: ordinul de semnare a memorandumului (2025) și actele amendamentului nr. 1 (2026) stau pe un singur rând, asistență tehnică; '
+             '22 902 012,92 CZK dintr-o sursă externă, trecut în euro la cursul BCE din 1 iulie 2026 (24,254)',
+             len(_rs) == 1 and _ac(_rs[0]) == {'HG115/2026', 'OMMPS264/2025', 'HG166/2026', 'OMMPS98/2026'} and _rs[0]['categorie'] == 'Asistență tehnică'
+             and _rs[0]['suma'] and _rs[0]['suma']['v'] == 22902012.92 and _rs[0]['suma']['val'] == 'CZK' and _rs[0]['suma']['sursa'] == 'extern'
+             and _rs[0]['suma']['eur'] == round(22902012.92 / 24.254) and not _rs[0]['faraTotal'],
+             [(a['scurt'], a['categorie'], a['suma'], sorted(_ac(a))) for a in _rs])
     _mon2, _ = lga.citeste_acorduri(pagina='acorduri.html')
     _ui = next((a for a in _mon2 if a['nume'].strip() == 'Sprijin pentru integrarea în UE'), None)
     verifica('registrul Monitor: „Sprijin pentru integrarea în UE" = 25 mil. EUR, sursă externă',
