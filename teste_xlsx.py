@@ -443,10 +443,12 @@ if '--browser' in sys.argv:
 
                 print(f'  [{limba}]')
                 tinte = [('mainView', 'topDonorsTitle', True, True), ('mainView', 'sectorsTitle', True, True), ('mainView', 'donorTableTitle', True, False),
-                         ('mainView', 'projectsListTitle', True, False), ('advancedView', 'cmpPanel', True, True), ('advancedView', 'advLineTitle', True, True),
+                         ('mainView', 'projectsListTitle', True, False), ('advancedView', 'advLineTitle', True, True),
                          ('advancedView', 'advExecTitle', True, True), ('advancedView', 'advHeatmapTitle', True, False), ('advancedView', 'advRegionTitle', True, True),
                          ('advancedView', 'advTyTitle', True, True), ('iatiView', 'iatiDifTitle', False, False), ('iatiView', 'iatiResultTitle', False, False),
                          ('dportalView', 'dpSectorTitle', True, True), ('dportalView', 'dpProjectsTitle', True, False), ('legaturiView', 'legListTitle', False, False)]
+                verifica(f'{limba} · „Analize avansate": panoul „Comparație între perioade" a fost scos (nici în pagină, nici funcția lui)',
+                         pg.evaluate("() => !document.getElementById('cmpPanel') && !document.getElementById('cmpTitlu') && typeof window.renderComparatie === 'undefined'"))
                 vedere_curenta = 'mainView'
                 for vid, cheie, cu_total, cu_grafic in tinte:
                     if vid != vedere_curenta:

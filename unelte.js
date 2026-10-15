@@ -55,32 +55,6 @@ css.textContent = `
   @keyframes pPuls{50%{opacity:.25}}
   @media (prefers-reduced-motion: reduce){.prospetime.p-load::before{animation:none;}}
   @media (max-width:800px){.top-dreapta{align-items:flex-start;}.unelte-sus{justify-content:flex-start;}}
-
-  #cmpPanel .cmp-ctrl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:12px 16px 2px;}
-  #cmpPanel .cmp-per{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-dim);}
-  #cmpPanel .cmp-per b{font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;border-radius:5px;}
-  #cmpPanel .cmp-a b{background:#e8ebf1;color:#4b5567;}
-  #cmpPanel .cmp-b b{background:var(--navy);color:#fff;}
-  #cmpPanel select{font:inherit;font-size:12.5px;padding:4px 6px;border:1px solid var(--line-strong);border-radius:6px;
-    background:var(--panel);color:var(--ink);}
-  #cmpPanel .cmp-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px;}
-  #cmpPanel .cmp-kpi > div{background:var(--blue-bg);border-radius:8px;padding:10px 12px;min-width:0;}
-  #cmpPanel .cmp-kpi span{display:block;font-size:10.5px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.04em;}
-  #cmpPanel .cmp-kpi b{display:block;font-size:18px;color:var(--navy-deep);font-variant-numeric:tabular-nums;margin-top:3px;white-space:nowrap;}
-  #cmpPanel .cmp-kpi small{display:block;font-size:11.5px;color:var(--ink-dim);margin-top:2px;}
-  #cmpPanel .cmp-sus{color:#16794f !important;}
-  #cmpPanel .cmp-jos{color:#c0392b !important;}
-  #cmpPanel .cmp-tab{width:100%;border-collapse:collapse;font-size:12.5px;}
-  #cmpPanel .cmp-tab th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);
-    padding:7px 8px;border-bottom:1px solid var(--line-strong);white-space:nowrap;}
-  #cmpPanel .cmp-tab td{padding:6px 8px;border-bottom:1px solid var(--line);}
-  #cmpPanel .cmp-tab .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
-  #cmpPanel .cmp-nume{max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  #cmpPanel .cmp-bar{position:relative;height:12px;min-width:140px;}
-  #cmpPanel .cmp-bar::after{content:'';position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--line-strong);}
-  #cmpPanel .cmp-bar i{position:absolute;top:0;bottom:0;border-radius:3px;}
-  #cmpPanel .cmp-scroll{overflow-x:auto;}
-  @media (max-width:800px){#cmpPanel .cmp-kpi{grid-template-columns:repeat(2,minmax(0,1fr));}}
 `;
 document.head.appendChild(css);
 
@@ -122,7 +96,7 @@ function eticheta(btn, text, implicit){
 function titluPanou(panel){
   const h = panel.querySelector('.panel-head h2');
   if(!h) return '';
-  const s = h.querySelector('[data-i18n], #cmpTitlu');
+  const s = h.querySelector('[data-i18n]');
   return (s ? s.textContent : h.textContent).replace(/\s+/g, ' ').trim();
 }
 
@@ -836,196 +810,6 @@ async function laRaport(e){
   }
 }
 
-/* ============================================================ comparație între perioade */
-/* baza: 'fin' = anul în care banii au fost efectiv angajați / debursați (anii financiari
-   din AMP, câmpul y al fiecărui proiect); 'start' = anul de început al proiectului, cu
-   toate sumele lui, ca în restul paginii. Pentru o comparație între perioade, anul
-   financiar e cel corect: pe anul de început, perioadele recente par mereu mai mici,
-   pentru că proiectele lor abia au început. */
-const cmp = { m: 'deb', d: 'donor', baza: 'fin', a1: null, a2: null, b1: null, b2: null };
-
-function aniFinanciari(){
-  const s = new Set();
-  (typeof ALL_RECORDS !== 'undefined' ? ALL_RECORDS : []).forEach(r => Object.keys(r.y || {}).forEach(k => {
-    if(!/^\d{4}$/.test(k)) return;
-    const v = r.y[k] || [], n = +k;
-    if(n >= 1990 && n <= 2100 && ((v[0] || 0) || (v[1] || 0))) s.add(n);
-  }));
-  return [...s].sort((a, b) => a - b);
-}
-function aniDisponibili(){
-  return cmp.baza === 'fin' ? aniFinanciari() : YEARS.filter(y => y !== 'NA').map(Number).sort((a, b) => a - b);
-}
-function perioadeImplicite(ani){
-  const min = ani[0], max = ani[ani.length - 1];
-  const b2 = Math.max(min, Math.min(max, new Date().getFullYear() - 1));   // ultimul an încheiat
-  const b1 = Math.max(min, b2 - 2), a2 = Math.max(min, b1 - 1), a1 = Math.max(min, a2 - 2);
-  return { a1: a1, a2: a2, b1: b1, b2: b2 };
-}
-function umple(id, ani, val){
-  const s = document.getElementById(id);
-  if(s) s.innerHTML = ani.map(y => '<option value="' + y + '"' + (y === val ? ' selected' : '') + '>' + y + '</option>').join('');
-}
-function intervalText(a, b){ return a === b ? String(a) : a + '–' + b; }
-function semn(v, txt){ return (v > 0 ? '+' : v < 0 ? '−' : '') + txt; }
-
-window.renderComparatie = function(){
-  const body = document.getElementById('cmpBody');
-  if(!body) return;
-  const ani = aniDisponibili();
-  etichetareComparatie();
-  if(!ani.length){ body.innerHTML = '<div class="empty-state">' + esc(t('emptyCurrentSelection')) + '</div>'; return; }
-  if(['a1', 'a2', 'b1', 'b2'].some(k => !ani.includes(cmp[k]))) Object.assign(cmp, perioadeImplicite(ani));
-  umple('cmpA1', ani, cmp.a1); umple('cmpA2', ani, cmp.a2); umple('cmpB1', ani, cmp.b1); umple('cmpB2', ani, cmp.b2);
-  const a1 = Math.min(cmp.a1, cmp.a2), a2 = Math.max(cmp.a1, cmp.a2), b1 = Math.min(cmp.b1, cmp.b2), b2 = Math.max(cmp.b1, cmp.b2);
-
-  const chei = p => cmp.d === 'donor' ? p.donatori
-    : cmp.d === 'sector' ? ((p.sectoare && p.sectoare.length) ? p.sectoare.map(s => s.nume) : ['Nespecificat'])
-    : ((p.beneficiari && p.beneficiari.length) ? p.beneficiari : ['Nespecificat']);
-  const etich = cmp.d === 'donor' ? donorLabel : cmp.d === 'sector' ? sectorLabel : beneficiaryLabel;
-  const harta = new Map(), projA = new Set(), projB = new Set();
-  let totA = 0, totB = 0;
-  const adauga = (p, vA, vB, inA, inB) => {
-    const cheie = p.id ? 'id:' + p.id : 'nm:' + p.denumire + '|' + p.donator;
-    if(inA){ totA += vA; projA.add(cheie); }
-    if(inB){ totB += vB; projB.add(cheie); }
-    chei(p).forEach(k => {
-      const o = harta.get(k) || { a: 0, b: 0 };
-      if(inA) o.a += vA;
-      if(inB) o.b += vB;
-      harta.set(k, o);
-    });
-  };
-  if(cmp.baza === 'fin'){
-    // suma fiecărui an financiar merge în perioada în care cade anul — exact cum au curs banii
-    const rec = new Map(ALL_RECORDS.map(r => [r.id, r]));
-    const idx = cmp.m === 'ang' ? 0 : 1;
-    PROJECTS.forEach(p => {
-      const r = rec.get(p.id);
-      if(!r || !r.y) return;
-      let vA = 0, vB = 0;
-      Object.keys(r.y).forEach(k => {
-        if(!/^\d{4}$/.test(k)) return;
-        const an = +k, val = Math.round((r.y[k] || [])[idx] || 0);
-        if(!val) return;
-        if(an >= a1 && an <= a2) vA += val;
-        if(an >= b1 && an <= b2) vB += val;
-      });
-      if(vA || vB) adauga(p, vA, vB, !!vA, !!vB);
-    });
-  } else {
-    PROJECTS.forEach(p => {
-      if(p.an === 'NA') return;
-      const inA = p.an >= a1 && p.an <= a2, inB = p.an >= b1 && p.an <= b2;
-      if(!inA && !inB) return;
-      const v = p[cmp.m] || 0;
-      adauga(p, v, v, inA, inB);
-    });
-  }
-  const randuri = [...harta.entries()].map(([k, o]) => ({ k: k, a: o.a, b: o.b, d: o.b - o.a }))
-    .filter(r => r.a || r.b).sort((x, y) => Math.abs(y.d) - Math.abs(x.d));
-  const varPct = (a, b) => a > 0 ? (b - a) / a * 100 : null;
-  const etA = intervalText(a1, a2), etB = intervalText(b1, b2);
-  const numeDim = cmp.d === 'donor' ? t('colDonor') : cmp.d === 'sector' ? 'Sector' : L('Beneficiar', 'Beneficiary');
-  const numeM = cmp.m === 'ang' ? L('Angajamente', 'Commitments') : L('Debursări', 'Disbursements');
-
-  const dif = totB - totA, pTot = varPct(totA, totB);
-  const cls = v => v > 0 ? 'cmp-sus' : v < 0 ? 'cmp-jos' : '';
-  const pctTxt = p => p === null ? L('nou', 'new') : semn(p, Math.abs(p).toFixed(1).replace('.', en() ? '.' : ',') + '%');
-  let h = '<div class="cmp-kpi">' +
-    '<div><span>' + L('Perioada A', 'Period A') + ' · ' + etA + '</span><b>' + esc(fmtCompact(totA)) + ' EUR</b><small>' + esc(fmtNum(projA.size)) + ' ' + L('proiecte', 'projects') + '</small></div>' +
-    '<div><span>' + L('Perioada B', 'Period B') + ' · ' + etB + '</span><b>' + esc(fmtCompact(totB)) + ' EUR</b><small>' + esc(fmtNum(projB.size)) + ' ' + L('proiecte', 'projects') + '</small></div>' +
-    '<div><span>' + L('Diferență', 'Difference') + '</span><b class="' + cls(dif) + '">' + esc(semn(dif, fmtCompact(Math.abs(dif)))) + ' EUR</b><small>' + esc(semn(dif, fmtNum(Math.abs(dif)))) + ' EUR</small></div>' +
-    '<div><span>' + L('Variație', 'Change') + '</span><b class="' + cls(dif) + '">' + (totA > 0 ? esc(pctTxt(pTot)) : '—') + '</b><small>' + numeM.toLowerCase() + ', B ' + L('față de', 'vs') + ' A</small></div>' +
-  '</div>';
-  const top = randuri.slice(0, 15);
-  if(!top.length){
-    h += '<div class="empty-state">' + esc(t('emptyCurrentSelection')) + '</div>';
-  } else {
-    const maxD = Math.max(1, ...top.map(r => Math.abs(r.d)));
-    h += '<div class="cmp-scroll"><table class="cmp-tab"><thead><tr><th>' + esc(numeDim) + '</th><th class="num">A · ' + etA + '</th><th class="num">B · ' + etB + '</th>' +
-      '<th class="num">' + L('Diferență', 'Difference') + '</th><th class="num">' + L('Variație', 'Change') + '</th><th></th></tr></thead><tbody>' +
-      top.map(r => {
-        const w = Math.abs(r.d) / maxD * 50, p = varPct(r.a, r.b);
-        const bara = r.d >= 0 ? 'left:50%;width:' + w + '%;background:#2f9e68;' : 'right:50%;width:' + w + '%;background:#d0574a;';
-        return '<tr><td class="cmp-nume" title="' + esc(etich(r.k)) + '">' + esc(etich(r.k)) + '</td>' +
-          '<td class="num">' + esc(fmtCompact(r.a)) + '</td><td class="num">' + esc(fmtCompact(r.b)) + '</td>' +
-          '<td class="num ' + cls(r.d) + '">' + esc(semn(r.d, fmtCompact(Math.abs(r.d)))) + '</td>' +
-          '<td class="num ' + cls(r.d) + '">' + esc(pctTxt(p)) + '</td>' +
-          '<td style="width:24%"><div class="cmp-bar"><i style="' + bara + '"></i></div></td></tr>';
-      }).join('') + '</tbody></table></div>';
-  }
-  body.innerHTML = h;
-
-  const note = [];
-  note.push(cmp.baza === 'fin'
-    ? L('Sumele sunt puse pe anul în care au fost efectiv angajate sau debursate (anul financiar din AMP); „proiecte" = proiecte cu sume în perioadă.',
-        'Amounts are placed in the year they were actually committed or disbursed (the AMP financial year); "projects" = projects with amounts in the period.')
-    : L('Fiecare proiect intră cu toate sumele lui în anul de început, ca în restul paginii — perioadele recente par mai mici, pentru că proiectele lor încă debursează.',
-        'Each project counts with all its amounts in its start year, as on the rest of the page — recent periods look smaller because their projects are still disbursing.'));
-  note.push(L('Primele 15 după diferența absolută; din ⚙ se descarcă lista completă (Excel sau CSV).', 'Top 15 by absolute difference; the ⚙ menu downloads the full list (Excel or CSV).'));
-  if((a2 - a1) !== (b2 - b1)) note.push(L('Perioadele au lungimi diferite (' + (a2 - a1 + 1) + ' vs ' + (b2 - b1 + 1) + ' ani) — se compară sume totale, nu medii anuale.',
-                                          'The periods differ in length (' + (a2 - a1 + 1) + ' vs ' + (b2 - b1 + 1) + ' years) — totals are compared, not yearly averages.'));
-  if(Math.max(a2, b2) >= new Date().getFullYear()) note.push(L('Anul ' + new Date().getFullYear() + ' e în curs, deci datele lui sunt incomplete.',
-                                                               new Date().getFullYear() + ' is still under way, so its data is incomplete.'));
-  note.push(cmp.d === 'donor'
-    ? L('Un proiect cofinanțat apare cu suma întreagă la fiecare donator; totalurile de sus îl numără o singură dată.',
-        'A co-financed project appears with its full amount under each donor; the totals above count it once.')
-    : cmp.d === 'sector'
-      ? L('Un proiect cu mai multe sectoare apare la fiecare sector; totalurile de sus îl numără o singură dată.',
-          'A project with several sectors appears under each sector; the totals above count it once.')
-      : L('Un proiect cu mai mulți beneficiari apare la fiecare beneficiar; totalurile de sus îl numără o singură dată.',
-          'A project with several beneficiaries appears under each beneficiary; the totals above count it once.'));
-  /* Datele pentru Excel / CSV: lista completă, nu doar primele 15. Totalul numără fiecare proiect o singură dată. */
-  __csvInreg(body, [numeDim, numeM + ' ' + etA + ' (EUR)', numeM + ' ' + etB + ' (EUR)', L('Diferență (EUR)', 'Difference (EUR)'), L('Variație (%)', 'Change (%)')],
-    randuri.map(r => { const p = varPct(r.a, r.b); return [etich(r.k), Math.round(r.a), Math.round(r.b), Math.round(r.d), p === null ? '' : Math.round(p * 10) / 10]; }),
-    { tip: 'teexv', randTotal: randuri.length ? [t('totalUniqueRow'), Math.round(totA), Math.round(totB), Math.round(dif), pTot === null ? '' : Math.round(pTot * 10) / 10] : null,
-      context: [L('Perioada A: ', 'Period A: ') + etA, L('Perioada B: ', 'Period B: ') + etB, numeM,
-                cmp.baza === 'fin' ? L('pe anul financiar', 'by financial year') : L('pe anul de început al proiectului', 'by project start year'),
-                L('Toate proiectele din AMP', 'All AMP projects')],
-      nota: note.filter(x => x.indexOf('⚙') < 0),
-      grafic: { tip: 'bar', cat: 0, serii: [1, 2], n: 15, culori: [__CUL_ANG, __CUL_DEB],
-                titlu: L('Primele 15 după diferența absolută', 'Top 15 by absolute difference') } });
-  const nota = document.getElementById('cmpNota');
-  if(nota) nota.textContent = note.join(' ');
-};
-
-function etichetareComparatie(){
-  const set = (id, txt) => { const el = document.getElementById(id); if(el) el.textContent = txt; };
-  set('cmpTitlu', L('Comparație între perioade', 'Period comparison'));
-  set('cmpEtA', L('Perioada A', 'Period A'));
-  set('cmpEtB', L('Perioada B', 'Period B'));
-  const seg = (sel, attr, val, txt) => { const b = document.querySelector(sel + ' [' + attr + '="' + val + '"]'); if(b){ b.textContent = txt; } };
-  seg('#cmpMetrica', 'data-m', 'ang', L('Angajamente', 'Commitments'));
-  seg('#cmpMetrica', 'data-m', 'deb', L('Debursări', 'Disbursements'));
-  seg('#cmpDim', 'data-d', 'donor', L('Donatori', 'Donors'));
-  seg('#cmpDim', 'data-d', 'sector', L('Sectoare', 'Sectors'));
-  seg('#cmpDim', 'data-d', 'benef', L('Beneficiari', 'Beneficiaries'));
-  seg('#cmpBaza', 'data-b', 'fin', L('An financiar', 'Financial year'));
-  seg('#cmpBaza', 'data-b', 'start', L('An de început', 'Start year'));
-  document.querySelectorAll('#cmpBaza button').forEach(b => {
-    b.setAttribute('aria-pressed', String(b.dataset.b === cmp.baza));
-    b.title = b.dataset.b === 'fin'
-      ? L('Banii, în anul în care au fost angajați sau debursați', 'Money in the year it was committed or disbursed')
-      : L('Toate sumele proiectului, în anul lui de început (ca în restul paginii)', 'All project amounts in its start year (as on the rest of the page)');
-  });
-  document.querySelectorAll('#cmpMetrica button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === cmp.m)));
-  document.querySelectorAll('#cmpDim button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.d === cmp.d)));
-}
-
-function legaComparatia(){
-  const p = document.getElementById('cmpPanel');
-  if(!p) return;
-  ['A1', 'A2', 'B1', 'B2'].forEach(k => {
-    const s = document.getElementById('cmp' + k);
-    if(s) s.addEventListener('change', () => { cmp[k.toLowerCase()] = +s.value; window.renderComparatie(); });
-  });
-  p.querySelectorAll('#cmpMetrica button').forEach(b => b.addEventListener('click', () => { cmp.m = b.dataset.m; window.renderComparatie(); }));
-  p.querySelectorAll('#cmpDim button').forEach(b => b.addEventListener('click', () => { cmp.d = b.dataset.d; window.renderComparatie(); }));
-  p.querySelectorAll('#cmpBaza button').forEach(b => b.addEventListener('click', () => { cmp.baza = b.dataset.b; window.renderComparatie(); }));
-  etichetareComparatie();
-}
-
 /* ============================================================ pornire + limba */
 window.__unelteLimba = function(){
   document.querySelectorAll('.roata-panou').forEach(b => { b.title = ET.roata(); b.setAttribute('aria-label', ET.roata()); });
@@ -1035,7 +819,6 @@ window.__unelteLimba = function(){
   if(bl) bl.title = L('Copiază un link care deschide pagina cu exact aceiași ani și donatori', 'Copy a link that opens the page with exactly these years and donors');
   if(bp && !bp.disabled && !bp.classList.contains('ok')){ bp.textContent = textPdf(); }
   if(bp) bp.title = L('Descarcă un raport PDF de o pagină pentru selecția curentă', 'Download a one-page PDF report for the current selection');
-  etichetareComparatie();
   window.renderProspetime();
 };
 
@@ -1044,10 +827,7 @@ function porneste(){
   const bl = document.getElementById('btnLinkSelectie'), bp = document.getElementById('btnRaportPdf');
   if(bl) bl.addEventListener('click', laLink);
   if(bp) bp.addEventListener('click', laRaport);
-  legaComparatia();
   window.__unelteLimba();
-  // dacă „Analize avansate" era deja deschisă (link direct la #analize), desenăm acum comparația
-  if(typeof __advInitialized !== 'undefined' && __advInitialized) window.renderComparatie();
 }
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', porneste);
 else porneste();

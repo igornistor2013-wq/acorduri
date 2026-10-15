@@ -1864,21 +1864,6 @@
 
   
 
-  <div class="panel" id="cmpPanel">
-    <div class="panel-head">
-      <h2><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg><span id="cmpTitlu">Comparație între perioade</span></h2>
-      <div class="btns seg" id="cmpMetrica"><button type="button" data-m="ang"></button><button type="button" data-m="deb"></button></div>
-    </div>
-    <div class="cmp-ctrl">
-      <div class="cmp-per cmp-a"><b id="cmpEtA">Perioada A</b> <select id="cmpA1"></select><span>–</span><select id="cmpA2"></select></div>
-      <div class="cmp-per cmp-b"><b id="cmpEtB">Perioada B</b> <select id="cmpB1"></select><span>–</span><select id="cmpB2"></select></div>
-      <div class="btns seg" id="cmpDim"><button type="button" data-d="donor"></button><button type="button" data-d="sector"></button><button type="button" data-d="benef"></button></div>
-      <div class="btns seg" id="cmpBaza"><button type="button" data-b="fin"></button><button type="button" data-b="start"></button></div>
-    </div>
-    <div class="panel-body" id="cmpBody"></div>
-    <div class="panel-note" id="cmpNota"></div>
-  </div>
-
   <div class="panel">
     <div class="panel-head">
       <h2><svg class="ico" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-4 4"/></svg><span data-i18n="advLineTitle">Evoluție în timp · Angajamente vs. Debursări pe ani</span></h2>
@@ -6564,7 +6549,6 @@ window.__initAdvancedView = function(){ ongoingProjectsIndex = null; regionFilte
   try{ renderSectorDonor(); }catch(e){ console.warn('sector×donator', e); }
   try{ if(window.__renderSectoare) window.__renderSectoare(); }catch(e){ console.warn('donatori → sectoare', e); }
   try{ renderTipPeAni(); }catch(e){ console.warn('tip pe ani', e); }
-  try{ if(typeof renderComparatie === 'function') renderComparatie(); }catch(e){ console.warn('comparație', e); }
   try{ etichetaControale(); }catch(e){}
 };
 window.findSvgRegionExport = findSvgRegion;
