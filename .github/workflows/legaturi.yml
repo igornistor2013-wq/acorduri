@@ -33,6 +33,7 @@ on:
       - date/legis_sume.json
       - date/sume_manual.json
       - date/categorii_manual.json
+      - date/contopiri_manual.json
       - date/legaturi_legis.json
 
 permissions:
