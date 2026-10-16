@@ -7,8 +7,11 @@ Guvernului („Aspectul financiar", „Descrierea contractului"). gov.md public�
 pentru fiecare ședință lista proiectelor, fiecare cu PDF-ul lui
 (sites/default/files/media/documents/sedinte-de-guvern/AAAA-LL/NU-….pdf),
 sub licența CC BY-SA 4.0. Ședința are loc ÎNAINTE ca hotărârea să apară în
-Monitorul Oficial, deci un acord nou are suma din ziua în care Monitorul îl
-înregistrează.
+Monitorul Oficial, deci, când nota e publicată, un acord nou are suma din ziua
+în care Monitorul îl înregistrează. Multe puncte au însă pe gov.md doar proiectul
+hotărârii, fără notă (7 și 15 octombrie 2026: NU-876 BERD, NU-860 CEB, NU-718
+BIRD, NU-959 și NU-939 Japonia): `sume` rămâne gol, iar suma se pune de mână în
+date/sume_manual.json, din comunicatul oficial al Guvernului sau al finanțatorului.
 
     python gov_sume.py                  # ședințele noi (zilnic, pe GitHub Actions)
     python gov_sume.py --limita-min 40  # se oprește după 40 de minute; continuă data viitoare
