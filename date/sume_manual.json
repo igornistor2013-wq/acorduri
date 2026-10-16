@@ -621,8 +621,9 @@
  "HG384/2026": {
   "v": 102900000,
   "val": "EUR",
-  "u": "https://www.ebrd.com/home/work-with-us/projects/psd/55907.html",
-  "nota": "Introdus manual: împrumut suveran BERD de 102 900 000 EUR pentru „Moldova – Proiect de alimentare durabilă cu apă (irigații)”, potrivit fișei BERD a proiectului (nr. 55907, actualizată la 11 septembrie 2026): 49,8 mil. EUR angajate și 53,1 mil. EUR neangajate. Acordul era în negociere."
+  "extern": true,
+  "u": "https://www.ebrd.com/home/news-and-events/news/2026/ebrd-finances-rehabilitation-of-moldova-s-key-irrigation-systems.html",
+  "nota": "BERD (13.10.2026): «€102.9 million» pentru „Moldova – Proiect de alimentare durabilă cu apă (irigații)”. MAIA (13.10.2026): acordul s-a semnat la minister, cu finanțare BERD de 102,9 mil. EUR."
  },
  "DPRM371/2017": {
   "v": 12400000,
@@ -1037,5 +1038,26 @@
   "extern": true,
   "u": "https://agepi.gov.md/en/news/moldovan-swiss-intellectual-property-project-was-officially-launched-chisinau",
   "nota": "AGEPI anunță la lansare (24.9.2024) o finanțare totală de «750,000 Swiss Francs» de la SECO. Echivalentul în EUR, 794 407,37, e cel comunicat pentru registru; corespunde cursului din septembrie 2024."
+ },
+ "HG562/2026": {
+  "v": 33000000,
+  "val": "EUR",
+  "extern": true,
+  "u": "https://gov.md/ro/comunicate-de-presa/investitii-de-80-de-milioane-de-euro-pentru-modernizarea-25-de-scoli",
+  "nota": "Comunicatul Guvernului din 15.10.2026: «un împrumut de 33 de milioane de euro de la Banca de Dezvoltare a Consiliului Europei (CEB)»; investiția totală, 80 mil. EUR: 33 CEB + 40 contribuția RM + 7 grant."
+ },
+ "HG567/2026": {
+  "v": 50000000,
+  "val": "USD",
+  "extern": true,
+  "u": "https://gov.md/ro/comunicate-de-presa/cladirile-publice-din-republica-moldova-vor-fi-modernizate-pentru-reduce",
+  "nota": "Comunicatul Guvernului din 15.10.2026: «Finanțarea preconizată include un împrumut de 50 de milioane de dolari și un grant de 2 milioane de dolari» pentru MEERM, în negocieri cu BIRD. Sumă preconizată."
+ },
+ "HG569/2026": {
+  "v": 55000000,
+  "val": "USD",
+  "extern": true,
+  "u": "https://gov.md/ro/comunicate-de-presa/fermierii-vor-avea-acces-la-tehnica-agricola-moderna-si-sisteme-de-irigare-cu",
+  "nota": "Comunicatul Guvernului din 15.10.2026: «Noua etapă prevede o finanțare de până la aproximativ 55 de milioane de dolari», cu sprijinul JICA. Plafon estimativ, la începutul negocierilor; la fel în comunicatul MAIA."
  }
 }
