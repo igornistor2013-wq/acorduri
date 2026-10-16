@@ -1,8 +1,14 @@
 """Clasificator extins pentru actele extrase din legis.md.
 
-Pornește de la monitor_watch.classify() și acoperă golurile găsite la
-compararea cu legis.md: acord-cadru, acord de facilitate, înțelegeri prin
-schimb de note, memorandumuri cu agenții de dezvoltare, Canada ca partener.
+Pornește de la regulile din monitor_watch (categorie_bruta, corecteaza) și acoperă golurile găsite
+la compararea cu legis.md: acord de facilitate, înțelegeri prin schimb de note, memorandumuri cu
+agenții de dezvoltare, garanții de stat, Canada ca partener.
+
+E filtrul ambelor registre. Colectorul Monitorului îl folosește și el, prin
+monitor_watch.clasifica_registru(): ce primește registrul legis.md primește și Monitorul, în ziua
+publicării. O regulă nouă se scrie aici (sau în monitor_watch, dacă e de bază), nu în doi
+clasificatori care să se îndepărteze unul de altul — așa au ajuns acordurile-cadru CEB să fie
+cunoscute doar de legis.md.
 """
 import json, re, sys
 from pathlib import Path
@@ -73,8 +79,9 @@ PARTENERI_NUME = [
 ]
 
 INCLUDE_EXTRA = [
-    (r"acord\w*-cadru\s+de\s+imprumut", "Împrumut"),
-    (r"acord\w*-cadru\s+de\s+finantare", "Asistență financiară"),
+    # „Acord-cadru de împrumut / de finanțare" nu mai e aici: ACORD din monitor_watch.INCLUDE
+    # îl primește de la sine (cu „-cadru", cu semn lung ori cu spațiu). Regula ținută doar în
+    # legis_clasifica a fost chiar cauza pentru care colectorul Monitorului nu vedea acordurile-cadru.
     (r"acord\w*\s+de\s+facilitate\s+de\s+imprumut", "Împrumut"),
     (r"facilitate\s+de\s+imprumut", "Împrumut"),
     (r"acord\w*\s+de\s+facilitate\b", "Asistență financiară"),

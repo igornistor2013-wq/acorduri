@@ -54,8 +54,9 @@ două acte: registrul le deosebește și după tip, nu doar după număr și dat
 
 ## Categoriile: grant, împrumut (credit), asistență tehnică
 
-Fiecare act primește o categorie din titlu (`monitor_watch.classify`, extinsă pentru
-legis.md în `legis_clasifica.py`). Regula, după HG 377/2018, anexa 1, pct. 9:
+Fiecare act primește o categorie din titlu (`monitor_watch.classify`, extinsă în
+`legis_clasifica.py`; ambele registre trec actele prin același filtru, vezi mai jos).
+Regula, după HG 377/2018, anexa 1, pct. 9:
 
 - **asistența financiară nerambursabilă** (și „ajutorul financiar nerambursabil”) este
   **Grant**;
@@ -113,6 +114,31 @@ Actele deja ținute în `date.json` și în `date/gov_sume.json` se pun la zi la
 acte vechi pe categoria de ieri. La fel, sumele din atașamente se citesc după instrumentul
 de azi al actului (împrumut sau grant, din categorie), nu după cel notat la prima citire.
 
+**Un singur filtru pentru cele două registre.** Ce act intră în registru hotărăște
+`monitor_watch.clasifica_registru`, care trece titlul prin clasificatorul din `legis_clasifica.py`
+(fără cuvântul de tip din față, „Hotărâre”, „Lege”, „Ordin”, cum îl dă legis.md). Înainte erau două
+filtre și se îndepărtaseră: acordurile-cadru de împrumut ale CEB, acordurile de facilitate de
+împrumut, înțelegerile prin schimb de note, memorandumurile cu agențiile de dezvoltare și garanțiile
+de stat le știa doar legis.md. Din ianuarie 2024, registrul Monitorului a ratat astfel 52 de acte (14
+despre acorduri-cadru CEB, 5 despre facilități de împrumut, 9 schimburi de note, 15 memorandumuri,
+3 amendamente la acordul de asistență cu Statele Unite, 4 acorduri cu agenția elvețiană sau cu GIZ, 2
+garanții de stat), între ele hotărârea publicată la 16 octombrie 2026 pentru Acordul-cadru de împrumut
+„Modernizarea instituțiilor de învățământ profesional tehnic”. Cauza cea mai simplă a fost un tipar:
+„acord de împrumut” nu trecea de „-cadru”; tiparele de bază primesc acum „acord-cadru”, cu cratimă,
+semn lung sau spațiu. Pe cele 333 de acte deja în `date.json` filtrul nou dă aceeași categorie și
+același partener ca cel vechi, deci niciun rând existent nu se schimbă; refuză, în schimb, câteva
+feluri de zgomot pe care cel vechi le lăsa să treacă (instituirea unui grup de negociere, „contractele
+de credit pentru consumatori”). Dacă `legis_clasifica.py` lipsește, colectarea merge mai departe pe
+regulile de bază și scrie pe ecran ce nu va prinde.
+
+Colectarea citește la fiecare rulare doar ultimele zece ediții, așa că o regulă corectată nu aduce
+singură actele din edițiile care au ieșit de pe prima pagină. Se refac din ediții cu
+`python3 monitor_watch.py --backfill PRIMUL ULTIMUL` (identificatorii edițiilor sunt în `date.json`,
+la `editii_vazute`), iar pentru perioadele mai vechi, din arhivele PDF, cu `python3 import_pdf.py`;
+ambele folosesc acum același filtru. Testele din `teste.py` (`test_acord_cadru`,
+`test_acelasi_filtru_ca_legis`, `test_paritate_cu_legis_md`) pică dacă Monitorul refuză un act pe
+care legis.md îl primește.
+
 ## Fișiere
 
 | Fișier | Rol |
@@ -141,16 +167,16 @@ de azi al actului (împrumut sau grant, din categorie), nu după cel notat la pr
 | `donatori.html` | Redirecționare către `index.html`, pentru linkurile vechi |
 | `date.json` | Registrul acordurilor. Actualizat automat de workflow |
 | `amp-arhiva.json` | Arhiva AMP, doar câmpurile de care are nevoie `hg246.html` |
-| `monitor_watch.py` | Colectarea zilnică din Monitorul Oficial și regula categoriilor (grant / împrumut / asistență tehnică) |
-| `import_pdf.py` | Importul din arhivele PDF ale Monitorului. Se rulează local |
-| `teste.py` | Testele colectorului. Rulate de workflow înaintea colectării |
+| `monitor_watch.py` | Colectarea zilnică din Monitorul Oficial și regula categoriilor (grant / împrumut / asistență tehnică); ce act intră în registru hotărăște `clasifica_registru`, filtrul comun cu legis.md |
+| `import_pdf.py` | Importul din arhivele PDF ale Monitorului, cu același filtru ca citirea de pe site. Se rulează local |
+| `teste.py` | Testele colectorului, inclusiv paritatea filtrului cu legis.md (acord-cadru, schimburi de note, memorandumuri, garanții de stat). Rulate de workflow înaintea colectării |
 | `.github/workflows/monitor.yml` | Programarea rulării |
 | `.github/workflows/legaturi.yml` | Rescrie `date/acorduri_legare.json` după fiecare colectare din Monitor sau citire a notelor Guvernului (cu Playwright) |
 | `legis_acorduri.html` | Acordurile din legis.md, grupate pe acord. Datele sunt incluse în pagină |
 | `legis_brut.json` | Istoricul: toate actele găsite pe legis.md, 1992–2026 |
 | `legis_watch.py` | Reîmprospătarea istoricului de pe legis.md, cu browser (ocazional, de pe calculator) |
 | `legis_extrage.js` | Căutările rulate în pagina legis.md |
-| `legis_clasifica.py` | Ce e asistență externă, categoria, partenerul (extinde `monitor_watch.py`); citește și deciziile de mână din `date/categorii_manual.json` |
+| `legis_clasifica.py` | Ce e asistență externă, categoria, partenerul (extinde `monitor_watch.py`) — filtrul ambelor registre: colectorul Monitorului îl apelează prin `monitor_watch.clasifica_registru`; citește și deciziile de mână din `date/categorii_manual.json` |
 | `date/categorii_manual.json` | Categoria actelor pe care nici titlul, nici finanțatorul nu le lămuresc, hotărâtă de mână, cu motiv și sursă: `{"categorie": "Grant"\|"Împrumut"\|"Asistență tehnică", "motiv": "…", "sursa": "https://…"}`, pe codul actului din legis.md (un act foarte nou, doar din Monitor, are codul scos din număr și tip: `HG430/2026`, ordinul `O147/2026`). Ce e aici bate clasificarea automată, dar nu adaugă acte; cheile care încep cu `_` sunt ignorate. Citit de `legis_pagina.py`, `legis_atasamente.py`, `date_deschise.py` și de registrul din Monitor (`acorduri.html`); fișa acordului spune că categoria e hotărâtă de mână, cu motivul și sursa |
 | `date/contopiri_manual.json` | Rândurile din registre (legis.md și Monitor) pe care regula automată de grupare nu le unește sau le unește greșit, hotărâte de mână: `{"uneste": [{"acte": ["LP148/2025", "HG183/2025"], "nota": "…", "nume": "…"}], "muta": [{"acte": ["LP58/2010", "DP242/2010"], "langa": "HG849/2009", "nota": "…"}]}`. Același acord ajunge uneori pe mai multe rânduri, fiindcă hotărârea de inițiere, hotărârea pentru proiectul de lege, legea și decretul își scriu titlul diferit (cu sau fără suma din titlu, cu altă denumire a proiectului). `uneste` pune pe un singur rând rândurile care conțin actele numite: rămâne rândul primului act găsit, celelalte se golesc în el, iar `nume` (opțional) îi dă altă denumire; cu un singur act în listă, `uneste` doar redenumește rândul (de pildă patru tranșe ale aceluiași program, care arătau la fel în listă și se deosebeau doar prin coada titlului, tăiată pe ecran, sau un titlu care purta numele unui ministru). `muta` scoate actele din rândul lor și le pune lângă actul `langa` (pe un rând nou, dacă `langa` lipsește): de pildă finanțarea suplimentară a unui proiect, care ajunsese pe rândul creditului de bază, sau actele altui acord, amestecate pe același rând (addendumul la programul TACIS stătea cu cel la programul pentru zonele rurale, fiindcă titlul lor dă aceeași denumire automată; contractul BEI din 2007 stătea cu „Moldova drumuri IV”; tranșele anuale japoneze 2KR, fiecare un schimb de note separat, stăteau pe un singur rând). Rândul din care pleacă un act își ia denumirea de la primul act rămas. Se aplică întâi `muta`, apoi `uneste`. Actele se numesc după codul din legis.md (`LP148/2025`), ca în `date/sume_manual.json`; un act care nu mai e în registru se sare, iar un fișier lipsă sau stricat nu schimbă nimic. Rândul unit își refac etapele, partenerii, data semnării (cea mai veche) și suma din titlu (a celui mai vechi act care are una). Rămân separate, deliberat: finanțările suplimentare și amendamentele care majorează un acord (au suma lor; un amendament care nu schimbă suma, ca amendamentul nr. 1 la memorandumul ceh RESTART, stă pe rândul acordului), două facilități diferite ale aceluiași finanțator (de pildă cele două facilități AFD de câte 40 mil. EUR) și cazurile în care o lege ratifică mai multe acorduri deodată. **Atenție la sumele de mână:** o sumă din `date/sume_manual.json` bate orice altă sumă din rând, iar cu mai multe sume de mână pe același rând câștigă cea a celui mai vechi act. De aceea un fragment unit cu acordul lui de bază nu mai poartă propria sumă sau marcajul `fara_total`: rândul întreg ar ieși din totaluri sau ar arăta suma greșită. Identificatorul rândului (`id` în `date/acorduri_legare.json`, linkul `#acord=`) vine de la cel mai vechi act al rândului; un link `#acord=` vechi rămâne valabil, pentru că se potrivește cu orice act din rând. Fișierul e citit de `acorduri.html` la fiecare deschidere; când se schimbă, pornește și `legaturi.yml` |
 | `legis_pagina.py` | Construiește `legis_acorduri.html` din `acorduri.html` + istoric + `date.json`; rulat de `monitor.yml` |
@@ -464,7 +490,9 @@ python3 import_pdf.py CALEA/CATRE/FOLDER_CU_PDF-URI --dry-run
 python3 import_pdf.py CALEA/CATRE/arhiva.zip --dry-run
 ```
 
-Primește un folder, un singur PDF sau o arhivă. Arhivele `.zip` le desface
+Primește un folder, un singur PDF sau o arhivă. Aplică același filtru ca citirea de pe
+site (`monitor_watch.clasifica_registru`), deci după o regulă corectată îl poți rula din nou
+pe o arhivă veche ca să recuperezi actele ratate. Arhivele `.zip` le desface
 singur. Pentru `.rar` și `.7z` are nevoie de un program deja instalat (7-Zip,
 WinRAR, `unrar` sau `tar`-ul din Windows 10/11); dacă nu găsește niciunul, spune
 asta și atunci desfaci arhiva într-un folder și îi dai folderul. Scoți

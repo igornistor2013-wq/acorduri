@@ -17,17 +17,27 @@ care n-o atingea nimic. A stat picată zile întregi.
 Testele de aici trec prin căile reale: parse_edition pe un cuprins întreg,
 main() pe o pagină simulată, recuperarea golurilor. Nu verifică doar că
 funcțiile dau răspunsul bun, ci că lanțul se execută cap-coadă.
+
+A doua lecție, din 16 octombrie 2026: hotărârea de inițiere a negocierilor pentru
+Acordul-cadru de împrumut cu Banca de Dezvoltare a Consiliului Europei („Modernizarea
+instituțiilor de învățământ profesional tehnic") n-a apărut în registrul Monitorului.
+Regula pentru „acord-cadru" exista doar în clasificatorul legis.md, iar colectorul
+avea alt filtru; ratase așa 52 de acte din ianuarie 2024 încoace. Testele
+test_acord_cadru, test_acelasi_filtru_ca_legis și test_paritate_cu_legis_md
+țin cele două registre pe același filtru.
 """
 
 import io
 import json
 import os
+import re
 import sys
 import tempfile
 import contextlib
 
 import monitor_watch as mw
 
+ACASA = os.path.dirname(os.path.abspath(__file__))
 ESECURI = []
 GET_ADEVARAT = mw.get      # testele de mai jos înlocuiesc mw.get; aici rămâne cel adevărat
 
@@ -199,6 +209,208 @@ def test_suport_bugetar():
                      "Facilitatea de reformă și creștere"), "Împrumut")
 
 
+# ------------------------------------- un singur filtru pentru ambele registre
+#
+# Titlurile sunt cele reale (legis.md), cu tipul actului în față, cum apar în cuprinsul
+# Monitorului. Hotărârea din primul e cea care a lipsit pe 16 octombrie 2026.
+
+TITLU_CEB_IPT = ("Hotărâre privind inițierea negocierilor și aprobarea semnării Acordului-cadru de "
+                 "împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei "
+                 "„Modernizarea instituțiilor de învățământ profesional tehnic”")
+
+
+def test_acord_cadru():
+    """„Acordul-cadru de împrumut" cu CEB intră în registru. Tiparul „acord de împrumut" nu
+    trecea de „-cadru", deci toate cele 14 acte CEB din ianuarie 2024 și hotărârea din
+    16 octombrie 2026 au rămas pe dinafară."""
+    cazuri = [
+        ("Împrumut", "CEB", TITLU_CEB_IPT),
+        ("Împrumut", "CEB", "Hotărâre privind inițierea negocierilor și aprobarea semnării Acordului-cadru de "
+                            "împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei "
+                            "pentru Proiectul „Locuințe publice III”"),
+        ("Împrumut", "CEB", "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Acordului-cadru "
+                            "de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei "
+                            "– Extinderea rețelei școlilor-model"),
+        ("Împrumut", "CEB", "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Amendamentului "
+                            "nr. 2 la Acordul-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare "
+                            "a Consiliului Europei pentru realizarea Proiectului de construcție a "
+                            "penitenciarului din Chișinău"),
+        ("Împrumut", "CEB", "Lege pentru ratificarea Acordului-cadru de împrumut dintre Banca de Dezvoltare a "
+                            "Consiliului Europei și Republica Moldova „Modernizarea școlilor (facilitatea de "
+                            "finanțare publică)”"),
+        ("Împrumut", "CEB", "Lege privind scutirea de unele taxe și impozite la importul/livrările de mărfuri "
+                            "și/sau servicii destinate implementării Acordului-cadru de împrumut dintre Banca "
+                            "de Dezvoltare a Consiliului Europei și Republica Moldova „Modernizarea școlilor "
+                            "(facilitatea de finanțare publică)”"),
+        # acord-cadru de finanțare: titlul nu spune dacă banii se rambursează, hotărăște finanțatorul
+        ("Împrumut", "BEI", "Lege pentru ratificarea Acordului-cadru de finanțare dintre Republica Moldova "
+                            "și Banca Europeană de Investiții"),
+    ]
+    for asteptat, partener, titlu in cazuri:
+        egal("acord-cadru, filtrul de bază: " + titlu[:56], mw.classify(titlu), asteptat)
+        egal("acord-cadru, filtrul registrului: " + titlu[:56], mw.clasifica_registru(titlu), asteptat)
+        egal("acord-cadru, partener: " + titlu[:56], mw.partener_registru(titlu), partener)
+
+    # Cratima din „acord-cadru" apare în cuprinsuri și ca semn lung, spațiu ori cratimă fără rupere.
+    for legatura in ("-", "\u2013", "\u2014", "\u2011", " - ", " \u2013 ", " "):      # cratimă, semn lung, cratimă fără rupere
+        titlu = TITLU_CEB_IPT.replace("Acordului-cadru", "Acordului" + legatura + "cadru")
+        egal("acord-cadru, legătura %r" % legatura, mw.classify(titlu), "Împrumut")
+    # și formele gramaticale: singular, genitiv, plural
+    for forma in ("Acordul", "Acordului", "Acordurile", "Acordurilor"):
+        titlu = TITLU_CEB_IPT.replace("Acordului", forma)
+        egal("acord-cadru, forma " + forma, mw.classify(titlu), "Împrumut")
+
+    # un acord-cadru de colaborare între instituții moldovenești nu e asistență externă
+    for f in (mw.classify, mw.clasifica_registru):
+        verifica("acord-cadru de colaborare între ministere: nu intră (%s)" % f.__name__,
+                 f("Hotărâre cu privire la aprobarea Acordului-cadru de colaborare dintre Ministerul "
+                   "Educației și Ministerul Sănătății") is None)
+
+
+def test_acelasi_filtru_ca_legis():
+    """Ce primește registrul legis.md primește și Monitorul, în ziua publicării.
+
+    Câte un titlu real din fiecare familie pe care colectorul n-o cunoștea (vezi
+    clasifica_registru). Categoria și partenerul așteptate sunt cele din registrul legis.md."""
+    import legis_clasifica as lc
+    cazuri = [
+        # acord de facilitate de împrumut
+        ("Împrumut", "Canada", "Lege privind ratificarea Acordului de facilitate de împrumut dintre Republica "
+                               "Moldova, acționând prin intermediul Ministerului Finanțelor al Republicii "
+                               "Moldova, și Majestatea Sa Regele de drept al Canadei, reprezentat de ministrul "
+                               "dezvoltării internaționale"),
+        # înțelegeri prin schimb de note
+        ("Grant", "Germania", "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Înțelegerii, "
+                              "întocmite prin schimb de note, dintre Guvernul Republicii Moldova și Guvernul "
+                              "Republicii Federale Germania privind cooperarea financiară pentru finanțarea "
+                              "proiectelor „Facilitarea dezvoltării IMM-urilor din Moldova”"),
+        ("Asistență tehnică", "Japonia", "Lege pentru ratificarea Înțelegerii, întocmită prin schimb de note, "
+                                         "dintre Guvernul Republicii Moldova și Guvernul Japoniei privind "
+                                         "cooperarea tehnică pentru finanțarea proiectului „Îmbunătățirea "
+                                         "echipamentelor de producție a programelor de televiziune”"),
+        # memorandumuri cu agenții de dezvoltare
+        ("Asistență tehnică", "AFD", "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării "
+                                     "Memorandumului de înțelegere tripartit dintre Ministerul Mediului din "
+                                     "Republica Moldova, Societatea Silvică a Fondului de Depozit și Consignație "
+                                     "și Agenția Franceză pentru Dezvoltare"),
+        ("Asistență tehnică", "PAM", "Ordin cu privire la semnarea și intrarea în vigoare a Memorandumului de "
+                                     "Înțelegere dintre Ministerul Muncii și Protecției Sociale și Programul "
+                                     "Alimentar Mondial (PAM) în ceea ce privește dezvoltarea profesională și "
+                                     "consolidarea capacităților pentru sistemele de protecție socială"),
+        ("Asistență tehnică", "Elveția", "Hotărâre pentru inițierea negocierilor și aprobarea semnării Acordului "
+                                         "dintre Ministerul Sănătății al Republicii Moldova și Agenția Elvețiană "
+                                         "pentru Dezvoltare și Cooperare privind a doua fază a Proiectului "
+                                         "„Progresul cu privire la acoperirea universală cu servicii de sănătate”"),
+        # amendamente la Acordul de asistență privind obiectivul de dezvoltare (Statele Unite)
+        ("Grant", "SUA", "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării celui de-al "
+                         "cincisprezecelea Amendament la Acordul de asistență privind obiectivul de dezvoltare "
+                         "dintre Guvernul Republicii Moldova și Guvernul Statelor Unite ale Americii pentru "
+                         "consolidarea democrației participative, semnat la Chișinău la 28 septembrie 2016"),
+        # garanția de stat pentru un împrumut extern
+        ("Împrumut", "BERD", "Lege privind acordarea garanției de stat pentru împrumutul extern acordat "
+                             "Societății pe Acțiuni ”Energocom” de către Banca Europeană pentru Reconstrucție "
+                             "și Dezvoltare, destinat realizării proiectului ”Consolidarea securității "
+                             "energetice a Republicii Moldova”"),
+    ]
+    for asteptat, partener, titlu in cazuri:
+        egal("același filtru: " + titlu[:56], mw.clasifica_registru(titlu), asteptat)
+        egal("același filtru, partener: " + titlu[:56], mw.partener_registru(titlu), partener)
+        egal("același filtru, ca legis.md: " + titlu[:56],
+             mw.clasifica_registru(titlu), lc.clasifica(mw.fara_tip(titlu)))
+
+
+# Acte pe care filtrul registrelor nu are voie să le primească. Intră aici și cele două feluri
+# de zgomot pe care filtrul de bază le lăsa să treacă (instituirea unui grup de negociere,
+# „contractele de credit pentru consumatori"), și un act pe care tipul din față l-ar fi
+# lăsat să treacă (excluderea „acordarea unui credit…" cere ca titlul să înceapă cu ea).
+CAPCANE_REGISTRU = [
+    "Hotărâre cu privire la instituirea Grupului de negociere a Acordului de credit între "
+    "Guvernul Republicii Moldova şi Banca Mondială",
+    "Lege privind contractele de credit pentru consumatori",
+    "Hotărâre cu privire la acordarea unui credit Întreprinderii de Stat X de către Banca "
+    "Europeană pentru Reconstrucție și Dezvoltare",
+    "Hotărâre cu privire la acordarea ajutorului umanitar populației din Republica Turcia",
+    "Hotărâre cu privire la aprobarea Memorandumului de înțelegere dintre Ministerul Educației al "
+    "Republicii Moldova și Ministerul Educației al României privind cooperarea în domeniul educației",
+    "Hotărâre cu privire la aprobarea Acordului-cadru de colaborare dintre Ministerul Educației și "
+    "Ministerul Sănătății",
+]
+
+
+def test_filtru_registru_nu_primeste_zgomot():
+    for titlu in CAPCANE_REGISTRU:
+        cat = mw.clasifica_registru(titlu)
+        verifica("registrul nu primește: " + titlu[:56], cat is None, "a primit %r" % cat)
+
+
+def test_filtru_de_rezerva():
+    """Fără legis_clasifica.py, colectarea nu se oprește: merge pe regulile de bază și spune asta."""
+    vechi_stare, vechi_modul = mw._LEGIS[0], sys.modules.get("legis_clasifica")
+    try:
+        mw._LEGIS[0] = None
+        sys.modules["legis_clasifica"] = None          # „import legis_clasifica" dă acum ImportError
+        iesire = io.StringIO()
+        with contextlib.redirect_stdout(iesire):
+            cat = mw.clasifica_registru(TITLU_CEB_IPT)
+            schimb_de_note = mw.clasifica_registru(
+                "Lege pentru ratificarea Înțelegerii, întocmită prin schimb de note, dintre Guvernul "
+                "Republicii Moldova și Guvernul Japoniei privind cooperarea tehnică pentru finanțarea "
+                "proiectului „Îmbunătățirea echipamentelor de producție”")
+            partener = mw.partener_registru(TITLU_CEB_IPT)
+        egal("filtru de rezervă: acordul-cadru intră și numai cu regulile de bază", cat, "Împrumut")
+        egal("filtru de rezervă: partenerul vine din lista de bază", partener, "CEB")
+        egal("filtru de rezervă: ce știe doar legis_clasifica lipsește", schimb_de_note, None)
+        verifica("filtru de rezervă: spune pe ecran ce lipsește",
+                 "legis_clasifica.py nu se poate încărca" in iesire.getvalue(), iesire.getvalue())
+        egal("filtru de rezervă: avertismentul apare o singură dată",
+             iesire.getvalue().count("nu se poate încărca"), 1)
+    finally:
+        mw._LEGIS[0] = vechi_stare
+        if vechi_modul is None:
+            sys.modules.pop("legis_clasifica", None)
+        else:
+            sys.modules["legis_clasifica"] = vechi_modul
+
+
+def test_paritate_cu_legis_md():
+    """Pe titlurile din istoricul legis.md filtrul Monitorului dă exact ce dă clasificatorul legis.
+
+    Titlurile din Monitor au tipul actului în față („Hotărâre …"), cele din legis.md nu. Trecerea
+    de la unele la altele (fara_tip) nu are voie să schimbe niciun răspuns. Se verifică toate
+    actele din ianuarie 2024 încoace — perioada în care Monitorul a ratat 52 de acte."""
+    import legis_clasifica as lc
+    baza = json.load(open(os.path.join(ACASA, "legis_brut.json"), encoding="utf-8"))
+    tip = {"LP": "Lege", "HG": "Hotărâre", "HP": "Hotărâre", "DP": "Decret", "DG": "Dispoziție", "O": "Ordin"}
+    verificate = primite = 0
+    diferente = []
+    for r in baza:
+        zi, luna, an = (int(x) for x in r["pub"].split("-"))
+        if (an, luna, zi) < (2024, 1, 1):
+            continue
+        t = re.sub(r"^(Modificat|Abrogat|Suspendat)\s*", "", r["t"]).strip()
+        cuvant = next((v for k, v in tip.items() if r["c"].startswith(k)), "Act")
+        asteptat = lc.clasifica(t)
+        obtinut = mw.clasifica_registru(cuvant + " " + t)
+        verificate += 1
+        primite += bool(asteptat)
+        if obtinut != asteptat:
+            diferente.append("%s: legis %r, Monitor %r" % (r["c"], asteptat, obtinut))
+    verifica("legis_brut.json are titluri de la 2024 de verificat", verificate > 300, verificate)
+    verifica("legis_brut.json are acte primite în registru de la 2024", primite > 200, primite)
+    egal("Monitorul primește tot ce primește legis.md (%d acte din %d titluri)" % (primite, verificate),
+         diferente[:5], [])
+
+
+def test_actele_din_date_json_trec_filtrul():
+    """Niciun act din registru nu e respins de filtrul de azi (altfel regulile s-au îndepărtat de date)."""
+    db = json.load(open(os.path.join(ACASA, "date.json"), encoding="utf-8"))
+    respinse = [k for k, a in db["acte"].items() if not mw.clasifica_registru(a.get("titlu", ""))]
+    egal("date.json: actele respinse de filtrul de azi", respinse, [])
+    diferite = [k for k, a in db["acte"].items()
+                if mw.partener_registru(a.get("titlu", "")) != a.get("partener", "")]
+    egal("date.json: partenerul din registru e cel de azi", diferite, [])
+
+
 # ------------------------------------------------------- lanțul de colectare
 
 # Fiecare act pe un singur rând: colectorul citește pagina linie cu linie, iar
@@ -263,6 +475,43 @@ def test_rulare_completa():
     verifica("ediția e marcată ca văzută", "3400" in db["editii_vazute"])
     verifica("ultima rulare e completată", bool(db.get("ultima_rulare")))
     verifica("câmpul editii_lipsa e salvat", "editii_lipsa" in db)
+
+
+# Cuprinsul unei ediții cu hotărârea CEB (numărul actului e inventat), una despre un credit intern
+# și una fără nicio legătură cu finanțarea externă.
+CUPRINS_CEB = (
+    "<html><body>"
+    "<p>612. " + TITLU_CEB_IPT + " (nr. 999, 14 octombrie 2026)</p>"
+    "<p>613. Hotărâre cu privire la acordarea unui credit Întreprinderii de Stat X de către Banca "
+    "Europeană pentru Reconstrucție și Dezvoltare (nr. 998, 14 octombrie 2026)</p>"
+    "<p>614. Hotărâre cu privire la aprobarea Regulamentului de organizare internă a unei "
+    "instituții publice oarecare (nr. 997, 14 octombrie 2026)</p>"
+    "</body></html>"
+)
+
+
+def test_hotarare_ceb_cap_coada():
+    """Ziua de 16 octombrie 2026, de la pagina principală la date.json: hotărârea pentru
+    Acordul-cadru de împrumut CEB intră în registru, celelalte două rânduri nu."""
+    acasa = "<html><body><a href='/ro/monitor/3500'>" \
+            "Monitorul Oficial Nr. 500-503 din 16.10.2026</a></body></html>"
+    mw.get = lambda u, tries=3: acasa if u.endswith("/ro") else CUPRINS_CEB
+    mw.time.sleep = lambda s: None
+    with tempfile.TemporaryDirectory() as folder:
+        vechi_data = mw.DATA
+        mw.DATA = os.path.join(folder, "date.json")
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                mw.main()
+            db = json.load(open(mw.DATA, encoding="utf-8"))
+        finally:
+            mw.DATA = vechi_data
+    egal("hotărârea CEB: un singur act colectat", len(db["acte"]), 1)
+    for a in db["acte"].values():
+        egal("hotărârea CEB: categoria", a["categorie"], "Împrumut")
+        egal("hotărârea CEB: partenerul", a["partener"], "CEB")
+        egal("hotărârea CEB: numărul actului", a["act"], "nr. 999, 14 octombrie 2026")
+        egal("hotărârea CEB: ediția", (a["editie"], a["data_editie"]), ("500-503", "16.10.2026"))
 
 
 def test_goluri():

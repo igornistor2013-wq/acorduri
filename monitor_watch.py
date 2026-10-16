@@ -12,7 +12,8 @@ Rulare:
 Ce face:
   1. Citește lista edițiilor recente de pe monitorul.gov.md
   2. Recitește TOATE edițiile din listă la fiecare rulare (nu doar cele noi)
-  3. Extrage actele care conțin termeni de finanțare externă
+  3. Extrage actele care conțin termeni de finanțare externă, cu același filtru
+     ca registrul legis.md (clasifica_registru, mai jos)
   4. Salvează în date.json (cumulativ, fără duplicate)
   5. Pagina acorduri.html citește date.json direct — nu se generează nimic
 
@@ -31,6 +32,12 @@ try:
     from bs4 import BeautifulSoup
 except ImportError:
     sys.exit("Lipsesc biblioteci. Rulează:  pip install requests beautifulsoup4")
+
+# Rulat ca script („python monitor_watch.py"), modulul se cheamă „__main__". Filtrul registrului
+# (clasifica_registru, mai jos) încarcă legis_clasifica, iar acela își importă baza după numele
+# adevărat, „monitor_watch": fără rândul de mai jos ar porni o a doua copie a acestui fișier.
+if __name__ == "__main__":
+    sys.modules.setdefault("monitor_watch", sys.modules[__name__])
 
 BASE = "https://monitorul.gov.md"
 HOME = BASE + "/ro"
@@ -76,7 +83,17 @@ UA = {"User-Agent": "Mozilla/5.0 (compatible; monitor-watch/1.0)"}
 # acordului" și rata acte reale: „Amendament la ACORDURILE de finanțare dintre
 # Republica Moldova și AID" (MO nr. 390-393 din 25.08.2026, poz. 421) n-a intrat
 # niciodată în registru din cauza unei singure litere.
-ACORD = r"acord(?:ul|ului|uri|urile|urilor)?"
+#
+# ACORD acoperă și „acord-cadru". Tiparele cer „de împrumut", „de finanțare" ș.a.m.d. IMEDIAT
+# după cuvântul „acord", așa că „-cadru" le rupea: „Acordul-cadru de împrumut" cu Banca de
+# Dezvoltare a Consiliului Europei (CEB), instrumentul prin care Moldova ia creditele de la ea, nu
+# trecea de filtru. Din ianuarie 2024 au rămas astfel pe dinafară 14 acte (hotărâri, legi, decrete)
+# despre acorduri-cadru CEB, iar hotărârea publicată la 16 octombrie 2026 pentru „Modernizarea
+# instituțiilor de învățământ profesional tehnic" a fost a cincisprezecea. Registrul legis.md le
+# primea (legis_clasifica avea regula), Monitorul nu. Cratima din „acord-cadru" poate fi și semn
+# lung ori spațiu — în cuprinsuri apar toate —, de aceea CADRU le primește pe toate.
+CADRU = r"(?:[\s\-\u2010-\u2015\u2212\u00ad]+cadru)?"
+ACORD = r"acord(?:ul|ului|uri|urile|urilor)?" + CADRU
 CONTRACT = r"contract(?:ul|ului|e|ele|elor)?"
 
 INCLUDE = [
@@ -547,6 +564,77 @@ def signed_on(title):
     return ""
 
 
+# ------------------------------------------- filtrul registrelor: un singur set de reguli
+#
+# Două registre, un singur filtru. Registrul din Monitor (acorduri.html) și cel din legis.md
+# (legis_acorduri.html) țin același fel de acte, iar actele noi ajung în al doilea tot prin
+# Monitor (legis_pagina.adauga_din_monitor), până le apucă legis.md. Regulile au fost însă scrise
+# în două locuri: legis_clasifica.py a primit, pe măsură ce comparația cu legis.md arăta goluri,
+# acordurile-cadru, acordurile de facilitate de împrumut, înțelegerile prin schimb de note,
+# memorandumurile cu agențiile de dezvoltare, garanțiile de stat — iar colectorul Monitorului a
+# rămas la regulile de la început. Ce știa legis.md și nu știa Monitorul se pierdea în ziua
+# publicării: așa au lipsit din registrul Monitorului 52 de acte din ianuarie 2024 încoace, între
+# ele toate cele despre acordurile-cadru de împrumut ale CEB.
+#
+# De acum colectorul filtrează cu legis_clasifica.clasifica(), exact ca registrul legis.md, deci
+# diferența nu mai poate reapărea: o regulă nouă se scrie o singură dată. legis_clasifica pornește
+# de la regulile de aici (classify) și adaugă pe ale lui, cu porțile lui (document încheiat cu un
+# partener, excluderi pentru acte de cadru, procedură, apărare, fiscalitate). Pe cele 333 de acte
+# deja în date.json cele două filtre dau aceeași categorie și același partener, deci niciun rând
+# existent nu se schimbă.
+#
+# Un act pe care îl primea vechiul filtru și îl refuză legis_clasifica e, în practică, zgomot:
+# instituirea unui grup de negociere, componența unui comitet, „contracte de credit pentru
+# consumatori". Din istoricul legis.md sunt 20 de asemenea titluri, niciunul în date.json.
+
+_LEGIS = [None]        # None: încă neîncercat; False: nu se poate încărca; altfel, modulul
+
+
+def _legis():
+    """Modulul legis_clasifica, încărcat la prima folosire; None dacă nu se poate.
+
+    Nu se importă în capul fișierului: el însuși importă monitor_watch, deci cele două
+    importuri s-ar aștepta unul pe altul. Dacă fișierul lipsește (cineva a copiat doar
+    monitor_watch.py) sau e stricat, colectarea nu se oprește: merge pe regulile de bază de aici
+    și spune pe ecran că registrul va rata acte pe care legis.md le prinde. În workflow nu poate
+    ajunge acolo, fiindcă teste.py verifică înainte că modulul se încarcă."""
+    if _LEGIS[0] is None:
+        try:
+            import legis_clasifica
+            _LEGIS[0] = legis_clasifica
+        except Exception as e:                              # noqa: BLE001
+            print(f"   ! legis_clasifica.py nu se poate încărca ({e.__class__.__name__}: {e}).\n"
+                  "     Folosesc doar regulile de bază ale Monitorului: acordurile-cadru, "
+                  "schimburile de note, memorandumurile și alte acte pe care legis.md le prinde "
+                  "vor lipsi din registru.")
+            _LEGIS[0] = False
+    return _LEGIS[0] or None
+
+
+def fara_tip(title):
+    """Titlul fără cuvântul de tip de la început („Hotărâre", „Lege", „Ordin"), cum îl dă legis.md.
+
+    Cuprinsul Monitorului începe cu tipul actului, legis.md nu. Câteva reguli din
+    legis_clasifica se ancorează pe începutul titlului („cu privire la acordarea unui ajutor…"),
+    deci titlul i se dă în forma pe care o știe."""
+    return re.sub(r"^\S+\s+", "", title.strip())
+
+
+def clasifica_registru(title):
+    """Categoria unui act din cuprinsul Monitorului, cu filtrul ambelor registre; None dacă nu e relevant.
+
+    Singura cale prin care un titlu din Monitor intră în date.json (parse_edition, reclasifica,
+    import_pdf.py). classify() rămâne baza, folosită de legis_clasifica."""
+    lc = _legis()
+    return lc.clasifica(fara_tip(title)) if lc else classify(title)
+
+
+def partener_registru(title):
+    """Partenerul actului, din lista extinsă a registrului legis.md (cea de bază când lipsește)."""
+    lc = _legis()
+    return lc.partener(fara_tip(title)) if lc else partner(title)
+
+
 # ------------------------------------------------------------------ colectare
 
 def get(url, tries=3, pauze=(3, 8, 20, 45)):
@@ -638,14 +726,14 @@ def parse_edition(eid, label):
         if not m:
             continue
         title, act = m.group(2).strip(), m.group(3).strip()
-        cat = classify(title)
+        cat = clasifica_registru(title)
         if not cat:
             continue
         found.append({
             "act": re.sub(r"\s+", " ", act),
             "titlu": title,
             "categorie": cat,
-            "partener": partner(title),
+            "partener": partener_registru(title),
             "semnat": signed_on(title),
             "editie": ed_nr,
             "data_editie": ed_date,
@@ -727,7 +815,7 @@ def reclasifica(db):
     Întoarce [(act, categoria veche, categoria nouă)]."""
     schimbate = []
     for a in db["acte"].values():
-        cat = classify(a.get("titlu", ""))
+        cat = clasifica_registru(a.get("titlu", ""))
         if cat and cat != a.get("categorie"):
             schimbate.append((a.get("act"), a.get("categorie"), cat))
             a["categorie"] = cat

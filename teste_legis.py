@@ -28,6 +28,9 @@ print('Clasificator')
 CAZURI = [
     ('pentru ratificarea Acordului de împrumut dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare', 'Împrumut', 'BIRD'),
     ('pentru ratificarea Acordului-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei pentru Proiectul „Locuințe publice III”', 'Împrumut', 'CEB'),
+    # hotărârea publicată la 16 octombrie 2026; regula „acord-cadru" stă acum în monitor_watch (aceeași pentru ambele registre)
+    ('privind inițierea negocierilor și aprobarea semnării Acordului-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei „Modernizarea instituțiilor de învățământ profesional tehnic”', 'Împrumut', 'CEB'),
+    ('privind inițierea negocierilor și aprobarea semnării Acordului–cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei „Modernizarea instituțiilor de învățământ profesional tehnic”', 'Împrumut', 'CEB'),
     ('privind ratificarea Acordului de facilitate de împrumut dintre Republica Moldova și Majestatea Sa Regele de drept al Canadei', 'Împrumut', 'Canada'),
     ('pentru ratificarea Acordului de grant, întocmit prin schimb de note, dintre Guvernul Republicii Moldova și Guvernul Japoniei privind asigurarea fermierilor cu fertilizanți', 'Grant', 'Japonia'),
     ('pentru ratificarea Acordului dintre Republica Moldova și Bosnia și Herțegovina privind asistența juridică reciprocă', None, None),

@@ -244,7 +244,7 @@ def acte_din_text(text, nr, data, eid, url):
         act = curata(m.group(3))
         if len(titlu) < 20 or GUNOI.search(titlu):
             continue
-        cat = mw.classify(titlu)
+        cat = mw.clasifica_registru(titlu)
         if not cat:
             continue
         cheie = act + "|" + titlu[:60]
@@ -255,7 +255,7 @@ def acte_din_text(text, nr, data, eid, url):
             "act": act,
             "titlu": titlu,
             "categorie": cat,
-            "partener": mw.partner(titlu),
+            "partener": mw.partener_registru(titlu),
             "semnat": mw.signed_on(titlu),
             "editie": nr or "?",
             "data_editie": data,
