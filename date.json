@@ -4326,6 +4326,30 @@
       "editie_id": "3356",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3356"
+    },
+    "nr. 567, 15 octombrie 2026|3359": {
+      "act": "nr. 567, 15 octombrie 2026",
+      "titlu": "Hotărâre cu privire la inițierea negocierilor asupra proiectului Acordului de împrumut dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare în vederea implementării proiectului „Mecanismul de eficiență energetică Revolving din Moldova (MEERM)” și împuternicirea delegației pentru negocierea acestuia",
+      "categorie": "Împrumut",
+      "partener": "BIRD",
+      "semnat": "",
+      "editie": "512-515",
+      "data_editie": "16.10.2026",
+      "editie_id": "3359",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3359"
+    },
+    "nr. 569, 15 octombrie 2026|3359": {
+      "act": "nr. 569, 15 octombrie 2026",
+      "titlu": "Hotărâre cu privire la inițierea negocierilor asupra proiectului Acordului de împrumut dintre Guvernul Republicii Moldova și Agenția Japoneză pentru Cooperare Internațională pentru realizarea Proiectului „Modernizarea tehnicii și echipamentelor agricole (etapa a II-a) și împuternicirea delegației oficiale pentru negocierea acestuia”",
+      "categorie": "Împrumut",
+      "partener": "JICA",
+      "semnat": "",
+      "editie": "512-515",
+      "data_editie": "16.10.2026",
+      "editie_id": "3359",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3359"
     }
   },
   "editii_vazute": [
@@ -4374,9 +4398,10 @@
     "3355",
     "3356",
     "3357",
-    "3358"
+    "3358",
+    "3359"
   ],
-  "ultima_rulare": "15.10.2026 14:01",
+  "ultima_rulare": "16.10.2026 10:25",
   "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5
