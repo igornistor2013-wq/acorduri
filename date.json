@@ -4350,6 +4350,30 @@
       "editie_id": "3359",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3359"
+    },
+    "nr. 562, 15 octombrie 2026|3359": {
+      "act": "nr. 562, 15 octombrie 2026",
+      "titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Acordului-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei „Modernizarea instituțiilor de învățământ profesional tehnic”",
+      "categorie": "Împrumut",
+      "partener": "CEB",
+      "semnat": "",
+      "editie": "512-515",
+      "data_editie": "16.10.2026",
+      "editie_id": "3359",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3359"
+    },
+    "nr. 568, 15 octombrie 2026|3359": {
+      "act": "nr. 568, 15 octombrie 2026",
+      "titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Acordului, întocmit prin schimb de note, dintre Guvernul Republicii Moldova şi Guvernul Japoniei privind acordarea unui împrumut pentru realizarea proiectului „Modernizarea tehnicii și echipamentelor agricole (etapa a II-a)”",
+      "categorie": "Împrumut",
+      "partener": "Japonia",
+      "semnat": "",
+      "editie": "512-515",
+      "data_editie": "16.10.2026",
+      "editie_id": "3359",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3359"
     }
   },
   "editii_vazute": [
@@ -4401,7 +4425,7 @@
     "3358",
     "3359"
   ],
-  "ultima_rulare": "16.10.2026 10:25",
+  "ultima_rulare": "16.10.2026 12:52",
   "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5
