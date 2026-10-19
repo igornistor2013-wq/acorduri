@@ -1,5 +1,5 @@
 {
-"actualizat": "2026-10-12 17:00",
+"actualizat": "2026-10-19 09:32",
 "istoric_complet": true,
 "puncte": {
 "1/MDED/2026": {
@@ -1925,6 +1925,10 @@
 "sedinta-guvernului-din-21-mai-2025-ora-1000": {
 "acorduri": 5,
 "data": "2025-05-21"
+},
+"sedinta-guvernului-din-21-octombrie-2026-ora-1000": {
+"acorduri": 0,
+"data": "2026-10-21"
 },
 "sedinta-guvernului-din-22-aprilie-2026-ora-1000": {
 "acorduri": 0,
