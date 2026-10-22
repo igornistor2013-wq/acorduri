@@ -4374,6 +4374,18 @@
       "editie_id": "3359",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3359"
+    },
+    "nr. 139, 20 octombrie 2026|3361": {
+      "act": "nr. 139, 20 octombrie 2026",
+      "titlu": "Ordin cu privire la aprobarea Instrucțiunii privind determinarea eligibilității operatorilor economici, precum și determinarea originii mărfurilor de către autoritățile publice în procesul de implementare a cotei de cofinanțare a Republicii Moldova în cadrul proiectelor investiționale, aprobate prin Platforma de investiții pentru politica de vecinătate în cadrul Mecanismului de reformă și creștere pentru Republica Moldova",
+      "categorie": "Asistență financiară",
+      "partener": "",
+      "semnat": "",
+      "editie": "520-523",
+      "data_editie": "22.10.2026",
+      "editie_id": "3361",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3361"
     }
   },
   "editii_vazute": [
@@ -4424,9 +4436,10 @@
     "3357",
     "3358",
     "3359",
-    "3360"
+    "3360",
+    "3361"
   ],
-  "ultima_rulare": "21.10.2026 14:22",
+  "ultima_rulare": "22.10.2026 14:21",
   "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5
