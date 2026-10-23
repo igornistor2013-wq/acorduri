@@ -1,5 +1,5 @@
 {
-"actualizat": "2026-10-19 09:32",
+"actualizat": "2026-10-23 12:51",
 "istoric_complet": true,
 "puncte": {
 "1/MDED/2026": {
@@ -1498,6 +1498,15 @@
 "sume": [],
 "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de grant dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare, acționând în calitate de entitate de implementare a Fondului Global de Mediu, pentru implementarea Proiectului „Restaurarea ecosistemelor pentru prevenirea poluării marine”"
 },
+"658/MF/2026": {
+"categorie": "Împrumut",
+"data": "2026-10-28",
+"partener": "AFD",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-10/NU-658-MF-2026.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-28-octombrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la inițierea negocierilor asupra proiectului Acordului de facilitate de credit dintre Republica Moldova și Agenția Franceză pentru Dezvoltare nr. CMD 1023 01 E „Programul pentru tranziția energetică verde” și acordarea împuternicirilor pentru negocierea acestuia"
+},
 "664/MIDR/2026": {
 "categorie": "Împrumut",
 "data": "2026-07-22",
@@ -1624,6 +1633,16 @@
 "sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-12-august-2026-ora-1000",
 "sume": [],
 "titlu": "Hotărâre cu privire la aprobarea Amendamentului nr. 1, semnat la Chișinău la 29 iulie 2026, la Acordul pentru proiectul de cooperare și finanțare dintre Federația Internațională a Societăților de Cruce Roșie și Semilună Roșie (FICR) și Ministerul Muncii și Protecției Sociale al Republicii Moldova privind Proiectul „Sprijin pentru funcționarea centrelor de plasament temporar pentru refugiați și acordarea asistenței în sezonul rece în Republica Moldova”, semnat la Chișinău la 2 martie 2026"
+},
+"848/MJ/2026": {
+"categorie": "Împrumut",
+"data": "2026-10-28",
+"modificare": true,
+"partener": "CEB",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-10/NU-848-MJ-2026_0.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-28-octombrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Amendamentului nr. 3 la Acordul-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei pentru realizarea Proiectului de construcție a penitenciarului din Chișinău"
 },
 "850/MDED/2025": {
 "categorie": "Grant",
@@ -2017,6 +2036,10 @@
 "sedinta-guvernului-din-28-mai-2025-ora-1000": {
 "acorduri": 1,
 "data": "2025-05-28"
+},
+"sedinta-guvernului-din-28-octombrie-2026-ora-1000": {
+"acorduri": 2,
+"data": "2026-10-28"
 },
 "sedinta-guvernului-din-29-aprilie-2024-ora-1000": {
 "acorduri": 0,
