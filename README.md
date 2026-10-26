@@ -374,11 +374,12 @@ La data acestei versiuni, `date/proiecte_manual.json` are obiective pentru 170 d
 Uniunea Europeană 6, Elveția 4, SUA/MCC 1), fiecare cu adresa documentului oficial și citatul exact. Restul (China,
 SUA/USAID, cea mai mare parte din Japonia și Germania, majoritatea acordurilor Elveției, ale UE și ale Băncii Mondiale
 mai vechi) rămân „neintroduse", până se găsește o sursă; se pot completa direct din pagină, cu codul de acces, sau în
-fișier, cu o intrare nouă (sursă + citat). Datele de început și de finalizare vin deocamdată din AMP (la proiectele
-legate sigur) și din 26 de intrări oficiale (opt de la FIDA — șapte doar cu data finalizării —, cinci de la
-JICA/Japonia, patru de la GIZ/Germania, patru de la AFD, trei de la Elveția/SDC, DHEIP-1 și MCC); la fiecare, `nota`
-spune ce reprezintă data (perioada unei faze, anul de început al programului, data intrării în vigoare sau a închiderii
-proiectului etc.) și când legătura cu rândul din registru se bazează doar pe denumire sau pe sumă.
+fișier, cu o intrare nouă (sursă + citat). Datele de început și de finalizare vin deocamdată din AMP (la proiectele legate sigur) și din 60 de intrări oficiale
+(Banca Mondială 35 — din rapoartele de implementare ISR, de finalizare ICR și din acordurile de finanțare: data intrării
+în vigoare ca început, data de închidere ca final —, FIDA 8, JICA/Japonia 5, GIZ/Germania 4, AFD 4, Elveția/SDC 3 și
+MCC 1); la fiecare, `nota` spune ce reprezintă data (intrare în vigoare, perioadă, închidere prevăzută sau reală) și
+când legătura cu rândul din registru se bazează doar pe denumire sau pe sumă. Fișele BERD, BEI și CEB dau doar data
+aprobării sau a semnării, nu perioada proiectului, deci la ele datele vin numai din AMP.
 
 **Codul de acces și „baza de date".** Site-ul e static (GitHub Pages): n-are server care să primească
 date. Singurul loc în care o pagină poate scrie fără un serviciu în plus e chiar repository-ul, prin
