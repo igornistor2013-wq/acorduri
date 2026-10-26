@@ -1,8 +1,9 @@
 /* debursari-ui.js — ce vede și ce atinge omul pe pagina „Debursări pe acorduri” (debursari.html).
 
-   Calculele, salvarea în „baza de date” (date/debursari.json) și fișierele Excel sunt în debursari.js, testat în Node. Aici sunt doar:
-   încărcarea datelor, lista donatorilor cu căsuțe, tabelele de proiecte, fereastra cu codul de acces, formularul de debursare,
-   coada de modificări nesalvate și butoanele de export.
+   Calculele, salvarea în „baza de date” (date/debursari.json) și fișierele Excel sunt în debursari.js, testat în Node; datele de început și de
+   finalizare din AMP, în amp-date.js. Aici sunt doar: încărcarea datelor, lista donatorilor cu căsuțe, tabelele de proiecte (cu obiectivele și
+   datele fiecărui proiect), fereastra cu codul de acces, formularele de debursare și de date despre proiect, coada de modificări nesalvate,
+   lista rândurilor omise și butoanele de export.
 
    Despre cod. Cheia de acces nu se scrie nicăieri în clar: rămâne în variabila `cod`, închisă în această funcție (nu în DOM, nu într-un
    obiect global, nu în adresa paginii). Dacă omul cere, se păstrează pe dispozitiv numai criptată cu un PIN (Debursari.Seif). */
@@ -28,11 +29,13 @@ var dep = D.Depozit();
 var S = {
   en: document.documentElement.lang === 'en',
   faza: 'incarc', eroareInc: null,
-  baza: null, serv: null, coada: [], dinMemorie: false, debEroare: null,
+  baza: null, brut: null, manualEroare: false, serv: null, coada: [], dinMemorie: false, debEroare: null,
   ocupat: false, eroareSalv: null, ultimaSalv: '',
   intrari: [], peAcord: new Map(), orfane: [], nesalvate: new Set(), cache: new Map(), rezDon: new Map(),
+  proiecteDb: { peAcord: new Map(), orfane: [], vechi: [] }, nesalvateP: new Set(), extra: new Map(),   // datele despre proiecte introduse în pagină
+  amp: { faza: 'neinceput', peAcord: new Map(), stare: null, eroare: '', promisiune: null },           // datele de început și de finalizare din AMP
   sel: [], q: '', tip: '', deb: '', sort: 'suma', dq: '', dsort: 'n',
-  deschise: new Set(), f: {}, fe: {}, ed: null, conf: null,
+  deschise: new Set(), f: {}, fe: {}, ed: null, conf: null, pf: {}, pfe: {}, confP: null,
   dlg: { mod: 'cod', eroare: '', ocupat: false, tine: false }
 };
 
@@ -107,10 +110,26 @@ function recalc() {
   if (!S.baza) return;
   var date = D.aplicaOps(S.serv || D.dateGoale(), S.coada);
   S.intrari = date.intrari;
-  S.nesalvate = new Set(S.coada.filter(function (o) { return o.t !== 'del'; }).map(function (o) { return o.e.id; }));
+  S.nesalvate = new Set(S.coada.filter(function (o) { return o.t === 'add' || o.t === 'upd'; }).map(function (o) { return o.e.id; }));
   var l = D.lega(S.intrari, S.baza);
   S.peAcord = l.peAcord; S.orfane = l.orfane;
+  S.proiecteDb = D.legaProiecte(date.proiecte, S.baza);
+  S.nesalvateP = new Set(S.coada.filter(function (o) { return o.t === 'pset'; }).map(function (o) { return o.p.id; }));
   S.cache = new Map(); S.rezDon = new Map();
+  recalcExtra();
+}
+/* Obiectivele, datele de început și de finalizare ale unui rând: ce a introdus un utilizator, apoi sursele oficiale, apoi AMP (doar legături sigure). */
+function infoDe(a) {
+  return D.infoProiect(a, { db: S.proiecteDb.peAcord, manual: S.baza.proiecteManual, amp: S.amp.peAcord });
+}
+/* Căutarea din bara de filtre cuprinde și obiectivele (în română și în engleză). */
+function recalcExtra() {
+  S.extra = new Map();
+  if (!S.baza) return;
+  S.baza.acorduri.forEach(function (a) {
+    var o = infoDe(a).obiective;
+    if (o) S.extra.set(a.id, o.ro + ' ' + (o.en && o.en !== o.ro ? o.en : ''));
+  });
 }
 function ag(a) {
   var x = S.cache.get(a.id);
@@ -122,7 +141,7 @@ function rezDon(d) {
   if (!x) { x = D.rezumat(d.acorduri, S.peAcord, S.baza.cursuri); S.rezDon.set(d.cheie, x); }
   return x;
 }
-function filtru() { return { q: S.q, tip: S.tip, deb: S.deb, peAcord: S.peAcord }; }
+function filtru() { return { q: S.q, tip: S.tip, deb: S.deb, peAcord: S.peAcord, extra: S.extra }; }
 function filtrate(lista) {
   var f = filtru();
   return D.ordoneaza(lista.filter(function (a) { return D.potriveste(a, f); }), S.sort, S.peAcord, S.baza.cursuri);
@@ -151,7 +170,8 @@ function texteFiltre() {
 
 /* ------------------------------------------------------------------ păstrarea locală: coada nesalvată și ultima stare */
 function opValida(o) {
-  return !!o && ((o.t === 'del' && typeof o.id === 'string') || ((o.t === 'add' || o.t === 'upd') && D.intrareValida(o.e)));
+  return !!o && ((o.t === 'del' && typeof o.id === 'string') || ((o.t === 'add' || o.t === 'upd') && D.intrareValida(o.e)) ||
+                 (o.t === 'pdel' && typeof o.id === 'string') || (o.t === 'pset' && D.proiectDbValid(o.p)));
 }
 function scrieCoada() {
   if (!S.coada.length) lsDel(CH_COADA); else lsSet(CH_COADA, JSON.stringify({ v: 1, ops: S.coada }));
@@ -178,14 +198,22 @@ function areSeif() { var t = lsGet(CH_SEIF); if (!t) return null; try { return J
 /* ------------------------------------------------------------------ încărcarea datelor */
 function incarca() {
   S.faza = 'incarc'; S.eroareInc = null;
+  S.amp = { faza: 'neinceput', peAcord: new Map(), stare: null, eroare: '', promisiune: null };
   randeazaTot();
   var pA = fetch(D.CONFIG.sursaAcorduri, { cache: 'no-cache' }).then(function (r) {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   });
+  // obiectivele, datele și rândurile omise, scrise de mână: dacă fișierul nu se citește, pagina merge, dar rândurile-umbrelă ar apărea în listă
+  var pM = fetch(D.CONFIG.sursaManual, { cache: 'no-cache' }).then(function (r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function (m) { return { m: m }; }, function (e) { return { m: null, e: e }; });
   var pD = dep.citestePublic().then(function (d) { return { d: d }; }, function (e) { return { e: e }; });
-  Promise.all([pA, pD]).then(function (r) {
-    S.baza = D.pregateste(r[0]);
+  Promise.all([pA, pD, pM]).then(function (r) {
+    S.brut = r[0];
+    S.baza = D.pregateste(r[0], r[2].m);
+    S.manualEroare = !!r[2].e;
     S.serv = r[1].d || D.dateGoale();
     S.debEroare = r[1].e || null;
     var rec = citesteRecent();
@@ -196,10 +224,88 @@ function incarca() {
     aplicaHash(location.hash);
     S.faza = 'gata';
     randeazaTot();
+    setTimeout(pornesteAmp, 60);               // tabelele se văd imediat; datele din AMP se completează când sosesc
   }, function (e) {
     S.faza = 'eroare'; S.eroareInc = e;
     randeazaTot();
   });
+}
+/* Datele de început și de finalizare din AMP (amp-date.js): arhiva încorporată și raportul live; legătura cu rândurile e prudentă (vezi amp-date.js). */
+function pornesteAmp() {
+  if (!S.baza || S.amp.faza === 'se-incarca') return S.amp.promisiune || Promise.resolve();
+  var curent = S.amp = { faza: 'se-incarca', peAcord: new Map(), stare: null, eroare: '', promisiune: null };
+  if (!window.AmpDate || !window.LegaturaAmp) {
+    curent.faza = 'eroare'; curent.eroare = L('modulul AMP nu s-a încărcat', 'the AMP module did not load');
+    randeazaAmp();
+    return Promise.resolve();
+  }
+  randeazaAmp();
+  var rand = (S.brut && S.brut.acorduri || []).filter(function (x) { return S.baza.peId.has(x.id); });       // fără rândurile-umbrelă omise
+  var conf = fetch('date/legaturi_amp.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : {}; }, function () { return {}; }).catch(function () { return {}; });
+  curent.promisiune = conf.then(function (confirmari) {
+    return window.AmpDate.incarca({ acorduri: rand, confirmari: confirmari, onStare: function (st) { if (S.amp === curent) { curent.stare = st; randeazaAmp(); } } });
+  }).then(function (r) {
+    if (S.amp !== curent) return;
+    curent.peAcord = r.peAcord; curent.stare = r.stare;
+    if (r.stare.eroareArhiva && r.stare.eroareLive) { curent.faza = 'eroare'; curent.eroare = r.stare.eroareLive; }
+    else curent.faza = 'gata';
+    recalcExtra();
+    randeazaAmp(); randeazaRez();
+    live(curent.faza === 'gata' ? L('Datele din AMP au fost încărcate.', 'The AMP data has been loaded.') : L('Datele din AMP nu au putut fi citite.', 'The AMP data could not be read.'));
+  }, function (e) {
+    if (S.amp !== curent) return;
+    curent.faza = 'eroare'; curent.eroare = String(e && e.message || e);
+    randeazaAmp();
+  });
+  return curent.promisiune;
+}
+function randeazaAmp() {
+  var el = $('#sAmp');
+  if (!el) return;
+  var a = S.amp, st = a.stare || {};
+  if (!S.baza || a.faza === 'neinceput') { el.innerHTML = ''; return; }
+  var retry = ' <button type="button" class="lnk" data-act="amp-reincearca">' + esc(L('Reîncearcă', 'Retry')) + '</button>';
+  var cls = 'amp-st', h;
+  if (a.faza === 'se-incarca') {
+    cls += ' lucru';
+    h = st.faza === 'potrivire' ? esc(L('Se leagă proiectele din AMP de acordurile din registru…', 'Linking the AMP projects to the agreements in the register…'))
+                                : esc(L('Se citesc din AMP datele de început și de finalizare ale proiectelor…', 'Reading the start and completion dates of the projects from AMP…'));
+  } else if (a.faza === 'eroare') {
+    cls += ' eroare';
+    h = '<b>' + esc(L('Datele din AMP nu s-au putut citi', 'The AMP data could not be read')) + '</b>' + (a.eroare ? ' (' + esc(a.eroare) + ')' : '') + '. ' +
+        esc(L('Datele de început și de finalizare apar doar când le-a introdus un utilizator sau vin dintr-o sursă oficială.',
+              'Start and completion dates appear only when a user entered them or they come from an official source.')) + retry;
+  } else {
+    var sigur = 0, probabil = 0;
+    a.peAcord.forEach(function (v) { if (v.nivel === 'sigur') sigur++; else probabil++; });
+    h = '<b>AMP</b> · ' + esc(L(sigur + ' din ' + S.baza.acorduri.length + ' proiecte sunt legate sigur de un proiect AMP (denumirea, finanțatorul și suma coincid), de unde vin datele lor de început și de finalizare. ' +
+                              (probabil ? probabil + ' legături doar probabile apar în detalii, ca indiciu, nu în tabel.' : ''),
+                              sigur + ' of ' + S.baza.acorduri.length + ' projects are linked with certainty to an AMP project (name, funder and amount agree), which is where their start and completion dates come from. ' +
+                              (probabil ? probabil + ' merely probable links appear in the details as a hint, not in the table.' : '')));
+    if (st.eroareLive) {
+      cls += ' avert';
+      h += ' <span class="rau">' + esc(L('Raportul AMP live nu a răspuns (' + st.eroareLive + '): am folosit arhiva AMP, care ajunge până în 2022.',
+                                         'The live AMP report did not respond (' + st.eroareLive + '): the AMP archive, which goes up to 2022, was used.')) + '</span>' + retry;
+    }
+    if (st.eroareArhiva) {
+      cls += ' avert';
+      h += ' <span class="rau">' + esc(L('Arhiva AMP nu s-a încărcat (' + st.eroareArhiva + ').', 'The AMP archive did not load (' + st.eroareArhiva + ').')) + '</span>' + retry;
+    }
+  }
+  el.innerHTML = '<div class="' + cls + '" role="status">' + h + '</div>';
+}
+function textAmpExcel() {
+  var a = S.amp, st = a.stare || {};
+  if (a.faza === 'eroare') return L('Datele AMP nu au putut fi citite (' + (a.eroare || 'eroare') + '): în coloanele de date apar doar informațiile introduse de utilizatori sau luate din surse oficiale.',
+                                    'The AMP data could not be read (' + (a.eroare || 'error') + '): the date columns hold only what users entered or what comes from official sources.');
+  if (a.faza !== 'gata') return L('Datele AMP nu erau încărcate la generarea fișierului: în coloanele de date apar doar informațiile introduse de utilizatori sau luate din surse oficiale.',
+                                  'The AMP data was not loaded when the file was generated: the date columns hold only what users entered or what comes from official sources.');
+  var sigur = 0; a.peAcord.forEach(function (v) { if (v.nivel === 'sigur') sigur++; });
+  var surse = st.live ? L('raportul AMP live (' + st.live + ' proiecte)', 'the live AMP report (' + st.live + ' projects)') : '';
+  if (st.arhiva) surse += (surse ? L(' și ', ' and ') : '') + L('arhiva AMP (' + st.arhiva + ' proiecte, până în 2022)', 'the AMP archive (' + st.arhiva + ' projects, up to 2022)');
+  var avert = st.eroareLive ? L(' Raportul live nu a răspuns (' + st.eroareLive + '), deci proiectele mai noi decât arhiva nu au date din AMP.', ' The live report did not respond (' + st.eroareLive + '), so projects newer than the archive have no AMP dates.') : '';
+  return L('Date AMP citite din ' + surse + '; ' + sigur + ' rânduri legate sigur de un proiect AMP (denumirea, finanțatorul și suma coincid).' + avert,
+           'AMP data read from ' + surse + '; ' + sigur + ' rows linked with certainty to an AMP project (name, funder and amount agree).' + avert);
 }
 function aplicaHash(h) {
   var o = D.citesteHash(h);
@@ -215,8 +321,8 @@ function scrieHash() {
 /* ------------------------------------------------------------------ randare: capul și bara de acces */
 function randeazaCap() {
   $('#tTitlu').textContent = L('Debursări pe acorduri', 'Disbursements by agreement');
-  $('#tSub').textContent = L('Acordurile din registrul legis.md, repartizate pe donatori. Bifează un donator ca să vezi proiectele lui; sumele debursate se introduc de mână, după ce introduci codul de acces.',
-                              'The agreements from the legis.md register, grouped by donor. Tick a donor to see its projects; disbursed amounts are entered by hand after you enter the access code.');
+  $('#tSub').textContent = L('Acordurile din registrul legis.md, repartizate pe donatori. Bifează un donator ca să vezi proiectele lui, cu obiectivele, data de început, data finalizării și suma; sumele debursate se introduc de mână, după ce introduci codul de acces.',
+                              'The agreements from the legis.md register, grouped by donor. Tick a donor to see its projects, with their objectives, start date, completion date and amount; disbursed amounts are entered by hand after you enter the access code.');
   if (!S.baza) { $('#topMeta').innerHTML = ''; return; }
   var nd = S.intrari.length;
   $('#topMeta').innerHTML =
@@ -340,7 +446,7 @@ function randeazaTool() {
   var ce = nSel ? nSel + ' ' + (nSel === 1 ? L('donator', 'donor') : L('donatori', 'donors')) : L('toți donatorii', 'all donors');
   var insigna = '<span class="badge">' + esc(nSel ? String(nSel) : L('toți', 'all')) + '</span>';
   $('#sTool').innerHTML = '<div class="toolbar" role="search">' +
-    '<input class="seek" id="q" type="search" autocomplete="off" value="' + esc(S.q) + '" placeholder="' + esc(L('Caută în proiecte: denumire, act, partener…', 'Search projects: name, act, partner…')) + '" aria-label="' + esc(L('Caută în proiecte', 'Search in projects')) + '">' +
+    '<input class="seek" id="q" type="search" autocomplete="off" value="' + esc(S.q) + '" placeholder="' + esc(L('Caută în proiecte: denumire, obiective, act, partener…', 'Search projects: name, objectives, act, partner…')) + '" aria-label="' + esc(L('Caută în proiecte', 'Search in projects')) + '">' +
     '<select class="sel" id="ftip" aria-label="' + esc(L('Tip de finanțare', 'Type of financing')) + '">' + tipuri + '</select>' +
     '<select class="sel" id="fdeb" aria-label="' + esc(L('Debursări', 'Disbursements')) + '">' + opt(debs, S.deb) + '</select>' +
     '<select class="sel" id="fsort" aria-label="' + esc(L('Ordinea proiectelor', 'Project order')) + '">' + opt(sorturi, S.sort) + '</select>' +
@@ -367,7 +473,7 @@ function htmlSuma(a) {
   if (src) h += '<div class="amt-sub"><span class="amt-src" title="' + esc(L('Sursa sumei', 'Source of the amount')) + '">' + esc(src[S.en ? 1 : 0]) + '</span></div>';
   return h;
 }
-function htmlDeb(a, g, k) {
+function htmlDeb(a, g, k, nume) {
   var h;
   if (S.debEroare) h = '<span class="nil">—</span>';
   else if (!g.n) h = '<span class="nil">—</span>';
@@ -380,25 +486,58 @@ function htmlDeb(a, g, k) {
     }
     h += '<div class="amt-sub">' + g.n + ' ' + (g.n === 1 ? L('debursare', 'disbursement') : L('debursări', 'disbursements')) + (g.ultima ? ' · ' + esc(L('ultima ', 'last ')) + esc(D.dataRo(g.ultima)) : '') + '</div>';
   }
-  return h + '<div style="margin-top:7px"><button type="button" class="btn mic" data-act="adauga" aria-label="' + esc(L('Adaugă o debursare la ', 'Add a disbursement to ') + a.nume) + '">' +
+  return h + '<div style="margin-top:7px"><button type="button" class="btn mic" data-act="adauga" aria-label="' + esc(L('Adaugă o debursare la ', 'Add a disbursement to ') + (nume || a.nume)) + '">' +
     (cod ? IC.plus : IC.lock) + esc(L('Debursare', 'Disbursement')) + '</button></div>';
 }
+/* ------------------------------------------------------------------ obiectivele și datele proiectului (celulele din tabel și secțiunea din detalii) */
+function gazda(url) { try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return String(url || ''); } }
+function titluSursa(x, camp) {
+  if (x.tip === 'amp') {
+    var ce = camp === 'inceput' ? L('data efectivă de începere (Actual Start Date)', 'actual start date') : camp === 'sfarsit' ? L('data propusă de terminare (Proposed Completion Date)', 'proposed completion date') : '';
+    return 'AMP ' + x.idAmp + (x.titluAmp ? ' — ' + x.titluAmp : '') + (ce ? ' · ' + ce : '');
+  }
+  if (x.tip === 'oficial') return L('Sursă oficială: ', 'Official source: ') + gazda(x.sursa) + (x.nota ? ' · ' + x.nota : '');
+  return L('Introdus de un utilizator în această pagină', 'Entered by a user on this page') + (x.nota ? ' · ' + x.nota : '');
+}
+/* eticheta sursei unui câmp: „sursă oficială” (cu link spre document), „AMP” sau „introdus de utilizator” */
+function etSursa(x, camp) {
+  if (!x) return '';
+  var t = esc(D.etichetaSursaProiect(x.tip, S.en)), tit = esc(titluSursa(x, camp));
+  if (x.tip === 'oficial' && x.sursa) return '<a class="src s-oficial" href="' + esc(x.sursa) + '" target="_blank" rel="noopener" title="' + tit + '">' + t + '</a>';
+  return '<span class="src s-' + esc(x.tip) + '" title="' + tit + '">' + t + '</span>';
+}
+function nesalvatP(info, x) {
+  return x && x.tip === 'manual' && info.db && S.nesalvateP.has(info.db.id) ? '<span class="nes">' + esc(L('nesalvat', 'unsaved')) + '</span>' : '';
+}
+function htmlObiective(a, info) {
+  var desc = D.descriere(a, S.en, info);
+  if (!desc) return '<div class="pdesc gol">' + esc(L('Obiective neintroduse', 'Objectives not entered')) + '</div>';
+  return '<div class="pdesc" title="' + esc(desc) + '">' + esc(desc) + '</div><div class="psrc">' + etSursa(info.obiective) + nesalvatP(info, info.obiective) + '</div>';
+}
+function htmlData(info, camp) {
+  var x = info[camp];
+  if (!x) return '<span class="nil" title="' + esc(L('Nu s-a găsit o sursă pentru această dată', 'No source was found for this date')) + '" aria-label="' + esc(L('necunoscută', 'unknown')) + '">—</span>';
+  var rau = info.contradictie ? ' <span class="rau" title="' + esc(L('Începutul e după finalizare: datele se contrazic', 'The start is after the completion: the dates contradict each other')) + '" aria-label="' + esc(L('datele se contrazic', 'the dates contradict each other')) + '">⚠</span>' : '';
+  return '<div class="dt' + (info.contradictie ? ' rau' : '') + '"><time datetime="' + esc(x.v) + '">' + esc(D.fmtDataPartiala(x.v)) + '</time>' + rau + '</div>' +
+    '<div class="psrc">' + etSursa(x, camp) + nesalvatP(info, x) + '</div>';
+}
 function htmlRand(d, a) {
-  var g = ag(a), k = d.cheie + '|' + a.id, deschis = S.deschise.has(k);
+  var g = ag(a), k = d.cheie + '|' + a.id, deschis = S.deschise.has(k), info = infoDe(a), nume = D.numeAfisat(a, S.en);
   var cof = a.donatori.filter(function (x) { return x !== d.cheie; });
   var meta = [];
   if (a.stadiu) meta.push('<span class="stg ' + a.stadiu + '">' + esc(D.etichetaStadiu(a.stadiu, S.en)) + '</span>');
   if (a.semnat) meta.push(esc(L('semnat ', 'signed ') + a.semnat));
   if (cof.length) meta.push('<span class="cof">' + esc(L('cofinanțat cu ', 'co-financed with ') + cof.join(', ')) + '</span>');
-  var desc = D.descriere(a, S.en);
   return '<tr class="ac' + (deschis ? ' deschis' : '') + '" data-k="' + esc(k) + '">' +
-    '<td data-l="' + esc(L('Proiectul', 'Project')) + '"><div class="pname">' + esc(a.nume) + '</div><div class="pmeta">' + meta.join(' · ') + '</div></td>' +
-    '<td data-l="' + esc(L('Descriere succintă', 'Short description')) + '"><div class="pdesc" title="' + esc(desc) + '">' + esc(desc) + '</div></td>' +
+    '<td data-l="' + esc(L('Proiectul', 'Project')) + '"><div class="pname">' + esc(nume) + '</div><div class="pmeta">' + meta.join(' · ') + '</div></td>' +
+    '<td data-l="' + esc(L('Descriere succintă (obiectivele proiectului)', 'Short description (project objectives)')) + '">' + htmlObiective(a, info) + '</td>' +
+    '<td class="dcol" data-l="' + esc(L('Data efectivă de începere', 'Actual start date')) + '">' + htmlData(info, 'inceput') + '</td>' +
+    '<td class="dcol" data-l="' + esc(L('Data finalizării', 'Completion date')) + '">' + htmlData(info, 'sfarsit') + '</td>' +
     '<td data-l="' + esc(L('Tip de finanțare', 'Type of financing')) + '"><span class="tag ' + (CLASA_TIP[a.categorie] || 't-alt') + '">' + esc(D.etichetaTip(a.categorie, S.en) || '—') + '</span></td>' +
     '<td class="num" data-l="' + esc(L('Suma proiectului', 'Project amount')) + '">' + htmlSuma(a) + '</td>' +
-    '<td class="num" data-l="' + esc(L('Suma debursărilor', 'Disbursed amount')) + '">' + htmlDeb(a, g, k) + '</td>' +
+    '<td class="num" data-l="' + esc(L('Suma debursărilor', 'Disbursed amount')) + '">' + htmlDeb(a, g, k, nume) + '</td>' +
     '<td class="act"><button type="button" class="exp" data-act="comuta" aria-expanded="' + (deschis ? 'true' : 'false') + '" aria-label="' +
-      esc((deschis ? L('Închide detaliile: ', 'Close details: ') : L('Deschide detaliile: ', 'Open details: ')) + a.nume) + '">' + IC.chev + '</button></td></tr>' +
+      esc((deschis ? L('Închide detaliile: ', 'Close details: ') : L('Deschide detaliile: ', 'Open details: ')) + nume) + '">' + IC.chev + '</button></td></tr>' +
     (deschis ? htmlDetalii(d, a, g, k) : '');
 }
 
@@ -420,7 +559,12 @@ var TEXTE_EROARE = {
   suma: { lipsa: ['Scrie suma.', 'Enter the amount.'], format: ['Nu înțeleg suma. Scrie, de exemplu, 1.250.000,50.', "I can't read the amount. Write, for example, 1,250,000.50."],
           zero: ['Suma trebuie să fie mai mare decât zero.', 'The amount must be greater than zero.'], mare: ['Suma e prea mare.', 'The amount is too large.'] },
   val: { valuta: ['Alege o valută cu curs de schimb cunoscut.', 'Choose a currency with a known exchange rate.'] },
-  nota: { lunga: ['Nota are cel mult ' + D.MAX_NOTA + ' de caractere.', 'The note has at most ' + D.MAX_NOTA + ' characters.'] }
+  nota: { lunga: ['Nota are cel mult ' + D.MAX_NOTA + ' de caractere.', 'The note has at most ' + D.MAX_NOTA + ' characters.'] },
+  obiective: { lunga: ['Obiectivele au cel mult ' + D.MAX_OBIECTIVE + ' de caractere.', 'The objectives have at most ' + D.MAX_OBIECTIVE + ' characters.'] },
+  inceput: { format: ['Nu înțeleg data de început. Scrie 15.03.2026, 03.2026 sau 2026.', "I can't read the start date. Write 15.03.2026, 03.2026 or 2026."] },
+  sfarsit: { format: ['Nu înțeleg data finalizării. Scrie 15.03.2026, 03.2026 sau 2026.', "I can't read the completion date. Write 15.03.2026, 03.2026 or 2026."],
+             ordine: ['Data finalizării nu poate fi înaintea celei de început.', 'The completion date cannot be before the start date.'] },
+  gol: { gol: ['Completează cel puțin un câmp (obiective, început sau finalizare).', 'Fill in at least one field (objectives, start or completion).'] }
 };
 function textErori(er) {
   return Object.keys(er || {}).map(function (c) {
@@ -444,7 +588,7 @@ function htmlForm(a, k) {
   var inv = function (n) { return er[n] ? ' aria-invalid="true"' : ''; };
   var fk = function (n) { return ' data-fk="' + esc(k + '|' + n) + '"'; };
   return '<h3>' + esc(L('Adaugă o debursare', 'Add a disbursement')) + '</h3>' +
-    '<form class="deb-form" data-k="' + esc(k) + '" data-a="' + esc(a.id) + '" novalidate>' +
+    '<form class="frm deb-form" data-k="' + esc(k) + '" data-a="' + esc(a.id) + '" novalidate>' +
     (bl ? '<div class="blocat">' + IC.lock + '<span>' + esc(L('Câmpurile sunt blocate. Introdu codul de acces ca să poți adăuga debursări.', 'The fields are locked. Enter the access code to add disbursements.')) +
           '</span><button type="button" class="btn mic p" data-act="unlock">' + esc(L('Introdu codul', 'Enter the code')) + '</button></div>' : '') +
     '<label>' + esc(L('Data debursării', 'Disbursement date')) + '<input type="date" name="data"' + fk('data') + ' value="' + esc(f.data) + '" min="1990-01-01" max="' + D.aziIso() + '"' + dis + inv('data') + '></label>' +
@@ -506,23 +650,116 @@ function htmlInfo(a) {
   dl.push([L('Intră în totaluri', 'Counted in totals'), esc(inTotal)]);
   return '<div class="det-info"><dl>' + dl.map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl></div>';
 }
+/* ---- secțiunea „Date despre proiect”: ce se știe (cu sursa și citatul), proiectul AMP legat și formularul de introducere */
+function formProiect(a) {
+  var f = S.pf[a.id];
+  if (!f) {
+    var e = S.proiecteDb.peAcord.get(a.id);
+    f = S.pf[a.id] = { obiective: (e && e.obiective) || '', inceput: e && e.inceput ? D.fmtDataPartiala(e.inceput) : '', sfarsit: e && e.sfarsit ? D.fmtDataPartiala(e.sfarsit) : '', nota: (e && e.nota) || '' };
+  }
+  return f;
+}
+function detaliiSursa(x) {
+  if (!x) return '';
+  var h = '';
+  if (x.tip === 'oficial') {
+    h += '<div class="citat">' + (x.citat ? '<span class="cap">' + esc(L('citat din sursă', 'quote from the source')) + '</span> „' + esc(x.citat) + '” ' : '') +
+         '<a href="' + esc(x.sursa) + '" target="_blank" rel="noopener">' + esc(gazda(x.sursa)) + '</a></div>';
+  }
+  if (x.nota) h += '<div class="notap">' + esc(x.nota) + '</div>';
+  if (x.tip === 'manual' && x.la) h += '<div class="notap">' + esc(L('introdus la ', 'entered on ') + dataOraDin(x.la)) + '</div>';
+  return h;
+}
+/* rândul „AMP” din secțiune: proiectul AMP legat de acord, datele lui și cât de sigură e legătura */
+function randAmp(a, info) {
+  var amp = info.amp, st = S.amp;
+  if (!amp) {
+    var t = st.faza === 'se-incarca' ? L('se citesc datele din AMP…', 'reading the AMP data…')
+          : st.faza === 'gata' ? L('niciun proiect AMP nu se potrivește sigur cu acest acord (denumirea, finanțatorul și suma) și de aceea nu are date din AMP',
+                                   'no AMP project matches this agreement with certainty (name, funder and amount), so it has no dates from AMP')
+          : st.faza === 'eroare' ? L('datele din AMP nu s-au putut citi', 'the AMP data could not be read') : '';
+    return t ? ['AMP', '<span class="nil">' + esc(t) + '</span>'] : null;
+  }
+  var sigur = amp.nivel === 'sigur', fd = function (v) { return v ? esc(D.fmtDataPartiala(v)) : '—'; };
+  var h = '<span data-ampid="' + esc(amp.id) + '">' + esc(amp.id) + '</span>' + (amp.titlu ? ' · ' + esc(amp.titlu) : '') +
+    '<div class="notap">' + esc(L('început (Actual Start Date): ', 'start (Actual Start Date): ')) + '<b>' + fd(amp.inceput) + '</b> · ' +
+    esc(L('finalizare propusă (Proposed Completion Date): ', 'proposed completion (Proposed Completion Date): ')) + '<b>' + fd(amp.sfarsit) + '</b></div>';
+  if (sigur) h += '<div class="notap">' + esc(amp.legatura === 'confirmat' ? L('Legătură confirmată de un om (date/legaturi_amp.json).', 'Link confirmed by a person (date/legaturi_amp.json).')
+                                                                        : L('Legătură sigură: denumirea, finanțatorul și suma coincid.', 'Certain link: the name, the funder and the amount agree.')) + '</div>';
+  else h += '<div class="notap avert">' + esc(L('Legătură doar probabilă (denumirea și finanțatorul se potrivesc, dar suma lipsește sau diferă), deci datele nu se folosesc în tabel. Dacă e proiectul acesta, le poți copia în formular și le verifici.',
+                                              'Only a probable link (the name and the funder agree, but the amount is missing or differs), so the dates are not used in the table. If this is the right project, you can copy them into the form and check them.')) + '</div>' +
+       (cod && (amp.inceput || amp.sfarsit) ? '<div style="margin-top:6px"><button type="button" class="btn mic" data-act="foloseste-amp" data-a="' + esc(a.id) + '">' + esc(L('Copiază datele în formular', 'Copy the dates into the form')) + '</button></div>' : '');
+  return ['AMP', h];
+}
+function htmlProiect(a, k) {
+  var info = infoDe(a), bl = !cod, f = formProiect(a), er = S.pfe[a.id] || {}, dis = bl ? ' disabled' : '';
+  var inv = function (n) { return er[n] ? ' aria-invalid="true"' : ''; };
+  var fk = function (n) { return ' data-fk="' + esc(k + '|p_' + n) + '"'; };
+  var dl = [], o = info.obiective;
+  dl.push([L('Obiectivele proiectului', 'Project objectives'),
+    o ? '<div>' + esc(S.en ? (o.en || o.ro) : o.ro) + '</div><div class="psrc">' + etSursa(o) + nesalvatP(info, o) + '</div>' + detaliiSursa(o)
+      : '<span class="nil">' + esc(L('neintroduse', 'not entered')) + '</span>']);
+  [['inceput', L('Data efectivă de începere', 'Actual start date')], ['sfarsit', L('Data finalizării', 'Completion date')]].forEach(function (c) {
+    var x = info[c[0]];
+    dl.push([c[1], x ? '<b>' + esc(D.fmtDataPartiala(x.v)) + '</b> <span class="psrc">' + etSursa(x, c[0]) + nesalvatP(info, x) + '</span>' + detaliiSursa(x)
+                     : '<span class="nil">' + esc(L('necunoscută', 'unknown')) + '</span>']);
+  });
+  if (info.contradictie) dl.push(['', '<span class="rau">⚠ ' + esc(L('Începutul e după finalizare: datele se contrazic. Verifică sursele.', 'The start is after the completion: the dates contradict each other. Check the sources.')) + '</span>']);
+  var ra = randAmp(a, info); if (ra) dl.push(ra);
+  var sterge = '';
+  if (info.db && cod) {
+    sterge = S.confP === a.id
+      ? ' <span class="cof">' + esc(L('Sigur?', 'Sure?')) + '</span> <button type="button" class="btn mic rosu" data-act="proiect-sterge-da" data-a="' + esc(a.id) + '">' + esc(L('Șterge', 'Delete')) + '</button> ' +
+        '<button type="button" class="btn mic" data-act="proiect-sterge-nu">' + esc(L('Nu', 'No')) + '</button>'
+      : ' <button type="button" class="btn rosu" data-act="proiect-sterge" data-a="' + esc(a.id) + '">' + IC.trash + esc(L('Șterge datele introduse', 'Delete the entered data')) + '</button>';
+  }
+  var form = '<h3>' + esc(L('Introdu sau corectează datele proiectului', 'Enter or correct the project data')) + '</h3>' +
+    '<form class="frm proj-form" data-k="' + esc(k) + '" data-a="' + esc(a.id) + '" novalidate>' +
+    (bl ? '<div class="blocat">' + IC.lock + '<span>' + esc(L('Câmpurile sunt blocate. Introdu codul de acces ca să poți scrie datele proiectului.', 'The fields are locked. Enter the access code to write the project data.')) +
+          '</span><button type="button" class="btn mic p" data-act="unlock">' + esc(L('Introdu codul', 'Enter the code')) + '</button></div>' : '') +
+    '<label class="w">' + esc(L('Obiectivele proiectului', 'Project objectives')) + '<textarea name="obiective" rows="4" maxlength="' + D.MAX_OBIECTIVE + '"' + fk('obiective') + dis + inv('obiective') +
+      ' placeholder="' + esc(L('Ce urmărește proiectul, în una-trei propoziții', 'What the project aims to do, in one to three sentences')) + '">' + esc(f.obiective) + '</textarea>' +
+      '<span class="cnt">' + String(f.obiective.length) + '/' + D.MAX_OBIECTIVE + '</span></label>' +
+    '<label>' + esc(L('Data efectivă de începere', 'Actual start date')) + '<input type="text" name="inceput" inputmode="numeric" autocomplete="off" placeholder="15.03.2026"' + fk('inceput') + ' value="' + esc(f.inceput) + '"' + dis + inv('inceput') + '></label>' +
+    '<label>' + esc(L('Data finalizării', 'Completion date')) + '<input type="text" name="sfarsit" inputmode="numeric" autocomplete="off" placeholder="31.12.2028"' + fk('sfarsit') + ' value="' + esc(f.sfarsit) + '"' + dis + inv('sfarsit') + '></label>' +
+    '<div class="full hint">' + esc(L('Scrie data întreagă (15.03.2026), doar luna (03.2026) sau doar anul (2026), cât spune sursa.', 'Write the full date (15.03.2026), only the month (03.2026) or only the year (2026), as far as the source goes.')) + '</div>' +
+    '<label class="w">' + esc(L('Sursa informației (opțional)', 'Source of the information (optional)')) + '<input type="text" name="nota" maxlength="' + D.MAX_NOTA + '" autocomplete="off" placeholder="' +
+      esc(L('de pildă: raportul anual al proiectului, pag. 3', 'for example: the project annual report, p. 3')) + '"' + fk('nota') + ' value="' + esc(f.nota) + '"' + dis + '></label>' +
+    '<div class="full ferr" role="alert">' + esc(textErori(er)) + '</div>' +
+    '<div class="full"><button type="submit" class="btn p"' + dis + '>' + IC.plus + esc(L('Salvează datele proiectului', 'Save the project data')) + '</button>' + sterge + '</div>' +
+    '<div class="full hint">' + esc(L('Ce scrii aici are prioritate față de sursele oficiale și AMP și se păstrează în baza de date; poți șterge oricând ce ai introdus, iar datele din surse rămân.',
+                                       'What you write here takes precedence over the official sources and AMP and is kept in the database; you can delete it at any time, and the source data stays.')) + '</div></form>';
+  return '<div class="det-proiect"><div><h3>' + esc(L('Date despre proiect', 'Project data')) + '</h3><dl class="dlp">' +
+    dl.map(function (x) { return (x[0] ? '<dt>' + esc(x[0]) + '</dt>' : '<dt></dt>') + '<dd>' + x[1] + '</dd>'; }).join('') + '</dl></div><div>' + form + '</div></div>';
+}
 function htmlDetalii(d, a, g, k) {
   var intrari = S.peAcord.get(a.id) || [];
-  return '<tr class="det" data-k="' + esc(k) + '"><td colspan="6"><div class="det-grid"><div>' + htmlIntrari(a, intrari, g) + '</div><div>' + htmlForm(a, k) + '</div>' + htmlInfo(a) + '</div></td></tr>';
+  return '<tr class="det" data-k="' + esc(k) + '"><td colspan="8"><div class="det-grid"><div>' + htmlIntrari(a, intrari, g) + '</div><div>' + htmlForm(a, k) + '</div>' + htmlProiect(a, k) + htmlInfo(a) + '</div></td></tr>';
 }
 
+/* câte din proiectele afișate au obiective, dată de început, dată de finalizare */
+function acoperire(lista) {
+  var o = 0, i = 0, f = 0;
+  lista.forEach(function (a) { var x = infoDe(a); if (x.obiective) o++; if (x.inceput) i++; if (x.sfarsit) f++; });
+  var n = lista.length;
+  return '<span title="' + esc(L('Câte proiecte au obiectivele și datele cunoscute (din surse oficiale, din AMP sau introduse de utilizatori)', 'How many projects have known objectives and dates (from official sources, AMP or entered by users)')) + '">' +
+    esc(L('obiective ', 'objectives ')) + '<b>' + o + '/' + n + '</b> · ' + esc(L('început ', 'start ')) + '<b>' + i + '/' + n + '</b> · ' + esc(L('finalizare ', 'completion ')) + '<b>' + f + '/' + n + '</b></span>';
+}
 function htmlPanou(d) {
   var lista = filtrate(d.acorduri), r = D.rezumat(lista, S.peAcord, S.baza.cursuri), nume = D.numeDonator(d.cheie, S.en);
   var total = d.acorduri.length;
   var dsum = '<div class="dsum"><span><b>' + lista.length + '</b> ' + (lista.length === total ? L('proiecte', 'projects') : L('proiecte din ', 'projects of ') + total) + '</span>' +
     '<span>' + esc(L('suma ', 'amount ')) + '<b>' + esc(fEur(r.sumaEur)) + '</b></span>' +
-    (S.debEroare ? '' : '<span>' + esc(L('debursat ', 'disbursed ')) + '<b>' + esc(fEur(r.debEur)) + '</b>' + (r.pct != null ? ' (' + esc(fmPct(r.pct * 100)) + '%)' : '') + '</span>') + '</div>';
+    (S.debEroare ? '' : '<span>' + esc(L('debursat ', 'disbursed ')) + '<b>' + esc(fEur(r.debEur)) + '</b>' + (r.pct != null ? ' (' + esc(fmPct(r.pct * 100)) + '%)' : '') + '</span>') +
+    acoperire(lista) + '</div>';
   var corp;
   if (!lista.length) {
     corp = '<div class="gol-msg"><b>' + esc(L('Niciun proiect nu corespunde filtrelor.', 'No project matches the filters.')) + '</b>' + esc(L('Acest donator are ' + total + ' proiecte în total.', 'This donor has ' + total + ' projects in total.')) +
       '<div class="chips"><button type="button" class="chip" data-act="sterge-filtre">' + esc(L('Șterge filtrele', 'Clear filters')) + '</button></div></div>';
   } else {
-    corp = '<div class="tbl-scroll"><table class="deb-tbl"><thead><tr><th>' + esc(L('Proiectul', 'Project')) + '</th><th>' + esc(L('Descriere succintă', 'Short description')) + '</th><th>' + esc(L('Tip de finanțare', 'Type of financing')) +
+    corp = '<div class="tbl-scroll"><table class="deb-tbl"><thead><tr><th>' + esc(L('Proiectul', 'Project')) + '</th><th>' + esc(L('Descriere succintă', 'Short description')) +
+      '<span class="th-sub">' + esc(L('obiectivele proiectului', 'project objectives')) + '</span></th><th>' + esc(L('Data efectivă de începere', 'Actual start date')) + '</th><th>' + esc(L('Data finalizării', 'Completion date')) +
+      '</th><th>' + esc(L('Tip de finanțare', 'Type of financing')) +
       '</th><th class="num">' + esc(L('Suma proiectului', 'Project amount')) + '</th><th class="num">' + esc(L('Suma debursărilor', 'Disbursed amount')) + '</th><th><span class="vh">' + esc(L('Detalii', 'Details')) + '</span></th></tr></thead><tbody>' +
       lista.map(function (a) { return htmlRand(d, a); }).join('') + '</tbody></table></div>';
   }
@@ -548,16 +785,81 @@ function randeazaRez() {
   pastreazaFocus(function () {
     el.innerHTML = S.sel.length ? donatoriAlesi().map(htmlPanou).join('') : htmlGol();
   });
+  legaLinkuriAmp();
+}
+/* AMP ID-ul din detaliile unui rând devine link spre fișa proiectului în AMP (amp-linkuri.js, care îl cere de la AMP): se încarcă o singură dată,
+   abia când apare un astfel de ID, ca pagina să nu depindă de AMP cât timp nu e nevoie. */
+var linkuriAmpIncarcate = false;
+function legaLinkuriAmp() {
+  if (linkuriAmpIncarcate || !RAD.querySelector('[data-ampid]')) return;
+  linkuriAmpIncarcate = true;
+  var sc = document.createElement('script');
+  sc.src = 'amp-linkuri.js?v=' + STIL_V;
+  sc.onerror = function () { linkuriAmpIncarcate = false; };
+  document.head.appendChild(sc);
 }
 function randeazaOrfane() {
-  var el = $('#sOrfane');
-  if (!S.baza || !S.orfane.length) { el.innerHTML = ''; return; }
-  var rows = S.orfane.map(function (e) { return '<tr' + (S.conf === e.id ? ' class="conf"' : '') + '><td>' + esc(D.dataRo(e.data)) + (S.nesalvate.has(e.id) ? '<span class="nes">' + esc(L('nesalvat', 'unsaved')) + '</span>' : '') + '</td><td>' + esc(e.nume || e.acord) + '</td>' +
-    '<td class="num">' + esc(fb(e.suma)) + ' ' + esc(e.val) + '</td><td class="nota">' + esc(e.nota || '') + '</td><td class="ea">' + acteIntrare(e, true) + '</td></tr>'; }).join('');
-  el.innerHTML = '<section class="panel"><div class="panel-head"><h2>' + esc(L('Debursări fără acord în registru', 'Disbursements without an agreement in the register')) + ' <small>' + S.orfane.length + '</small></h2></div><div class="panel-body">' +
-    '<p style="margin:0 0 10px;font-size:12.5px;color:var(--ink-dim)">' + esc(L('Au fost introduse pentru acorduri care nu se mai găsesc în registru (de pildă, acordul a fost unit cu altul sau scos). Nu intră în totalurile pe donatori, dar rămân în fișierul de date și în Excel · total.',
-      'They were entered for agreements that are no longer in the register (for example, the agreement was merged with another or removed). They are not counted in the donor totals, but stay in the data file and in Excel · total.')) + '</p>' +
-    '<table class="deb-ent"><thead><tr><th>' + esc(L('Data', 'Date')) + '</th><th>' + esc(L('Proiectul', 'Project')) + '</th><th class="num">' + esc(L('Suma', 'Amount')) + '</th><th>' + esc(L('Notă', 'Note')) + '</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div></section>';
+  var el = $('#sOrfane'), po = S.baza ? S.proiecteDb.orfane : [];
+  if (!S.baza || (!S.orfane.length && !po.length)) { el.innerHTML = ''; return; }
+  var h = '';
+  if (S.orfane.length) {
+    var rows = S.orfane.map(function (e) { return '<tr' + (S.conf === e.id ? ' class="conf"' : '') + '><td>' + esc(D.dataRo(e.data)) + (S.nesalvate.has(e.id) ? '<span class="nes">' + esc(L('nesalvat', 'unsaved')) + '</span>' : '') + '</td><td>' + esc(e.nume || e.acord) + '</td>' +
+      '<td class="num">' + esc(fb(e.suma)) + ' ' + esc(e.val) + '</td><td class="nota">' + esc(e.nota || '') + '</td><td class="ea">' + acteIntrare(e, true) + '</td></tr>'; }).join('');
+    h += '<section class="panel"><div class="panel-head"><h2>' + esc(L('Debursări fără acord în registru', 'Disbursements without an agreement in the register')) + ' <small>' + S.orfane.length + '</small></h2></div><div class="panel-body">' +
+      '<p style="margin:0 0 10px;font-size:12.5px;color:var(--ink-dim)">' + esc(L('Au fost introduse pentru acorduri care nu se mai găsesc în registru (de pildă, acordul a fost unit cu altul sau scos). Nu intră în totalurile pe donatori, dar rămân în fișierul de date și în Excel · total.',
+        'They were entered for agreements that are no longer in the register (for example, the agreement was merged with another or removed). They are not counted in the donor totals, but stay in the data file and in Excel · total.')) + '</p>' +
+      '<table class="deb-ent"><thead><tr><th>' + esc(L('Data', 'Date')) + '</th><th>' + esc(L('Proiectul', 'Project')) + '</th><th class="num">' + esc(L('Suma', 'Amount')) + '</th><th>' + esc(L('Notă', 'Note')) + '</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div></section>';
+  }
+  if (po.length) {
+    var rp = po.map(function (e) {
+      var act = !cod ? '' : (S.confP === e.id
+        ? '<span class="cof">' + esc(L('Sigur?', 'Sure?')) + '</span> <button type="button" class="btn mic rosu" data-act="proiect-orfan-sterge-da" data-id="' + esc(e.id) + '">' + esc(L('Șterge', 'Delete')) + '</button> <button type="button" class="btn mic" data-act="proiect-orfan-sterge-nu">' + esc(L('Nu', 'No')) + '</button>'
+        : '<button type="button" class="btn mic" data-act="proiect-orfan-sterge" data-id="' + esc(e.id) + '" aria-label="' + esc(L('Șterge datele proiectului ', 'Delete the project data of ') + (e.nume || e.acord)) + '" title="' + esc(L('Șterge', 'Delete')) + '">' + IC.trash + '</button>');
+      return '<tr' + (S.confP === e.id ? ' class="conf"' : '') + '><td>' + esc(e.nume || e.acord) + (S.nesalvateP.has(e.id) ? '<span class="nes">' + esc(L('nesalvat', 'unsaved')) + '</span>' : '') + '</td>' +
+        '<td class="nota">' + esc(e.obiective || '') + '</td><td>' + esc(D.fmtDataPartiala(e.inceput) || '—') + '</td><td>' + esc(D.fmtDataPartiala(e.sfarsit) || '—') + '</td><td class="ea">' + act + '</td></tr>';
+    }).join('');
+    h += '<section class="panel"><div class="panel-head"><h2>' + esc(L('Date despre proiecte fără acord în registru', 'Project data without an agreement in the register')) + ' <small>' + po.length + '</small></h2></div><div class="panel-body">' +
+      '<p style="margin:0 0 10px;font-size:12.5px;color:var(--ink-dim)">' + esc(L('Obiectivele și datele introduse pentru acorduri care nu se mai găsesc în registru. Nu apar în tabele, dar rămân în fișierul de date.',
+        'Objectives and dates entered for agreements that are no longer in the register. They do not appear in the tables, but stay in the data file.')) + '</p>' +
+      '<table class="deb-ent"><thead><tr><th>' + esc(L('Proiectul', 'Project')) + '</th><th>' + esc(L('Obiective', 'Objectives')) + '</th><th>' + esc(L('Început', 'Start')) + '</th><th>' + esc(L('Finalizare', 'Completion')) + '</th><th></th></tr></thead><tbody>' + rp + '</tbody></table></div></section>';
+  }
+  el.innerHTML = h;
+}
+/* codul unui act, cu link spre legis.md când se știe adresa */
+function legAct(cod, a) {
+  var rows = (a ? [a] : []).concat(S.baza.peAct.get(cod) || []), u = '';
+  rows.forEach(function (r) { if (u) return; var x = r.acte.filter(function (y) { return y.act === cod; })[0]; if (x && x.url) u = x.url; });
+  return u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(cod) + '</a>' : esc(cod);
+}
+/* Rândurile-umbrelă omise din liste (ca să nu dubleze proiecte) și intrările respinse din date/proiecte_manual.json: pagina le spune, nu le ascunde. */
+function randeazaOmise() {
+  var el = $('#sOmise');
+  if (!el) return;
+  if (!S.baza) { el.innerHTML = ''; return; }
+  var h = '', om = S.baza.omise;
+  if (S.manualEroare) {
+    h += '<div class="panel"><div class="panel-body"><p class="rau" style="margin:0">' + esc(L('Nu am putut citi fișierul ' + D.CONFIG.sursaManual + ': rândurile-umbrelă (negocieri și memorandumuri care repetă acorduri existente) apar acum în liste și unele proiecte pot părea dublate; obiectivele și datele din surse oficiale lipsesc. Reîncarcă pagina.',
+      'Could not read the file ' + D.CONFIG.sursaManual + ': the umbrella rows (negotiations and memoranda that repeat existing agreements) now appear in the lists and some projects may look duplicated; the objectives and dates from official sources are missing. Reload the page.')) + '</p></div></div>';
+  }
+  if (om.length) {
+    var li = om.map(function (o) {
+      var a = o.a;
+      return '<li><div><b>' + esc(a.nume) + '</b> <span class="cof">' + a.coduri.map(function (c) { return legAct(c, a); }).join(', ') + '</span></div>' +
+        '<div class="om-m">' + esc(S.en && o.motivEn ? o.motivEn : o.motiv) + '</div>' +
+        (o.numaratLa.length ? '<div class="om-m">' + esc(L('Numărat la: ', 'Counted under: ')) + '<span class="cof">' + o.numaratLa.map(function (c) { return legAct(c); }).join(', ') + '</span></div>' : '') + '</li>';
+    }).join('');
+    h += '<details class="omise"><summary>' + esc(L(om.length + ' rânduri din registru nu apar în liste, ca să nu dubleze proiecte', om.length + ' rows of the register do not appear in the lists, so as not to duplicate projects')) + '</summary>' +
+      '<p>' + esc(L('Sunt rânduri-umbrelă: negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu aceleași sume. Rămân în registrul de acorduri și nu schimbă totalurile.',
+                    'These are umbrella rows: negotiations or memoranda for agreements that already have their own rows, with the same amounts. They stay in the register of agreements and do not change the totals.')) + '</p><ul>' + li + '</ul></details>';
+  }
+  var er = (S.baza.eroriManual || []).concat((S.baza.proiecteNegasite || []).map(function (p) {
+    return L('Intrarea pentru ' + p.acte.join(', ') + ' nu se potrivește cu niciun act din registru.', 'The entry for ' + p.acte.join(', ') + ' matches no act in the register.');
+  }));
+  if (er.length) {
+    h += '<details class="omise avert"><summary>' + esc(L(er.length + ' intrări din ' + D.CONFIG.sursaManual + ' nu s-au folosit', er.length + ' entries of ' + D.CONFIG.sursaManual + ' were not used')) + '</summary><ul>' +
+      er.map(function (x) { return '<li><div class="om-m">' + esc(x) + '</div></li>'; }).join('') + '</ul></details>';
+  }
+  el.innerHTML = h;
 }
 function randeazaNote() {
   var el = $('#sNote');
@@ -568,6 +870,14 @@ function randeazaNote() {
        '. Un acord finanțat de mai mulți parteneri apare la fiecare dintre ei, dar în totaluri e numărat o singură dată.',
        'The projects are the agreements from the legis.md register (one row combines all acts of the same agreement). "Project amount" is the agreement amount as the register shows it; the euro equivalent uses the ECB rates of ' + cursData() +
        '. An agreement financed by several partners appears under each of them, but is counted once in the totals.')],
+    [L('Obiectivele și datele proiectelor. ', 'Project objectives and dates. '),
+     L('„Descriere succintă” înseamnă obiectivele proiectului, iar datele sunt data efectivă de începere și data finalizării proiectului. Fiecare informație vine, în ordine, din: ce a introdus un utilizator în pagină (după ce a pus codul); o sursă oficială (un document cu adresă și citat exact, scrise în date/proiecte_manual.json); AMP, platforma de gestionare a asistenței externe, doar pentru proiectele legate sigur de acord (denumirea, finanțatorul și suma coincid; în AMP, data finalizării e data propusă de terminare). Obiectivele nu vin din AMP. O celulă goală înseamnă că nu s-a găsit încă o sursă: pagina nu completează cu presupuneri.',
+       '"Short description" means the objectives of the project, and the dates are the actual start date and the completion date of the project. Each item comes, in this order, from: what a user entered in the page (after entering the code); an official source (a document with its address and an exact quote, written in date/proiecte_manual.json); AMP, the external assistance management platform, only for projects linked with certainty to the agreement (name, funder and amount agree; in AMP, the completion date is the proposed completion date). The objectives do not come from AMP. An empty cell means no source has been found yet: the page does not fill in guesses.')],
+    [L('Fără dubluri. ', 'No duplicates. '),
+     L('Fiecare act din registru se află într-un singur rând, iar rândurile cu aceeași denumire la același donator se deosebesc printr-o mențiune (tipul și anul semnării, la nevoie și suma). ' +
+       (S.baza.omise.length ? 'Cele ' + S.baza.omise.length + ' rânduri-umbrelă (negocieri sau memorandumuri care repetă acorduri existente) nu apar în liste; ele sunt enumerate mai jos, cu motivul.' : ''),
+       'Every act of the register is in exactly one row, and rows with the same name under the same donor are told apart by a short mention (the type and the year of signing, and the amount if needed). ' +
+       (S.baza.omise.length ? 'The ' + S.baza.omise.length + ' umbrella rows (negotiations or memoranda that repeat existing agreements) do not appear in the lists; they are listed below, with the reason.' : ''))],
     [L('Debursările ', 'Disbursements '),
      L('nu vin dintr-o sursă oficială: se introduc de mână și se păstrează în fișierul date/debursari.json din repository-ul site-ului. Oricine poate citi fișierul; scrie doar cine are codul de acces. Fiecare salvare e un commit, așa că istoricul modificărilor se vede în GitHub și o greșeală se poate anula.',
        'do not come from an official source: they are entered by hand and kept in the date/debursari.json file in the site repository. Anyone can read the file; only the holder of the access code can write. Every save is a commit, so the history of changes is visible on GitHub and a mistake can be undone.')],
@@ -585,7 +895,7 @@ function randeazaNav() {
     '<a href="#">' + esc(L('↑ Începutul paginii', '↑ Top of the page')) + '</a><a href="despre.html">' + esc(L('Despre date', 'About the data')) + '</a>';
 }
 function randeazaTot() {
-  randeazaCap(); randeazaAcces(); randeazaKpi(); randeazaPicker(); randeazaTool(); randeazaRez(); randeazaOrfane(); randeazaNote(); randeazaNav();
+  randeazaCap(); randeazaAcces(); randeazaKpi(); randeazaPicker(); randeazaTool(); randeazaAmp(); randeazaRez(); randeazaOrfane(); randeazaOmise(); randeazaNote(); randeazaNav();
   if (dlgDeschis()) randeazaDialog();
 }
 function dupaDate() {
@@ -621,6 +931,7 @@ function refaRand(k) {
     while (tmp.firstChild) tr.parentNode.insertBefore(tmp.firstChild, tr);
     tr.parentNode.removeChild(tr);
   });
+  legaLinkuriAmp();
 }
 
 /* ------------------------------------------------------------------ acțiuni: selecție, filtre, rânduri */
@@ -665,15 +976,19 @@ function focuseazaFormular(k) {
 
 /* ------------------------------------------------------------------ operații asupra debursărilor și salvarea lor */
 function mesajCommit(ops) {
+  var proiect = function (o) { return o.t === 'pset' || o.t === 'pdel'; };
   var descr = function (o) {
-    if (o.t === 'del') return 'șters: ' + D.taie(o.nume || o.id, 70);
+    if (o.t === 'pset') return 'salvat: ' + D.taie(o.p.nume || o.p.acord, 70);
+    if (o.t === 'pdel' || o.t === 'del') return 'șters: ' + D.taie(o.nume || o.id, 70);
     var e = o.e;
     return (o.t === 'add' ? 'adăugat: ' : 'modificat: ') + D.taie(e.nume || e.acord, 70) + ' — ' + D.fmtBani(e.suma, false) + ' ' + e.val + ' (' + e.data + ')';
   };
-  return 'Debursări: ' + (ops.length === 1 ? descr(ops[0]) : ops.length + ' modificări');
+  var pref = ops.every(proiect) ? 'Date proiecte: ' : ops.some(proiect) ? 'Debursări și date proiecte: ' : 'Debursări: ';
+  return pref + (ops.length === 1 ? descr(ops[0]) : ops.length + ' modificări');
 }
 function operatie(op) {
-  S.coada.push(op); scrieCoada(); recalc();
+  (Array.isArray(op) ? op : [op]).forEach(function (o) { S.coada.push(o); });
+  scrieCoada(); recalc();
   dupaDate();
   trimite();
 }
@@ -743,6 +1058,69 @@ function sterge(id) {
   S.conf = null;
   operatie({ t: 'del', id: id, nume: e ? e.nume : '' });
   live(L('Debursarea a fost ștearsă.', 'The disbursement was deleted.'));
+}
+
+/* ------------------------------------------------------------------ date despre proiect: salvare, ștergere, copiere din AMP */
+function salveazaProiect(form) {
+  var id = form.getAttribute('data-a'), k = form.getAttribute('data-k'), a = S.baza.peId.get(id);
+  if (!a || !cod) return;
+  var f = S.pf[id] || {}, v = D.valideazaProiect(f), existent = S.proiecteDb.peAcord.get(id) || null;
+  if (!v.ok) {
+    S.pfe[id] = v.erori; refaRand(k);
+    var prima = ['obiective', 'inceput', 'sfarsit', 'nota'].filter(function (c) { return v.erori[c]; })[0];
+    var n = prima && RAD.querySelector('[data-fk="' + qs(k + '|p_' + prima) + '"]'); if (n) n.focus();
+    live(textErori(v.erori));
+    return;
+  }
+  if (v.valoare.gol) {                              // nimic completat: ce era introdus se șterge; altfel nu e nimic de salvat
+    if (existent) { stergeProiect(id, k); return; }
+    S.pfe[id] = { gol: 'gol' }; refaRand(k);
+    live(textErori(S.pfe[id]));
+    return;
+  }
+  var p = D.proiectDin(a, v.valoare, null, existent ? existent.id : null);
+  S.pfe[id] = null; S.pf[id] = null;                // formularul se reia din ce s-a salvat
+  operatie({ t: 'pset', p: p });
+  live(L('Datele proiectului au fost salvate.', 'The project data was saved.'));
+}
+/* Șterge ce s-a introdus pentru rând, inclusiv eventualele înregistrări mai vechi pentru același rând (altfel ar reapărea cele vechi). */
+function stergeProiect(id, k) {
+  var a = S.baza.peId.get(id), e = a && S.proiecteDb.peAcord.get(id);
+  S.confP = null;
+  if (!a || !e) { refaRand(k); return; }
+  var ids = [e.id].concat(S.proiecteDb.vechi.filter(function (x) { var r = D.gasesteAcord(x, S.baza); return r && r.id === id; }).map(function (x) { return x.id; }));
+  S.pf[id] = null; S.pfe[id] = null;
+  operatie(ids.map(function (i) { return { t: 'pdel', id: i, nume: a.nume }; }));
+  live(L('Datele introduse au fost șterse.', 'The entered data was deleted.'));
+}
+function stergeProiectOrfan(id) {
+  var e = S.proiecteDb.orfane.filter(function (x) { return x.id === id; })[0];
+  S.confP = null;
+  operatie({ t: 'pdel', id: id, nume: e ? e.nume : '' });
+  live(L('Datele introduse au fost șterse.', 'The entered data was deleted.'));
+}
+/* Legătura probabilă cu un proiect AMP nu dă date în tabel; omul poate copia datele în formular, le verifică și le salvează el. */
+function folosesteAmp(id, k) {
+  var a = S.baza.peId.get(id), amp = a && infoDe(a).amp;
+  if (!amp) return;
+  var f = formProiect(a);
+  if (amp.inceput) f.inceput = D.fmtDataPartiala(amp.inceput);
+  if (amp.sfarsit) f.sfarsit = D.fmtDataPartiala(amp.sfarsit);
+  if (!f.nota) f.nota = L('din AMP, proiectul ' + amp.id + ' (legătură neconfirmată)', 'from AMP, project ' + amp.id + ' (unconfirmed link)');
+  S.pfe[id] = null;
+  refaRand(k);
+  live(L('Datele din AMP au fost copiate în formular. Verifică-le și apasă „Salvează datele proiectului”.', 'The AMP dates were copied into the form. Check them and press "Save the project data".'));
+}
+function sincronizeazaProiect(el) {
+  var form = el.closest('form.proj-form'), id = form.getAttribute('data-a'), a = S.baza.peId.get(id);
+  var f = formProiect(a);
+  f[el.name] = el.value;
+  var er = S.pfe[id];
+  if (er && (er[el.name] || er.gol)) {
+    delete er[el.name]; delete er.gol; el.removeAttribute('aria-invalid');
+    var m = form.querySelector('.ferr'); if (m) m.textContent = textErori(er);
+  }
+  if (el.name === 'obiective') { var c = form.querySelector('.cnt'); if (c) c.textContent = el.value.length + '/' + D.MAX_OBIECTIVE; }
 }
 
 /* ------------------------------------------------------------------ fereastra cu codul de acces */
@@ -868,7 +1246,8 @@ function descarcaBlob(blob, nume) {
 }
 function ctxExcel() {
   return { t: L, en: S.en, baza: paginaUrl(), cursuri: S.baza.cursuri, cursData: cursData(), peAcord: S.peAcord,
-           generat: D.dataOraRo(), filtre: texteFiltre() };
+           generat: D.dataOraRo(), filtre: texteFiltre(),
+           proiecteDb: S.proiecteDb.peAcord, proiecteManual: S.baza.proiecteManual, amp: S.amp.peAcord, omise: S.baza.omise, ampNota: textAmpExcel() };
 }
 function donatoriExport() {
   var baza = S.sel.length ? donatoriAlesi() : D.ordoneazaDonatori(S.baza.donatori, S.dsort, S.peAcord, S.baza.cursuri, S.en);
@@ -876,25 +1255,33 @@ function donatoriExport() {
 }
 function exporta(tip, cheie, btn) {
   var err = $('#exErr'); if (err) err.textContent = '';
-  var ctx = ctxExcel(), spec, nume, azi = D.aziIso();
+  var azi = D.aziIso(), lista = null, dons = null, orf = null;
   if (tip === 'donator') {
     var d = S.baza.donatori.filter(function (x) { return x.cheie === cheie; })[0];
-    var lista = d ? filtrate(d.acorduri) : [];
+    lista = d ? filtrate(d.acorduri) : [];
     if (!lista.length) { if (err) err.textContent = L('Nu e nimic de exportat cu filtrele de acum.', 'Nothing to export with the current filters.'); return; }
-    spec = D.excelDonator(ctx, { cheie: cheie, acorduri: lista });
-    nume = 'debursari-' + D.slug(cheie) + '-' + azi + '.xlsx';
   } else {
-    var dons = donatoriExport();
+    dons = donatoriExport();
     if (!dons.length) { if (err) err.textContent = L('Nu e nimic de exportat cu filtrele de acum.', 'Nothing to export with the current filters.'); return; }
-    var orf = S.sel.length ? [] : S.orfane;
-    if (tip === 'total') { spec = D.excelTotal(ctx, dons, orf); nume = 'debursari-total-' + azi + '.xlsx'; }
-    else { spec = D.excelPeDonatori(ctx, dons, orf); nume = 'debursari-pe-donatori-' + azi + '.xlsx'; }
+    orf = S.sel.length ? [] : S.orfane;
   }
   if (btn) btn.disabled = true;
-  incarcaStil().then(function (X) { return X.construieste(spec); }).then(function (blob) {
-    descarcaBlob(blob, nume);
-    live(L('Fișierul Excel a fost generat: ', 'The Excel file was generated: ') + nume);
-  }, function (e) {
+  // datele din AMP nu trebuie să lipsească din fișier doar fiindcă încă se încarcă: se așteaptă (cel mult cât durează citirea lor)
+  if (S.amp.faza === 'neinceput') pornesteAmp();
+  var asteapta = S.amp.faza === 'se-incarca' && S.amp.promisiune ? S.amp.promisiune : Promise.resolve();
+  if (S.amp.faza === 'se-incarca') live(L('Se așteaptă datele din AMP, apoi se generează fișierul…', 'Waiting for the AMP data, then the file is generated…'));
+  asteapta.catch(function () { /* starea AMP spune ce s-a întâmplat */ }).then(function () {
+    var ctx = ctxExcel(), spec, nume;
+    if (tip === 'donator') {
+      spec = D.excelDonator(ctx, { cheie: cheie, acorduri: lista });
+      nume = 'debursari-' + D.slug(cheie) + '-' + azi + '.xlsx';
+    } else if (tip === 'total') { spec = D.excelTotal(ctx, dons, orf); nume = 'debursari-total-' + azi + '.xlsx'; }
+    else { spec = D.excelPeDonatori(ctx, dons, orf); nume = 'debursari-pe-donatori-' + azi + '.xlsx'; }
+    return incarcaStil().then(function (X) { return X.construieste(spec); }).then(function (blob) {
+      descarcaBlob(blob, nume);
+      live(L('Fișierul Excel a fost generat: ', 'The Excel file was generated: ') + nume);
+    });
+  }).then(null, function (e) {
     if (window.console) console.warn('Exportul Excel a eșuat:', e);
     if (err) err.textContent = L('Nu am putut genera fișierul Excel. Încearcă din nou.', 'Could not generate the Excel file. Try again.');
   }).then(function () { if (btn) btn.disabled = false; });
@@ -919,7 +1306,7 @@ function actiune(act, b) {
   if (!k) { var f = b.closest('form[data-k]'); if (f) k = f.getAttribute('data-k'); }
   switch (act) {
     case 'unlock': deschideDialog(); break;
-    case 'lock': cod = null; S.ed = null; S.conf = null; randeazaTot(); live(L('Câmpurile sunt din nou blocate.', 'The fields are locked again.')); break;
+    case 'lock': cod = null; S.ed = null; S.conf = null; S.confP = null; randeazaTot(); live(L('Câmpurile sunt din nou blocate.', 'The fields are locked again.')); break;
     case 'retry': S.eroareSalv = null; if (!cod) deschideDialog(); else trimite(); break;
     case 'renunta-coada':
       if (S.ocupat) break;
@@ -940,6 +1327,14 @@ function actiune(act, b) {
     case 'del': S.ed = null; S.conf = b.getAttribute('data-id'); randeazaRez(); randeazaOrfane(); break;
     case 'del-nu': S.conf = null; randeazaRez(); randeazaOrfane(); break;
     case 'del-da': sterge(b.getAttribute('data-id')); break;
+    case 'proiect-sterge': S.confP = b.getAttribute('data-a'); if (k) refaRand(k); break;
+    case 'proiect-sterge-nu': S.confP = null; if (k) refaRand(k); break;
+    case 'proiect-sterge-da': stergeProiect(b.getAttribute('data-a'), k); break;
+    case 'proiect-orfan-sterge': S.confP = b.getAttribute('data-id'); randeazaOrfane(); break;
+    case 'proiect-orfan-sterge-nu': S.confP = null; randeazaOrfane(); break;
+    case 'proiect-orfan-sterge-da': stergeProiectOrfan(b.getAttribute('data-id')); break;
+    case 'foloseste-amp': folosesteAmp(b.getAttribute('data-a'), k); break;
+    case 'amp-reincearca': pornesteAmp(); break;
     case 'excel-donator': exporta('donator', b.getAttribute('data-d'), b); break;
     case 'excel-total': exporta('total', null, b); break;
     case 'excel-donatori': exporta('donatori', null, b); break;
@@ -962,6 +1357,7 @@ RAD.addEventListener('input', function (ev) {
   if (t.id === 'dq') { S.dq = t.value; peste('dq', randeazaLista, 120); return; }
   if (t.id === 'q') { S.q = t.value.slice(0, 120); peste('q', dupaFiltre, 160); return; }
   if (t.matches('form.deb-form input')) sincronizeazaFormular(t);
+  if (t.matches('form.proj-form input, form.proj-form textarea')) sincronizeazaProiect(t);
   if (t.matches('[data-ed]') && S.ed) S.ed.f[t.getAttribute('data-ed')] = t.value;
 });
 function sincronizeazaFormular(el) {
@@ -973,10 +1369,10 @@ function sincronizeazaFormular(el) {
   var pv = form.querySelector('.prev'); if (pv) pv.innerHTML = previzualizare(f);
 }
 RAD.addEventListener('submit', function (ev) {
-  var f = ev.target.closest('form.deb-form');
+  var f = ev.target.closest('form.frm');
   if (!f) return;
   ev.preventDefault();
-  adauga(f);
+  if (f.classList.contains('proj-form')) salveazaProiect(f); else adauga(f);
 });
 RAD.addEventListener('keydown', function (ev) {
   var t = ev.target;
@@ -1019,7 +1415,7 @@ new MutationObserver(function () {
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
 /* pentru teste și depanare: nimic din ce ține de cod nu e expus */
-window.DebursariUI = { stare: function () { return { sel: S.sel.slice(), coada: S.coada.length, deblocat: !!cod, ocupat: S.ocupat, intrari: S.intrari.length, orfane: S.orfane.length }; } };
+window.DebursariUI = { stare: function () { return { sel: S.sel.slice(), coada: S.coada.length, deblocat: !!cod, ocupat: S.ocupat, intrari: S.intrari.length, orfane: S.orfane.length, amp: S.amp.faza, proiecteDb: S.proiecteDb.peAcord.size }; } };
 
 incarca();
 })();

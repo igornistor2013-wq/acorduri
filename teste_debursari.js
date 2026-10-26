@@ -103,14 +103,11 @@ egal('peAct găsește acordurile după codul actului', B.peAct.get('HG2/2020').m
 egal('cursurile și data lor', [B.cursData, B.cursuri.USD, B.cursuri.EUR], ['1 iulie 2026', 1.1383, 1]);
 const FARA_CURSURI = D.pregateste(Object.assign({}, JSON_TEST, { cursuri: undefined }));
 aproape('un fișier mai vechi, fără cursuri: se deduc din rânduri', FARA_CURSURI.cursuri.USD, 1.1383, 0.001);
-egal('descriere: titlul complet când spune mai mult decât denumirea', D.descriere(B.peId.get('a3'), false).indexOf('Acordul de finanțare dintre') === 0, true);
-egal('descriere: altfel o frază din ce se știe, cu actele (română)', D.descriere(B.peId.get('a1'), false), 'Împrumut de la BIRD / AID, semnat la 07.09.2026. Acte: HG1/2020 din 01.01.2020. Stadiu: în vigoare.');
-egal('descriere: aceeași, în engleză', D.descriere(B.peId.get('a1'), true), 'Loan from BIRD / AID, signed on 07.09.2026. Acts: HG1/2020 of 01.01.2020. Stage: in force.');
-const multe = Object.assign({}, B.peId.get('a1'), { acte: [1, 2, 3, 4, 5].map(i => ({ act: 'HG' + i + '/2020', data: '0' + i + '.01.2020' })) });
-egal('descriere: cel mult trei acte, restul numărate', [D.descriere(multe, false).indexOf('Acte: HG1/2020 din 01.01.2020, HG2/2020 din 02.01.2020, HG3/2020 din 03.01.2020 și încă 2.') > 0, D.descriere(multe, true).indexOf('and 2 more.') > 0], [true, true]);
-const fragment = Object.assign({}, B.peId.get('a3'), { numeComplet: 'proiectului „Modernizarea școlilor” din Republica Moldova, semnat de părți' });
-egal('descriere: un titlu care începe cu literă mică (fragment) nu se folosește singur', D.descriere(fragment, false).indexOf('proiectului') < 0 && D.descriere(fragment, false).length > 10, true);
-egal('descriere pentru un acord fără partener nu spune „de la”', D.descriere(B.peId.get('a5'), false).indexOf(' de la ') < 0, true);
+egal('descriere = obiectivele proiectului; fără obiective, șir gol (nu o frază alcătuită din titlu și date)',
+     [D.descriere(B.peId.get('a1'), false), D.descriere(B.peId.get('a1'), true, D.infoProiect(B.peId.get('a1'), {})), D.descriere(B.peId.get('a3'), false, null)], ['', '', '']);
+const INFO_O = { obiective: { ro: 'Modernizarea școlilor', en: 'Modernising schools', tip: 'oficial' } };
+egal('descriere: obiectivele în limba paginii', [D.descriere(B.peId.get('a1'), false, INFO_O), D.descriere(B.peId.get('a1'), true, INFO_O)], ['Modernizarea școlilor', 'Modernising schools']);
+egal('descriere: fără traducere în engleză, se păstrează textul român', D.descriere(B.peId.get('a1'), true, { obiective: { ro: 'Text', en: '', tip: 'manual' } }), 'Text');
 
 console.log('\nDebursările: formular, legare, totaluri');
 const ACUM = new Date(2026, 9, 26, 12, 0);
@@ -166,6 +163,150 @@ aproape('suma totală = doar rândurile numărate', R_TOT.sumaEur, 10000000 / 1.
 aproape('debursat total = toate intrările valide', R_TOT.debEur, 1000000 / 1.1383 + 500000 + 100000, 1e-6);
 const R_DUBLU = D.rezumat(B.peDonator.get('BIRD').concat(B.peDonator.get('AID')), L.peAcord, cursuri);
 egal('un acord cofinanțat de doi donatori ținuți împreună: numărat o dată', [R_DUBLU.n, R_DUBLU.nIntrari], [1, 2]);
+
+console.log('\nObiective, date de început și de finalizare');
+const SURSA = 'https://exemplu.org/doc', CITAT = 'citat exact din document';
+const M0 = D.normalizeazaManual({
+  omise: [{ acte: ['HG1/2020'], motiv: '  umbrelă   pentru a1 ', numarat_la: ['HG2/2020'] }, { acte: [], motiv: 'x' }, { acte: ['HG3/2020'] }],
+  proiecte: [
+    { acte: ['HG1/2020'], obiective: { ro: 'Obiectiv  RO', en: 'Objective EN' }, inceput: '2021-03-15', sfarsit: '2025-12', sursa: SURSA, citat: CITAT, nota: ' despre date ' },
+    { acte: ['HG2/2020'], obiective: { ro: 'Fără sursă' } },
+    { acte: ['HG3/2020'], inceput: '15.03.2021', sursa: SURSA, citat: CITAT },
+    { acte: ['HG4/2020'], inceput: '2026-05', sfarsit: '2026-02', sursa: SURSA, citat: CITAT },
+    { acte: ['HG5/2020'], obiective: { ro: 'x'.repeat(601) }, sursa: SURSA, citat: CITAT },
+    { acte: ['HG6/2020'], obiective: { en: 'Only EN' }, sursa: SURSA, citat: CITAT },
+    { acte: ['HG7/2020'], sursa: SURSA, citat: CITAT },
+    { acte: ['HG8/2020'], inceput: '2021-02-30', sursa: SURSA, citat: CITAT },
+    { acte: ['HG9/2020'], obiective: { ro: 'Sursă fără adresă web' }, sursa: 'exemplu.org', citat: CITAT },
+    { acte: ['HG10/2020'], obiective: { ro: 'Citat prea scurt' }, sursa: SURSA, citat: 'scurt' },
+    { obiective: { ro: 'Fără acte' }, sursa: SURSA, citat: CITAT }
+  ]
+});
+egal('fișierul manual: o intrare bună se păstrează, cu spațiile curățate', [M0.proiecte.length, M0.proiecte[0].ro, M0.proiecte[0].en, M0.proiecte[0].inceput, M0.proiecte[0].sfarsit, M0.proiecte[0].nota], [1, 'Obiectiv RO', 'Objective EN', '2021-03-15', '2025-12', 'despre date']);
+egal('fișierul manual: rândurile omise (cu motivul curățat) și cele fără acte sau fără motiv', [M0.omise.length, M0.omise[0].motiv, M0.omise[0].numaratLa], [1, 'umbrelă pentru a1', ['HG2/2020']]);
+egal('fișierul manual: fără sursă, dată în alt format, început după sfârșit, text prea lung, engleză fără română, fără conținut, dată inexistentă, sursă fără adresă web, citat scurt, fără acte — toate respinse, 12 erori',
+     [M0.erori.length, M0.proiecte.length], [12, 1]);
+egal('fișierul manual: lipsă sau altceva decât obiect → liste goale, fără excepție', [D.normalizeazaManual(null).proiecte.length, D.normalizeazaManual({ omise: 5, proiecte: 'x' }).omise.length, D.normalizeazaManual(undefined).erori.length], [0, 0, 0]);
+
+const MAN = {
+  omise: [{ acte: ['HG4/2020'], motiv: 'Rând-umbrelă pentru a2', numarat_la: ['HG2/2020'] }],
+  proiecte: [
+    { acte: ['HG1/2020'], obiective: { ro: 'Modernizarea clădirilor școlilor', en: 'Modernising school buildings' }, inceput: '2021-03-15', sfarsit: '2025-12', sursa: SURSA + '/a1', citat: 'citat exact pentru a1 din document' },
+    { acte: ['HG999/1999'], obiective: { ro: 'Un proiect care nu mai e în registru' }, sursa: SURSA, citat: CITAT },
+    { acte: ['HG2/2020'], obiective: { ro: 'Sprijin pentru reforma justiției' }, sursa: SURSA + '/a2', citat: 'citat exact pentru a2 din document' },
+    { acte: ['HG2/2020'], obiective: { ro: 'A doua intrare, ignorată pentru obiective' }, inceput: '2020-06', sursa: SURSA + '/a2b', citat: 'citat exact pentru a2, a doua intrare' }
+  ]
+};
+const BM = D.pregateste(JSON_TEST, MAN);
+egal('rând omis: nu mai apare în listă, nici la donatorul lui, dar se ține minte cu motivul și cu locul unde e numărată suma',
+     [BM.acorduri.map(a => a.id), BM.peDonator.has('BERD'), BM.omise.map(o => [o.a.id, o.motiv, o.numaratLa])], [['a1', 'a2', 'a3', 'a5', 'a6', 'a7'], false, [['a4', 'Rând-umbrelă pentru a2', ['HG2/2020']]]]);
+egal('rândul omis nu se găsește după act (nu primește debursări)', [BM.peAct.has('HG4/2020'), BM.peId.has('a4')], [false, false]);
+egal('intrarea pentru un act care nu mai e în registru ajunge în „negăsite”, nu se pierde în tăcere', [BM.proiecteNegasite.map(p => p.acte[0]), BM.eroriManual.length], [['HG999/1999'], 0]);
+egal('intrările pe rând: două pentru a2, una pentru a1', [BM.proiecteManual.get('a1').length, BM.proiecteManual.get('a2').length, BM.proiecteManual.has('a3')], [1, 2, false]);
+const A1 = BM.peId.get('a1'), A2 = BM.peId.get('a2'), A3 = BM.peId.get('a3');
+let inf = D.infoProiect(A1, { manual: BM.proiecteManual });
+egal('info: obiective și date din sursa oficială, cu adresa și citatul', [inf.obiective.tip, inf.obiective.ro, inf.obiective.en, inf.inceput.tip, inf.inceput.v, inf.sfarsit.v, inf.inceput.sursa, inf.obiective.citat],
+     ['oficial', 'Modernizarea clădirilor școlilor', 'Modernising school buildings', 'oficial', '2021-03-15', '2025-12', SURSA + '/a1', 'citat exact pentru a1 din document']);
+inf = D.infoProiect(A2, { manual: BM.proiecteManual });
+egal('info: fiecare câmp din prima intrare care îl are (obiectivele din prima, începutul din a doua)', [inf.obiective.ro, inf.obiective.sursa, inf.inceput.v, inf.inceput.sursa, inf.sfarsit], ['Sprijin pentru reforma justiției', SURSA + '/a2', '2020-06', SURSA + '/a2b', null]);
+egal('info: fără nicio sursă, nimic nu se inventează', (inf = D.infoProiect(A3, {}), [inf.obiective, inf.inceput, inf.sfarsit, inf.contradictie]), [null, null, null, false]);
+const AMP1 = new Map([['a1', { id: '872111', titlu: 'Titlu AMP', inceput: '2020-01-10', sfarsit: '2026-06-30', nivel: 'sigur' }]]);
+inf = D.infoProiect(A1, { manual: BM.proiecteManual, amp: AMP1 });
+egal('info: sursa oficială bate AMP', [inf.inceput.v, inf.inceput.tip, inf.sfarsit.v, inf.sfarsit.tip], ['2021-03-15', 'oficial', '2025-12', 'oficial']);
+inf = D.infoProiect(A1, { amp: AMP1 });
+egal('info: din AMP, cu id-ul și titlul proiectului AMP; obiectivele nu vin niciodată din AMP', [inf.inceput.tip, inf.inceput.v, inf.sfarsit.v, inf.inceput.idAmp, inf.inceput.titluAmp, inf.obiective], ['amp', '2020-01-10', '2026-06-30', '872111', 'Titlu AMP', null]);
+inf = D.infoProiect(A2, { amp: new Map([['a2', { id: '1', titlu: 'T', inceput: '2019-05-02', sfarsit: '', nivel: 'probabil' }]]) });
+egal('info: o legătură doar probabilă cu AMP nu dă nicio dată în tabel; rămâne ca indiciu', [inf.inceput, inf.sfarsit, inf.ampProbabil && inf.ampProbabil.titlu], [null, null, 'T']);
+inf = D.infoProiect(A2, { amp: new Map([['a2', { id: '1', titlu: 'T', inceput: '2019-05-02', sfarsit: '', nivel: 'sigur' }]]) });
+egal('info: din AMP (legătură sigură); o dată goală în AMP rămâne goală; fără indiciu', [inf.inceput.tip, inf.inceput.v, inf.sfarsit, inf.ampProbabil], ['amp', '2019-05-02', null, null]);
+inf = D.infoProiect(A1, { amp: new Map([['a1', { id: '1', titlu: 'T', inceput: '31/12/2019', sfarsit: '', nivel: 'sigur' }]]) });
+egal('info: o dată AMP care nu e în forma AAAA-LL-ZZ nu se folosește', [inf.inceput, inf.sfarsit], [null, null]);
+const DB1 = new Map([['a1', { id: 'p1', acord: 'a1', obiective: 'Obiectiv introdus de om', inceput: '2022-01', nota: 'din contract', la: '2026-10-26T10:00:00.000Z' }]]);
+inf = D.infoProiect(A1, { db: DB1, manual: BM.proiecteManual, amp: AMP1 });
+egal('info: ce a introdus omul bate sursele oficiale și AMP; câmpul pe care nu l-a completat vine din sursa următoare',
+     [inf.obiective.tip, inf.obiective.ro, inf.obiective.en, inf.inceput.tip, inf.inceput.v, inf.sfarsit.tip, inf.sfarsit.v], ['manual', 'Obiectiv introdus de om', 'Obiectiv introdus de om', 'manual', '2022-01', 'oficial', '2025-12']);
+inf = D.infoProiect(A1, { db: new Map([['a1', { id: 'p1', acord: 'a1', inceput: '2030' }]]), manual: BM.proiecteManual });
+egal('info: începutul de după finalizare e semnalat ca o contradicție', [inf.inceput.v, inf.sfarsit.v, inf.contradictie], ['2030', '2025-12', true]);
+inf = D.infoProiect(A1, { db: new Map([['a1', { id: 'p1', acord: 'a1', inceput: '2025-12' }]]), manual: BM.proiecteManual });
+egal('info: aceeași lună nu se contrazice', inf.contradictie, false);
+egal('sursa scrisă: o singură sursă sau câmp cu câmp, în ambele limbi', [
+  D.textSursaProiect(D.infoProiect(A1, { manual: BM.proiecteManual }), false),
+  D.textSursaProiect(D.infoProiect(A1, { db: DB1, manual: BM.proiecteManual }), false),
+  D.textSursaProiect(D.infoProiect(A1, { db: DB1, manual: BM.proiecteManual }), true),
+  D.textSursaProiect(D.infoProiect(A3, {}), false)],
+  ['sursă oficială', 'obiective: introdus de utilizator; început: introdus de utilizator; finalizare: sursă oficială', 'objectives: entered by a user; start: entered by a user; completion: official source', '']);
+egal('adresa sursei: doar a unei surse oficiale', [D.legaturaSursaProiect(D.infoProiect(A1, { manual: BM.proiecteManual })), D.legaturaSursaProiect(D.infoProiect(A1, { amp: AMP1 })), D.legaturaSursaProiect(D.infoProiect(A1, { db: DB1 }))], [SURSA + '/a1', '', '']);
+
+console.log('\nDate despre proiect introduse de utilizator');
+egal('citire date: „15.03.2021”, „03.2021”, „2021”, „2021-03-15”, cu „/” sau „-”',
+     ['15.03.2021', '5.3.2021', '15/03/2021', '15-03-2021', '2021-03-15', '2021/3/5', '03.2021', '3/2021', '2021-03', '2021', ' 2021 ', ''].map(D.parseDataPartiala),
+     ['2021-03-15', '2021-03-05', '2021-03-15', '2021-03-15', '2021-03-15', '2021-03-05', '2021-03', '2021-03', '2021-03', '2021', '2021', '']);
+egal('citire date: nu se inventează zile și luni', ['30.02.2021', '31.04.2021', '15.13.2021', '00.03.2021', '2021-00', '1949', '2101', 'ieri', '15.03.21', '15.03', '1.2.3.2021'].map(D.parseDataPartiala), [null, null, null, null, null, null, null, null, null, null, null]);
+egal('afișare: dată întreagă, lună, an; formă greșită → gol', ['2026-03-05', '2026-03', '2026', 'x', ''].map(D.fmtDataPartiala), ['05.03.2026', '03.2026', '2026', '', '']);
+egal('ordinea datelor se judecă doar cât spun ambele', [['2026-03', '2026-03-20'], ['2026-04', '2026-03-20'], ['2027', '2026-12-31'], ['2026', '2026-01-01'], ['2026-03-21', '2026-03-20'], ['', '2026']].map(x => D.inceputDupaSfarsit(x[0], x[1])), [false, true, true, false, true, false]);
+const VP = c => D.valideazaProiect(c);
+let vp = VP({ obiective: ' Modernizarea   școlilor ', inceput: '15.03.2021', sfarsit: '2025', nota: ' n  1 ' });
+egal('formular „Date despre proiect” corect', [vp.ok, vp.valoare.obiective, vp.valoare.inceput, vp.valoare.sfarsit, vp.valoare.nota, vp.valoare.gol], [true, 'Modernizarea școlilor', '2021-03-15', '2025', 'n 1', false]);
+egal('formular: o singură informație ajunge', [VP({ obiective: 'x' }).ok, VP({ inceput: '2020' }).ok, VP({ sfarsit: '12.2030' }).ok], [true, true, true]);
+egal('formular: gol = ștergere (e valid, dar marcat „gol”)', (vp = VP({}), [vp.ok, vp.valoare.gol]), [true, true]);
+egal('formular: erori — dată, ordine, text lung, notă lungă', [VP({ inceput: 'ieri' }).erori.inceput, VP({ sfarsit: '2020-13' }).erori.sfarsit, VP({ inceput: '2026-05', sfarsit: '2026-02' }).erori.sfarsit,
+     VP({ obiective: 'x'.repeat(601) }).erori.obiective, VP({ obiective: 'x'.repeat(600) }).ok, VP({ obiective: 'x', nota: 'y'.repeat(201) }).erori.nota], ['format', 'format', 'ordine', 'lunga', true, 'lunga']);
+const P1 = D.proiectDin(A1, vp = VP({ obiective: 'Modernizarea școlilor', inceput: '2021-03', sfarsit: '', nota: '' }).valoare, ACUM);
+egal('înregistrarea nouă: leagă rândul, păstrează actele, scrie doar ce s-a completat', [P1.acord, P1.acte, P1.nume, P1.obiective, P1.inceput, 'sfarsit' in P1, 'nota' in P1, P1.la, /^p[a-z0-9]{8,}$/.test(P1.id)],
+     ['a1', ['HG1/2020'], 'Modernizarea școlilor', 'Modernizarea școlilor', '2021-03', false, false, ACUM.toISOString(), true]);
+egal('înregistrarea refăcută își păstrează id-ul', D.proiectDin(A1, vp, ACUM, P1.id).id, P1.id);
+let dd = D.aplicaOps(D.dateGoale(), [{ t: 'pset', p: P1 }], ACUM);
+egal('operația „pset” adaugă; aceeași operație repetată nu dublează', [dd.proiecte.length, D.aplicaOps(dd, [{ t: 'pset', p: P1 }]).proiecte.length], [1, 1]);
+dd = D.aplicaOps(dd, [{ t: 'pset', p: Object.assign({}, P1, { obiective: 'Nou', inceput: '2022' }) }]);
+egal('„pset” cu același id înlocuiește înregistrarea întreagă', [dd.proiecte.length, dd.proiecte[0].obiective, dd.proiecte[0].inceput], [1, 'Nou', '2022']);
+egal('„pset” fără înregistrare sau fără id se ignoră', D.aplicaOps(dd, [{ t: 'pset' }, { t: 'pset', p: {} }]).proiecte.length, 1);
+dd = D.aplicaOps(dd, [{ t: 'add', e: e2 }]);
+egal('operațiile pe debursări și pe proiecte nu se amestecă', [dd.intrari.length, dd.proiecte.length], [1, 1]);
+egal('„pdel” șterge doar înregistrarea cu id-ul dat', [D.aplicaOps(dd, [{ t: 'pdel', id: P1.id }]).proiecte.length, D.aplicaOps(dd, [{ t: 'pdel', id: P1.id }]).intrari.length, D.aplicaOps(dd, [{ t: 'pdel', id: 'altul' }]).proiecte.length], [0, 1, 1]);
+egal('fișierul fără proiecte se scrie ca înainte (nicio cheie „proiecte”)', D.text(D.aplicaOps(D.dateGoale(), [{ t: 'add', e: e2 }], ACUM)).indexOf('proiecte') < 0, true);
+const textDd = D.text(dd);
+egal('fișierul cu proiecte: o înregistrare pe linie, se citește înapoi la fel', [textDd.split('\n').length, JSON.stringify(D.citesteText(textDd).proiecte), JSON.stringify(D.citesteText(textDd).intrari)], [textDd.split('\n').length, JSON.stringify(dd.proiecte), JSON.stringify(dd.intrari)]);
+verifica('fiecare înregistrare e pe linia ei (git arată o modificare ca o linie)', textDd.split('\n').filter(l => l.indexOf('"id":"' + P1.id + '"') >= 0).length === 1 && /\n\{"id":"p/.test(textDd));
+egal('fișier vechi, fără „proiecte”: se citește cu listă goală; „proiecte” care nu e listă → eroare de format', [D.citesteText('{"versiune":1,"intrari":[]}').proiecte, (() => { try { D.citesteText('{"intrari":[],"proiecte":5}'); return 'fără eroare'; } catch (e) { return e.cod; } })()], [[], 'format']);
+const PA = P1, PB = Object.assign({}, P1, { id: 'pvechi', la: '2026-01-01T00:00:00.000Z', obiective: 'Mai vechi' });
+const PC = { id: 'pc', acord: 'id-vechi', acte: ['HG2/2020'], obiective: 'Legat după act', la: '2026-02-01T00:00:00.000Z' };
+const PO = { id: 'po', acord: 'x', acte: ['HG999/1999'], obiective: 'Orfan', la: '2026-02-01T00:00:00.000Z' };
+const PX = { id: 'px', acord: 'a1' };
+const LP = D.legaProiecte([PB, PA, PC, PO, PX], B);
+egal('înregistrările legate de rânduri: cea mai nouă pe rând; cea veche rămâne în fișier, dar nu se arată', [LP.peAcord.get('a1').id, LP.vechi.map(e => e.id), LP.peAcord.get('a2').id, LP.orfane.map(e => e.id), LP.peAcord.size], [PA.id, ['pvechi'], 'pc', ['po'], 2]);
+egal('o înregistrare fără obiective și fără date nu se ia în seamă', LP.peAcord.has('px') || LP.orfane.some(e => e.id === 'px') || LP.vechi.some(e => e.id === 'px'), false);
+egal('căutarea poate folosi și textul obiectivelor', [B.acorduri.filter(a => D.potriveste(a, { peAcord: new Map(), q: 'extinderea canalizarii', extra: new Map([['a2', 'extinderea canalizării']]) })).map(a => a.id), B.acorduri.filter(a => D.potriveste(a, { peAcord: new Map(), q: 'extinderea canalizarii' })).length], [['a2'], 0]);
+
+console.log('\nDenumiri la fel, rânduri deosebite');
+const JSON_NUME = {
+  cursuri: CURSURI,
+  acorduri: [
+    ac('n1', 'Reabilitarea drumurilor', 'BEI', S(50e6, 'EUR'), { categorie: 'Împrumut', semnat: '01.02.2015' }),
+    ac('n2', 'Reabilitarea drumurilor', 'BEI', S(30e6, 'EUR'), { categorie: 'Împrumut', semnat: '03.04.2019' }),
+    ac('n3', 'Reabilitarea drumurilor', 'BEI', S(20e6, 'EUR'), { categorie: 'Grant', semnat: '05.06.2019' }),
+    ac('n4', 'Reabilitarea drumurilor', 'Japonia', S(1e9, 'JPY'), { categorie: 'Împrumut', semnat: '01.02.2015' }),
+    ac('n5', 'Alt proiect', 'BEI', S(5e6, 'EUR')),
+    ac('n6', 'Reabilitarea drumurilor', 'BEI', S(30e6, 'EUR'), { categorie: 'Împrumut', semnat: '03.04.2019' }),
+    ac('n7', 'Reabilitarea drumurilor', 'BEI / Japonia', S(7e6, 'EUR'), { categorie: 'Grant', semnat: '01.01.2020' })
+  ]
+};
+const BN = D.pregateste(JSON_NUME);
+const dn = id => BN.peId.get(id).deosebire;
+egal('aceeași denumire și același donator: tip și an (cel mai scurt text care deosebește)', [dn('n1').ro, dn('n3').ro, dn('n7').ro], ['împrumut, 2015', 'grant, 2019', 'grant, 2020']);
+egal('tip și an la fel: se adaugă suma, apoi codul celui mai vechi act', [dn('n2').ro, dn('n6').ro], ['împrumut, 2019, 30 mil. EUR, HG2/2020', 'împrumut, 2019, 30 mil. EUR, HG6/2020']);
+egal('în engleză', [dn('n1').en, dn('n2').en], ['loan, 2015', 'loan, 2019, 30 M EUR, HG2/2020']);
+egal('un rând cu nume unic sau care nu împarte donatorul cu un rând la fel nu primește mențiune', [BN.peId.get('n5').deosebire, BN.peId.get('n4').deosebire && 'are'], [null, 'are']);
+egal('numele afișat', [D.numeAfisat(BN.peId.get('n1'), false), D.numeAfisat(BN.peId.get('n1'), true), D.numeAfisat(BN.peId.get('n5'), false)],
+     ['Reabilitarea drumurilor (împrumut, 2015)', 'Reabilitarea drumurilor (loan, 2015)', 'Alt proiect']);
+verifica('în lista fiecărui donator, două rânduri nu au același nume afișat', (function () {
+  let bun = true;
+  BN.donatori.forEach(d => { const v = d.acorduri.map(a => D.fold(D.numeAfisat(a, false))); if (new Set(v).size !== v.length) bun = false; });
+  return bun;
+})(), BN.donatori.map(d => [d.cheie, d.acorduri.map(a => D.numeAfisat(a, false))]));
+egal('denumirea din registru rămâne neatinsă', BN.peId.get('n1').nume, 'Reabilitarea drumurilor');
+const PN = D.pregateste({ cursuri: CURSURI, acorduri: [ac('q1', 'Școli', 'UE', S(1, 'EUR'), { parteneri: 'UE / BEI', parteneriAcord: 'BEI' })] });
+egal('donatorii unui rând: finanțatorul acordului (parteneriAcord), nu toți partenerii din grup; registrul rămâne la îndemână', [PN.acorduri[0].donatori, PN.acorduri[0].parteneriText, PN.acorduri[0].parteneriRegistru], [['BEI'], 'BEI', 'UE / BEI']);
+egal('fără parteneriAcord (fișier mai vechi): partenerii din registru', D.pregateste({ cursuri: CURSURI, acorduri: [ac('q2', 'Școli', 'UE / BEI', null)] }).acorduri[0].donatori, ['UE', 'BEI']);
 
 console.log('\nFiltre, ordonare, adresă');
 const peAc = L.peAcord;
@@ -346,19 +487,24 @@ let xs = D.excelDonator(ctx(false), donUE);
 verificaSpec('donator', xs);
 egal('donator: foile „UE” și „Debursări”', xs.foi.map(f => f.foaie), ['UE', 'Debursări']);
 const fp = xs.foi[0];
-egal('donator: coloanele cerute — proiect, descriere, tip, suma proiectului, debursări', [fp.antete[0], fp.antete[1], fp.antete[2], fp.antete[5], fp.antete[8]],
-     ['Proiectul', 'Descriere succintă', 'Tip de finanțare', 'Suma proiectului', 'Debursat (în valuta proiectului)']);
+const H = (f, nume) => f.antete.indexOf(nume);
+egal('donator: coloanele cerute — proiect, descriere (obiective), început, finalizare, tip, suma proiectului, debursări', [fp.antete[0], fp.antete[1], fp.antete[2], fp.antete[3], fp.antete[4], H(fp, 'Suma proiectului') > 4, H(fp, 'Debursat (în valuta proiectului)') > H(fp, 'Suma proiectului')],
+     ['Proiectul', 'Descriere succintă (obiectivele proiectului)', 'Data efectivă de începere', 'Data finalizării', 'Tip de finanțare', true, true]);
+egal('donator: cele două coloane de date sunt de tip dată (z), descrierea text, sursa text', [fp.tipuri[2], fp.tipuri[3], fp.tipuri[1], fp.tipuri[H(fp, 'Sursa obiectivelor și a datelor')]], ['z', 'z', 't', 't']);
 egal('donator: un rând pe acord, în ordinea sumei', fp.randuri.map(r => r[0]), ['Sprijin pentru justiție', 'Reforma achizițiilor publice']);
-egal('donator: suma și echivalentul în euro', [fp.randuri[0][5], fp.randuri[0][6], fp.randuri[0][7], fp.randuri[1][5]], [5000000, 'EUR', 5000000, '']);
-egal('donator: debursat (în valuta proiectului și în euro), procent (în puncte), rest', [fp.randuri[0][8], fp.randuri[0][9], fp.randuri[0][10], fp.randuri[0][11]], [100000, 100000, 2, 4900000]);
-egal('donator: fără debursări → celule goale, număr 0', [fp.randuri[1][8], fp.randuri[1][10], fp.randuri[1][12]], ['', '', 0]);
-egal('donator: totalul se calculează cu formule pe coloanele de sumă (echivalent EUR, debursat EUR, rest, număr)', fp.total.suma, [7, 9, 11, 12]);
+const cS = H(fp, 'Suma proiectului');       // coloanele de sumă vin una după alta: sumă, valută, echivalent EUR, debursat (valută), debursat (EUR), %, rest, număr
+egal('donator: suma și echivalentul în euro', [fp.randuri[0][cS], fp.randuri[0][cS + 1], fp.randuri[0][cS + 2], fp.randuri[1][cS]], [5000000, 'EUR', 5000000, '']);
+egal('donator: debursat (în valuta proiectului și în euro), procent (în puncte), rest', [fp.randuri[0][cS + 3], fp.randuri[0][cS + 4], fp.randuri[0][cS + 5], fp.randuri[0][cS + 6]], [100000, 100000, 2, 4900000]);
+egal('donator: fără debursări → celule goale, număr 0', [fp.randuri[1][cS + 3], fp.randuri[1][cS + 5], fp.randuri[1][cS + 7]], ['', '', 0]);
+egal('donator: totalul se calculează cu formule pe coloanele de sumă (echivalent EUR, debursat EUR, rest, număr)', fp.total.suma, [cS + 2, cS + 4, cS + 6, cS + 7]);
+egal('donator: fără obiective și fără date, celulele sunt goale și sursa nu inventează nimic', [fp.randuri[0][1], fp.randuri[0][2], fp.randuri[0][3], fp.randuri[0][H(fp, 'Sursa obiectivelor și a datelor')]], ['', '', '', '']);
 egal('donator: foaia Debursări are intrarea lui UE', xs.foi[1].randuri.map(r => [r[0], r[1], r[2], r[3], r[4]]), [['UE', 'Sprijin pentru justiție', '2026-05-01', 100000, 'EUR']]);
 const cuFiltre = D.excelDonator(Object.assign(ctx(false), { filtre: 'filtre: tip: Grant' }), donUE);
 verifica('filtrele active din pagină apar în antetul fișierului', cuFiltre.foi.every(f => f.subtitlu.indexOf('filtre: tip: Grant') > 0), cuFiltre.foi.map(f => f.subtitlu));
 verifica('fără filtre, antetul nu pomenește filtre', xs.foi.every(f => f.subtitlu.indexOf('filtre') < 0), xs.foi.map(f => f.subtitlu));
 xs = D.excelDonator(ctx(true), donUE);
-egal('donator, engleză: foile și antetele', [xs.foi[0].antete[0], xs.foi[0].antete[2], xs.foi[1].foaie, xs.foi[0].randuri[0][2].indexOf('Grant') === 0], ['Project', 'Type of financing', 'Disbursements', true]);
+egal('donator, engleză: foile și antetele', [xs.foi[0].antete[0], xs.foi[0].antete[2], xs.foi[0].antete[3], xs.foi[0].antete[4], xs.foi[1].foaie, xs.foi[0].randuri[0][4].indexOf('Grant') === 0],
+     ['Project', 'Actual start date', 'Completion date', 'Type of financing', 'Disbursements', true]);
 xs = D.excelTotal(Object.assign(ctx(false), { peAcord: LL.peAcord }), [donUE, donBIRD, B.donatori.filter(d => d.cheie === 'AID')[0]], LL.orfane);
 verificaSpec('total', xs);
 egal('total: foile „Total”, „Pe donatori”, „Debursări”', xs.foi.map(f => f.foaie), ['Total', 'Pe donatori', 'Debursări']);
@@ -375,7 +521,7 @@ xs = D.excelTotal(ctx(false), B.donatori, []);
 const nume = xs.foi.map(f => f.foaie);
 verifica('foile au nume unice (fără a conta diferențele de majuscule)', new Set(nume.map(x => x.toLowerCase())).size === nume.length, nume);
 xs = D.excelDonator(ctx(false), B.donatori.filter(d => d.cheie === 'BERD')[0]);
-egal('acord care nu intră în total: euro gol, motivul scris', [xs.foi[0].randuri[0][7], xs.foi[0].randuri[0][14]], ['', 'nu: nu se adună']);
+egal('acord care nu intră în total: euro gol, motivul scris', [xs.foi[0].randuri[0][H(xs.foi[0], 'Echivalent EUR')], xs.foi[0].randuri[0][H(xs.foi[0], 'Intră în total?')]], ['', 'nu: nu se adună']);
 // scris cu adevărat de xlsx-stil.js
 for (const spec of [D.excelDonator(ctx(false), donUE), D.excelTotal(ctx(true), B.donatori, LL.orfane), D.excelPeDonatori(ctx(false), B.donatori, [])]) {
   const blob = await X.construieste(spec);
@@ -388,21 +534,70 @@ verifica('un donator fără niciun acord tot produce un fișier valid', Buffer.f
 
 console.log('\nPe datele reale din repository');
 const real = JSON.parse(fs.readFileSync(path.join(__dirname, 'date', 'acorduri_legare.json'), 'utf8'));
-const R = D.pregateste(real);
-verifica('toate acordurile din fișier ajung în pagină', R.acorduri.length === real.acorduri.length && R.acorduri.length >= 400, [R.acorduri.length, real.acorduri.length]);
+const MANUAL = JSON.parse(fs.readFileSync(path.join(__dirname, 'date', 'proiecte_manual.json'), 'utf8'));
+const R0 = D.pregateste(real);
+const R = D.pregateste(real, MANUAL);
+verifica('fără fișierul manual, toate acordurile din registru ajung în pagină', R0.acorduri.length === real.acorduri.length && R0.acorduri.length >= 400 && R0.omise.length === 0, [R0.acorduri.length, real.acorduri.length]);
+verifica('cu fișierul manual: fiecare rând din registru e în listă sau între cele omise, o singură dată', R.acorduri.length + R.omise.length === real.acorduri.length && R.omise.length >= 1 &&
+         new Set(R.acorduri.map(a => a.id).concat(R.omise.map(o => o.a.id))).size === real.acorduri.length, [R.acorduri.length, R.omise.length, real.acorduri.length]);
 verifica('fișierul are cursurile exacte (nu trebuie deduse)', real.cursuri && real.cursuri.USD > 0 && real.cursuri.EUR === 1, real.cursuri);
 verifica('fiecare rând are câmpul „inTotal”', real.acorduri.every(a => ['numarat', 'dublura', 'fara_total', 'fara_curs', 'fara_suma'].indexOf(a.inTotal) >= 0));
-verifica('fiecare acord are cel puțin un donator, o denumire fără paranteză neînchisă și o descriere',
-         R.acorduri.every(a => a.donatori.length >= 1 && a.nume && !/\($/.test(a.nume) && D.descriere(a, false).length > 10 && D.descriere(a, true).length > 10));
-const dupaToken = (t) => real.acorduri.filter(a => String(a.parteneri || '').split('/').map(x => x.trim()).indexOf(t) >= 0).length;
+verifica('fiecare acord are cel puțin un donator, o denumire fără paranteză neînchisă și titlul din registru',
+         R.acorduri.every(a => a.donatori.length >= 1 && a.nume && !/\($/.test(a.nume) && a.numeComplet && a.numeComplet.length > 0));
+const omiseId = new Set(R.omise.map(o => o.a.id));
+const dupaToken = (t) => real.acorduri.filter(a => !omiseId.has(a.id) && String(a.parteneriAcord || a.parteneri || '').split('/').map(x => x.trim()).indexOf(t) >= 0).length;
 const donUEr = R.donatori.filter(d => d.cheie === 'UE')[0];
-egal('UE: numărul de proiecte = rândurile din registru care îl au printre parteneri', donUEr.acorduri.length, dupaToken('UE'));
+egal('UE: numărul de proiecte = rândurile (neomise) care îl au printre finanțatori', donUEr.acorduri.length, dupaToken('UE'));
 verifica('suma donatorilor (cu repetări) ≥ numărul de acorduri; fiecare acord e la cel puțin un donator',
          R.donatori.reduce((s, d) => s + d.acorduri.length, 0) >= R.acorduri.length && R.acorduri.every(a => R.peDonator.get(a.donatori[0]).indexOf(a) >= 0));
 const totalR = D.rezumat(R.acorduri, new Map(), R.cursuri);
-const totalFisier = real.acorduri.filter(a => a.inTotal === 'numarat').reduce((s, a) => s + a.suma.eur, 0);
+const totalFisier = real.acorduri.filter(a => a.inTotal === 'numarat').reduce((s, a) => s + a.suma.eur, 0);   // rândurile omise nu se adună niciodată în total (vezi mai jos)
 aproape('suma proiectelor = suma „echivalent EUR” din registru (diferă doar rotunjirea la euro a fiecărui rând)', totalR.sumaEur, totalFisier, real.acorduri.length * 0.5);
 egal('numărul de proiecte cu sumă în total = rândurile „numărat”', totalR.cuSuma, real.acorduri.filter(a => a.inTotal === 'numarat').length);
+console.log('\nDubluri: verificări pe datele reale');
+const peActReal = new Map();
+real.acorduri.forEach(a => (a.acte || []).forEach(x => { if (x.act) (peActReal.get(x.act) || peActReal.set(x.act, []).get(x.act)).push(a.id); }));
+const actDublat = [...peActReal.entries()].filter(e => new Set(e[1]).size > 1).map(e => e[0]);
+egal('niciun act nu apare în două rânduri ale registrului', actDublat, []);
+const peDonDub = [];
+R.donatori.forEach(d => {
+  const v = new Map();
+  d.acorduri.forEach(a => { const k = D.fold(D.numeAfisat(a, false)); (v.get(k) || v.set(k, []).get(k)).push(a.id); });
+  v.forEach((l, k) => { if (l.length > 1) peDonDub.push(d.cheie + ': ' + k + ' → ' + l.join(', ')); });
+});
+egal('în lista fiecărui donator, două rânduri nu au același nume afișat (denumirea + mențiunea de deosebire)', peDonDub, []);
+egal('niciun rând nu are mențiune de deosebire fără să aibă un vecin cu același nume și același donator', R.acorduri.filter(a => a.deosebire && !R.acorduri.some(b => b !== a && D.fold(b.nume) === D.fold(a.nume) && b.donatori.some(x => a.donatori.indexOf(x) >= 0))).map(a => a.id), []);
+egal('rândurile omise nu se adună în niciun total (altfel suma ar fi numărată de două ori)', R.omise.filter(o => o.a.inTotal === 'numarat').map(o => o.a.id), []);
+egal('suma unui rând omis e numărată în alte rânduri: fiecare act din „numarat_la” se găsește într-un rând care rămâne în listă', R.omise.filter(o => o.numaratLa.length === 0 || o.numaratLa.some(c => !(R.peAct.get(c) || []).length)).map(o => o.a.id), []);
+egal('fișierul manual: nicio intrare respinsă, nicio intrare fără rând în registru', [R.eroriManual, R.proiecteNegasite.map(p => p.acte)], [[], []]);
+egal('fișierul manual: fiecare act dintr-o intrare aparține aceluiași rând (nu amestecă două acorduri)', MANUAL.proiecte.filter(p => {
+  const randuri = new Set();
+  p.acte.forEach(c => (peActReal.get(c) || []).forEach(id => randuri.add(id)));
+  return randuri.size !== 1;
+}).map(p => p.acte), []);
+egal('fișierul manual: anii datelor sunt plauzibili (1990–2045) și începutul nu e după sfârșit', MANUAL.proiecte.filter(p => ['inceput', 'sfarsit'].some(k => p[k] && (+String(p[k]).slice(0, 4) < 1990 || +String(p[k]).slice(0, 4) > 2045)) || D.inceputDupaSfarsit(p.inceput, p.sfarsit)).map(p => p.acte), []);
+egal('fișierul manual: o intrare nu trece de 600 de caractere la obiective și are sursă web și citat', MANUAL.proiecte.filter(p => !/^https?:\/\//.test(p.sursa || '') || String(p.citat || '').length < 12 ||
+     ['ro', 'en'].some(l => ((p.obiective || {})[l] || '').length > 600)).map(p => p.acte), []);
+egal('finanțatorul acordului (parteneriAcord) există pe fiecare rând, nu e gol și e o submulțime a partenerilor din registru', real.acorduri.filter(a => {
+  if (typeof a.parteneriAcord !== 'string') return true;
+  const tok = x => String(x || '').split('/').map(y => y.trim()).filter(Boolean);
+  const reg = tok(a.parteneri);
+  return reg.length ? !(tok(a.parteneriAcord).length && tok(a.parteneriAcord).every(t => reg.indexOf(t) >= 0)) : false;
+}).map(a => a.id), []);
+egal('donatorii unui rând = finanțatorii acordului: un rând nu apare la un donator doar fiindcă un act al grupului îl pomenește', R.acorduri.filter(a => a.parteneriText !== (real.acorduri.filter(x => x.id === a.id)[0].parteneriAcord || real.acorduri.filter(x => x.id === a.id)[0].parteneri || '')).map(a => a.id), []);
+// Excel pe date reale, cu fișierul manual și cu date AMP inventate
+const ampR = new Map(R.acorduri.slice(0, 40).map((a, i) => [a.id, { id: 'amp' + i, titlu: 'Proiect ' + i, inceput: '2020-0' + (1 + i % 9) + '-15', sfarsit: i % 2 ? '2026-12-31' : '', nivel: i % 3 ? 'sigur' : 'probabil' }]));
+const ctxR = Object.assign(ctx(false), { peAcord: new Map(), proiecteManual: R.proiecteManual, amp: ampR, omise: R.omise, ampNota: 'Nota AMP de probă: raportul live nu a răspuns.' });
+const xdon = D.excelTotal(ctxR, R.donatori, []);
+verificaSpec('total pe date reale, cu surse', xdon);
+const fT = xdon.foi[0], iSursa = fT.antete.indexOf('Sursa obiectivelor și a datelor'), iInc = fT.antete.indexOf('Data efectivă de începere'), iSf = fT.antete.indexOf('Data finalizării'), iNume = fT.antete.indexOf('Proiectul');
+verifica('Excel pe date reale: fiecare rând cu dată are sursă scrisă; nicio celulă nu conține „undefined” sau „null”', fT.randuri.every(r => (!r[iInc] && !r[iSf]) || r[iSursa]) &&
+         fT.randuri.every(r => r.every(x => !/undefined|null|NaN/.test(String(x)))), fT.randuri.filter(r => r.some(x => /undefined|null|NaN/.test(String(x)))).slice(0, 2));
+verifica('Excel pe date reale: datele întregi au forma zz.ll.aaaa (se citesc ca dată în Excel), cele parțiale ll.aaaa sau aaaa', fT.randuri.every(r => [r[iInc], r[iSf]].every(x => x === '' || /^(\d{2}\.\d{2}\.\d{4}|\d{2}\.\d{4}|\d{4})$/.test(x))), fT.randuri.slice(0, 3).map(r => [r[iInc], r[iSf]]));
+verifica('Excel pe date reale: nota despre citirea datelor din AMP (ce s-a întâmplat cu raportul live) ajunge în fișier', fT.note.some(n => typeof n === 'string' && n.indexOf('Nota AMP de probă') === 0), fT.note.map(n => String(n.t || n).slice(0, 40)));
+verifica('Excel pe date reale: nota explică datele întregi (dată adevărată) și pe cele parțiale (text)', fT.note.some(n => typeof n === 'string' && n.indexOf('rămâne text') > 0 && n.indexOf('dată adevărată') > 0), fT.note.map(n => String(n.t || n).slice(0, 40)));
+verifica('Excel pe date reale: rândurile omise nu apar în foaie, dar sunt pomenite în note', R.omise.every(o => !fT.randuri.some(r => r[iNume] === o.a.nume && r[iNume + 1] === o.a.donatori.join(' / '))) && fT.note.some(n => typeof n === 'string' && n.indexOf('rânduri-umbrelă') > 0), fT.note.map(n => String(n.t || n).slice(0, 60)));
+verifica('Excel pe date reale: în foaie nu apar două rânduri cu același nume afișat și aceiași donatori', (function () { const v = fT.randuri.map(r => D.fold(r[iNume]) + '|' + r[iNume + 1]); return new Set(v).size === v.length; })());
 // un donator real, de la un capăt la altul
 const peRand = new Map();
 const donB = R.donatori.filter(d => d.cheie === 'BERD')[0];

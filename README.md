@@ -9,7 +9,7 @@ Paginile care arată, din surse oficiale, cine finanțează Republica Moldova
 |---|---|---|
 | `index.html` | Donatori, proiecte, sume — tabloul principal, cu analize avansate și export. Butonul **Acorduri** deschide un meniu cu cele două registre de acorduri, cu „De la lege la bani" (acordurile legate de proiectele AMP) și cu „Debursări pe acorduri" | Platforma AMP (live) + arhiva 1993–2022, verificare încrucișată cu IATI |
 | `acorduri.html` | Registrul acordurilor de asistență externă, act cu act, cu etapa la care a ajuns fiecare | Cuprinsurile Monitorului Oficial |
-| `debursari.html` | Debursări pe acorduri: pe donatori, la bifarea unuia apar proiectele lui (denumire, descriere, tip de finanțare, suma proiectului) și debursările introduse de mână după un cod de acces; Excel pe donator sau total | Registrul legis.md (`date/acorduri_legare.json`) + debursările din `date/debursari.json` |
+| `debursari.html` | Debursări pe acorduri: pe donatori, la bifarea unuia apar proiectele lui (denumire, obiectivele proiectului, data efectivă de începere, data finalizării, tip de finanțare, suma proiectului) și debursările introduse de mână după un cod de acces; Excel pe donator sau total | Registrul legis.md (`date/acorduri_legare.json`) + obiectivele din `date/proiecte_manual.json` + datele din AMP + ce introduc oamenii în `date/debursari.json` |
 | `hg246.html` | Compară anexa nr. 1 la HG 246/2010 cu baza AMP și scoate în Word proiectele expirate | Documentul încărcat de utilizator + AMP |
 
 ## Registrul acordurilor — cum se actualizează
@@ -196,11 +196,14 @@ care legis.md îl primește.
 | `date/acorduri_legare.json` | Acordurile din registru, gata grupate, un acord pe linie. Citit de pagina „De la lege la bani". Se rescrie doar când se schimbă ceva |
 | `date/legaturi_amp.json` | Legăturile acord ↔ proiect AMP confirmate de oameni (vezi mai jos). Se completează de mână sau din pagină |
 | `debursari.html` | Pagina „Debursări pe acorduri”: structura și stilurile. Scripturile ei sunt `debursari.js` și `debursari-ui.js` (vezi „Debursări pe acorduri”) |
-| `debursari.js` | Logica paginii, fără DOM, ca s-o poată testa Node: donatorii și proiectele lor, descrierile, totalurile (aceleași reguli ca în registru), operațiile asupra fișierului de date și salvarea lui prin API-ul GitHub („Depozit”), păstrarea codului cu PIN („Seif”) și specificațiile celor trei fișiere Excel |
-| `debursari-ui.js` | Interfața paginii: alegerea donatorilor, tabelul, fereastra cu codul, formularele de debursare, butoanele Excel, engleza și varianta pentru telefon. Nu ține codul nicăieri în afara memoriei paginii |
-| `date/debursari.json` | „Baza de date” a paginii: debursările introduse de mână, o înregistrare pe linie. Fișier public; îl scrie doar pagina, prin API-ul GitHub, cu codul de acces. Fiecare salvare e un commit |
-| `teste_debursari.js` | Testele logicii (descrieri, totaluri, operații, conflicte de scriere, PIN, specificațiile Excel). Rulare: `node teste_debursari.js` |
-| `teste_debursari.py` | Verifică fișierele paginii și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”) |
+| `debursari.js` | Logica paginii, fără DOM, ca s-o poată testa Node: donatorii și proiectele lor, rândurile omise, obiectivele și datele proiectelor (sursele și ordinea lor), totalurile (aceleași reguli ca în registru), operațiile asupra fișierului de date și salvarea lui prin API-ul GitHub („Depozit”), păstrarea codului cu PIN („Seif”) și specificațiile celor trei fișiere Excel |
+| `debursari-ui.js` | Interfața paginii: alegerea donatorilor, tabelul, fereastra cu codul, formularele de debursare și de date despre proiect, panourile „AMP”, „Rânduri omise” și „Date fără acord găsit”, butoanele Excel, engleza și varianta pentru telefon. Nu ține codul nicăieri în afara memoriei paginii |
+| `amp-date.js` | Datele de început și de finalizare din AMP pentru acordurile din „Debursări pe acorduri”: citește raportul AMP live (nr. 661, prin proxy-ul amp.vivi.md) și, când nu răspunde, arhiva `arhiva.js`; leagă un acord de un proiect AMP doar când denumirea, finanțatorul și suma coincid („sigur”) sau când un om a confirmat legătura în `date/legaturi_amp.json`; o legătură doar „probabilă” rămâne indiciu, nu dă date în tabel. Funcții pure, ca să le poată testa Node |
+| `teste_amp_date.js` | Testele lui `amp-date.js`: formatele datelor, regulile de potrivire (sigur, probabil, ambiguu, prea vechi), legăturile confirmate sau respinse, raportul live față de arhivă, oprirea după 20 de secunde și o verificare pe arhiva AMP + registrul real. Rulare: `node teste_amp_date.js` |
+| `date/proiecte_manual.json` | Date despre proiecte, scrise de mână și cu sursă. „omise”: rândurile-umbrelă ale registrului, care nu apar în lista de proiecte (cu motivul). „proiecte”: obiectivele proiectului și, când sursa le dă, data de început și de finalizare; fiecare intrare are adresa documentului oficial și citatul exact — fără ele nu se citește. Vezi „Debursări pe acorduri” |
+| `date/debursari.json` | „Baza de date” a paginii: debursările introduse de mână, o înregistrare pe linie, și — la cheia `proiecte`, scrisă doar când nu e goală — datele despre proiecte introduse în pagină (obiective, început, finalizare). Fișier public; îl scrie doar pagina, prin API-ul GitHub, cu codul de acces. Fiecare salvare e un commit |
+| `teste_debursari.js` | Testele logicii (obiective și date cu sursele lor, rânduri omise, totaluri, operații, conflicte de scriere, PIN, specificațiile Excel). Rulare: `node teste_debursari.js` |
+| `teste_debursari.py` | Verifică fișierele paginii (inclusiv `date/proiecte_manual.json`) și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”); `--doar 13,14` rulează doar secțiunile numerotate |
 | `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi. Le scrie `legis_watch.py`; apar în repository după prima rulare reușită a lui `legis_local.bat` |
 | `CNAME` | Domeniul propriu |
 
@@ -302,14 +305,29 @@ debursat. Debursările nu vin dintr-o sursă oficială: se introduc de mână, d
 deblochează câmpurile, și se salvează în fișierul `date/debursari.json` din repository.
 
 **Ce arată.** Pagina ia acordurile din `date/acorduri_legare.json` (scris de `legatura_acorduri.py`
-chiar din registru) și le repartizează pe donatori: partenerii din registru, cum îi numește și filtrul
-registrului. Un acord cofinanțat apare la fiecare donator, dar în totaluri se numără o singură dată;
-fără partener în registru, donatorul e „(neidentificat)". Bifezi unul sau mai mulți donatori și apare
-lista proiectelor lor: denumirea, o descriere succintă, tipul de finanțare, suma proiectului (în valuta
-acordului și în euro), suma debursărilor și procentul debursat. Se poate căuta (denumire, act, partener),
-filtra (tip de finanțare, cu sau fără debursări) și sorta. Donatorii bifați și filtrele rămân în adresa
-paginii (`#d=BERD|BEI&tip=…`), deci o selecție se trimite ca link. Pe telefon tabelul devine fișe; pagina
-are și varianta în engleză.
+chiar din registru) și le repartizează pe donatori: finanțatorii numiți în acordul însuși
+(`parteneriAcord`), nu toți partenerii adunați din actele grupate; un împrumut al BERD nu apare și la BEI
+doar fiindcă un act al grupului vorbește de ambele bănci. Un acord cofinanțat apare la fiecare finanțator
+al lui, dar în totaluri se numără o singură dată; fără partener în registru, donatorul e „(neidentificat)".
+Bifezi unul sau mai mulți donatori și apare lista proiectelor lor, cu coloanele **Proiectul**,
+**Descriere succintă** (obiectivele proiectului), **Data efectivă de începere**, **Data finalizării**,
+**Tip de finanțare**, **Suma proiectului** (în valuta acordului și în euro) și **Suma debursărilor** (cu
+procentul debursat). Butonul din dreapta deschide detaliile: debursările, datele despre proiect (cu sursa și
+citatul), proiectul AMP legat, actele. Se poate căuta (denumire, obiective, act, partener), filtra (tip de
+finanțare, cu sau fără debursări) și sorta. Donatorii bifați și filtrele rămân în adresa paginii
+(`#d=BERD|BEI&tip=…`), deci o selecție se trimite ca link. Pe telefon tabelul devine fișe; pagina are și
+varianta în engleză.
+
+**Rânduri omise, ca un proiect să nu apară de două ori.** Cinci rânduri ale registrului nu apar în liste:
+sunt rânduri-umbrelă, adică negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu
+aceleași sume (HG546/2026, HG799/2014, HG296/2013, HG704/2007, LP232/2023). Lista lor, cu motivul, e în
+panoul „Rânduri omise" de sub tabel și în notele Excel-ului. Rămân în registru și nu schimbă totalurile
+(niciunul nu se adună în total). Se schimbă în `date/proiecte_manual.json`, la „omise". Verificarea
+dublurilor (octombrie 2026): niciun act nu e pe două rânduri; aceeași denumire la același donator (de pildă
+două tranșe ale aceluiași program) primește în listă o deosebire (tipul, anul); rândurile cu denumiri
+asemănătoare s-au verificat unul câte unul și sunt acorduri diferite (alt împrumut, altă tranșă, altă
+bancă). Câteva rânduri ale registrului unesc totuși două acorduri distincte (de pildă Livada Moldovei I și
+II); nu s-au despărțit, ca să nu se schimbe totalurile.
 
 **Sumele.** Aceleași reguli ca în panoul „Sumele acordurilor" din registru: un rând intră în total doar
 dacă îl numără registrul (`inTotal` din `date/acorduri_legare.json`: `numarat`, `fara_suma`, `fara_total` sau
@@ -320,13 +338,45 @@ Un proiect fără sumă rămâne în listă („suma nu e cunoscută") și poate
 procent. Nu se numără sume în lei (registrul n-are curs pentru ei) și nici o valută fără curs: o debursare
 se introduce într-o valută care are curs în fișier.
 
-**Descrierea.** Registrul nu are o descriere a acordurilor, deci pagina o compune. Când acordul are o
-denumire completă (mai lungă decât numele scurt, începută cu literă mare, cifră, ghilimele sau paranteză;
-un început cu literă mică e un fragment de titlu și se ignoră), aceea e descrierea. Altfel e o propoziție
-făcută din tip, finanțator, data semnării, primele trei acte și stadiu: „Împrumut de la BERD, semnat la
-27.06.2023. Acte: DP763/2026 din 03.09.2026, LP188/2026 din 24.08.2026, HG374/2026 din 22.07.2026 și încă 11.
-Stadiu: promulgat." Aproape jumătate din acorduri (211 din 466, în octombrie 2026) n-au o denumire completă,
-deci au descriere compusă. Descrierea din Excel e aceeași.
+**Obiectivele și datele proiectelor.** „Descriere succintă" înseamnă obiectivele proiectului, iar „Data
+efectivă de începere" și „Data finalizării" sunt datele proiectului, cum le numește AMP („Actual Start Date" și
+„Proposed Completion Date"). Registrul legis.md nu are nimic din acestea, deci fiecare câmp (obiectivele,
+începutul, finalizarea) se ia, în ordine, din prima sursă care îl are:
+
+1. **Ce a introdus un utilizator în pagină**, după ce a pus codul (secțiunea „Date despre proiect" din
+   detalii). Se salvează în `date/debursari.json`, la cheia `proiecte`, cu data salvării și o notă.
+2. **O sursă oficială, scrisă de mână** în `date/proiecte_manual.json`, la „proiecte": `acte` (orice cod de act al
+   rândului), `obiective` (`ro` și `en`), `inceput` și `sfarsit` (`AAAA-LL-ZZ`, `AAAA-LL` sau `AAAA`, după cât spune
+   sursa), `sursa` (adresa documentului oficial), `citat` (fragmentul exact din document care susține ce s-a
+   scris) și, opțional, `nota`. O intrare fără sursă și citat nu se citește: pagina o semnalează în panoul „Date
+   fără acord găsit", ca să nu apară în tabel nimic ce nu se poate verifica. Obiectivele se scriu în română
+   (traducerea) și în engleză (cum le dă documentul); o dată se pune doar dacă sursa spune începutul sau
+   sfârșitul proiectului (nu data aprobării sau a semnării), iar `nota` spune ce anume înseamnă data.
+3. **AMP**, doar pentru date și doar când legătura acord ↔ proiect AMP e sigură: denumirea, finanțatorul și suma
+   coincid, sau un om a confirmat legătura în `date/legaturi_amp.json`. O legătură doar „probabilă" nu dă nicio
+   dată în tabel, fiindcă prea des nimerește altă fază sau alt an: se arată în detalii, ca indiciu, cu butonul
+   „Copiază datele în formular". Obiectivele nu vin din AMP: raportul pe care îl citim nu le cuprinde.
+
+Fiecare dată sau obiectiv arată în tabel și în Excel de unde vine („introdus de utilizator", „sursă oficială",
+„AMP"). Datele din AMP vin din raportul AMP live (nr. 661, prin proxy-ul amp.vivi.md); dacă nu răspunde în 20 de
+secunde, pagina folosește arhiva `arhiva.js`, care ajunge până în 2022, spune asta în panoul „AMP" și oferă
+„Reîncearcă". Cu arhiva, în octombrie 2026, 42 din cele 460 de proiecte sunt legate sigur de un proiect AMP (cele 42
+au fost verificate de mână), 41 doar probabil și 19 ambiguu; raportul live, care acoperă și anii 2022–2026,
+leagă de regulă mai multe. O legătură probabilă se poate confirma în „De la lege la bani": de atunci devine
+„sigură, confirmată" și în această pagină. O celulă goală („—", „Obiective neintroduse") înseamnă că nu s-a găsit
+încă o sursă: pagina nu completează cu presupuneri. Cât e completat la donatorii afișați se vede sub titlul
+tabelului („obiective N/M · început N/M · finalizare N/M", cu cifrele de la momentul deschiderii paginii).
+Un utilizator poate corecta oricând un câmp din pagină; `date/proiecte_manual.json` e pentru ce se poate
+dovedi cu un document oficial.
+
+La data acestei versiuni, `date/proiecte_manual.json` are obiective pentru 143 din cele 460 de rânduri listate
+(Banca Mondială 62, BERD 34, BEI 20, CEB 10, AFD 7, Uniunea Europeană 6, Elveția 4), fiecare cu adresa
+documentului oficial și citatul exact. Restul (Japonia, Germania, China, SUA, FIDA și majoritatea acordurilor
+Elveției, ale UE și ale Băncii Mondiale mai vechi) rămân „neintroduse", până se găsește o sursă; se pot
+completa direct din pagină, cu codul de acces, sau în fișier, cu o intrare nouă (sursă + citat). Datele de
+început și de finalizare vin deocamdată din AMP (la proiectele legate sigur) și din 8 intrări oficiale
+(DHEIP-1, patru de la AFD, trei de la Elveția/SDC); la fiecare, `nota` spune ce reprezintă data (perioada
+unei faze, anul de început al programului etc.).
 
 **Codul de acces și „baza de date".** Site-ul e static (GitHub Pages): n-are server care să primească
 date. Singurul loc în care o pagină poate scrie fără un serviciu în plus e chiar repository-ul, prin
@@ -385,10 +435,11 @@ filtrele active (căutarea, tipul, cu/fără debursări) și le trec în subtitl
 
 | Buton | Fișier | Foi |
 |---|---|---|
-| **Excel · BERD** (numele donatorului, în capul tabelului lui) | `debursari-berd-2026-10-26.xlsx` (donatorul și data) | foaia donatorului (un rând pe proiect: denumire, descriere, tip, stadiu, semnat, suma proiectului, valuta, echivalent EUR, debursat în valuta proiectului și în EUR, % debursat, rest de debursat, număr de debursări, ultima debursare, „Intră în total?”, link legis.md) și „Debursări" (fiecare debursare introdusă) |
+| **Excel · BERD** (numele donatorului, în capul tabelului lui) | `debursari-berd-2026-10-26.xlsx` (donatorul și data) | foaia donatorului (un rând pe proiect: denumire, descriere succintă = obiectivele proiectului, data efectivă de începere, data finalizării, tip, stadiu, semnat, suma proiectului, valuta, echivalent EUR, debursat în valuta proiectului și în EUR, % debursat, rest de debursat, număr de debursări, ultima debursare, „Intră în total?”, sursa obiectivelor și a datelor, link legis.md) și „Debursări" (fiecare debursare introdusă) |
 | **Excel · total** | `debursari-total-2026-10-26.xlsx` | „Total" (fiecare proiect o singură dată, cu coloana „Donatori"), „Pe donatori" (rezumat) și „Debursări" |
 | **Excel · pe donatori** | `debursari-pe-donatori-2026-10-26.xlsx` | „Rezumat", câte o foaie pentru fiecare donator și „Debursări" |
 
+O dată întreagă (de pildă 30.06.2029) e dată adevărată în Excel, deci se poate sorta și filtra; una cunoscută doar cu luna și anul (03.2026) sau doar cu anul (2026) rămâne text, cât spune sursa. Notele de sub tabel spun sursele obiectivelor și ale datelor, rândurile omise și starea AMP.
 Cu donatori bifați, „total" și „pe donatori" cuprind doar donatorii bifați; fără niciunul, pe toți (și
 debursările fără acord găsit). Pe foile cu proiecte și pe cea cu debursări, rândul de total e formulă
 `SUBTOTAL`, deci se recalculează când filtrezi în Excel. În foaia „Pe donatori" („Rezumat"), rândul „Total
@@ -399,22 +450,29 @@ lui `debursari.js` (de schimbat dacă repository-ul se mută sau se redenumește
 denumirile lor complete (indiciul de sub acronim), e `NUME_DONATOR` din același fișier; un donator nou
 din registru apare singur, doar fără denumire completă.
 
-**Teste.** `node teste_debursari.js` (logica: sume față de o socoteală independentă, descrieri, operații,
-conflicte, PIN, specificațiile Excel). `python teste_debursari.py` verifică fișierele paginii (scripturi
-prezente, niciun cod GitHub în fișiere, forma lui `date/debursari.json`); cu `--browser` deschide pagina
-cu Chromium împotriva unui GitHub simulat (coduri greșite sau fără drept de scriere, conflicte de scriere,
-rețea căzută, fișier lipsă) și parcurge: donatorii și tabelul față de o socoteală independentă, câmpurile
-blocate, deblocarea, adăugarea, editarea și ștergerea cu verificarea fișierului scris și a mesajelor commit,
-coada nesalvată după reîncărcare, PIN-ul, debursări existente și orfane, cele trei fișiere Excel (deschise cu
-openpyxl), engleza, telefonul, starea din adresă, tastatura, lipsa erorilor JavaScript și a cererilor spre
-alte adrese decât pagina și `api.github.com`.
+**Teste.** `node teste_debursari.js` (logica: sume față de o socoteală independentă, obiective și date cu
+sursele lor și ordinea lor, rânduri omise, operații, conflicte, PIN, specificațiile Excel) și
+`node teste_amp_date.js` (datele din AMP: potrivirea, arhiva și raportul live). `python teste_debursari.py`
+verifică fișierele paginii (scripturi prezente, niciun cod GitHub în fișiere, forma lui `date/debursari.json` și
+a lui `date/proiecte_manual.json`: fiecare intrare cu sursă și citat, fiecare rând găsit în registru, niciun rând
+în două intrări); cu `--browser` deschide pagina cu Chromium împotriva unui GitHub simulat (coduri greșite sau
+fără drept de scriere, conflicte de scriere, rețea căzută, fișier lipsă) și parcurge: donatorii și tabelul față
+de o socoteală independentă, coloanele (inclusiv obiectivele și cele două date, pe desktop, pe telefon și în
+engleză), formularul „Date despre proiect" (introducere, editare, ștergere, coada nesalvată, mesajele commit),
+panourile „AMP", „Rânduri omise" și „Date fără acord găsit", câmpurile blocate, deblocarea, debursările (adăugare,
+editare, ștergere, verificarea fișierului scris), coada după reîncărcare, PIN-ul, debursări existente și orfane,
+cele trei fișiere Excel (deschise cu openpyxl; datele întregi sunt date adevărate), engleza, telefonul, starea
+din adresă, tastatura, lipsa erorilor JavaScript și a cererilor spre alte adrese decât pagina, `api.github.com`
+și `amp.vivi.md`. Cu `--doar 13,14` rulează doar secțiunile numerotate.
 
 **Limite.** Debursările sunt cele introduse de oameni și nu sunt verificate față de AMP sau o altă sursă;
-pagina nu le leagă de proiectele AMP („De la lege la bani" arată debursările din AMP). Descrierea compusă
-spune doar ce se știe din registru (tip, finanțator, acte, stadiu), nu ce finanțează proiectul. Un acord
-al cărui partener nu e recunoscut în registru apare la „(neidentificat)". Data „semnat" e cea din registru;
-la câteva rânduri registrul o arată greșit (coloana `Semnat` din registrul legis.md, de pildă la HG174/2006),
-iar pagina o preia ca atare.
+pagina nu le leagă de proiectele AMP („De la lege la bani" arată debursările din AMP). Obiectivele din
+`date/proiecte_manual.json` sunt traduse în română din documentul oficial (adresa și citatul exact sunt păstrate),
+iar ce nu s-a găsit rămâne gol. „Data finalizării" din AMP e data propusă de terminare, nu cea reală. Datele din
+AMP se văd doar la proiectele legate sigur de un acord, iar raportul live trebuie să răspundă din browserul tău
+(altfel pagina arată arhiva, până în 2022). Un acord al cărui partener nu e recunoscut în registru apare la
+„(neidentificat)". Data „semnat" e cea din registru; la câteva rânduri registrul o arată greșit (coloana
+`Semnat` din registrul legis.md, de pildă la HG174/2006), iar pagina o preia ca atare.
 
 ## Exporturile Excel ale graficelor și tabelelor
 

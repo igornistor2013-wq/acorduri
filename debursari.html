@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Debursări pe acorduri — Asistență Externă, Republica Moldova</title>
-<meta name="description" content="Acordurile din registrul legis.md, repartizate pe donatori: proiectele fiecăruia, suma lor și debursările introduse manual, cu export în Excel pe donator sau total.">
+<meta name="description" content="Acordurile din registrul legis.md, repartizate pe donatori: proiectele fiecăruia, cu obiectivele, data de început și data finalizării, suma lor și debursările introduse manual, cu export în Excel pe donator sau total.">
 <meta property="og:title" content="Debursări pe acorduri — Republica Moldova">
-<meta property="og:description" content="Acordurile din registrul legis.md, repartizate pe donatori: proiectele fiecăruia, suma lor și debursările introduse manual, cu export în Excel pe donator sau total.">
+<meta property="og:description" content="Acordurile din registrul legis.md, repartizate pe donatori: proiectele fiecăruia, cu obiectivele, data de început și data finalizării, suma lor și debursările introduse manual, cu export în Excel pe donator sau total.">
 <meta property="og:image" content="https://nistor.vivi.md/og.png">
 <meta property="og:url" content="https://nistor.vivi.md/debursari.html">
 <link rel="canonical" href="https://nistor.vivi.md/debursari.html">
@@ -31,7 +31,7 @@
     font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
   .wrap{max-width:1400px;margin:0 auto;padding:32px 24px 60px}
   @media (max-width:720px){.wrap{padding:16px 12px 40px}}
-  button,input,select{font-family:inherit}
+  button,input,select,textarea{font-family:inherit}
   a{color:var(--navy)}
   [hidden]{display:none !important}
 
@@ -67,7 +67,7 @@
     font-size:12.5px;font-weight:700;border-radius:7px;padding:8px 13px;cursor:pointer;white-space:nowrap;line-height:1.2}
   .btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
   .btn:hover{background:var(--blue-bg)}
-  .btn:focus-visible,.exp:focus-visible,.don input:focus-visible,.chip:focus-visible,select:focus-visible,input:focus-visible,.lnk:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .btn:focus-visible,.exp:focus-visible,.don input:focus-visible,.chip:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,.lnk:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   .btn.p{background:linear-gradient(135deg,var(--navy),#2f5691);border-color:var(--navy);color:#fff}
   .btn.p:hover{filter:brightness(1.1)}
   .btn[disabled]{opacity:.55;cursor:not-allowed}
@@ -75,6 +75,7 @@
   .btn.rosu{color:var(--red);border-color:#e3b8ae}
   .btn.rosu:hover{background:var(--red-bg)}
   .lnk{background:none;border:none;padding:0;color:var(--navy);text-decoration:underline;cursor:pointer;font-size:inherit;font-weight:600}
+  .rau{color:var(--red);font-weight:600}
 
   /* indicatori */
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
@@ -148,16 +149,19 @@
   .dsum b{color:var(--navy-deep)}
   .head-btns{display:flex;gap:8px;flex-wrap:wrap}
   .tbl-scroll{overflow-x:auto}
-  table.deb-tbl{border-collapse:collapse;width:100%;table-layout:fixed;min-width:860px}
+  table.deb-tbl{border-collapse:collapse;width:100%;table-layout:fixed;min-width:1040px}
   .deb-tbl > thead > tr > th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;text-align:left;padding:11px 12px;border-bottom:1px solid var(--line-strong);background:#fbfcfe;line-height:1.3;vertical-align:bottom;overflow-wrap:anywhere}
   .deb-tbl > thead > tr > th.num,.deb-tbl > tbody > tr > td.num{text-align:right}
   .deb-tbl > tbody > tr > td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-  .deb-tbl > thead > tr > th:nth-child(1){width:23%}
-  .deb-tbl > thead > tr > th:nth-child(2){width:27%}
-  .deb-tbl > thead > tr > th:nth-child(3){width:12%}
-  .deb-tbl > thead > tr > th:nth-child(4){width:15%}
-  .deb-tbl > thead > tr > th:nth-child(5){width:17%}
-  .deb-tbl > thead > tr > th:nth-child(6){width:6%}
+  .deb-tbl > thead > tr > th:nth-child(1){width:16%}
+  .deb-tbl > thead > tr > th:nth-child(2){width:21%}
+  .deb-tbl > thead > tr > th:nth-child(3){width:10%}
+  .deb-tbl > thead > tr > th:nth-child(4){width:10%}
+  .deb-tbl > thead > tr > th:nth-child(5){width:10%}
+  .deb-tbl > thead > tr > th:nth-child(6){width:14%}
+  .deb-tbl > thead > tr > th:nth-child(7){width:14%}
+  .deb-tbl > thead > tr > th:nth-child(8){width:5%}
+  .th-sub{display:block;text-transform:none;letter-spacing:0;font-weight:500;font-size:10px;margin-top:1px}
   tr.ac{cursor:pointer}
   tr.ac:hover{background:#fafbfd}
   tr.ac.deschis{background:#f7f9fd}
@@ -166,7 +170,16 @@
   .pmeta{margin-top:5px;display:flex;gap:4px 6px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--ink-dim)}
   .pdesc{font-size:12.5px;color:#39405a;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
   tr.deschis .pdesc,tr.deschis .pname{-webkit-line-clamp:unset;overflow:visible}
-  .tag{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+  .pdesc.gol{color:var(--ink-dim);font-style:italic}
+  .psrc{margin-top:4px;display:flex;gap:4px 6px;flex-wrap:wrap;align-items:center}
+  .src{display:inline-block;font-size:10px;font-weight:700;line-height:1.5;padding:0 6px;border-radius:4px;background:#eef0f4;color:#4f5668;white-space:nowrap;text-decoration:none}
+  .src.s-oficial{background:var(--green-bg);color:var(--green-ink)}
+  .src.s-manual{background:var(--gold-bg);color:#8a5c0d}
+  .src.s-amp{background:var(--blue-bg);color:var(--navy)}
+  a.src:hover{text-decoration:underline}
+  .dt{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--navy-deep);white-space:nowrap}
+  .dt.rau{color:var(--red)}
+  .tag{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:700;letter-spacing:.02em;line-height:1.3}
   .t-grant{background:var(--teal-bg);color:var(--teal-ink)}
   .t-imprumut{background:var(--red-bg);color:var(--red)}
   .t-tehnica{background:#e8eef7;color:#3d5a80}
@@ -198,6 +211,17 @@
   .deb-tbl > tbody > tr.det > td{background:#fbfcfe;padding:16px 18px 18px;cursor:default;border-bottom:1px solid var(--line-strong)}
   .det-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px 26px}
   @media (max-width:900px){.det-grid{grid-template-columns:1fr}}
+  .det-proiect{grid-column:1 / -1;border-top:1px dashed var(--line-strong);padding-top:14px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px 26px}
+  @media (max-width:900px){.det-proiect{grid-template-columns:1fr}}
+  .dlp{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:9px 14px;font-size:12.5px;color:#39405a}
+  .dlp dt{color:var(--ink-dim);font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;padding-top:2px}
+  .dlp dd{margin:0;min-width:0;overflow-wrap:anywhere}
+  .dlp .nil{color:var(--ink-dim)}
+  @media (max-width:560px){.dlp{grid-template-columns:1fr;gap:2px}.dlp dt{padding-top:8px}}
+  .citat{margin-top:5px;font-size:11.5px;color:#4f5668;border-left:3px solid var(--line-strong);padding-left:9px;font-style:italic;line-height:1.5}
+  .citat .cap{font-style:normal;font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-dim)}
+  .notap{margin-top:3px;font-size:11.5px;color:var(--ink-dim);line-height:1.45}
+  .notap.avert{color:#8a5c0d}
   .det-info{grid-column:1 / -1;border-top:1px dashed var(--line-strong);padding-top:12px;font-size:12.5px;color:#39405a}
   .det-info dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:4px 14px}
   .det-info dt{color:var(--ink-dim);font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;padding-top:2px}
@@ -216,18 +240,34 @@
   .deb-ent tr.conf td{background:var(--red-bg)}
   .nes{display:inline-block;font-size:10px;font-weight:700;color:#8a5c0d;background:var(--gold-bg);border-radius:4px;padding:0 6px;margin-left:6px;white-space:nowrap}
   .nimic{font-size:12.5px;color:var(--ink-dim);padding:10px 0}
-  form.deb-form{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;position:relative}
-  form.deb-form label{display:flex;flex-direction:column;gap:3px;font-size:11px;font-weight:700;color:var(--ink-dim);letter-spacing:.04em;text-transform:uppercase;min-width:0}
-  form.deb-form label.w,form.deb-form .full{grid-column:1 / -1}
-  form.deb-form input,form.deb-form select{border:1px solid var(--line-strong);border-radius:6px;padding:8px 10px;font-size:13.5px;color:var(--ink);background:#fff;min-width:0;width:100%;text-transform:none;letter-spacing:0;font-weight:400}
-  form.deb-form input:disabled,form.deb-form select:disabled{background:#f1f3f8;color:#8a91a3;cursor:not-allowed}
-  form.deb-form input[aria-invalid="true"]{border-color:var(--red);background:#fffafa}
+  form.frm{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;position:relative}
+  form.frm label{display:flex;flex-direction:column;gap:3px;font-size:11px;font-weight:700;color:var(--ink-dim);letter-spacing:.04em;text-transform:uppercase;min-width:0}
+  form.frm label.w,form.frm .full{grid-column:1 / -1}
+  form.frm input,form.frm select,form.frm textarea{border:1px solid var(--line-strong);border-radius:6px;padding:8px 10px;font-size:13.5px;color:var(--ink);background:#fff;min-width:0;width:100%;text-transform:none;letter-spacing:0;font-weight:400}
+  form.frm input:disabled,form.frm select:disabled,form.frm textarea:disabled{background:#f1f3f8;color:#8a91a3;cursor:not-allowed}
+  form.frm input[aria-invalid="true"],form.frm textarea[aria-invalid="true"]{border-color:var(--red);background:#fffafa}
+  form.frm textarea{resize:vertical;min-height:84px;line-height:1.45}
+  form.frm .cnt{align-self:flex-end;font-family:var(--mono);font-size:10.5px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--ink-dim)}
+  form.frm .hint,.hint{font-size:11.5px;color:var(--ink-dim);line-height:1.45}
   .prev{font-family:var(--mono);font-size:11.5px;color:var(--navy-deep);min-height:17px}
   .ferr{font-size:12px;color:var(--red);font-weight:600;min-height:0}
   .ferr:empty{display:none}
   .blocat{grid-column:1 / -1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--gold-bg);border:1px dashed var(--gold);border-radius:8px;padding:9px 12px;font-size:12.5px;color:#6b4a10}
   .blocat svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
+  .amp-st{background:var(--blue-bg);border:1px solid #cfdcf3;border-radius:8px;padding:8px 12px;margin:0 0 16px;font-size:12.5px;color:#2b3a5a;line-height:1.45}
+  .amp-st.eroare,.amp-st.avert{background:var(--gold-bg);border-color:#ecd7a8;color:#6b4a10}
+  .amp-st.lucru::before{content:'';display:inline-block;vertical-align:-2px;margin-right:8px;width:12px;height:12px;border-radius:50%;border:2px solid var(--navy);border-top-color:transparent;animation:inv .8s linear infinite}
+  @keyframes inv{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){.amp-st.lucru::before{animation:none}}
+  details.omise{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);box-shadow:var(--shadow);margin:0 0 20px}
+  details.omise.avert{border-color:#ecd7a8;background:#fffcf5}
+  details.omise > summary{cursor:pointer;padding:12px 18px;font-weight:700;color:var(--navy);font-size:12.5px}
+  details.omise > p{margin:0;padding:0 18px 6px;font-size:12.5px;color:var(--ink-dim)}
+  details.omise > ul{margin:0;padding:0 18px 14px 36px;font-size:12.5px;color:#39405a}
+  details.omise li{margin:9px 0}
+  details.omise a{color:var(--navy)}
+  .om-m{font-size:12px;color:var(--ink-dim);line-height:1.45}
   .panel[data-d]{scroll-margin-top:10px}
   .note{font-size:12.5px;color:var(--ink-dim);line-height:1.6;max-width:120ch;margin:26px 0 0}
   .note p{margin:0 0 8px}
@@ -265,7 +305,7 @@
     .deb-tbl > tbody > tr.ac{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;border:1px solid var(--line);border-radius:10px;margin:10px 12px 0;padding:10px 12px 12px;background:#fff}
     .deb-tbl > tbody > tr.ac.deschis{border-color:var(--navy);border-bottom:none;border-bottom-left-radius:0;border-bottom-right-radius:0;padding-bottom:4px}
     .deb-tbl > tbody > tr.ac > td{display:block;border:none;padding:4px 0;min-width:0;text-align:left !important}
-    .deb-tbl > tbody > tr.ac > td:nth-child(1),.deb-tbl > tbody > tr.ac > td:nth-child(2){grid-column:1 / -1}
+    .deb-tbl > tbody > tr.ac > td:nth-child(1),.deb-tbl > tbody > tr.ac > td:nth-child(2),.deb-tbl > tbody > tr.ac > td:nth-child(7){grid-column:1 / -1}
     .deb-tbl > tbody > tr.ac > td[data-l]::before{content:attr(data-l);display:block;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;margin-bottom:2px}
     .deb-tbl > tbody > tr.ac > td.act{grid-column:1 / -1;text-align:right !important}
     .exp{width:auto;padding:0 12px}
@@ -275,10 +315,10 @@
     .deb-ent th:nth-child(3),.deb-ent td:nth-child(3){display:none}
     .panel-head{padding:12px 14px}
     .col-picker .don-lista{padding:12px}
-    form.deb-form{grid-template-columns:1fr}
+    form.frm{grid-template-columns:1fr}
   }
   @media print{
-    .acces,.col-picker,.toolbar,.head-btns,.exp,.btn,form.deb-form,.footer-nav{display:none !important}
+    .acces,.col-picker,.toolbar,.head-btns,.exp,.btn,form.frm,.footer-nav,.amp-st{display:none !important}
     .cols{display:block}
     .panel{break-inside:auto;box-shadow:none}
     table.deb-tbl{min-width:0}
@@ -299,7 +339,7 @@
           </div>
           <h1 id="tTitlu">Debursări pe acorduri</h1>
         </div>
-        <p class="top-sub" id="tSub">Acordurile din registrul legis.md, repartizate pe donatori. Bifează un donator ca să vezi proiectele lui; sumele debursate se introduc de mână, după ce introduci codul de acces.</p>
+        <p class="top-sub" id="tSub">Acordurile din registrul legis.md, repartizate pe donatori. Bifează un donator ca să vezi proiectele lui, cu obiectivele, data de început, data finalizării și suma; sumele debursate se introduc de mână, după ce introduci codul de acces.</p>
       </div>
       <div class="top-meta" id="topMeta"></div>
     </header>
@@ -312,8 +352,10 @@
       <div class="col-main">
         <div id="sKpi"></div>
         <div id="sTool"></div>
+        <div id="sAmp"></div>
         <div id="sRez"></div>
         <div id="sOrfane"></div>
+        <div id="sOmise"></div>
       </div>
     </div>
     <div id="sNote"></div>
@@ -327,6 +369,8 @@
 
 <script src="traducere.js" defer></script>
 <script src="debursari.js"></script>
+<script src="legatura-amp.js"></script>
+<script src="amp-date.js"></script>
 <script src="debursari-ui.js"></script>
 </body>
 </html>

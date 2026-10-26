@@ -38,10 +38,12 @@ const CONFIG = {
   cale: 'date/debursari.json',
   api: 'https://api.github.com',
   sursaAcorduri: 'date/acorduri_legare.json',
+  sursaManual: 'date/proiecte_manual.json',      // obiective, date, rânduri omise (scrise de mână, cu sursă și citat)
   sursaDate: 'date/debursari.json'              // aceeași bază, citită ca fișier public (fără cod)
 };
 const NEIDENTIFICAT = '(neidentificat)';
 const MAX_NOTA = 200;
+const MAX_OBIECTIVE = 600;
 const MAX_SUMA = 1e13;
 const LUNGIME_MIN_PIN = 4;
 
@@ -56,6 +58,12 @@ const STADII = [
 ];
 const TIPURI_EN = { 'Grant': 'Grant', 'Împrumut': 'Loan', 'Asistență tehnică': 'Technical assistance', 'Asistență financiară': 'Financial assistance' };
 const ORDINE_TIP = ['Grant', 'Împrumut', 'Asistență tehnică', 'Asistență financiară'];
+/* De unde vine o informație despre proiect (obiective, început, finalizare): [română, engleză]. */
+const SURSE_PROIECT = {
+  manual: ['introdus de utilizator', 'entered by a user'],
+  oficial: ['sursă oficială', 'official source'],
+  amp: ['AMP', 'AMP']
+};
 const SURSE_SUMA = {
   acord: ['din textul acordului', 'from the text of the agreement'],
   extern: ['sursă externă', 'external source'],
@@ -202,6 +210,81 @@ function ordRo(ro) {
   return m ? m[3] + m[2] + m[1] : '';
 }
 
+/* Datele de început și de finalizare ale proiectelor pot fi întregi („2026-03-15”) sau parțiale („2026-03”, „2026”), după cât spune sursa:
+   o dată parțială nu se completează cu o zi inventată. */
+function dataPartiala(s) {
+  const m = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/.exec(String(s == null ? '' : s).trim());
+  if (!m) return null;
+  const a = +m[1], l = m[2] ? +m[2] : 0, z = m[3] ? +m[3] : 0;
+  if (a < 1950 || a > 2100) return null;
+  if (m[2] && (l < 1 || l > 12)) return null;
+  if (m[3] && !esteDataIso(m[0])) return null;
+  return { a: a, l: l, z: z, p: z ? 'z' : (l ? 'l' : 'a') };
+}
+function esteDataPartiala(s) { return !!dataPartiala(s); }
+/* „2026-03-15” → „15.03.2026”; „2026-03” → „03.2026”; „2026” → „2026”. Datele întregi se scriu cum le citește Excel. */
+function fmtDataPartiala(s) {
+  const d = dataPartiala(s);
+  if (!d) return '';
+  return d.p === 'z' ? pad(d.z) + '.' + pad(d.l) + '.' + d.a : d.p === 'l' ? pad(d.l) + '.' + d.a : String(d.a);
+}
+/* Începutul e după sfârșit? Se compară doar cât spun ambele date („2026-03” față de „2026-03-20” nu se contrazic). */
+function inceputDupaSfarsit(i, s) {
+  const x = dataPartiala(i), y = dataPartiala(s);
+  if (!x || !y) return false;
+  if (x.a !== y.a) return x.a > y.a;
+  if (!x.l || !y.l) return false;
+  if (x.l !== y.l) return x.l > y.l;
+  if (!x.z || !y.z) return false;
+  return x.z > y.z;
+}
+
+/* Ce scrie omul într-un câmp de dată: „15.03.2026”, „03.2026”, „2026”, „2026-03-15” (cu „.”, „/” sau „-” între părți). Întoarce data în forma
+   păstrată în fișiere (AAAA-LL-ZZ, AAAA-LL sau AAAA), '' când câmpul e gol și null când nu se înțelege. */
+function parseDataPartiala(txt) {
+  const s = String(txt == null ? '' : txt).trim();
+  if (!s) return '';
+  let m, iso = null;
+  if ((m = /^(\d{4})[-./](\d{1,2})[-./](\d{1,2})$/.exec(s))) iso = m[1] + '-' + pad(+m[2]) + '-' + pad(+m[3]);
+  else if ((m = /^(\d{1,2})[-./](\d{1,2})[-./](\d{4})$/.exec(s))) iso = m[3] + '-' + pad(+m[2]) + '-' + pad(+m[1]);
+  else if ((m = /^(\d{4})[-./](\d{1,2})$/.exec(s))) iso = m[1] + '-' + pad(+m[2]);
+  else if ((m = /^(\d{1,2})[-./](\d{4})$/.exec(s))) iso = m[2] + '-' + pad(+m[1]);
+  else if (/^\d{4}$/.test(s)) iso = s;
+  return iso && dataPartiala(iso) ? iso : null;
+}
+
+/* ------------------------------------------------------------------ datele despre proiecte, scrise de mână (date/proiecte_manual.json) */
+/* Fișierul are două liste: „omise” (rânduri-umbrelă din registru, care nu apar în lista de proiecte) și „proiecte” (obiective, început,
+   finalizare, fiecare cu sursa și citatul exact). Aici se verifică ce s-a scris: o intrare fără sursă și citat nu se citește, ca să nu apară
+   în pagină nimic ce nu se poate verifica. Întoarce { omise, proiecte, erori } — erorile spun ce intrare s-a respins și de ce. */
+function normalizeazaManual(j) {
+  const r = { omise: [], proiecte: [], erori: [] };
+  const lista = function (x) { return Array.isArray(x) ? x : []; };
+  const coduri = function (x) { return lista(x).filter(function (c) { return typeof c === 'string' && c.trim(); }).map(function (c) { return c.trim(); }); };
+  const sir = function (x) { return String(x == null ? '' : x).replace(/\s+/g, ' ').trim(); };
+  lista(j && j.omise).forEach(function (o, i) {
+    const acte = coduri(o && o.acte), motiv = sir(o && o.motiv);
+    if (!acte.length || !motiv) { r.erori.push('omise[' + i + ']: lipsesc actele sau motivul'); return; }
+    r.omise.push({ acte: acte, motiv: motiv, motivEn: sir(o.motiv_en), numaratLa: coduri(o.numarat_la) });
+  });
+  lista(j && j.proiecte).forEach(function (p, i) {
+    const e = 'proiecte[' + i + ']';
+    const acte = coduri(p && p.acte);
+    if (!acte.length) { r.erori.push(e + ': lipsesc actele'); return; }
+    const ro = sir(p.obiective && p.obiective.ro), en = sir(p.obiective && p.obiective.en);
+    const inceput = sir(p.inceput), sfarsit = sir(p.sfarsit);
+    if (!ro && !inceput && !sfarsit) { r.erori.push(e + ' (' + acte[0] + '): nu conține obiective și nici date'); return; }
+    if (en && !ro) { r.erori.push(e + ' (' + acte[0] + '): obiectivele în engleză fără cele în română'); return; }
+    if (ro.length > MAX_OBIECTIVE || en.length > MAX_OBIECTIVE) { r.erori.push(e + ' (' + acte[0] + '): obiectivele depășesc ' + MAX_OBIECTIVE + ' de caractere'); return; }
+    if ((inceput && !esteDataPartiala(inceput)) || (sfarsit && !esteDataPartiala(sfarsit))) { r.erori.push(e + ' (' + acte[0] + '): dată în alt format decât AAAA-LL-ZZ, AAAA-LL sau AAAA'); return; }
+    if (inceput && sfarsit && inceputDupaSfarsit(inceput, sfarsit)) { r.erori.push(e + ' (' + acte[0] + '): începutul e după sfârșit'); return; }
+    const sursa = sir(p.sursa), citat = sir(p.citat);
+    if (!/^https?:\/\/\S+$/.test(sursa) || citat.length < 12) { r.erori.push(e + ' (' + acte[0] + '): lipsește sursa (adresa documentului) sau citatul exact'); return; }
+    r.proiecte.push({ acte: acte, ro: ro, en: en, inceput: inceput, sfarsit: sfarsit, sursa: sursa, citat: citat, nota: sir(p.nota) });
+  });
+  return r;
+}
+
 /* ------------------------------------------------------------------ acordurile și donatorii */
 /* Donatorii unui acord: partenerii din registru, desfăcuți la „ / ”. Același lucru face filtrul „Partener” al registrului. */
 function donatoriiAcordului(parteneri) {
@@ -245,61 +328,182 @@ function deduCursuri(acorduri) {
   return c;
 }
 
-/* Rândurile fișierului date/acorduri_legare.json, pregătite pentru pagină. */
-function pregateste(json) {
+/* Rândurile fișierului date/acorduri_legare.json, pregătite pentru pagină. `manualBrut` e fișierul date/proiecte_manual.json (opțional).
+   Donatorii unui rând sunt finanțatorii acordului însuși (parteneriAcord), nu toți partenerii adunați din actele grupate: un împrumut al BERD
+   nu apare și la BEI doar fiindcă un act al grupului vorbește de ambele bănci. Rândurile-umbrelă („omise”) nu intră în listă. */
+function pregateste(json, manualBrut) {
   json = json || {};
+  const manual = normalizeazaManual(manualBrut);
   const brut = Array.isArray(json.acorduri) ? json.acorduri : [];
   const cursuri = json.cursuri && Object.keys(json.cursuri).length ? Object.assign({}, json.cursuri) : deduCursuri(brut);
   cursuri.EUR = 1;
   const acorduri = [], peId = new Map(), peDonator = new Map(), peAct = new Map();
+  const toate = [], peActToate = new Map(), vazute = new Set();
   brut.forEach(function (a) {
-    if (!a || !a.id || peId.has(a.id)) return;
+    if (!a || !a.id || vazute.has(a.id)) return;
+    vazute.add(a.id);
     const s = a.suma && numar(a.suma.v) && a.suma.v > 0 ? a.suma : null;
     const eur = s ? (cursuri[s.val] ? s.v / cursuri[s.val] : (numar(s.eur) ? s.eur : null)) : null;
     const inTotal = a.inTotal || (s ? (a.faraTotal ? 'fara_total' : (eur == null ? 'fara_curs' : 'numarat')) : 'fara_suma');
     const acte = (a.acte || []).map(function (x) { return { act: x.act || '', tip: x.tip || '', data: x.data || '', url: x.url || '', etape: x.etape || [] }; });
+    const parteneri = a.parteneriAcord || a.parteneri || '';
     const x = {
       id: a.id,
       nume: curataNume(a.scurt || a.nume) || a.nume || a.id,
       numeComplet: String(a.nume || '').replace(/\s+/g, ' ').trim(),
       categorie: a.categorie || '',
-      parteneriText: a.parteneri || '',
-      donatori: donatoriiAcordului(a.parteneri),
+      parteneriText: parteneri,
+      parteneriRegistru: a.parteneri || '',
+      donatori: donatoriiAcordului(parteneri),
       stadiu: stadiu(a.et), etape: a.et || [],
       semnat: a.semnat || '', primul: a.primul || '', ultimul: a.ultimul || '',
       suma: s, sursaSuma: s ? (s.sursa || '') : '', actSuma: s ? (s.act || '') : '',
       eur: eur, inTotal: inTotal, eurTotal: inTotal === 'numarat' ? eur : null,
       alte: a.alte || [], cost: a.cost || null,
       acte: acte, coduri: acte.map(function (y) { return y.act; }).filter(Boolean),
-      url: (acte.filter(function (y) { return y.url; })[0] || {}).url || ''
+      url: (acte.filter(function (y) { return y.url; })[0] || {}).url || '',
+      deosebire: null
     };
+    toate.push(x);
+    x.coduri.forEach(function (c) { (peActToate.get(c) || peActToate.set(c, []).get(c)).push(x); });
+  });
+  const omiseIds = new Map();
+  manual.omise.forEach(function (o) {
+    o.acte.forEach(function (c) { (peActToate.get(c) || []).forEach(function (x) { if (!omiseIds.has(x.id)) omiseIds.set(x.id, o); }); });
+  });
+  const omise = [];
+  toate.forEach(function (x) {
+    const o = omiseIds.get(x.id);
+    if (o) { omise.push({ a: x, motiv: o.motiv, motivEn: o.motivEn || '', numaratLa: o.numaratLa }); return; }
     acorduri.push(x); peId.set(x.id, x);
     x.coduri.forEach(function (c) { (peAct.get(c) || peAct.set(c, []).get(c)).push(x); });
     x.donatori.forEach(function (d) { (peDonator.get(d) || peDonator.set(d, []).get(d)).push(x); });
   });
+  adaugaDeosebiri(acorduri);
+  const proiecteManual = new Map(), proiecteNegasite = [];
+  manual.proiecte.forEach(function (p) {
+    const a = gasesteAcord({ acte: p.acte }, { peId: peId, peAct: peAct });
+    if (!a) { proiecteNegasite.push(p); return; }
+    (proiecteManual.get(a.id) || proiecteManual.set(a.id, []).get(a.id)).push(p);
+  });
   const donatori = Array.from(peDonator.keys()).map(function (k) { return { cheie: k, acorduri: peDonator.get(k) }; });
   return { acorduri: acorduri, peId: peId, peAct: peAct, donatori: donatori, peDonator: peDonator, cursuri: cursuri,
+           omise: omise, proiecteManual: proiecteManual, proiecteNegasite: proiecteNegasite, eroriManual: manual.erori,
            cursData: json.curs_data || '', actualizat: json.actualizat || '' };
 }
 
-/* Descrierea succintă din coloana a doua: titlul acordului, când spune mai mult decât denumirea; altfel o frază din ce se știe
-   (tipul, donatorul, semnarea, ultimele acte, stadiul): pentru unele acorduri registrul nu are decât denumirea. */
-function descriere(a, en) {
-  // Un titlu care începe cu literă mică e un fragment dintr-un titlu mai lung („proiectului …”, „acordarea deplinelor puteri …”): nu se înțelege singur.
-  if (a.numeComplet && a.numeComplet.length > a.nume.length + 12 && fold(a.numeComplet) !== fold(a.nume) && /^[A-ZĂÂÎȘȚŞŢ0-9„"“(]/.test(a.numeComplet)) return a.numeComplet;
-  const t = etichetaTip(a.categorie, en), p = a.donatori.join(' / ');
-  const semnat = a.semnat ? (en ? ', signed on ' : ', semnat la ') + a.semnat : '';
-  const acte = (a.acte || []).slice(0, 3).map(function (x) { return x.act + (x.data ? (en ? ' of ' : ' din ') + x.data : ''); });
-  const maiMulte = (a.acte || []).length - acte.length;
-  const ac = acte.length ? (en ? ' Acts: ' : ' Acte: ') + acte.join(', ') + (maiMulte > 0 ? (en ? ' and ' + maiMulte + ' more' : ' și încă ' + maiMulte) : '') + '.' : '';
-  const st = a.stadiu ? (en ? ' Stage: ' : ' Stadiu: ') + etichetaStadiu(a.stadiu, en).toLowerCase() + '.' : '';
-  if (en) return (t || 'Agreement') + (a.donatori[0] === NEIDENTIFICAT ? '' : ' from ' + p) + semnat + '.' + ac + st;
-  return (t || 'Acord') + (a.donatori[0] === NEIDENTIFICAT ? '' : ' de la ' + p) + semnat + '.' + ac + st;
+/* Rândul căruia îi aparține o înregistrare salvată (debursare sau date despre proiect). Id-ul unui acord e cel al actului lui cel mai vechi
+   și se poate schimba (se unesc două rânduri, apare un act mai vechi): atunci îl regăsim după oricare dintre actele păstrate în înregistrare. */
+function gasesteAcord(e, baza) {
+  let a = e.acord ? baza.peId.get(e.acord) : null;
+  if (!a && Array.isArray(e.acte)) {
+    const voturi = new Map();
+    e.acte.forEach(function (c) { (baza.peAct.get(c) || []).forEach(function (x) { voturi.set(x, (voturi.get(x) || 0) + 1); }); });
+    let max = 0;
+    voturi.forEach(function (n, x) { if (n > max) { max = n; a = x; } });
+  }
+  return a || null;
+}
+
+/* Rândurile cu aceeași denumire la același donator (de pildă un împrumut și un grant pentru același program, sau tranșe din ani diferiți)
+   par dublate într-o listă. Sunt acorduri deosebite, dar numele nu le deosebește: le adăugăm o mențiune scurtă — tipul și anul semnării,
+   iar dacă nici ele nu ajung, suma și codul celui mai vechi act. Nu se atinge denumirea din registru. */
+function cheieNume(s) { return fold(s).replace(/[^a-z0-9]+/g, ' ').trim(); }
+function anul(a) {
+  const m = /(\d{4})$/.exec(a.semnat || '') || /(\d{4})$/.exec(a.primul || '');
+  return m ? m[1] : '';
+}
+function partiDeosebire(a, nivel, en) {
+  const p = [];
+  const t = etichetaTip(a.categorie, en);
+  if (t) p.push(t.toLowerCase());
+  const an = anul(a);
+  if (an) p.push(an);
+  if (nivel >= 2 && a.suma) p.push(fmtCompact(a.suma.v, en) + ' ' + a.suma.val);
+  if (nivel >= 3 && a.coduri.length) p.push(a.coduri[a.coduri.length - 1]);
+  return p.join(', ');
+}
+function adaugaDeosebiri(acorduri) {
+  const pe = new Map(), grupe = new Map();
+  acorduri.forEach(function (a) {
+    const n = cheieNume(a.nume);
+    (pe.get(n) || pe.set(n, []).get(n)).push(a);
+    a.donatori.forEach(function (d) { const k = d + '\u0001' + n; (grupe.get(k) || grupe.set(k, []).get(k)).push(a); });
+  });
+  const repetate = new Set();
+  grupe.forEach(function (l, k) { if (l.length > 1) repetate.add(k.slice(k.indexOf('\u0001') + 1)); });
+  repetate.forEach(function (n) {
+    const fam = pe.get(n);
+    fam.forEach(function (a) {
+      // doar rândurile cu același nume care apar în aceeași listă de donator se încurcă între ele
+      const vecini = fam.filter(function (b) { return b !== a && b.donatori.some(function (d) { return a.donatori.indexOf(d) >= 0; }); });
+      if (!vecini.length) return;
+      let nivel = 1;
+      while (nivel < 3 && vecini.some(function (b) { return partiDeosebire(b, nivel, false) === partiDeosebire(a, nivel, false); })) nivel++;
+      a.deosebire = { ro: partiDeosebire(a, nivel, false), en: partiDeosebire(a, nivel, true) };
+    });
+  });
+}
+/* Denumirea cu mențiunea de deosebire, cum se scrie în Excel. */
+function numeAfisat(a, en) {
+  const d = a.deosebire && a.deosebire[en ? 'en' : 'ro'];
+  return d ? a.nume + ' (' + d + ')' : a.nume;
+}
+
+/* Ce se știe despre un rând: obiectivele proiectului și datele de început și de finalizare. Fiecare câmp se ia din prima sursă care îl are:
+     1. ce a introdus un utilizator în pagină (date/debursari.json, `ctx.db`: Map id rând → înregistrare),
+     2. surse oficiale, scrise de mână, cu adresa documentului și citatul exact (date/proiecte_manual.json, `ctx.manual`: Map id rând → intrări),
+     3. AMP, doar când legătura cu proiectul e sigură (`ctx.amp`: Map id rând → { id, titlu, inceput, sfarsit, nivel: 'sigur' | 'probabil' });
+        o legătură doar probabilă nu dă nicio dată în tabel: se păstrează ca indiciu (`ampProbabil`), fiindcă prea des nimerește altă fază sau alt an.
+   Obiectivele nu vin din AMP: raportul pe care îl citim nu le cuprinde. Fiecare câmp își păstrează sursa (`tip`), ca pagina și Excel-ul să o spună. */
+function infoProiect(a, ctx) {
+  ctx = ctx || {};
+  const db = (ctx.db && ctx.db.get(a.id)) || null;
+  const oficiale = (ctx.manual && ctx.manual.get(a.id)) || [];
+  const amp = (ctx.amp && ctx.amp.get(a.id)) || null;
+  const r = { obiective: null, inceput: null, sfarsit: null, db: db, oficiale: oficiale, amp: amp, ampProbabil: null, contradictie: false };
+  if (db && db.obiective) r.obiective = { ro: db.obiective, en: db.obiective, tip: 'manual', nota: db.nota || '', la: db.la || '' };
+  else {
+    const e = oficiale.filter(function (x) { return x.ro; })[0];
+    if (e) r.obiective = { ro: e.ro, en: e.en || e.ro, tip: 'oficial', sursa: e.sursa, citat: e.citat, nota: e.nota || '' };
+  }
+  ['inceput', 'sfarsit'].forEach(function (k) {
+    if (db && esteDataPartiala(db[k])) { r[k] = { v: db[k], tip: 'manual', nota: db.nota || '', la: db.la || '' }; return; }
+    const e = oficiale.filter(function (x) { return esteDataPartiala(x[k]); })[0];
+    if (e) { r[k] = { v: e[k], tip: 'oficial', sursa: e.sursa, citat: e.citat, nota: e.nota || '' }; return; }
+    if (amp && amp.nivel === 'sigur' && esteDataPartiala(amp[k])) r[k] = { v: amp[k], tip: 'amp', idAmp: amp.id, titluAmp: amp.titlu || '' };
+  });
+  if (amp && amp.nivel === 'probabil' && (esteDataPartiala(amp.inceput) || esteDataPartiala(amp.sfarsit))) r.ampProbabil = amp;
+  r.contradictie = !!(r.inceput && r.sfarsit && inceputDupaSfarsit(r.inceput.v, r.sfarsit.v));
+  return r;
+}
+function etichetaSursaProiect(tip, en) { const x = SURSE_PROIECT[tip]; return x ? x[en ? 1 : 0] : ''; }
+/* „sursă oficială” sau, când câmpurile vin din surse diferite, „obiective: sursă oficială; început: AMP; finalizare: AMP”. */
+function textSursaProiect(info, en) {
+  const camp = [[info.obiective, en ? 'objectives' : 'obiective'], [info.inceput, en ? 'start' : 'început'], [info.sfarsit, en ? 'completion' : 'finalizare']]
+    .filter(function (x) { return x[0]; });
+  if (!camp.length) return '';
+  const tipuri = [];
+  camp.forEach(function (x) { if (tipuri.indexOf(x[0].tip) < 0) tipuri.push(x[0].tip); });
+  if (tipuri.length === 1) return etichetaSursaProiect(tipuri[0], en);
+  return camp.map(function (x) { return x[1] + ': ' + etichetaSursaProiect(x[0].tip, en); }).join('; ');
+}
+/* Adresa documentului care susține un câmp: a sursei oficiale; pentru ce vine din AMP, nu există una (proiectul AMP se leagă separat). */
+function legaturaSursaProiect(info) {
+  const c = [info.obiective, info.inceput, info.sfarsit].filter(function (x) { return x && x.tip === 'oficial' && x.sursa; })[0];
+  return c ? c.sursa : '';
+}
+
+/* Descrierea succintă din tabel = obiectivele proiectului. Când nu se știu, întoarce un șir gol: pagina scrie atunci „neintroduse”
+   (nu o frază alcătuită din titlu și date, care ar părea obiective fără să fie). */
+function descriere(a, en, info) {
+  const o = info && info.obiective;
+  return o ? (en ? (o.en || o.ro) : o.ro) : '';
 }
 
 /* ------------------------------------------------------------------ debursările */
-function idNou() {
-  return 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+function idNou(pref) {
+  return (pref || 'd') + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 function cursDe(cursuri, val) { return cursuri && numar(cursuri[val]) && cursuri[val] > 0 ? cursuri[val] : null; }
 function eurIntrare(e, cursuri) {
@@ -333,19 +537,55 @@ function intrareDin(acord, valoare, acum) {
     la: (acum || new Date()).toISOString()
   };
 }
+/* Ce scrie omul în formularul „Date despre proiect”: obiective, început, finalizare, notă. Toate sunt opționale, dar măcar unul trebuie completat
+   (altfel înregistrarea se șterge). Datele pot fi întregi sau parțiale (vezi parseDataPartiala). */
+function valideazaProiect(c) {
+  const erori = {}, v = {};
+  v.obiective = String(c.obiective || '').replace(/\s+/g, ' ').trim();
+  if (v.obiective.length > MAX_OBIECTIVE) erori.obiective = 'lunga';
+  v.inceput = parseDataPartiala(c.inceput);
+  if (v.inceput === null) { erori.inceput = 'format'; v.inceput = ''; }
+  v.sfarsit = parseDataPartiala(c.sfarsit);
+  if (v.sfarsit === null) { erori.sfarsit = 'format'; v.sfarsit = ''; }
+  if (!erori.inceput && !erori.sfarsit && v.inceput && v.sfarsit && inceputDupaSfarsit(v.inceput, v.sfarsit)) erori.sfarsit = 'ordine';
+  v.nota = String(c.nota || '').replace(/\s+/g, ' ').trim();
+  if (v.nota.length > MAX_NOTA) erori.nota = 'lunga';
+  v.gol = !v.obiective && !v.inceput && !v.sfarsit;
+  return { ok: !Object.keys(erori).length, erori: erori, valoare: v };
+}
+function proiectDin(acord, valoare, acum, id) {
+  const e = { id: id || idNou('p'), acord: acord.id, acte: acord.coduri.slice(0, 12), nume: taie(acord.nume, 160) };
+  if (valoare.obiective) e.obiective = valoare.obiective;
+  if (valoare.inceput) e.inceput = valoare.inceput;
+  if (valoare.sfarsit) e.sfarsit = valoare.sfarsit;
+  if (valoare.nota) e.nota = valoare.nota;
+  e.la = (acum || new Date()).toISOString();
+  return e;
+}
+function proiectDbValid(e) {
+  return !!(e && typeof e.id === 'string' && e.id && typeof e.acord === 'string' &&
+            ((typeof e.obiective === 'string' && e.obiective.trim()) || esteDataPartiala(e.inceput) || esteDataPartiala(e.sfarsit)));
+}
+/* Leagă înregistrările „Date despre proiect” de rânduri: una pe rând (cea mai nouă); celelalte, mai vechi, rămân în fișier dar nu se arată.
+   Fără rând (acordul nu mai e în registru sau s-a schimbat atât de mult încât nu se mai recunoaște) → orfane. */
+function legaProiecte(proiecte, baza) {
+  const peAcord = new Map(), orfane = [], vechi = [];
+  (proiecte || []).filter(proiectDbValid).sort(function (x, y) { return (y.la || '').localeCompare(x.la || ''); }).forEach(function (e) {
+    const a = gasesteAcord(e, baza);
+    if (!a) { orfane.push(e); return; }
+    if (peAcord.has(a.id)) { vechi.push(e); return; }
+    peAcord.set(a.id, e);
+  });
+  return { peAcord: peAcord, orfane: orfane, vechi: vechi };
+}
+
 /* Leagă debursările de acorduri. Id-ul unui acord e cel al actului lui cel mai vechi și se poate schimba (se unesc două rânduri,
    apare un act mai vechi): atunci îl regăsim după oricare dintre actele păstrate în debursare. Ce nu se leagă nicicum e „orfan”. */
 function lega(intrari, baza) {
   const peAcord = new Map(), orfane = [];
   (intrari || []).forEach(function (e) {
     if (!intrareValida(e)) return;
-    let a = baza.peId.get(e.acord);
-    if (!a && Array.isArray(e.acte)) {
-      const voturi = new Map();
-      e.acte.forEach(function (c) { (baza.peAct.get(c) || []).forEach(function (x) { voturi.set(x, (voturi.get(x) || 0) + 1); }); });
-      let max = 0;
-      voturi.forEach(function (n, x) { if (n > max) { max = n; a = x; } });
-    }
+    const a = gasesteAcord(e, baza);
     if (!a) { orfane.push(e); return; }
     (peAcord.get(a.id) || peAcord.set(a.id, []).get(a.id)).push(e);
   });
@@ -396,7 +636,7 @@ function potriveste(a, f) {
   if (f.deb === 'cu' && !n) return false;
   if (f.deb === 'fara' && n) return false;
   if (f.q) {
-    const hay = fold([a.nume, a.numeComplet, a.parteneriText, a.coduri.join(' '), a.categorie, a.semnat].join(' '));
+    const hay = fold([a.nume, a.numeComplet, a.parteneriText, a.coduri.join(' '), a.categorie, a.semnat, (f.extra && f.extra.get(a.id)) || ''].join(' '));
     const cuv = fold(f.q).split(/\s+/).filter(Boolean);
     if (!cuv.every(function (c) { return hay.indexOf(c) >= 0; })) return false;
   }
@@ -463,20 +703,28 @@ function scrieHash(o) {
 class EroareDepozit extends Error {
   constructor(cod, mesaj, status) { super(mesaj); this.name = 'EroareDepozit'; this.cod = cod; this.status = status || 0; }
 }
-function dateGoale() { return { versiune: 1, actualizat: '', intrari: [] }; }
+function dateGoale() { return { versiune: 1, actualizat: '', intrari: [], proiecte: [] }; }
 function citesteText(text) {
   let o;
   try { o = JSON.parse(String(text).replace(/^﻿/, '')); } catch (e) { throw new EroareDepozit('format', 'Fișierul cu debursări nu e un JSON valid.'); }
   if (!o || typeof o !== 'object' || Array.isArray(o)) throw new EroareDepozit('format', 'Fișierul cu debursări are alt format decât cel așteptat.');
   if (o.intrari == null) o.intrari = [];
   if (!Array.isArray(o.intrari)) throw new EroareDepozit('format', 'Fișierul cu debursări are alt format decât cel așteptat.');
+  if (o.proiecte == null) o.proiecte = [];
+  if (!Array.isArray(o.proiecte)) throw new EroareDepozit('format', 'Fișierul cu debursări are alt format decât cel așteptat.');
   return o;
 }
-/* Operații: {t:'add', e}, {t:'upd', e}, {t:'del', id}. Se aplică pe orice stare a fișierului, deci se pot reaplica peste varianta mai nouă a cuiva altcuiva. */
+/* Operații: {t:'add', e}, {t:'upd', e}, {t:'del', id} pentru debursări; {t:'pset', p}, {t:'pdel', id} pentru datele despre proiecte
+   (obiective, început, finalizare). Se aplică pe orice stare a fișierului, deci se pot reaplica peste varianta mai nouă a cuiva altcuiva. */
 function aplicaOps(date, ops, acum) {
-  const nou = Object.assign({}, date, { intrari: (date.intrari || []).slice() });
+  const nou = Object.assign({}, date, { intrari: (date.intrari || []).slice(), proiecte: (date.proiecte || []).slice() });
   (ops || []).forEach(function (op) {
-    if (op.t === 'del') nou.intrari = nou.intrari.filter(function (x) { return x.id !== op.id; });
+    if (op.t === 'pdel') nou.proiecte = nou.proiecte.filter(function (x) { return x.id !== op.id; });
+    else if (op.t === 'pset') {
+      if (!op.p || !op.p.id) return;
+      const i = nou.proiecte.findIndex(function (x) { return x.id === op.p.id; });
+      if (i >= 0) nou.proiecte[i] = Object.assign({}, op.p); else nou.proiecte.push(Object.assign({}, op.p));
+    } else if (op.t === 'del') nou.intrari = nou.intrari.filter(function (x) { return x.id !== op.id; });
     else if (op.t === 'add' || op.t === 'upd') {
       const i = nou.intrari.findIndex(function (x) { return x.id === op.e.id; });
       const e = Object.assign({}, op.e);
@@ -491,8 +739,9 @@ function aplicaOps(date, ops, acum) {
 /* Fișierul se scrie cu o înregistrare pe linie: o modificare se vede în git ca o linie, nu ca un fișier întreg. */
 function text(date) {
   const cap = JSON.stringify({ versiune: date.versiune || 1, actualizat: date.actualizat || '' });
-  const l = (date.intrari || []).map(function (e) { return JSON.stringify(e); });
-  return cap.slice(0, -1) + ',"intrari":[' + (l.length ? '\n' + l.join(',\n') + '\n' : '') + ']}\n';
+  const lista = function (v) { return '[' + (v.length ? '\n' + v.map(function (e) { return JSON.stringify(e); }).join(',\n') + '\n' : '') + ']'; };
+  const pr = date.proiecte || [];
+  return cap.slice(0, -1) + ',"intrari":' + lista(date.intrari || []) + (pr.length ? ',"proiecte":' + lista(pr) : '') + '}\n';
 }
 function b64DinText(s) {
   const b = new TextEncoder().encode(s);
@@ -652,7 +901,9 @@ function foaieProiecte(c, o) {
   const col = function (nume, tip, lat) { cols.push([nume, tip, lat]); return cols.length - 1; };
   const cProiect = col(t('Proiectul', 'Project'), 't', 38);
   const cDon = o.cuDonatori ? col(t('Donatori', 'Donors'), 't', 16) : -1;
-  const cDesc = col(t('Descriere succintă', 'Short description'), 't', 56);
+  const cDesc = col(t('Descriere succintă (obiectivele proiectului)', 'Short description (project objectives)'), 't', 56);
+  const cInc = col(t('Data efectivă de începere', 'Actual start date'), 'z', 14);
+  const cSfa = col(t('Data finalizării', 'Completion date'), 'z', 14);
   const cTip = col(t('Tip de finanțare', 'Type of financing'), 't', 18);
   const cStadiu = col(t('Stadiu', 'Stage'), 't', 18);
   const cSemnat = col(t('Semnat', 'Signed'), 'z', 12);
@@ -666,13 +917,23 @@ function foaieProiecte(c, o) {
   const cNr = col(t('Nr. debursări', 'No. of disbursements'), 'n', 11);
   const cUltima = col(t('Ultima debursare', 'Last disbursement'), 'z', 13);
   const cInTotal = col(t('Intră în total?', 'In the total?'), 'c', 16);
+  const cSursa = col(t('Sursa obiectivelor și a datelor', 'Source of objectives and dates'), 't', 30);
   const cLink = col(t('Link legis.md', 'legis.md link'), 't', 13);
-  const randuri = [], urluri = [];
+  const randuri = [], urluri = [], urluriSursa = [];
+  const infoDe = c.infoDe || function (a) { return infoProiect(a, { db: c.proiecteDb, manual: c.proiecteManual, amp: c.amp }); };
+  const nr = { obiective: 0, inceput: 0, sfarsit: 0, n: 0 };
   o.acorduri.forEach(function (a) {
-    const g = agregaAcord(a, c.peAcord.get(a.id) || [], c.cursuri), r = [];
-    r[cProiect] = a.nume;
+    const g = agregaAcord(a, c.peAcord.get(a.id) || [], c.cursuri), r = [], info = infoDe(a);
+    nr.n++;
+    r[cProiect] = numeAfisat(a, en);
     if (cDon >= 0) r[cDon] = a.donatori.join(' / ');
-    r[cDesc] = descriere(a, en);
+    r[cDesc] = descriere(a, en, info);
+    r[cInc] = info.inceput ? fmtDataPartiala(info.inceput.v) : '';
+    r[cSfa] = info.sfarsit ? fmtDataPartiala(info.sfarsit.v) : '';
+    if (info.obiective) nr.obiective++;
+    if (info.inceput) nr.inceput++;
+    if (info.sfarsit) nr.sfarsit++;
+    r[cSursa] = textSursaProiect(info, en) + (info.contradictie ? ' · ' + t('datele se contrazic', 'the dates contradict each other') : '');
     r[cTip] = etichetaTip(a.categorie, en);
     r[cStadiu] = etichetaStadiu(a.stadiu, en);
     r[cSemnat] = a.semnat || '';
@@ -686,13 +947,13 @@ function foaieProiecte(c, o) {
     r[cUltima] = g.ultima || '';
     r[cInTotal] = textInTotal(a.inTotal, t);
     r[cLink] = a.url ? 'legis.md' : '';
-    randuri.push(r); urluri.push(a.url);
+    randuri.push(r); urluri.push(a.url); urluriSursa.push(legaturaSursaProiect(info));
   });
   const latimi = {}; cols.forEach(function (x, k) { latimi[k] = x[2]; });
   const etichete = {}; etichete[cTip] = CULORI_TIP;
   etichete[cInTotal] = [[t('da', 'yes'), 'FF16794F', 'FFE3F4EC'], [t('nu: dublură', 'no: duplicate'), 'FF6B7284', 'FFEEF0F4'],
                         [t('nu: nu se adună', 'no: not added up'), 'FF6B7284', 'FFEEF0F4'], [t('nu: fără curs', 'no: no rate'), 'FF6B7284', 'FFEEF0F4']];
-  const linkuri = {}; linkuri[cLink] = function (rand, i) { return urluri[i]; };
+  const linkuri = {}; linkuri[cLink] = function (rand, i) { return urluri[i]; }; linkuri[cSursa] = function (rand, i) { return urluriSursa[i]; };
   const re = rezumat(o.acorduri, c.peAcord, c.cursuri);
   const note = [
     t('Un rând = un acord din registrul legis.md (actele aceluiași acord sunt grupate). „Suma proiectului” e suma acordului, așa cum o arată registrul; ' +
@@ -705,6 +966,11 @@ function foaieProiecte(c, o) {
       'The total at the bottom adds up the visible rows and recalculates when you filter in Excel. Overall, disbursements on projects with an amount are ') +
       (re.pct != null ? fmtSuma(re.pct * 100, en, 1) + '%' : '—') + t(' din suma lor.', ' of their amount.')
   ];
+  note.push(t('Descrierea succintă e obiectivele proiectului; datele de început și de finalizare sunt cele ale proiectului. Fiecare informație vine, în ordine, din: ce a introdus un utilizator în pagină; o sursă oficială (adresa documentului e în coloana „Sursa obiectivelor și a datelor”); AMP, platforma de gestionare a asistenței externe, doar pentru proiectele legate sigur de acord (denumire, finanțator și sumă coincid; acolo, „Data finalizării” e data propusă de terminare). Unde celula e goală, nu s-a găsit o sursă. O dată întreagă e o dată adevărată în Excel (se poate sorta); una cunoscută doar cu luna și anul (03.2026) sau doar cu anul (2026) rămâne text, cât spune sursa. Aici: obiective la ' + nr.obiective + ' din ' + nr.n + ' proiecte, data de început la ' + nr.inceput + ', data finalizării la ' + nr.sfarsit + '.',
+    'The short description is the project objectives; the start and completion dates are those of the project. Each item comes, in this order, from: what a user entered in the page; an official source (the address of the document is in the "Source of objectives and dates" column); AMP, the external assistance management platform, only for projects linked with certainty to the agreement (name, funder and amount all agree; there, the completion date is the proposed completion date). An empty cell means no source was found. A full date is a real Excel date (it sorts); one known only as month and year (03.2026) or only as a year (2026) stays text, as far as the source goes. Here: objectives for ' + nr.obiective + ' of ' + nr.n + ' projects, start date for ' + nr.inceput + ', completion date for ' + nr.sfarsit + '.'));
+  if (c.ampNota) note.push(c.ampNota);                // ce s-a întâmplat cu citirea datelor din AMP (raport live, arhivă)
+  if (c.omise && c.omise.length) note.push(t('Nu sunt incluse ' + c.omise.length + ' rânduri-umbrelă din registru (negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu aceleași sume): ' + c.omise.map(function (x) { return x.a.nume; }).join('; ') + '.',
+    c.omise.length + ' umbrella rows of the register are not included (negotiations or memoranda for agreements that already have their own rows, with the same amounts): ' + c.omise.map(function (x) { return x.a.nume; }).join('; ') + '.'));
   if (o.cuDonatori) note.push(t('Un acord cu mai mulți donatori apare o singură dată, cu toți donatorii în coloana „Donatori”.', 'An agreement with several donors appears once, with all its donors in the "Donors" column.'));
   else note.push(t('Un acord finanțat de mai mulți parteneri apare la fiecare dintre ei, cu suma întreagă a acordului.', 'An agreement financed by several partners appears under each of them, with the whole amount of the agreement.'));
   note.push({ t: t('Pagina, online: ', 'The page, online: ') + c.baza, u: c.baza });
@@ -713,7 +979,8 @@ function foaieProiecte(c, o) {
     antete: cols.map(function (x) { return x[0]; }), tipuri: cols.map(function (x) { return x[1]; }).join(''), randuri: randuri, latimi: latimi,
     total: { eticheta: t('Total (rândurile vizibile)', 'Total (visible rows)'), suma: [cEur, cDebEur, cRest, cNr] },
     inghetaColoane: 1, maxLinii: 3, paginiLatime: 'auto', bare: [cPct],
-    grupe: [{ de: cProiect, pana: cSemnat, text: t('PROIECTUL', 'THE PROJECT') }, { de: cSuma, pana: cEur, text: t('SUMA PROIECTULUI', 'PROJECT AMOUNT') },
+    grupe: [{ de: cProiect, pana: cSfa, text: t('PROIECTUL', 'THE PROJECT') }, { de: cTip, pana: cSemnat, text: t('ACORDUL', 'THE AGREEMENT') },
+            { de: cSuma, pana: cEur, text: t('SUMA PROIECTULUI', 'PROJECT AMOUNT') },
             { de: cDebVal, pana: cUltima, text: t('DEBURSĂRI', 'DISBURSEMENTS') }, { de: cInTotal, pana: cLink, text: t('DETALII', 'DETAILS') }],
     etichete: etichete, linkuri: linkuri, note: note, culoareFila: o.culoare || 'FF1E4B8C', subsol: c.subsol
   };
@@ -830,6 +1097,11 @@ return {
   dataRo: dataRo, esteDataIso: esteDataIso, aziIso: aziIso, dataOraRo: dataOraRo, ordRo: ordRo,
   donatoriiAcordului: donatoriiAcordului, curataNume: curataNume, stadiu: stadiu, etichetaStadiu: etichetaStadiu, etichetaTip: etichetaTip, numeDonator: numeDonator,
   deduCursuri: deduCursuri, pregateste: pregateste, descriere: descriere,
+  MAX_OBIECTIVE: MAX_OBIECTIVE, SURSE_PROIECT: SURSE_PROIECT,
+  normalizeazaManual: normalizeazaManual, gasesteAcord: gasesteAcord, numeAfisat: numeAfisat,
+  dataPartiala: dataPartiala, esteDataPartiala: esteDataPartiala, fmtDataPartiala: fmtDataPartiala, parseDataPartiala: parseDataPartiala, inceputDupaSfarsit: inceputDupaSfarsit,
+  infoProiect: infoProiect, etichetaSursaProiect: etichetaSursaProiect, textSursaProiect: textSursaProiect, legaturaSursaProiect: legaturaSursaProiect,
+  valideazaProiect: valideazaProiect, proiectDin: proiectDin, proiectDbValid: proiectDbValid, legaProiecte: legaProiecte,
   idNou: idNou, eurIntrare: eurIntrare, intrareValida: intrareValida, valideazaFormular: valideazaFormular, intrareDin: intrareDin, lega: lega,
   agregaAcord: agregaAcord, rezumat: rezumat, potriveste: potriveste, ordoneaza: ordoneaza, ordoneazaDonatori: ordoneazaDonatori,
   citesteHash: citesteHash, scrieHash: scrieHash,

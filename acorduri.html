@@ -1154,6 +1154,29 @@
   var ORDINE_TIP = ['Grant', 'Împrumut', 'Asistență tehnică', 'Asistență financiară'];
   function sumaAfisata(g){ return g.sumaA || g.suma || g.sumaT || g.sumaG || null; }
 
+  /* Finanțatorii acordului propriu-zis. g.parteneri strânge partenerii din TOATE actele rândului, iar o hotărâre de
+     negociere sau de semnare care numește doi finanțatori („BERD și BEI") îl face să pară al amândurora, deși legea de
+     ratificare privește unul singur și celălalt are rândul lui: același proiect apărea de două ori în lista aceluiași
+     finanțator. Suma rândului e scrisă într-un act (legea, hotărârea de aprobare): finanțatorii acelui act sunt ai
+     acordului. Rândul se restrânge numai când actul numește mai puțini finanțatori decât rândul; dacă ceilalți sunt
+     același finanțator scris altfel (Japonia = JICA, KfW = Germania, SUA = SUA (MCC), Banca Mondială = BIRD sau AID),
+     rămân. Registrul nu se schimbă: câmpul e doar în export (parteneriAcord), pentru pagina „Debursări". */
+  var ALIAS_FIN = [['Japonia', 'JICA', 'Japonia (JBIC)'], ['KfW', 'Germania'], ['SUA', 'SUA (MCC)'], ['BIRD', 'Banca Mondială'], ['AID', 'Banca Mondială']];
+  function acelasiFinantator(x, y){
+    return ALIAS_FIN.some(function(f){ return f.indexOf(x) >= 0 && f.indexOf(y) >= 0; });
+  }
+  function finantatoriAcord(g, s){
+    var lista = function(p){ return String(p || '').split(' / ').map(function(x){ return x.trim(); }).filter(Boolean); };
+    var toti = lista(g.parteneri);
+    if (toti.length < 2 || !s || !s.act) return g.parteneri || '';
+    var act = (g.acte || []).filter(function(a){ return a.act === s.act; })[0];
+    var ei = act ? lista(act.partener).filter(function(x){ return toti.indexOf(x) >= 0; }) : [];
+    if (!ei.length || ei.length >= toti.length) return g.parteneri || '';
+    return toti.filter(function(x){
+      return ei.indexOf(x) >= 0 || ei.some(function(y){ return acelasiFinantator(x, y); });
+    }).join(' / ');
+  }
+
   /* Lista acordurilor, așa cum le vede pagina: grupate, denumite, cu sumele alese și trecute în
      euro. O citește legatura_acorduri.py (într-un browser fără ecran) și o scrie în
      date/acorduri_legare.json, de unde o ia „De la lege la bani” din dashboard. Așa dashboardul
@@ -1186,7 +1209,7 @@
       var ro = function(d){ return d ? d.slice(6, 8) + '.' + d.slice(4, 6) + '.' + d.slice(0, 4) : ''; };
       return {
         id: idAcord(g), nume: g.nume, scurt: g.numeScurt || g.nume,
-        parteneri: g.parteneri || '', categorie: g.categorie || '', semnat: g.semnat || '',
+        parteneri: g.parteneri || '', parteneriAcord: finantatoriAcord(g, s), categorie: g.categorie || '', semnat: g.semnat || '',
         primul: ro(datele[0]), ultimul: ro(datele[datele.length - 1]), et: Object.keys(g.et || {}),
         suma: s ? plat(g, s) : null, faraTotal: !!(s && s.faraTotal), inTotal: stari[i] || 'fara_suma',
         alte: alte, cost: g.cost ? { v: g.cost.v, val: g.cost.val, eur: eur(g.cost) } : null,
