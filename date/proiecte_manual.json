@@ -1,0 +1,2031 @@
+{
+ "_cum_se_foloseste": "Date despre proiecte, scrise de mână, pentru pagina „Debursări pe acorduri” (debursari.html). Două liste. „omise”: rândurile din registru care nu apar în lista de proiecte, fiindcă sunt rânduri-umbrelă: negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu aceleași sume; fără ele, același proiect ar apărea de două ori. Rândurile omise rămân în registrul de acorduri și nu schimbă totalurile (niciunul nu se adună în total). „acte” sunt codurile actelor ca în registru (ex. HG546/2026), „motiv” spune de ce (în română; „motiv_en” e varianta în engleză), „numarat_la” spune unde e numărată suma. „proiecte”: obiectivele proiectului și datele de început și de finalizare; „acte” = orice cod de act al rândului din registru; „obiective” = {„ro”, „en”}; „inceput” și „sfarsit” = AAAA-LL-ZZ, AAAA-LL sau AAAA, după cât spune sursa; „sursa” = adresa documentului oficial, „citat” = fragmentul exact din document care susține ce s-a scris. Fără sursă și citat, o intrare nu se citește. Ce scrie omul în pagină (după ce introduce codul) se păstrează separat, în date/debursari.json, și are prioritate. Dacă același rând apare în mai multe intrări, fiecare câmp (obiective, început, sfârșit) se ia din prima intrare care îl are.",
+ "omise": [
+  {
+   "acte": [
+    "HG546/2026"
+   ],
+   "motiv": "Amendamentul din 2026 la cele două credite AID din 2019 (nr. 6380-MD și 6381-MD, în total 61,0 mil. EUR). Creditele au rândurile lor, cu sumele lor.",
+   "motiv_en": "The 2026 amendment to the two IDA credits of 2019 (nos. 6380-MD and 6381-MD, 61.0 million EUR in total). The credits have their own rows, with their own amounts.",
+   "numarat_la": [
+    "LP179/2019",
+    "LP177/2019"
+   ]
+  },
+  {
+   "acte": [
+    "HG799/2014"
+   ],
+   "motiv": "Negocieri pentru două împrumuturi (BERD 52,5 mil. EUR și BEI 50 mil. EUR) pentru infrastructura feroviară. Fiecare împrumut are rândul lui.",
+   "motiv_en": "Negotiations for two loans (EBRD 52.5 million EUR and EIB 50 million EUR) for railway infrastructure. Each loan has its own row.",
+   "numarat_la": [
+    "LP22/2015",
+    "LP298/2016"
+   ]
+  },
+  {
+   "acte": [
+    "HG296/2013"
+   ],
+   "motiv": "Negocieri pentru două împrumuturi a câte 150 mil. EUR (BERD și BEI) pentru drumuri. Fiecare împrumut are rândul lui.",
+   "motiv_en": "Negotiations for two loans of 150 million EUR each (EBRD and EIB) for roads. Each loan has its own row.",
+   "numarat_la": [
+    "LP191/2013",
+    "LP190/2013"
+   ]
+  },
+  {
+   "acte": [
+    "HG704/2007"
+   ],
+   "motiv": "Negocieri pentru două împrumuturi a câte 30 mil. EUR (BERD și BEI) pentru drumuri. Fiecare împrumut are rândul lui.",
+   "motiv_en": "Negotiations for two loans of 30 million EUR each (EBRD and EIB) for roads. Each loan has its own row.",
+   "numarat_la": [
+    "LP216/2007",
+    "LP217/2007"
+   ]
+  },
+  {
+   "acte": [
+    "LP232/2023"
+   ],
+   "motiv": "Memorandumul de înțelegere cu UE privind asistența macrofinanciară (150 mil. EUR): suma se regăsește în acordul de împrumut și în cel de grant, care au rândurile lor.",
+   "motiv_en": "The memorandum of understanding with the EU on macro-financial assistance (150 million EUR): the amount is found in the loan agreement and in the grant agreement, which have their own rows.",
+   "numarat_la": [
+    "LP166/2020"
+   ]
+  }
+ ],
+ "proiecte": [
+  {
+   "acte": [
+    "DP1527/2024",
+    "LP176/2024",
+    "HG483/2024"
+   ],
+   "obiective": {
+    "ro": "(i) Îmbunătățirea conectivității rutiere reziliente la schimbările climatice în comunitățile rurale selectate; (ii) îmbunătățirea tranzitului rutier prin punctele de trecere a frontierei selectate cu România; (iii) în cazul unei crize sau urgențe eligibile, reacția promptă și eficientă la aceasta.",
+    "en": "(i) To improve climate resilient road connectivity in selected rural communities; (ii) to enhance road transit through selected border crossings with Romania; and (iii) in case of an Eligible Crisis or Emergency, respond promptly and effectively to it."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099061924192027450/pdf/P180153-b96a2705-b438-4017-bae3-64e258547ce4.pdf",
+   "citat": "The objective of the Project is: (i) to improve climate resilient road connectivity in selected rural communities; (ii) to enhance road transit through selected border crossings with Romania, and (iii) in case of an Eligible Crisis or Emergency, respond promptly and effectively to it.",
+   "nota": "Moldova Rural Connectivity Project (Banca Mondială, P180153). Textul e din anexa 1 a acordului de împrumut nr. 9672-MD (BIRD, 92,4 mil. EUR); același obiectiv apare și în documentul proiectului (Appraisal ESRS, ianuarie 2025). Creditul AID are aceeași denumire și a fost semnat la aceeași dată."
+  },
+  {
+   "acte": [
+    "DP1528/2024",
+    "LP177/2024",
+    "HG484/2024"
+   ],
+   "obiective": {
+    "ro": "(i) Îmbunătățirea conectivității rutiere reziliente la schimbările climatice în comunitățile rurale selectate; (ii) îmbunătățirea tranzitului rutier prin punctele de trecere a frontierei selectate cu România; (iii) în cazul unei crize sau urgențe eligibile, reacția promptă și eficientă la aceasta.",
+    "en": "(i) To improve climate resilient road connectivity in selected rural communities; (ii) to enhance road transit through selected border crossings with Romania; and (iii) in case of an Eligible Crisis or Emergency, respond promptly and effectively to it."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099061924192027450/pdf/P180153-b96a2705-b438-4017-bae3-64e258547ce4.pdf",
+   "citat": "The objective of the Project is: (i) to improve climate resilient road connectivity in selected rural communities; (ii) to enhance road transit through selected border crossings with Romania, and (iii) in case of an Eligible Crisis or Emergency, respond promptly and effectively to it.",
+   "nota": "Moldova Rural Connectivity Project (Banca Mondială, P180153). Textul e din anexa 1 a acordului de împrumut nr. 9672-MD (BIRD, 92,4 mil. EUR); același obiectiv apare și în documentul proiectului (Appraisal ESRS, ianuarie 2025). Creditul AID are aceeași denumire și a fost semnat la aceeași dată."
+  },
+  {
+   "acte": [
+    "DP690/2026",
+    "LP137/2026",
+    "HG311/2026"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea creșterii economice durabile prin reforme în două domenii: (i) consolidarea competitivității, a eficienței și a transparenței piețelor; (ii) consolidarea rezilienței și a integrării economice.",
+    "en": "To support sustainable economic growth through the following reform areas: (i) strengthening competitiveness, efficiency, and transparency of markets; and (ii) strengthening resilience and economic integration."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099051326143528502/pdf/BOSIB-c3d6f710-6d44-4c4d-b049-e72b2fa697fb.pdf",
+   "citat": "The development objective is to support sustainable economic growth through the following reform areas: (i) strengthening competitiveness, efficiency, and transparency of markets ; and (ii) strengthening resilience and economic integration.",
+   "nota": "Moldova Growth and Resilience Development Policy Operation (Banca Mondială, P513997), prima dintr-o serie programatică de două; documentul de program (PD000240) din 7 mai 2026: împrumut BIRD de 218,2 mil. EUR."
+  },
+  {
+   "acte": [
+    "DP1576/2024",
+    "LP215/2024",
+    "HG527/2024"
+   ],
+   "obiective": {
+    "ro": "(i) Consolidarea rezilienței refugiaților și a gospodăriilor; (ii) stimularea creșterii durabile prin concurență sporită și o creștere condusă de sectorul privat; (iii) sprijinirea rezilienței la schimbările climatice.",
+    "en": "(i) To strengthen resilience of refugees and households; (ii) to foster sustainable growth through enhanced competition and private sector-led growth; and (iii) to support climate resilience."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099052324112510009/pdf/BOSIB-f275c2ea-bcad-4344-8333-d454e743f9b1.pdf",
+   "citat": "The DPO aims to (i) strengthen resilience of refugees and households, (ii) foster sustainable growth through enhanced competition and private sector-led growth, and (iii) support climate resilience.",
+   "nota": "Moldova Supporting Growth and Resilience DPO (Banca Mondială, P181479); documentul de program (PGD472) din mai 2024: împrumut BIRD de 37,3 mil. EUR și grant din fondul fiduciar M-GROW de 10,5 mil. USD."
+  },
+  {
+   "acte": [
+    "DP1570/2024",
+    "LP216/2024",
+    "HG528/2024"
+   ],
+   "obiective": {
+    "ro": "(i) Consolidarea rezilienței refugiaților și a gospodăriilor; (ii) stimularea creșterii durabile prin concurență sporită și o creștere condusă de sectorul privat; (iii) sprijinirea rezilienței la schimbările climatice.",
+    "en": "(i) To strengthen resilience of refugees and households; (ii) to foster sustainable growth through enhanced competition and private sector-led growth; and (iii) to support climate resilience."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099052324112510009/pdf/BOSIB-f275c2ea-bcad-4344-8333-d454e743f9b1.pdf",
+   "citat": "The DPO aims to (i) strengthen resilience of refugees and households, (ii) foster sustainable growth through enhanced competition and private sector-led growth, and (iii) support climate resilience.",
+   "nota": "Moldova Supporting Growth and Resilience DPO (Banca Mondială, P181479); documentul de program (PGD472) din mai 2024: împrumut BIRD de 37,3 mil. EUR și grant din fondul fiduciar M-GROW de 10,5 mil. USD."
+  },
+  {
+   "acte": [
+    "DP308/2025",
+    "LP226/2025",
+    "HG373/2025"
+   ],
+   "obiective": {
+    "ro": "(i) Creșterea competitivității sectorului privat prin ușurarea intrării pe piață și a ieșirii de pe piață; (ii) îmbunătățirea angajabilității și a accesului la educație de calitate; (iii) consolidarea securității energetice și promovarea agriculturii inteligente din punct de vedere climatic.",
+    "en": "(i) To boost private sector competitiveness by easing market entry and exit; (ii) to improve employability and access to quality education; and (iii) to enhance energy security and promote climate-smart agriculture."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099052025154021615/pdf/P507576-486a54b1-94a0-423b-89e1-6501baa1e52d.pdf",
+   "citat": "The Program Development Objective of the operation is to (i) boost private sector competitiveness by easing market entry and exit; (ii) improve employability and access to quality education; and (iii) enhance energy security and promote climate-smart agriculture.",
+   "nota": "Moldova Supporting Economic Opportunities and Climate Transition DPO (Banca Mondială, P507576); documentul de program (PD000157) din 11 aprilie 2025: împrumut BIRD de 37 mil. EUR, credit AID de 46,3 mil. EUR și grant din fondul fiduciar M-GROW de 7,7 mil. USD."
+  },
+  {
+   "acte": [
+    "DP309/2025",
+    "LP225/2025",
+    "HG372/2025"
+   ],
+   "obiective": {
+    "ro": "(i) Creșterea competitivității sectorului privat prin ușurarea intrării pe piață și a ieșirii de pe piață; (ii) îmbunătățirea angajabilității și a accesului la educație de calitate; (iii) consolidarea securității energetice și promovarea agriculturii inteligente din punct de vedere climatic.",
+    "en": "(i) To boost private sector competitiveness by easing market entry and exit; (ii) to improve employability and access to quality education; and (iii) to enhance energy security and promote climate-smart agriculture."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099052025154021615/pdf/P507576-486a54b1-94a0-423b-89e1-6501baa1e52d.pdf",
+   "citat": "The Program Development Objective of the operation is to (i) boost private sector competitiveness by easing market entry and exit; (ii) improve employability and access to quality education; and (iii) enhance energy security and promote climate-smart agriculture.",
+   "nota": "Moldova Supporting Economic Opportunities and Climate Transition DPO (Banca Mondială, P507576); documentul de program (PD000157) din 11 aprilie 2025: împrumut BIRD de 37 mil. EUR, credit AID de 46,3 mil. EUR și grant din fondul fiduciar M-GROW de 7,7 mil. USD."
+  },
+  {
+   "acte": [
+    "HG186/2025"
+   ],
+   "obiective": {
+    "ro": "(i) Creșterea competitivității sectorului privat prin ușurarea intrării pe piață și a ieșirii de pe piață; (ii) îmbunătățirea angajabilității și a accesului la educație de calitate; (iii) consolidarea securității energetice și promovarea agriculturii inteligente din punct de vedere climatic.",
+    "en": "(i) To boost private sector competitiveness by easing market entry and exit; (ii) to improve employability and access to quality education; and (iii) to enhance energy security and promote climate-smart agriculture."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099052025154021615/pdf/P507576-486a54b1-94a0-423b-89e1-6501baa1e52d.pdf",
+   "citat": "The Program Development Objective of the operation is to (i) boost private sector competitiveness by easing market entry and exit; (ii) improve employability and access to quality education; and (iii) enhance energy security and promote climate-smart agriculture.",
+   "nota": "Moldova Supporting Economic Opportunities and Climate Transition DPO (Banca Mondială, P507576); documentul de program (PD000157) din 11 aprilie 2025: împrumut BIRD de 37 mil. EUR, credit AID de 46,3 mil. EUR și grant din fondul fiduciar M-GROW de 7,7 mil. USD."
+  },
+  {
+   "acte": [
+    "DP543/2022",
+    "LP197/2022",
+    "HG459/2022"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Guvernului în crearea bazelor pentru: (i) atenuarea impactului războiului din Ucraina asupra refugiaților și a gospodăriilor; (ii) consolidarea rezilienței și a competitivității, pentru a reduce vulnerabilitățile la șocurile viitoare.",
+    "en": "To support the Borrower in setting foundations to: (i) mitigate the impact of the war in Ukraine on refugees and households; and (ii) build resilience and enhance competitiveness to reduce vulnerabilities to future shocks."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099920007082213657/pdf/P17564007e02760830a3e0049dda77c219e.pdf",
+   "citat": "the Program aimed to support the Borrower set foundations to: (i) mitigate the impact of the war in Ukraine on refugees and households, (ii) build resilience and enhance competitiveness to reduce vulnerabilities to future shocks.",
+   "nota": "Moldova Emergency Response, Resilience and Competitiveness Development Policy Operation (Banca Mondială, P175640). Textul e din considerentele acordului de finanțare nr. 9142-MD; programul are două acorduri (BIRD și AID), ambele cu același obiectiv."
+  },
+  {
+   "acte": [
+    "DP542/2022",
+    "LP198/2022",
+    "HG460/2022"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Guvernului în crearea bazelor pentru: (i) atenuarea impactului războiului din Ucraina asupra refugiaților și a gospodăriilor; (ii) consolidarea rezilienței și a competitivității, pentru a reduce vulnerabilitățile la șocurile viitoare.",
+    "en": "To support the Borrower in setting foundations to: (i) mitigate the impact of the war in Ukraine on refugees and households; and (ii) build resilience and enhance competitiveness to reduce vulnerabilities to future shocks."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099920007082213657/pdf/P17564007e02760830a3e0049dda77c219e.pdf",
+   "citat": "the Program aimed to support the Borrower set foundations to: (i) mitigate the impact of the war in Ukraine on refugees and households, (ii) build resilience and enhance competitiveness to reduce vulnerabilities to future shocks.",
+   "nota": "Moldova Emergency Response, Resilience and Competitiveness Development Policy Operation (Banca Mondială, P175640). Textul e din considerentele acordului de finanțare nr. 9142-MD; programul are două acorduri (BIRD și AID), ambele cu același obiectiv."
+  },
+  {
+   "acte": [
+    "DP1002/2023",
+    "LP184/2023",
+    "HG384/2023"
+   ],
+   "obiective": {
+    "ro": "(i) Creșterea sprijinului pentru refugiați și gospodării; (ii) consolidarea rezilienței și a competitivității, pentru a reduce vulnerabilitățile la șocurile viitoare.",
+    "en": "(i) To increase support to refugees and households; and (ii) to build resilience and enhance competitiveness to reduce vulnerabilities to future shocks."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099050423045023666/pdf/BOSIB0ff8efd3b02c08cdf0dc4e98e6c5af.pdf",
+   "citat": "The DPO aims to (i) increase support to refugees and households, and (ii) build resilience and enhance competitiveness to reduce vulnerabilities to future shocks.",
+   "nota": "Moldova Emergency Response, Resilience, and Competitiveness DPO2 (Banca Mondială, P179086); documentul de program (PGD415) din 28 aprilie 2023: împrumut BIRD de 92,1 mil. EUR și grant din fondul fiduciar multidonator de 9,3 mil. USD."
+  },
+  {
+   "acte": [
+    "DP1048/2023",
+    "DP987/2023",
+    "LP166/2023"
+   ],
+   "obiective": {
+    "ro": "(i) Creșterea sprijinului pentru refugiați și gospodării; (ii) consolidarea rezilienței și a competitivității, pentru a reduce vulnerabilitățile la șocurile viitoare.",
+    "en": "(i) To increase support to refugees and households; and (ii) to build resilience and enhance competitiveness to reduce vulnerabilities to future shocks."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099050423045023666/pdf/BOSIB0ff8efd3b02c08cdf0dc4e98e6c5af.pdf",
+   "citat": "The DPO aims to (i) increase support to refugees and households, and (ii) build resilience and enhance competitiveness to reduce vulnerabilities to future shocks.",
+   "nota": "Moldova Emergency Response, Resilience, and Competitiveness DPO2 (Banca Mondială, P179086); documentul de program (PGD415) din 28 aprilie 2023: împrumut BIRD de 92,1 mil. EUR și grant din fondul fiduciar multidonator de 9,3 mil. USD."
+  },
+  {
+   "acte": [
+    "DP144/2025",
+    "LP67/2025",
+    "HG89/2025"
+   ],
+   "obiective": {
+    "ro": "Consolidarea pregătirii și a capacității de răspuns ale Republicii Moldova la hazardurile naturale și la șocurile legate de climă și, în cazul unei crize sau urgențe eligibile, reacția promptă și eficientă la aceasta.",
+    "en": "To enhance Moldova’s preparedness and response to natural hazards and climate-related shocks, and in case of an eligible crisis or emergency, respond promptly and effectively to it."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099081624133015448/pdf/BOSIB-f3b87424-1d10-4f0f-a6b9-e341f80293fd.pdf",
+   "citat": "The Project Development Objective is to enhance Moldova’s preparedness and response to natural hazards and climate-related shocks, and in case of an eligible crisis or emergency, respond promptly and effectively to it.",
+   "nota": "Strengthening Moldova’s Disaster Risk Management and Resilience Project (SMORE, Banca Mondială, P504278); documentul de evaluare a proiectului (PADHI00372) din 13 august 2024: împrumut BIRD de 37,4 mil. EUR."
+  },
+  {
+   "acte": [
+    "DP1652/2024",
+    "LP251/2024",
+    "HG710/2024"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea eficienței energetice în clădirile publice existente și în sectorul încălzirii centralizate din Moldova și asigurarea unui răspuns imediat și eficient în cazul unei crize sau urgențe eligibile.",
+    "en": "To enhance energy efficiency in existing public buildings and the district heating sector in Moldova and provide immediate and effective response to an Eligible Crisis or Emergency."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099080824125542711/pdf/P500560-6857c1a6-21a5-43fa-a85b-8b3d35f2ecb9.pdf",
+   "citat": "The objective of the Project is to enhance energy efficiency in existing public buildings and the district heating sector in Moldova and provide immediate and effective response to an Eligible Crisis or Emergency.",
+   "nota": "Sustainable Transition through Energy Efficiency in Moldova (STEEM, Banca Mondială, P500560). Textul e din anexa 1 a acordului de împrumut nr. 9696-MD (BIRD, 46,7 mil. EUR), semnat la 8 august 2024."
+  },
+  {
+   "acte": [
+    "DP1449/2024",
+    "DP963/2018",
+    "LP240/2018"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea calității și a transparenței sistemelor de administrare a terenurilor și de evaluare a proprietăților.",
+    "en": "To improve the quality and transparency of the land administration and property valuation systems."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/491971535859109015/pdf/Moldova-Land-PAD-08132018.pdf",
+   "citat": "To improve the quality and transparency of the land administration and property valuation systems.",
+   "nota": "Land Registration and Property Valuation Project (Banca Mondială, P161238); documentul de evaluare a proiectului (PAD2666, august 2018): credit AID de 30,1 mil. EUR."
+  },
+  {
+   "acte": [
+    "DP1851/2020",
+    "LP195/2020",
+    "HG650/2020"
+   ],
+   "obiective": {
+    "ro": "Asigurarea accesibilității rutiere locale, sigure și durabile, la educație, sănătate și piață.",
+    "en": "To provide safe and sustainable local road accessibility to education, health and market."
+   },
+   "sursa": "https://documents.worldbank.org/en/publication/documents-reports/documentdetail/556451548974174940/disclosable-restructuring-paper-local-roads-improvement-project-p150357",
+   "citat": "The development objective of Local Roads Improvement Project for Moldova is to provide safe and sustainable local road accessibility to education, health and market .",
+   "nota": "Local Roads Improvement Project (Banca Mondială, P150357). Textul e din descrierea documentului „Disclosable Restructuring Paper” din arhiva de documente a Băncii Mondiale; sursa nu menționează creditul AID din registru, dar denumirea proiectului coincide."
+  },
+  {
+   "acte": [
+    "DP528/2022",
+    "LP169/2022",
+    "HG351/2022"
+   ],
+   "obiective": {
+    "ro": "Creșterea accesului la servicii de alimentare cu apă și de sanitație gestionate în siguranță, în zone rurale și orașe mici selectate, și consolidarea capacității instituționale naționale și locale de furnizare a acestor servicii.",
+    "en": "To increase access to safely managed water supply and sanitation services in selected rural areas and small towns and to strengthen national and local institutional capacity for water supply and sanitation delivery."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/602501614116532923/pdf/Appraisal-Environmental-and-Social-Review-Summary-ESRS-Moldova-Water-Security-and-Sanitation-Project-P173076.pdf",
+   "citat": "To increase access to safely managed water supply and sanitation services in selected rural areas and small towns and to strengthen national and local institutional capacity for water supply and sanitation delivery.",
+   "nota": "Moldova Water Security and Sanitation Project (Banca Mondială, P173076). Textul e din documentul „Appraisal Environmental and Social Review Summary” (februarie 2021), care numește finanțarea: credit AID, împrumut BIRD și grantul de cofinanțare al Agenției Austriece pentru Dezvoltare (ADA)."
+  },
+  {
+   "acte": [
+    "DP275/2021"
+   ],
+   "obiective": {
+    "ro": "Creșterea accesului la servicii de alimentare cu apă și de sanitație gestionate în siguranță, în zone rurale și orașe mici selectate, și consolidarea capacității instituționale naționale și locale de furnizare a acestor servicii.",
+    "en": "To increase access to safely managed water supply and sanitation services in selected rural areas and small towns and to strengthen national and local institutional capacity for water supply and sanitation delivery."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/602501614116532923/pdf/Appraisal-Environmental-and-Social-Review-Summary-ESRS-Moldova-Water-Security-and-Sanitation-Project-P173076.pdf",
+   "citat": "To increase access to safely managed water supply and sanitation services in selected rural areas and small towns and to strengthen national and local institutional capacity for water supply and sanitation delivery.",
+   "nota": "Moldova Water Security and Sanitation Project (Banca Mondială, P173076). Textul e din documentul „Appraisal Environmental and Social Review Summary” (februarie 2021), care numește finanțarea: credit AID, împrumut BIRD și grantul de cofinanțare al Agenției Austriece pentru Dezvoltare (ADA)."
+  },
+  {
+   "acte": [
+    "DP1894/2020"
+   ],
+   "obiective": {
+    "ro": "Creșterea accesului la servicii de alimentare cu apă și de sanitație gestionate în siguranță, în zone rurale și orașe mici selectate, și consolidarea capacității instituționale naționale și locale de furnizare a acestor servicii.",
+    "en": "To increase access to safely managed water supply and sanitation services in selected rural areas and small towns and to strengthen national and local institutional capacity for water supply and sanitation delivery."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/602501614116532923/pdf/Appraisal-Environmental-and-Social-Review-Summary-ESRS-Moldova-Water-Security-and-Sanitation-Project-P173076.pdf",
+   "citat": "To increase access to safely managed water supply and sanitation services in selected rural areas and small towns and to strengthen national and local institutional capacity for water supply and sanitation delivery.",
+   "nota": "Moldova Water Security and Sanitation Project (Banca Mondială, P173076). Textul e din documentul „Appraisal Environmental and Social Review Summary” (februarie 2021), care numește finanțarea: credit AID, împrumut BIRD și grantul de cofinanțare al Agenției Austriece pentru Dezvoltare (ADA)."
+  },
+  {
+   "acte": [
+    "DP716/2026",
+    "LP157/2026",
+    "HG406/2026"
+   ],
+   "obiective": {
+    "ro": "(i) Reducerea poverii de reglementare, creșterea accesului la finanțare și creșterea competitivității la export a întreprinderilor din Moldova; (ii) în cazul unei crize sau urgențe eligibile, reacția promptă și eficientă la aceasta.",
+    "en": "(i) To reduce the regulatory burden, increase access to finance and increase the export competitiveness of Moldovan enterprises; and (ii) in case of an Eligible Crisis or Emergency, to respond promptly and effectively to it."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/903351656371201383/txt/Moldova-MSME-Competitiveness-Project.txt",
+   "citat": "The Project's Development Objective (PDO) is i) to reduce the regulatory burden, increase access to finance, increase the export competitiveness of Moldovan enterprises, and (ii) in case of an Eligible Crisis or Emergency, respond promptly and effectively to it.",
+   "nota": "Moldova MSME Competitiveness Project (Banca Mondială, P177895); documentul de evaluare a proiectului (PAD4824) din 3 iunie 2022: împrumut BIRD de 17,7 mil. EUR și credit AID de 29,8 mil. EUR."
+  },
+  {
+   "acte": [
+    "DP563/2022",
+    "LP204/2022",
+    "HG482/2022"
+   ],
+   "obiective": {
+    "ro": "(i) Reducerea poverii de reglementare, creșterea accesului la finanțare și creșterea competitivității la export a întreprinderilor din Moldova; (ii) în cazul unei crize sau urgențe eligibile, reacția promptă și eficientă la aceasta.",
+    "en": "(i) To reduce the regulatory burden, increase access to finance and increase the export competitiveness of Moldovan enterprises; and (ii) in case of an Eligible Crisis or Emergency, to respond promptly and effectively to it."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/903351656371201383/txt/Moldova-MSME-Competitiveness-Project.txt",
+   "citat": "The Project's Development Objective (PDO) is i) to reduce the regulatory burden, increase access to finance, increase the export competitiveness of Moldovan enterprises, and (ii) in case of an Eligible Crisis or Emergency, respond promptly and effectively to it.",
+   "nota": "Moldova MSME Competitiveness Project (Banca Mondială, P177895); documentul de evaluare a proiectului (PAD4824) din 3 iunie 2022: împrumut BIRD de 17,7 mil. EUR și credit AID de 29,8 mil. EUR."
+  },
+  {
+   "acte": [
+    "HG275/2026"
+   ],
+   "obiective": {
+    "ro": "(i) Reducerea poverii de reglementare, creșterea accesului la finanțare și creșterea competitivității la export a întreprinderilor din Moldova; (ii) în cazul unei crize sau urgențe eligibile, reacția promptă și eficientă la aceasta.",
+    "en": "(i) To reduce the regulatory burden, increase access to finance and increase the export competitiveness of Moldovan enterprises; and (ii) in case of an Eligible Crisis or Emergency, to respond promptly and effectively to it."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/903351656371201383/txt/Moldova-MSME-Competitiveness-Project.txt",
+   "citat": "The Project's Development Objective (PDO) is i) to reduce the regulatory burden, increase access to finance, increase the export competitiveness of Moldovan enterprises, and (ii) in case of an Eligible Crisis or Emergency, respond promptly and effectively to it.",
+   "nota": "Moldova MSME Competitiveness Project (Banca Mondială, P177895). Sursa (documentul de evaluare PAD4824, iunie 2022) nu menționează grantul din registru; se leagă de proiect după denumire, care e identică."
+  },
+  {
+   "acte": [
+    "DP1531/2024",
+    "LP173/2024",
+    "HG481/2024"
+   ],
+   "obiective": {
+    "ro": "(i) Consolidarea îngrijirii bolilor netransmisibile prin îmbunătățirea serviciilor de prevenție și de reabilitare, cu accent pe accidentul vascular cerebral și infarct, la toate nivelurile sistemului de sănătate; (ii) în cazul unei crize sau urgențe eligibile, reacția promptă și eficientă la aceasta.",
+    "en": "(i) To strengthen noncommunicable disease care by improving prevention and rehabilitation services, with a focus on stroke and heart attacks, at all levels of the health system; and (ii) in case of an Eligible Crisis or Emergency, to respond promptly and effectively to it."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099101725171020873/pdf/P180306-d090e53e-4787-4533-bd0a-4d385f9f2cbe.pdf",
+   "citat": "The PDO is to (i) strengthen noncommunicable disease care by improving prevention and rehabilitation services, with a focus on stroke and heart attacks, at all levels of the health system, and (ii) in case of an Eligible Crisis or Emergency, respond promptly and effectively to it.",
+   "nota": "Modernization and Improvement of Rehabilitation Services Project (Banca Mondială, P180306); raportul de implementare (ISR) din 17 octombrie 2025: împrumut BIRD (IBRD-96460, 40 mil. USD) și două granturi din fonduri fiduciare (TF-C4575, 5,61 mil. USD; TF-C7597, 2,11 mil. USD)."
+  },
+  {
+   "acte": [
+    "DP1536/2024",
+    "LP187/2024",
+    "HG482/2024"
+   ],
+   "obiective": {
+    "ro": "(i) Consolidarea îngrijirii bolilor netransmisibile prin îmbunătățirea serviciilor de prevenție și de reabilitare, cu accent pe accidentul vascular cerebral și infarct, la toate nivelurile sistemului de sănătate; (ii) în cazul unei crize sau urgențe eligibile, reacția promptă și eficientă la aceasta.",
+    "en": "(i) To strengthen noncommunicable disease care by improving prevention and rehabilitation services, with a focus on stroke and heart attacks, at all levels of the health system; and (ii) in case of an Eligible Crisis or Emergency, to respond promptly and effectively to it."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099101725171020873/pdf/P180306-d090e53e-4787-4533-bd0a-4d385f9f2cbe.pdf",
+   "citat": "The PDO is to (i) strengthen noncommunicable disease care by improving prevention and rehabilitation services, with a focus on stroke and heart attacks, at all levels of the health system, and (ii) in case of an Eligible Crisis or Emergency, respond promptly and effectively to it.",
+   "nota": "Modernization and Improvement of Rehabilitation Services Project (Banca Mondială, P180306); raportul de implementare (ISR) din 17 octombrie 2025: împrumut BIRD (IBRD-96460, 40 mil. USD) și două granturi din fonduri fiduciare (TF-C4575, 5,61 mil. USD; TF-C7597, 2,11 mil. USD)."
+  },
+  {
+   "acte": [
+    "HG512/2025"
+   ],
+   "obiective": {
+    "ro": "(i) Consolidarea îngrijirii bolilor netransmisibile prin îmbunătățirea serviciilor de prevenție și de reabilitare, cu accent pe accidentul vascular cerebral și infarct, la toate nivelurile sistemului de sănătate; (ii) în cazul unei crize sau urgențe eligibile, reacția promptă și eficientă la aceasta.",
+    "en": "(i) To strengthen noncommunicable disease care by improving prevention and rehabilitation services, with a focus on stroke and heart attacks, at all levels of the health system; and (ii) in case of an Eligible Crisis or Emergency, to respond promptly and effectively to it."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099101725171020873/pdf/P180306-d090e53e-4787-4533-bd0a-4d385f9f2cbe.pdf",
+   "citat": "The PDO is to (i) strengthen noncommunicable disease care by improving prevention and rehabilitation services, with a focus on stroke and heart attacks, at all levels of the health system, and (ii) in case of an Eligible Crisis or Emergency, respond promptly and effectively to it.",
+   "nota": "Modernization and Improvement of Rehabilitation Services Project (Banca Mondială, P180306); raportul de implementare (ISR) din 17 octombrie 2025: împrumut BIRD (IBRD-96460, 40 mil. USD) și două granturi din fonduri fiduciare (TF-C4575, 5,61 mil. USD; TF-C7597, 2,11 mil. USD)."
+  },
+  {
+   "acte": [
+    "DP1610/2020"
+   ],
+   "obiective": {
+    "ro": "Creșterea competitivității sectorului agroalimentar prin sprijinirea modernizării sistemului de gestionare a siguranței alimentelor, facilitarea accesului fermierilor la piețe și integrarea practicilor agro-ecologice și de gestionare durabilă a terenurilor.",
+    "en": "To enhance the competitiveness of the agro-food sector by supporting the modernization of the food safety management system, facilitating market access for farmers, and mainstreaming agro-environmental and sustainable land management practices."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/735681594752616586/pdf/Moldova-Agriculture-Competitiveness-Project-Third-Additional-Financing.pdf",
+   "citat": "The Project Development Objective is to enhance the competitiveness of the agro-food sector by supporting the modernization of the food safety management system, facilitating market access for farmers, and mainstreaming agro-environmental and sustainable land management practices.",
+   "nota": "Moldova Agriculture Competitiveness Project (Banca Mondială, P118518), a treia finanțare adițională (P171284): credit AID suplimentar de 13,5 mil. EUR; documentul (PAD3618) din 30 iunie 2020. Documentul numește finanțarea credit AID, iar registrul o arată ca împrumut BIRD."
+  },
+  {
+   "acte": [
+    "DP1852/2020",
+    "LP193/2020",
+    "HG799/2020"
+   ],
+   "obiective": {
+    "ro": "Creșterea eficienței și a fiabilității producerii și distribuției de energie termică și electrică în sistemul de termoficare din Chișinău.",
+    "en": "To increase the efficiency and reliability of heat and power production and distribution of the Chisinau District Heating system."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/677731588707264535/pdf/Stakeholder-Engagement-Plan-SEP-Second-District-Heating-Efficiency-Improvement-Project-P172668.pdf",
+   "citat": "The Development Objective of the Project is to increase the efficiency and reliability of heat and power production and distribution of the Chisinau District Heating system.",
+   "nota": "Second District Heating Efficiency Improvement Project (Banca Mondială, P172668). Textul e din Planul de implicare a părților interesate (versiune preliminară, martie 2020), nu din acordul de împrumut."
+  },
+  {
+   "acte": [
+    "DP1401/2019",
+    "LP179/2019",
+    "HG537/2019"
+   ],
+   "obiective": {
+    "ro": "Creșterea capacității și îmbunătățirea fiabilității sistemului de transport al energiei electrice din Moldova.",
+    "en": "To increase capacity and improve reliability of the power transmission system in Moldova."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/713911557626447656/pdf/Moldova-Power-System-Development-Project.pdf",
+   "citat": "The Project Development Objective is to increase capacity and improve reliability of the power transmission system in Moldova.",
+   "nota": "Moldova Power System Development Project (Banca Mondială, P160829); documentul de evaluare a proiectului (PAD3147) din 9 aprilie 2019: credit AID de 47,9 mil. EUR și credit AID din Facilitatea de extindere (Scale-up) de 13,1 mil. EUR."
+  },
+  {
+   "acte": [
+    "DP1402/2019",
+    "LP177/2019",
+    "HG536/2019"
+   ],
+   "obiective": {
+    "ro": "Creșterea capacității și îmbunătățirea fiabilității sistemului de transport al energiei electrice din Moldova.",
+    "en": "To increase capacity and improve reliability of the power transmission system in Moldova."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/713911557626447656/pdf/Moldova-Power-System-Development-Project.pdf",
+   "citat": "The Project Development Objective is to increase capacity and improve reliability of the power transmission system in Moldova.",
+   "nota": "Moldova Power System Development Project (Banca Mondială, P160829); documentul de evaluare a proiectului (PAD3147) din 9 aprilie 2019: credit AID de 47,9 mil. EUR și credit AID din Facilitatea de extindere (Scale-up) de 13,1 mil. EUR."
+  },
+  {
+   "acte": [
+    "DP324/2025",
+    "LP211/2025",
+    "HG427/2025"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea prestării serviciilor agricole publice, stimularea creșterii orientate spre piață și sporirea rezilienței beneficiarilor vizați și, în cazul unei crize sau urgențe eligibile, reacția promptă și eficientă la aceasta.",
+    "en": "To improve delivery of public agricultural services, foster market-oriented growth and increase resilience of targeted beneficiaries, and in case of an eligible crisis or emergency, respond promptly and effectively to it."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099051123140057357/pdf/BOSIB03b23751a04e0802b02c628739a8ce.pdf",
+   "citat": "Improve delivery of public agricultural services, foster market-oriented growth and increase resilience of targeted beneficiaries, and in case of an eligible crisis or emergency, respond promptly and effectively to it.",
+   "nota": "Agriculture Governance, Growth and Resilience Investment Project (AGGRI, Banca Mondială, P170035); documentul de evaluare a proiectului (PAD5158) din 8 mai 2023: împrumut BIRD de 50,1 mil. EUR."
+  },
+  {
+   "acte": [
+    "DP1645/2024",
+    "LP256/2024",
+    "HG737/2024"
+   ],
+   "obiective": {
+    "ro": "(i) Îmbunătățirea mediului de învățare în instituțiile participante, cu accent pe sprijinirea elevilor dezavantajați; (ii) consolidarea capacității Ministerului Educației și Cercetării pentru gestionarea sectorului și pentru răspunsul la situația refugiaților.",
+    "en": "(i) To improve the learning environment in participating institutions, with an emphasis on supporting disadvantaged students; and (ii) to strengthen the capacity of the Ministry of Education and Research for sector management and refugee response."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099051123142553305/pdf/BOSIB1624554c10761aa601cca7d93b64e7.pdf",
+   "citat": "The objectives of the Project are to: (i) improve the learning environment in participating institutions, with an emphasis on supporting disadvantaged students; and (ii) strengthen the capacity of the Ministry of Education and Research for sector management and refugee response.",
+   "nota": "Education Quality Improvement Project (Banca Mondială, P179363); documentul de evaluare a proiectului (PAD5321) din 8 mai 2023: împrumut BIRD de 36,5 mil. EUR și granturi din fonduri fiduciare (GPE, 4,8 mil. USD; ELP, 5 mil. USD)."
+  },
+  {
+   "acte": [
+    "DP1674/2024",
+    "LP273/2024",
+    "HG755/2024"
+   ],
+   "obiective": {
+    "ro": "(i) Îmbunătățirea mediului de învățare în instituțiile participante, cu accent pe sprijinirea elevilor dezavantajați; (ii) consolidarea capacității Ministerului Educației și Cercetării pentru gestionarea sectorului și pentru răspunsul la situația refugiaților.",
+    "en": "(i) To improve the learning environment in participating institutions, with an emphasis on supporting disadvantaged students; and (ii) to strengthen the capacity of the Ministry of Education and Research for sector management and refugee response."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099051123142553305/pdf/BOSIB1624554c10761aa601cca7d93b64e7.pdf",
+   "citat": "The objectives of the Project are to: (i) improve the learning environment in participating institutions, with an emphasis on supporting disadvantaged students; and (ii) strengthen the capacity of the Ministry of Education and Research for sector management and refugee response.",
+   "nota": "Education Quality Improvement Project (Banca Mondială, P179363); documentul de evaluare a proiectului (PAD5321) din 8 mai 2023: împrumut BIRD de 36,5 mil. EUR și granturi din fonduri fiduciare (GPE, 4,8 mil. USD; ELP, 5 mil. USD)."
+  },
+  {
+   "acte": [
+    "DP1675/2024",
+    "LP275/2024",
+    "HG756/2024"
+   ],
+   "obiective": {
+    "ro": "(i) Îmbunătățirea mediului de învățare în instituțiile participante, cu accent pe sprijinirea elevilor dezavantajați; (ii) consolidarea capacității Ministerului Educației și Cercetării pentru gestionarea sectorului și pentru răspunsul la situația refugiaților.",
+    "en": "(i) To improve the learning environment in participating institutions, with an emphasis on supporting disadvantaged students; and (ii) to strengthen the capacity of the Ministry of Education and Research for sector management and refugee response."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099051123142553305/pdf/BOSIB1624554c10761aa601cca7d93b64e7.pdf",
+   "citat": "The objectives of the Project are to: (i) improve the learning environment in participating institutions, with an emphasis on supporting disadvantaged students; and (ii) strengthen the capacity of the Ministry of Education and Research for sector management and refugee response.",
+   "nota": "Education Quality Improvement Project (Banca Mondială, P179363); documentul de evaluare a proiectului (PAD5321) din 8 mai 2023: împrumut BIRD de 36,5 mil. EUR și granturi din fonduri fiduciare (GPE, 4,8 mil. USD; ELP, 5 mil. USD)."
+  },
+  {
+   "acte": [
+    "DP864/2023",
+    "LP55/2023",
+    "HG63/2023"
+   ],
+   "obiective": {
+    "ro": "Prevenirea, depistarea și combaterea amenințării reprezentate de pandemia de COVID-19 în Republica Moldova.",
+    "en": "To prevent, detect and respond to the threat posed by the COVID-19 pandemic in the Republic of Moldova."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/865001588624487531/pdf/Moldova-Emergency-COVID-19-Response-Project.pdf",
+   "citat": "The objectives of the Project are to prevent, detect and respond to the threat posed by the COVID-19 pandemic in the Republic of Moldova.",
+   "nota": "Moldova Emergency COVID-19 Response Project (Banca Mondială, P173776), parte a programului multifazic COVID-19 SPRP; documentul de evaluare (PAD3830), aprilie 2020, secțiunea III.A, paragraful 28 (obiectivul proiectului, nu al programului)."
+  },
+  {
+   "acte": [
+    "DPRM1715/2015",
+    "LP148/2015",
+    "HG333/2015"
+   ],
+   "obiective": {
+    "ro": "Contribuția la îmbunătățirea eficienței operaționale și a viabilității financiare a companiei de termoficare și îmbunătățirea calității și a fiabilității serviciilor de încălzire oferite populației din Chișinău.",
+    "en": "To contribute to improved operational efficiency and financial viability of the District Heating company and to improve quality and reliability of heating services delivered to the population of Chisinau."
+   },
+   "inceput": "2015-08-14",
+   "sfarsit": "2020-06-30",
+   "sursa": "https://documents1.worldbank.org/curated/en/337121618844834264/pdf/Moldova-District-Heating-Efficiency-Improvement-Project.pdf",
+   "citat": "The objective of the proposed project is to contribute to improved operational efficiency and financial viability of the District Heating company and to improve quality and reliability of heating services delivered to the population of Chisinau. … Approval Effectiveness MTR Review Original Closing Actual Closing 21-Nov-2014 14-Aug-2015 15-Nov-2019 30-Jun-2020 30-Jun-2020",
+   "nota": "District Heating Efficiency Improvement Project (Banca Mondială, P132443); raportul final al proiectului (ICR00005342, 7 aprilie 2021), obiectivul inițial din fișa de date: împrumut BIRD de 40,5 mil. USD. Începutul = data intrării în vigoare a finanțării (Effectiveness, 14 august 2015); finalizarea = închiderea efectivă (Actual Closing, 30 iunie 2020). Aprobarea Băncii: 21 noiembrie 2014."
+  },
+  {
+   "acte": [
+    "HG405/2026"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea, lărgirea și construcția sectoarelor de drum M3 și R7 (rețeaua TEN-T extinsă), pentru ca legăturile rutiere esențiale să fie menținute la standarde acceptabile, pentru a facilita creșterea economică și a consolida integrarea și conectivitatea regională.",
+    "en": "Rehabilitation, widening and construction of the M3 and R7 road sections (extended TEN-T network), to keep key road links at acceptable standards, facilitate economic growth and strengthen regional integration and connectivity."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/55768.html",
+   "citat": "The loan will be structured in two tranches and will finance the rehabilitation, widening and construction of the M3 and R7 road sections. … Government's efforts to ensure key road links are maintained to acceptable standards, to facilitate economic growth, and strengthen regional integration and connectivity.",
+   "nota": "Fișa BERD «Moldova TEN-T Road Network Rehabilitation» (PSD 55768): împrumut suveran de până la 344 mil. EUR, în două tranșe. Citatul are două fragmente din aceeași fișă (descrierea și obiectivele proiectului)."
+  },
+  {
+   "acte": [
+    "DP644/2026",
+    "LP98/2026",
+    "HG277/2026"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea dezvoltării economice a Moldovei și a eficienței operaționale prin infrastructura rutieră regională îmbunătățită, prin reabilitarea rețelei rutiere principale; împrumutul finanțează reabilitarea și lărgirea inelului rutier M2 Chișinău (secțiunea 2) și reabilitarea sectorului M1 Chișinău–Leușeni.",
+    "en": "To support Moldova's economic development and operational efficiency through improved regional road infrastructure, by rehabilitating the key road network; the loan finances the rehabilitation and widening of the M2 Chisinau ring road (section 2) and the rehabilitation of the M1 Chisinau–Leuseni section."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/54423.html",
+   "citat": "The Project will support Moldova's economic development and bring operational efficiency from improved regional road infrastructure through the rehabilitation of the key road network. … to finance the rehabilitation and widening of the M2 Chisinau ring road - section 2 and the rehabilitation of the M1 Chisinau to Leuseni road section.",
+   "nota": "Fișa BERD «Moldova Roads Rehabilitation V» (PSD 54423): împrumut suveran de până la 150 mil. EUR, acordat în ianuarie 2024. Citatul are două fragmente din aceeași fișă (obiectivele și descrierea)."
+  },
+  {
+   "acte": [
+    "DP298/2025",
+    "LP184/2025",
+    "HG411/2025"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea dezvoltării economice a Moldovei și a eficienței operaționale prin infrastructura regională îmbunătățită, prin reabilitarea rețelei rutiere principale.",
+    "en": "To support Moldova's economic development and bring operational efficiency from improved regional infrastructure through the rehabilitation of the key road network."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/45094.html",
+   "citat": "The Project will support Moldova's economic development and bring operational efficiency from improved regional infrastructure through the rehabilitation of the key road network.",
+   "nota": "Fișa BERD «Moldova Roads Rehabilitation IV» (PSD 45094): împrumut suveran de până la 250 mil. EUR în patru tranșe. Rândurile (acordul de împrumut din 28 iunie 2013 și grantul «Proiectul IV de reabilitare a drumurilor») sunt legate de fișă prin denumire și sumă."
+  },
+  {
+   "acte": [
+    "DPRM1819/2015",
+    "LP190/2015",
+    "HG761/2015"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea dezvoltării economice a Moldovei și a eficienței operaționale prin infrastructura regională îmbunătățită, prin reabilitarea rețelei rutiere principale.",
+    "en": "To support Moldova's economic development and bring operational efficiency from improved regional infrastructure through the rehabilitation of the key road network."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/45094.html",
+   "citat": "The Project will support Moldova's economic development and bring operational efficiency from improved regional infrastructure through the rehabilitation of the key road network.",
+   "nota": "Fișa BERD «Moldova Roads Rehabilitation IV» (PSD 45094): împrumut suveran de până la 250 mil. EUR în patru tranșe. Rândurile (acordul de împrumut din 28 iunie 2013 și grantul «Proiectul IV de reabilitare a drumurilor») sunt legate de fișă prin denumire și sumă."
+  },
+  {
+   "acte": [
+    "LP77/2011",
+    "HG161/2011"
+   ],
+   "obiective": {
+    "ro": "Inversarea deteriorării rețelei rutiere din Moldova și menținerea corespunzătoare a legăturilor rutiere esențiale, pentru a facilita creșterea economică și integrarea regională.",
+    "en": "To help reverse the deterioration of the road network in Moldova and to ensure key road links are properly maintained to facilitate economic growth and regional integration."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/41442.html",
+   "citat": "The purpose of the project is to help reverse the deterioration of the road network in Moldova and to ensure key road links are properly maintained to facilitate economic growth and regional integration.",
+   "nota": "Fișa BERD «Moldova Road Rehabilitation III» (PSD 41442): împrumut suveran de până la 75 mil. EUR pentru reabilitarea unor sectoare principale de drum."
+  },
+  {
+   "acte": [
+    "DP272/2025",
+    "LP161/2025",
+    "HG369/2025"
+   ],
+   "obiective": {
+    "ro": "Primul proiect de amploare de gestionare a deșeurilor solide din Moldova care implică mai multe regiuni: îmbunătățirea și extinderea serviciilor de gestionare a deșeurilor solide în zonele de management participante și abordarea provocărilor de mediu.",
+    "en": "The first large-scale solid waste management project in Moldova involving multiple regions: it aims to improve and increase solid waste management services in the participating Waste Management Zones and address environmental challenges."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/52512.html",
+   "citat": "The Project is the first large-scale solid waste management project in Moldova involving multiple regions. It aims to improve and increase solid waste management services in the participating Waste Management Zones and address environmental challenges.",
+   "nota": "Fișa BERD «Moldova Solid Waste Project» (PSD 52512): împrumut suveran de 25 mil. EUR semnat în ianuarie 2023, cofinanțat de BEI și de granturi E5P. Rândurile de grant poartă aceeași denumire în registru."
+  },
+  {
+   "acte": [
+    "DP245/2025",
+    "LP138/2025",
+    "HG279/2025"
+   ],
+   "obiective": {
+    "ro": "Primul proiect de amploare de gestionare a deșeurilor solide din Moldova care implică mai multe regiuni: îmbunătățirea și extinderea serviciilor de gestionare a deșeurilor solide în zonele de management participante și abordarea provocărilor de mediu.",
+    "en": "The first large-scale solid waste management project in Moldova involving multiple regions: it aims to improve and increase solid waste management services in the participating Waste Management Zones and address environmental challenges."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/52512.html",
+   "citat": "The Project is the first large-scale solid waste management project in Moldova involving multiple regions. It aims to improve and increase solid waste management services in the participating Waste Management Zones and address environmental challenges.",
+   "nota": "Fișa BERD «Moldova Solid Waste Project» (PSD 52512): împrumut suveran de 25 mil. EUR semnat în ianuarie 2023, cofinanțat de BEI și de granturi E5P. Rândurile de grant poartă aceeași denumire în registru."
+  },
+  {
+   "acte": [
+    "DP1477/2024",
+    "LP129/2024",
+    "HG315/2024"
+   ],
+   "obiective": {
+    "ro": "Primul proiect de amploare de gestionare a deșeurilor solide din Moldova care implică mai multe regiuni: îmbunătățirea și extinderea serviciilor de gestionare a deșeurilor solide în zonele de management participante și abordarea provocărilor de mediu.",
+    "en": "The first large-scale solid waste management project in Moldova involving multiple regions: it aims to improve and increase solid waste management services in the participating Waste Management Zones and address environmental challenges."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/52512.html",
+   "citat": "The Project is the first large-scale solid waste management project in Moldova involving multiple regions. It aims to improve and increase solid waste management services in the participating Waste Management Zones and address environmental challenges.",
+   "nota": "Fișa BERD «Moldova Solid Waste Project» (PSD 52512): împrumut suveran de 25 mil. EUR semnat în ianuarie 2023, cofinanțat de BEI și de granturi E5P. Rândurile de grant poartă aceeași denumire în registru."
+  },
+  {
+   "acte": [
+    "DP945/2023",
+    "LP127/2023",
+    "HG272/2023"
+   ],
+   "obiective": {
+    "ro": "Primul proiect de amploare de gestionare a deșeurilor solide din Moldova care implică mai multe regiuni: îmbunătățirea și extinderea serviciilor de gestionare a deșeurilor solide în zonele de management participante și abordarea provocărilor de mediu.",
+    "en": "The first large-scale solid waste management project in Moldova involving multiple regions: it aims to improve and increase solid waste management services in the participating Waste Management Zones and address environmental challenges."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/52512.html",
+   "citat": "The Project is the first large-scale solid waste management project in Moldova involving multiple regions. It aims to improve and increase solid waste management services in the participating Waste Management Zones and address environmental challenges.",
+   "nota": "Fișa BERD «Moldova Solid Waste Project» (PSD 52512): împrumut suveran de 25 mil. EUR semnat în ianuarie 2023, cofinanțat de BEI și de granturi E5P. Rândurile de grant poartă aceeași denumire în registru."
+  },
+  {
+   "acte": [
+    "DP836/2023",
+    "LP14/2023",
+    "HG44/2023"
+   ],
+   "obiective": {
+    "ro": "Primul proiect de amploare de gestionare a deșeurilor solide din Moldova care implică mai multe regiuni: îmbunătățirea și extinderea serviciilor de gestionare a deșeurilor solide în zonele de management participante și abordarea provocărilor de mediu.",
+    "en": "The first large-scale solid waste management project in Moldova involving multiple regions: it aims to improve and increase solid waste management services in the participating Waste Management Zones and address environmental challenges."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/52512.html",
+   "citat": "The Project is the first large-scale solid waste management project in Moldova involving multiple regions. It aims to improve and increase solid waste management services in the participating Waste Management Zones and address environmental challenges.",
+   "nota": "Fișa BERD «Moldova Solid Waste Project» (PSD 52512): împrumut suveran de 25 mil. EUR semnat în ianuarie 2023, cofinanțat de BEI și de granturi E5P. Rândurile de grant poartă aceeași denumire în registru."
+  },
+  {
+   "acte": [
+    "DP276/2025",
+    "LP162/2025"
+   ],
+   "obiective": {
+    "ro": "Consolidarea securității energetice a Moldovei prin asigurarea achiziției și furnizării continue de gaze și energie electrică.",
+    "en": "To strengthen Moldova's energy security by enabling continuous acquisition and supply of gas and electricity."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/56466.html",
+   "citat": "The project aims to strengthen Moldova's energy security by enabling continuous acquisition and supply of gas and electricity.",
+   "nota": "Fișa BERD «Moldova Energy Security 2025» (PSD 56466): linie de credit revolving de 300 mil. EUR și scrisoare de credit de rezervă de 100 mil. EUR, în total până la 400 mil. EUR, în favoarea Energocom."
+  },
+  {
+   "acte": [
+    "DP1417/2019",
+    "LP195/2019",
+    "HG659/2019"
+   ],
+   "obiective": {
+    "ro": "Permiterea Moldovei să procure o lună de gaze naturale de rezervă pentru eventuale întreruperi ale furnizării în iarna 2019–2020.",
+    "en": "To allow Moldova to procure one month of natural gas to back up potential supply disruption during winter 2019-2020."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/51585.html",
+   "citat": "The purpose of the transaction is to allow Moldova to procure one month of natural gas to back up potential supply disruption during winter 2019-2020.",
+   "nota": "Fișa BERD «Moldova Emergency Gas Purchase Facility» (PSD 51585): scrisoare de credit de 50 mil. USD în favoarea Naftogaz, pentru achiziții de gaze ale Energocom; fișa indică starea «Cancelled»."
+  },
+  {
+   "acte": [
+    "DP798/2018",
+    "LP150/2018",
+    "HG658/2018"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Moldovei în diversificarea aprovizionării cu energie electrică și în consolidarea rețelei interne de transport, în special pentru a permite, pe termen lung, integrarea în rețeaua ENTSO-E.",
+    "en": "To assist Moldova in diversifying its supply of electricity and strengthening the domestic transmission network, in particular to allow for integration with the ENTSO-E network in the long run."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/47087.html",
+   "citat": "The project aims at assisting Moldova to diversify its supply of electricity and strengthen the domestic transmission network, in particular in order to allow for integration with the ENTSO-E network in the long run.",
+   "nota": "Fișa BERD «Moldova Romania Power Interconnection Phase I» (PSD 47087): împrumut de până la 80 mil. EUR, redirecționat către Moldelectrica; rândul de grant poartă aceeași denumire în registru."
+  },
+  {
+   "acte": [
+    "DP1418/2019",
+    "LP180/2019",
+    "HG538/2019"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Moldovei în diversificarea aprovizionării cu energie electrică și în consolidarea rețelei interne de transport, în special pentru a permite, pe termen lung, integrarea în rețeaua ENTSO-E.",
+    "en": "To assist Moldova in diversifying its supply of electricity and strengthening the domestic transmission network, in particular to allow for integration with the ENTSO-E network in the long run."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/47087.html",
+   "citat": "The project aims at assisting Moldova to diversify its supply of electricity and strengthen the domestic transmission network, in particular in order to allow for integration with the ENTSO-E network in the long run.",
+   "nota": "Fișa BERD «Moldova Romania Power Interconnection Phase I» (PSD 47087): împrumut de până la 80 mil. EUR, redirecționat către Moldelectrica; rândul de grant poartă aceeași denumire în registru."
+  },
+  {
+   "acte": [
+    "DP1430/2024",
+    "LP104/2024",
+    "HG268/2024"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea securității energetice a Moldovei prin accelerarea integrării în ENTSO-E și a integrării regionale (o nouă rută de schimb de energie electrică cu România), reducerea pierderilor din rețeaua de transport și creșterea fiabilității alimentării prin înlocuirea echipamentelor învechite.",
+    "en": "To improve Moldova's energy security by accelerating integration with ENTSO-E and regional integration (a new electricity exchange route with Romania), reduce losses in the transmission network and increase supply reliability by replacing outdated equipment."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/54567.html",
+   "citat": "The Project will improve the energy security for Moldova by accelerating the ongoing integration with ENTSO-E and accelerate the development of regional integration as Moldova will introduce a new route for electricity exchange … The Project will also lead to a reduction of losses in the electricity transmission network and increase the reliability of electricity supply through replacing and modernising the conceptually and physically outdated equipment.",
+   "nota": "Fișa BERD «Moldova Romania Power Interconnection Phase II» (PSD 54567): împrumut suveran de până la 32 mil. EUR, redirecționat către Moldelectrica; rândul de grant poartă aceeași denumire în registru. Citatul are două fragmente din secțiunea de obiective."
+  },
+  {
+   "acte": [
+    "DP92/2025",
+    "LP29/2025",
+    "HG85/2025"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea securității energetice a Moldovei prin accelerarea integrării în ENTSO-E și a integrării regionale (o nouă rută de schimb de energie electrică cu România), reducerea pierderilor din rețeaua de transport și creșterea fiabilității alimentării prin înlocuirea echipamentelor învechite.",
+    "en": "To improve Moldova's energy security by accelerating integration with ENTSO-E and regional integration (a new electricity exchange route with Romania), reduce losses in the transmission network and increase supply reliability by replacing outdated equipment."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/54567.html",
+   "citat": "The Project will improve the energy security for Moldova by accelerating the ongoing integration with ENTSO-E and accelerate the development of regional integration as Moldova will introduce a new route for electricity exchange … The Project will also lead to a reduction of losses in the electricity transmission network and increase the reliability of electricity supply through replacing and modernising the conceptually and physically outdated equipment.",
+   "nota": "Fișa BERD «Moldova Romania Power Interconnection Phase II» (PSD 54567): împrumut suveran de până la 32 mil. EUR, redirecționat către Moldelectrica; rândul de grant poartă aceeași denumire în registru. Citatul are două fragmente din secțiunea de obiective."
+  },
+  {
+   "acte": [
+    "DP76/2025",
+    "LP14/2025",
+    "HG1/2025"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea infrastructurii de termoficare, reducerea consumului de combustibil și decarbonizarea sistemului; eficiență operațională și energetică mai bună prin control îmbunătățit al sistemului, facturare pe consum la nivel de apartament și reluarea furnizării accesibile de apă caldă menajeră; costuri mai mici, competitivitate, securitate energetică și economii importante de CO2.",
+    "en": "To improve district heating infrastructure, reduce fuel consumption and promote the system's decarbonisation; enhance operational and energy efficiency through improved system control, consumption-based billing at apartment level and the resumption of affordable domestic hot water supply; and increase cost efficiency and competitiveness, with enhanced energy security and significant CO2 savings."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/54427.html",
+   "citat": "The Project will improve district heating (\"DH\") infrastructure, reduce fuel consumption and promote the system's decarbonisation. It will enhance DH operational and energy efficiency through improved system control, introduce apartment level consumption-based billing to DH consumers and the resumption of affordable domestic hot water supply. It will increase the cost efficiency and competitiveness of the DH system, resulting in enhanced energy security and significant savings of CO2 emissions.",
+   "nota": "Fișa BERD «GrCF 2 W2 E2-Termoelectrica: Chisinau District Heating» (PSD 54427): împrumut suveran de 143,5 mil. EUR pentru Termoelectrica, cu granturi EU NIP (până la 24,5 mil. EUR) și E5P (până la 15,0 mil. EUR); rândurile de grant se leagă de proiect prin denumire și sumă."
+  },
+  {
+   "acte": [
+    "DP212/2025",
+    "LP104/2025",
+    "HG205/2025"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea infrastructurii de termoficare, reducerea consumului de combustibil și decarbonizarea sistemului; eficiență operațională și energetică mai bună prin control îmbunătățit al sistemului, facturare pe consum la nivel de apartament și reluarea furnizării accesibile de apă caldă menajeră; costuri mai mici, competitivitate, securitate energetică și economii importante de CO2.",
+    "en": "To improve district heating infrastructure, reduce fuel consumption and promote the system's decarbonisation; enhance operational and energy efficiency through improved system control, consumption-based billing at apartment level and the resumption of affordable domestic hot water supply; and increase cost efficiency and competitiveness, with enhanced energy security and significant CO2 savings."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/54427.html",
+   "citat": "The Project will improve district heating (\"DH\") infrastructure, reduce fuel consumption and promote the system's decarbonisation. It will enhance DH operational and energy efficiency through improved system control, introduce apartment level consumption-based billing to DH consumers and the resumption of affordable domestic hot water supply. It will increase the cost efficiency and competitiveness of the DH system, resulting in enhanced energy security and significant savings of CO2 emissions.",
+   "nota": "Fișa BERD «GrCF 2 W2 E2-Termoelectrica: Chisinau District Heating» (PSD 54427): împrumut suveran de 143,5 mil. EUR pentru Termoelectrica, cu granturi EU NIP (până la 24,5 mil. EUR) și E5P (până la 15,0 mil. EUR); rândurile de grant se leagă de proiect prin denumire și sumă."
+  },
+  {
+   "acte": [
+    "DP210/2025",
+    "LP105/2025",
+    "HG206/2025"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea infrastructurii de termoficare, reducerea consumului de combustibil și decarbonizarea sistemului; eficiență operațională și energetică mai bună prin control îmbunătățit al sistemului, facturare pe consum la nivel de apartament și reluarea furnizării accesibile de apă caldă menajeră; costuri mai mici, competitivitate, securitate energetică și economii importante de CO2.",
+    "en": "To improve district heating infrastructure, reduce fuel consumption and promote the system's decarbonisation; enhance operational and energy efficiency through improved system control, consumption-based billing at apartment level and the resumption of affordable domestic hot water supply; and increase cost efficiency and competitiveness, with enhanced energy security and significant CO2 savings."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/54427.html",
+   "citat": "The Project will improve district heating (\"DH\") infrastructure, reduce fuel consumption and promote the system's decarbonisation. It will enhance DH operational and energy efficiency through improved system control, introduce apartment level consumption-based billing to DH consumers and the resumption of affordable domestic hot water supply. It will increase the cost efficiency and competitiveness of the DH system, resulting in enhanced energy security and significant savings of CO2 emissions.",
+   "nota": "Fișa BERD «GrCF 2 W2 E2-Termoelectrica: Chisinau District Heating» (PSD 54427): împrumut suveran de 143,5 mil. EUR pentru Termoelectrica, cu granturi EU NIP (până la 24,5 mil. EUR) și E5P (până la 15,0 mil. EUR); rândurile de grant se leagă de proiect prin denumire și sumă."
+  },
+  {
+   "acte": [
+    "DP286/2021",
+    "DP288/2021",
+    "LP214/2021"
+   ],
+   "obiective": {
+    "ro": "Modernizarea materialului rulant al CFM (locomotive noi, cu servicii de calitate, siguranță și eficiență energetică mai bune), reabilitarea infrastructurii feroviare prioritare și sprijinirea procesului de reformă a restructurării căilor ferate.",
+    "en": "To upgrade CFM's rolling stock (new locomotives offering higher service quality, safety and energy efficiency), rehabilitate priority rail infrastructure and support the railway restructuring reform process."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/44085.html",
+   "citat": "The objectives of the proposed Project are to upgrade CFM's rolling stock, rehabilitate priority rail infrastructure and support the railway restructuring reform process that will be achieved through: … (a) acquisition of new locomotives to offer a higher level of service quality, safety and energy efficiency benefits;",
+   "nota": "Fișa BERD «Moldovan Railways Restructuring Project» (PSD 44085): împrumut suveran de 76,5 mil. EUR pentru Calea Ferată din Moldova, din care 52,5 mil. EUR semnați la 14 noiembrie 2014 (după fișă); fișa indică starea «Cancelled». Rândurile de grant poartă aceeași denumire în registru."
+  },
+  {
+   "acte": [
+    "DPRM181/2017",
+    "DPRM2019/2016",
+    "LP43/2016"
+   ],
+   "obiective": {
+    "ro": "Modernizarea materialului rulant al CFM (locomotive noi, cu servicii de calitate, siguranță și eficiență energetică mai bune), reabilitarea infrastructurii feroviare prioritare și sprijinirea procesului de reformă a restructurării căilor ferate.",
+    "en": "To upgrade CFM's rolling stock (new locomotives offering higher service quality, safety and energy efficiency), rehabilitate priority rail infrastructure and support the railway restructuring reform process."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/44085.html",
+   "citat": "The objectives of the proposed Project are to upgrade CFM's rolling stock, rehabilitate priority rail infrastructure and support the railway restructuring reform process that will be achieved through: … (a) acquisition of new locomotives to offer a higher level of service quality, safety and energy efficiency benefits;",
+   "nota": "Fișa BERD «Moldovan Railways Restructuring Project» (PSD 44085): împrumut suveran de 76,5 mil. EUR pentru Calea Ferată din Moldova, din care 52,5 mil. EUR semnați la 14 noiembrie 2014 (după fișă); fișa indică starea «Cancelled». Rândurile de grant poartă aceeași denumire în registru."
+  },
+  {
+   "acte": [
+    "DPRM1979/2016",
+    "LP17/2016",
+    "HG115/2016"
+   ],
+   "obiective": {
+    "ro": "Modernizarea materialului rulant al CFM (locomotive noi, cu servicii de calitate, siguranță și eficiență energetică mai bune), reabilitarea infrastructurii feroviare prioritare și sprijinirea procesului de reformă a restructurării căilor ferate.",
+    "en": "To upgrade CFM's rolling stock (new locomotives offering higher service quality, safety and energy efficiency), rehabilitate priority rail infrastructure and support the railway restructuring reform process."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/44085.html",
+   "citat": "The objectives of the proposed Project are to upgrade CFM's rolling stock, rehabilitate priority rail infrastructure and support the railway restructuring reform process that will be achieved through: … (a) acquisition of new locomotives to offer a higher level of service quality, safety and energy efficiency benefits;",
+   "nota": "Fișa BERD «Moldovan Railways Restructuring Project» (PSD 44085): împrumut suveran de 76,5 mil. EUR pentru Calea Ferată din Moldova, din care 52,5 mil. EUR semnați la 14 noiembrie 2014 (după fișă); fișa indică starea «Cancelled». Rândurile de grant poartă aceeași denumire în registru."
+  },
+  {
+   "acte": [
+    "HG384/2026"
+   ],
+   "obiective": {
+    "ro": "Restabilirea serviciilor de irigare fiabile și extinderea accesului la irigare în sistemele centralizate de irigare reabilitate; îmbunătățirea eficienței apei și a energiei, reducerea pierderilor de apă și creșterea rezilienței agriculturii la secetă și la variabilitatea climatică.",
+    "en": "To restore reliable irrigation services and expand access to irrigation within the rehabilitated centralised irrigation systems; improve water and energy efficiency, reduce water losses and strengthen the resilience of Moldova's agricultural sector to drought and increasing climate variability."
+   },
+   "sursa": "https://www.ebrd.com/home/work-with-us/projects/psd/55907.html",
+   "citat": "The Project aims to restore reliable irrigation services and expand access to irrigation within the rehabilitated CISs. It is expected to improve water and energy efficiency, reduce water losses and strengthen the resilience of Moldova's agricultural sector to drought and increasing climate variability.",
+   "nota": "Fișa BERD «Moldova Sustainable Water Supply Project» (PSD 55907): împrumut suveran de 102,9 mil. EUR pentru reabilitarea și modernizarea sistemelor centralizate de irigare prioritare."
+  },
+  {
+   "acte": [
+    "DP1272/2023",
+    "LP424/2023",
+    "HG929/2023"
+   ],
+   "obiective": {
+    "ro": "Asigurarea unei furnizări neîntrerupte de gaze în Moldova și protejarea nevoilor de bază și a mijloacelor de trai ale locuitorilor, prin achiziția de gaze (inclusiv rezerve strategice) pe hub-urile din UE de către întreprinderea de stat Energocom.",
+    "en": "To ensure uninterrupted gas supply in Moldova and safeguard the basic needs and economic livelihoods of inhabitants, through the purchase of gas (including strategic reserves) on EU hubs by the state-owned trader Energocom."
+   },
+   "sursa": "https://www.ebrd.com/home/news-and-events/news/2023/ebrd-and-norway-provide-a-further-199-million-financing-package-for-moldova-gas-purchases.html",
+   "citat": "is extending its finance for Moldova to acquire strategic gas reserves with a new €199 million package … for on-lending to the state-owned energy trader JSC Energocom to procure gas on European Union hubs. The aim is to ensure uninterrupted gas supply in Moldova and safeguard the basic needs and economic livelihoods of inhabitants.",
+   "nota": "Comunicatul BERD din 17 octombrie 2023 despre extinderea finanțării pentru Moldova (pachet de 199 mil. EUR: împrumut de 165 mil. EUR și grant de 34 mil. EUR din partea Norvegiei, pentru Energocom). Grantul din registru (34 mil. EUR, semnat la 13.10.2023) corespunde celui din comunicat; împrumutul de 465 mil. EUR se leagă de proiect doar prin denumirea identică. Fișa BERD a proiectului («RLF - Moldova Gas Security Supply», PSD 53417) nu s-a putut citi."
+  },
+  {
+   "acte": [
+    "DP143/2025",
+    "LP68/2025",
+    "HG157/2025"
+   ],
+   "obiective": {
+    "ro": "Asigurarea unei furnizări neîntrerupte de gaze în Moldova și protejarea nevoilor de bază și a mijloacelor de trai ale locuitorilor, prin achiziția de gaze (inclusiv rezerve strategice) pe hub-urile din UE de către întreprinderea de stat Energocom.",
+    "en": "To ensure uninterrupted gas supply in Moldova and safeguard the basic needs and economic livelihoods of inhabitants, through the purchase of gas (including strategic reserves) on EU hubs by the state-owned trader Energocom."
+   },
+   "sursa": "https://www.ebrd.com/home/news-and-events/news/2023/ebrd-and-norway-provide-a-further-199-million-financing-package-for-moldova-gas-purchases.html",
+   "citat": "is extending its finance for Moldova to acquire strategic gas reserves with a new €199 million package … for on-lending to the state-owned energy trader JSC Energocom to procure gas on European Union hubs. The aim is to ensure uninterrupted gas supply in Moldova and safeguard the basic needs and economic livelihoods of inhabitants.",
+   "nota": "Comunicatul BERD din 17 octombrie 2023 despre extinderea finanțării pentru Moldova (pachet de 199 mil. EUR: împrumut de 165 mil. EUR și grant de 34 mil. EUR din partea Norvegiei, pentru Energocom). Grantul din registru (34 mil. EUR, semnat la 13.10.2023) corespunde celui din comunicat; împrumutul de 465 mil. EUR se leagă de proiect doar prin denumirea identică. Fișa BERD a proiectului («RLF - Moldova Gas Security Supply», PSD 53417) nu s-a putut citi."
+  },
+  {
+   "acte": [
+    "DP403/2022",
+    "LP68/2022",
+    "HG146/2022"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea eficienței energetice și reducerea consumului de energie al clădirilor publice din Moldova, inclusiv spitale, școli și grădinițe, prin renovări eficiente energetic.",
+    "en": "To improve energy efficiency and reduce the energy consumption of public buildings in Moldova, including hospitals, schools and kindergartens, through energy-efficient renovations."
+   },
+   "sursa": "https://www.ebrd.com/home/news-and-events/news/2021/ebrd-eib-and-eu-invest-75-million-for-a-more-energy-efficient-moldova.html",
+   "citat": "will jointly provide €75 million to improve energy efficiency and reduce the energy consumption of public buildings in Moldova. … EBRD, EIB and EU to finance energy efficiency renovations in public buildings in Moldova, including hospitals, schools and kindergartens",
+   "nota": "Comunicatul BERD din 16 decembrie 2021: BERD și BEI împrumută câte 30 mil. EUR, iar UE completează cu granturi de 15,2 mil. EUR. Rândul se leagă de comunicat prin suma împrumutului (30 mil. EUR) și anul semnării."
+  },
+  {
+   "acte": [
+    "DP763/2026",
+    "LP188/2026",
+    "HG374/2026"
+   ],
+   "obiective": {
+    "ro": "Creșterea potențialului logistic și de tranzit al Moldovei și a eficienței operaționale prin infrastructură regională îmbunătățită: reabilitarea a două sectoare importante de cale ferată.",
+    "en": "To increase Moldova's logistics and transit potential and bring operational efficiency from improved regional infrastructure, by rehabilitating two key sections of railway lines."
+   },
+   "sursa": "https://www.ebrd.com/news/2023/ebrd-lends-23-million-to-moldovan-railways.html",
+   "citat": "is lending €23 million to Moldovan Railways to support the rehabilitation of two key sections of railway lines … The project aims to increase Moldova's logistics and transit potential and bring operational efficiency from improved regional infrastructure",
+   "nota": "Comunicat BERD din 2023: împrumut de 23 mil. EUR pentru Calea Ferată din Moldova și grant UE, într-un proiect de 71 mil. EUR («RLF - Moldovan Railways Crisis Response»). Suma rândului de împrumut din registru (41,2 mil. EUR) diferă de cifra din comunicat: de verificat."
+  },
+  {
+   "acte": [
+    "DP1243/2023",
+    "LP385/2023",
+    "HG928/2023"
+   ],
+   "obiective": {
+    "ro": "Creșterea potențialului logistic și de tranzit al Moldovei și a eficienței operaționale prin infrastructură regională îmbunătățită: reabilitarea a două sectoare importante de cale ferată.",
+    "en": "To increase Moldova's logistics and transit potential and bring operational efficiency from improved regional infrastructure, by rehabilitating two key sections of railway lines."
+   },
+   "sursa": "https://www.ebrd.com/news/2023/ebrd-lends-23-million-to-moldovan-railways.html",
+   "citat": "is lending €23 million to Moldovan Railways to support the rehabilitation of two key sections of railway lines … The project aims to increase Moldova's logistics and transit potential and bring operational efficiency from improved regional infrastructure",
+   "nota": "Comunicat BERD din 2023: împrumut de 23 mil. EUR pentru Calea Ferată din Moldova și grant UE, într-un proiect de 71 mil. EUR («RLF - Moldovan Railways Crisis Response»). Suma rândului de împrumut din registru (41,2 mil. EUR) diferă de cifra din comunicat: de verificat."
+  },
+  {
+   "acte": [
+    "HG723/2020",
+    "DPRM745/2013",
+    "LP190/2013"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea și modernizarea unor sectoare-cheie de drumuri naționale, în principal pe coridoarele transeuropene extinse care traversează țara.",
+    "en": "Rehabilitation and upgrading of key national roads sections, mainly on extended trans-European corridors crossing the country."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20110650",
+   "citat": "Rehabilitation and upgrading of key national roads sections, mainly on extended trans-European corridors crossing the country.",
+   "nota": "Fișa BEI «Moldova Roads III» (20110650): două semnături, 25.06.2013 (150 mil. EUR) și 15.12.2022 (100 mil. EUR), corespunzătoare celor două rânduri; promotor: Administrația de Stat a Drumurilor."
+  },
+  {
+   "acte": [
+    "DP315/2025",
+    "LP212/2025",
+    "HG431/2025"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea și modernizarea unor sectoare-cheie de drumuri naționale, în principal pe coridoarele transeuropene extinse care traversează țara.",
+    "en": "Rehabilitation and upgrading of key national roads sections, mainly on extended trans-European corridors crossing the country."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20110650",
+   "citat": "Rehabilitation and upgrading of key national roads sections, mainly on extended trans-European corridors crossing the country.",
+   "nota": "Fișa BEI «Moldova Roads III» (20110650): două semnături, 25.06.2013 (150 mil. EUR) și 15.12.2022 (100 mil. EUR), corespunzătoare celor două rânduri; promotor: Administrația de Stat a Drumurilor."
+  },
+  {
+   "acte": [
+    "DP562/2022",
+    "LP205/2022",
+    "HG477/2022"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea și modernizarea sectoarelor prioritare de drumuri din rețeaua transeuropeană de transport (TEN-T) și implementarea unor măsuri de siguranță rutieră pe segmente selectate.",
+    "en": "Rehabilitation and upgrade of priority Trans-European Transport Network (TEN-T) road sections and implementation of road safety measures on selected road segments."
+   },
+   "sursa": "https://eib.org/en/projects/pipelines/all/20200537",
+   "citat": "Rehabilitation and upgrade of priority Trans-European Transport Network (TEN-T) road sections and implementation of road safety measures on selected road segments.",
+   "nota": "Fișa BEI «Moldova Roads IV» (20200537): împrumut de 150 mil. EUR semnat la 31.03.2022, cost total estimat 300 mil. EUR; promotor: Administrația de Stat a Drumurilor."
+  },
+  {
+   "acte": [
+    "DP307/2025",
+    "LP219/2025",
+    "HG429/2025"
+   ],
+   "obiective": {
+    "ro": "Construcția și echiparea a două noi spitale regionale în Republica Moldova (Bălți, în nord, și Cahul, în sud), pentru descentralizarea serviciilor medicale terțiare și îmbunătățirea accesibilității lor în nordul și sudul țării, ameliorând astfel furnizarea generală a serviciilor de sănătate.",
+    "en": "The construction and equipping of two new regional hospitals in Moldova (Balti in the north and Cahul in the south), to decentralise tertiary healthcare services and improve their accessibility in northern and southern Moldova, thereby enhancing the overall provision of healthcare in the country."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20160888",
+   "citat": "The project will finance the construction and equipping of two new regional hospitals in the Republic of Moldova … The aim is to decentralise tertiary healthcare services and improve their accessibility in both the northern and southern Moldova, thereby enhancing the overall provision of healthcare in the country.",
+   "nota": "Fișa BEI «Moldova Regional Hospitals» (20160888): împrumut de 101 mil. EUR semnat la 08.07.2025, cost total estimat 209 mil. EUR; promotor: Ministerul Sănătății."
+  },
+  {
+   "acte": [
+    "DP1712/2024",
+    "LP299/2024",
+    "HG785/2024"
+   ],
+   "obiective": {
+    "ro": "Modernizarea sectorului forestier din Moldova în perioada 2024–2028: guvernanță și cadru de reglementare îmbunătățite, capacități instituționale, infrastructură și echipamente consolidate, producerea de material forestier de reproducere și restaurarea și reabilitarea a circa 63.000 ha de terenuri și păduri degradate.",
+    "en": "To support the modernisation of the forestry sector in Moldova during 2024-2028: better forest governance and regulatory framework, stronger institutional capacities, infrastructure and equipment, reinforced production of forest reproductive material, and restoration and rehabilitation of about 63,000 ha of degraded lands and forests."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20230445",
+   "citat": "The operation will support the modernisation of the forestry sector in Moldova during 2024-2028 through investments aiming to enhance forest governance and regulatory framework as well as strengthen the institutional capacities, infrastructure and equipment base. … The programme will also reinforce the production capacity of forest reproductive material and focus on the restoration and rehabilitation of about 63,000 ha degraded lands and forests.",
+   "nota": "Fișa BEI «Moldova Forest Development Programme» (20230445): împrumut de 200 mil. EUR semnat la 17.09.2024, cost total estimat 435 mil. EUR; promotor: Oficiul Național de Implementare a Proiectelor în Domeniul Mediului."
+  },
+  {
+   "acte": [
+    "DP700/2026",
+    "LP143/2026",
+    "HG353/2026"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea și modernizarea a 36 de instituții de învățământ din Moldova (20 finanțate de BEI), cu îmbunătățiri ale clădirilor, ale eficienței energetice, ale siguranței și accesibilității, pentru condiții mai bune de învățare și de muncă și un consum mai mic de energie.",
+    "en": "Rehabilitation and modernisation of 36 educational institutions across Moldova (20 financed by the EIB), improving learning conditions for students and working environments for teachers and significantly enhancing energy efficiency."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20250210",
+   "citat": "The project focuses on rehabilitation and modernisation of 36 educational institutions across the Republic of Moldova, of which 20 to be financed by the EIB. … The project aims to improve learning conditions for students and working environments for teachers, while significantly enhancing energy efficiency through the installation of energy efficient equipment and improved building insulation.",
+   "nota": "Fișa BEI «Moldova Schools Rehabilitation and Modernization» (20250210): împrumut de 40 mil. EUR semnat la 17.06.2026, cost total estimat 83 mil. EUR."
+  },
+  {
+   "acte": [
+    "DP1377/2024",
+    "LP54/2024",
+    "HG143/2024"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea unor elemente ale infrastructurii feroviare existente pe coridorul Vălcineț–Bălți–Ungheni–Chișinău–Căinari (în special înlocuirea căii pe traseul existent), pentru a îmbunătăți legătura dintre frontiera de nord a Moldovei și linia Bender / Basarabeasca / Etulia / Giurgiulești.",
+    "en": "To rehabilitate selected elements of the existing railway infrastructure in the corridor Valcinet - Balti - Ungheni - Chisinau - Cainari (in particular track renewal on the existing alignment), improving the connection from the northern border of Moldova to the line Bender / Basarabeasca / Etulia / Giurgiulesti."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20220846",
+   "citat": "The project will finance the rehabilitation of selected elements of the existing railway infrastructure in the corridor Valcinet - Balti - Ungheni - Chisinau - Cainari, in particular it concerns the track renewal on the existing alignment. … The aim of this project is to improve the connection from the northern border of Moldova to the line Bender / Basarabeasca / Etulia / Giurgiulesti, in combination with another ongoing rehabilitation project.",
+   "nota": "Fișa BEI «Moldova Solidarity Lanes» (20220846): împrumut de 41,205 mil. EUR semnat la 15.12.2023 (rândul «EFSD + Fereastra dedicată investiției 1») și grant de investiții de 12 mil. EUR din Platforma de Investiții pentru Vecinătate, semnat la 17.09.2024; promotor: Calea Ferată din Moldova."
+  },
+  {
+   "acte": [
+    "DP1707/2024",
+    "LP295/2024",
+    "HG629/2024"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea unor elemente ale infrastructurii feroviare existente pe coridorul Vălcineț–Bălți–Ungheni–Chișinău–Căinari (în special înlocuirea căii pe traseul existent), pentru a îmbunătăți legătura dintre frontiera de nord a Moldovei și linia Bender / Basarabeasca / Etulia / Giurgiulești.",
+    "en": "To rehabilitate selected elements of the existing railway infrastructure in the corridor Valcinet - Balti - Ungheni - Chisinau - Cainari (in particular track renewal on the existing alignment), improving the connection from the northern border of Moldova to the line Bender / Basarabeasca / Etulia / Giurgiulesti."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20220846",
+   "citat": "The project will finance the rehabilitation of selected elements of the existing railway infrastructure in the corridor Valcinet - Balti - Ungheni - Chisinau - Cainari, in particular it concerns the track renewal on the existing alignment. … The aim of this project is to improve the connection from the northern border of Moldova to the line Bender / Basarabeasca / Etulia / Giurgiulesti, in combination with another ongoing rehabilitation project.",
+   "nota": "Fișa BEI «Moldova Solidarity Lanes» (20220846): împrumut de 41,205 mil. EUR semnat la 15.12.2023 (rândul «EFSD + Fereastra dedicată investiției 1») și grant de investiții de 12 mil. EUR din Platforma de Investiții pentru Vecinătate, semnat la 17.09.2024; promotor: Calea Ferată din Moldova."
+  },
+  {
+   "acte": [
+    "HG278/2025",
+    "DP1039/2023",
+    "LP205/2023"
+   ],
+   "obiective": {
+    "ro": "Implementarea proiectelor din sectorul deșeurilor solide în toată Moldova, în sprijinul Strategiei de gestionare a deșeurilor 2013–2027: dezvoltarea infrastructurii de mediu pentru deșeurile solide și reducerea impactului negativ asupra mediului și sănătății publice al sistemelor și instalațiilor actuale necorespunzătoare.",
+    "en": "Implementation of solid waste sector projects throughout Moldova, supporting the Waste Management Strategy 2013-2027: development of environmental infrastructure in solid waste management and reduction of adverse impacts on the environment and public health from current sub-standard systems and facilities."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20140483",
+   "citat": "The project concerns the implementation of solid waste sector projects throughout Moldova, supporting the Waste Management Strategy of the Republic of Moldova 2013-2027. … The project will contribute to the development of environmental infrastructure in the sector of solid waste management and will aim to reduce adverse impacts on the environment and public health from current sub-standard systems and facilities",
+   "nota": "Fișa BEI «Moldova Solid Waste Framework Loan» (20140483): împrumut-cadru de 25 mil. EUR semnat la 18.10.2019."
+  },
+  {
+   "acte": [
+    "DPRM1689/2015",
+    "LP129/2015",
+    "HG298/2015"
+   ],
+   "obiective": {
+    "ro": "Crearea unui sistem regional integrat de alimentare cu apă în nordul Moldovei, prin asocierea furnizorilor de servicii de apă din șapte raioane (Soroca, Bălți, Florești, Drochia, Rîșcani, Sîngerei și Telenești), printr-un program prioritar de investiții pentru reabilitarea sistemelor de alimentare cu apă și modernizarea tratării apei.",
+    "en": "To create a regional integrated water supply system in Northern Moldova by associating the water service providers in seven districts (Soroca, Balti, Floresti, Drochia, Riscani, Singerei and Telenesti), through a priority investment programme to rehabilitate water supply systems and modernise water treatment."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20130469",
+   "citat": "The project will support a priority investment programme to rehabilitate the water supply systems and to modernize the water treatment in the Northern Region of Moldova. … The aim of the project is to create a regional integrated water supply system in Northern Moldova by associating the water service providers in seven districts of the region (Soroca, Balti, Floresti, Drochia, Riscani, Singerei and Telenesti).",
+   "nota": "Fișa BEI «North Moldova Water» (20130469): împrumut de 10 mil. EUR semnat la 31.07.2014, cost total estimat 30 mil. EUR; promotor: Guvernul Republicii Moldova, prin Ministerul Mediului. Rândurile BERD (împrumutul din 2014 și grantul «Apă Nord Moldova») se leagă de proiect prin denumire (Proiectul de alimentare cu apă în regiunea de dezvoltare Nord) și sumă."
+  },
+  {
+   "acte": [
+    "DPRM1688/2015",
+    "LP128/2015",
+    "HG297/2015"
+   ],
+   "obiective": {
+    "ro": "Crearea unui sistem regional integrat de alimentare cu apă în nordul Moldovei, prin asocierea furnizorilor de servicii de apă din șapte raioane (Soroca, Bălți, Florești, Drochia, Rîșcani, Sîngerei și Telenești), printr-un program prioritar de investiții pentru reabilitarea sistemelor de alimentare cu apă și modernizarea tratării apei.",
+    "en": "To create a regional integrated water supply system in Northern Moldova by associating the water service providers in seven districts (Soroca, Balti, Floresti, Drochia, Riscani, Singerei and Telenesti), through a priority investment programme to rehabilitate water supply systems and modernise water treatment."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20130469",
+   "citat": "The project will support a priority investment programme to rehabilitate the water supply systems and to modernize the water treatment in the Northern Region of Moldova. … The aim of the project is to create a regional integrated water supply system in Northern Moldova by associating the water service providers in seven districts of the region (Soroca, Balti, Floresti, Drochia, Riscani, Singerei and Telenesti).",
+   "nota": "Fișa BEI «North Moldova Water» (20130469): împrumut de 10 mil. EUR semnat la 31.07.2014, cost total estimat 30 mil. EUR; promotor: Guvernul Republicii Moldova, prin Ministerul Mediului. Rândurile BERD (împrumutul din 2014 și grantul «Apă Nord Moldova») se leagă de proiect prin denumire (Proiectul de alimentare cu apă în regiunea de dezvoltare Nord) și sumă."
+  },
+  {
+   "acte": [
+    "DP25/2017",
+    "LP299/2016",
+    "HG1244/2016"
+   ],
+   "obiective": {
+    "ro": "Crearea unui sistem regional integrat de alimentare cu apă în nordul Moldovei, prin asocierea furnizorilor de servicii de apă din șapte raioane (Soroca, Bălți, Florești, Drochia, Rîșcani, Sîngerei și Telenești), printr-un program prioritar de investiții pentru reabilitarea sistemelor de alimentare cu apă și modernizarea tratării apei.",
+    "en": "To create a regional integrated water supply system in Northern Moldova by associating the water service providers in seven districts (Soroca, Balti, Floresti, Drochia, Riscani, Singerei and Telenesti), through a priority investment programme to rehabilitate water supply systems and modernise water treatment."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20130469",
+   "citat": "The project will support a priority investment programme to rehabilitate the water supply systems and to modernize the water treatment in the Northern Region of Moldova. … The aim of the project is to create a regional integrated water supply system in Northern Moldova by associating the water service providers in seven districts of the region (Soroca, Balti, Floresti, Drochia, Riscani, Singerei and Telenesti).",
+   "nota": "Fișa BEI «North Moldova Water» (20130469): împrumut de 10 mil. EUR semnat la 31.07.2014, cost total estimat 30 mil. EUR; promotor: Guvernul Republicii Moldova, prin Ministerul Mediului. Rândurile BERD (împrumutul din 2014 și grantul «Apă Nord Moldova») se leagă de proiect prin denumire (Proiectul de alimentare cu apă în regiunea de dezvoltare Nord) și sumă."
+  },
+  {
+   "acte": [
+    "DP328/2022",
+    "LP10/2022",
+    "HG450/2021"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea și modernizarea rețelei feroviare și a materialului rulant al Moldovei, printr-un cadru cu două componente: achiziția a 11 locomotive diesel de linie, pentru transport de marfă și de călători, cu echipamentele de întreținere aferente, și reabilitarea unor sectoare selectate ale infrastructurii feroviare.",
+    "en": "To improve and modernise both Moldova's railway network and rolling stock, through a framework with two components: the acquisition of 11 mainline diesel locomotives for freight and passenger services with the associated maintenance equipment, and the rehabilitation of selected sections of the railway infrastructure."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20130274",
+   "citat": "The purpose of the project is to improve and modernise both Moldova's railway network and rolling stock. … It consists of a framework with two components: (i) the acquisition of 11 mainline diesel locomotives suitable for both freight and passenger services and the associated maintenance equipment and (ii) the rehabilitation of selected sections of the railway infrastructure.",
+   "nota": "Fișa BEI «Moldova Rail Infrastructure and Rolling Stock FL» (20130274): împrumut-cadru semnat la 26.09.2016 (50 mil. EUR, rândul din registru) și la 17.12.2021 (24 mil. EUR); promotor: Calea Ferată din Moldova."
+  },
+  {
+   "acte": [
+    "DPRM1350/2007",
+    "LP217/2007",
+    "HG1030/2007"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea unor sectoare-cheie ale rețelei de drumuri magistrale ale Moldovei de-a lungul axelor principale nord–sud și est–vest, inclusiv legături de mare interes pentru UE; proiectul, în două faze, urmează să fie cofinanțat de BEI, BERD și Grupul Băncii Mondiale și ar trebui să asigure un acces mai bun la piețele UE și să atragă investiții străine directe.",
+    "en": "Rehabilitation of key sections of Moldova's road trunk network along the main North-South and East-West axes, including links of high EU interest; a two-phase project expected to be co-financed by the EIB, the EBRD and the World Bank Group, helping secure better access to EU markets and encourage foreign direct investment."
+   },
+   "sursa": "https://www.eib.org/en/projects/pipelines/all/20060485",
+   "citat": "Rehabilitation of key sections of Moldova's road trunk network along the main North-South and East-West axes, including in particular links of high EU interest. … The Project will comprise two phases and is expected to be co-financed by the EIB, the EBRD and the World Bank Group. … It will help secure better access to EU markets and encourage foreign direct investment inflows into Moldova.",
+   "nota": "Fișa BEI «Moldova European Roads» (20060485): împrumut de 30 mil. EUR semnat la 28.06.2007; promotor: Administrația de Stat a Drumurilor. Rândul BERD (acordul de împrumut din 2007, 30 mil. EUR, aprobat în aceeași zi) se leagă de proiect prin cofinanțarea BERD menționată în fișă, prin denumire, dată și sumă."
+  },
+  {
+   "acte": [
+    "DPRM1349/2007",
+    "LP216/2007",
+    "HG1031/2007"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea unor sectoare-cheie ale rețelei de drumuri magistrale ale Moldovei de-a lungul axelor principale nord–sud și est–vest, inclusiv legături de mare interes pentru UE; proiectul, în două faze, urmează să fie cofinanțat de BEI, BERD și Grupul Băncii Mondiale și ar trebui să asigure un acces mai bun la piețele UE și să atragă investiții străine directe.",
+    "en": "Rehabilitation of key sections of Moldova's road trunk network along the main North-South and East-West axes, including links of high EU interest; a two-phase project expected to be co-financed by the EIB, the EBRD and the World Bank Group, helping secure better access to EU markets and encourage foreign direct investment."
+   },
+   "sursa": "https://www.eib.org/en/projects/pipelines/all/20060485",
+   "citat": "Rehabilitation of key sections of Moldova's road trunk network along the main North-South and East-West axes, including in particular links of high EU interest. … The Project will comprise two phases and is expected to be co-financed by the EIB, the EBRD and the World Bank Group. … It will help secure better access to EU markets and encourage foreign direct investment inflows into Moldova.",
+   "nota": "Fișa BEI «Moldova European Roads» (20060485): împrumut de 30 mil. EUR semnat la 28.06.2007; promotor: Administrația de Stat a Drumurilor. Rândul BERD (acordul de împrumut din 2007, 30 mil. EUR, aprobat în aceeași zi) se leagă de proiect prin cofinanțarea BERD menționată în fișă, prin denumire, dată și sumă."
+  },
+  {
+   "acte": [
+    "HG336/2021",
+    "HG1254/2018",
+    "HG1141/2018"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea fiabilității rețelei de transport al energiei electrice a Moldovei și reducerea pierderilor, prin reabilitarea și modernizarea unei părți a rețelei de înaltă tensiune a Moldelectrica (stații și linii), pentru ca operatorul să respecte mai bine prevederile ENTSO-E.",
+    "en": "To improve the reliability of Moldova's electricity transmission network and reduce its losses through the rehabilitation and modernisation of part of Moldelectrica's high-voltage network (substations and lines), enabling the operator to further comply with ENTSO-E provisions."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20110140",
+   "citat": "The project envisages the rehabilitation and modernisation of a part of the high voltage transmission network of Moldelectrica, the state-owned Moldovan transmission system operator. … The project aims at improving the reliability of Moldova’s electricity transmission network and at reducing its losses.",
+   "nota": "Fișa BEI «Moldelectrica Power Transmission» (20110140): împrumut de 17 mil. EUR semnat la 26.06.2012, cost total estimat 40 mil. EUR."
+  },
+  {
+   "acte": [
+    "HG474/2017",
+    "HG1394/2016"
+   ],
+   "obiective": {
+    "ro": "Construcția unei conducte de gaze naturale de 120 km, de la interconexiunea existentă Moldova–România de la Ungheni până la Chișinău, pentru diversificarea surselor de aprovizionare și îmbunătățirea capacității de integrare a rețelei de gaze a Moldovei cu rețelele românești și europene.",
+    "en": "Construction of a 120 km natural gas pipeline from the existing Moldova-Romania gas interconnection at Ungheni to Chisinau, enabling Moldova to diversify its sources of supply and improve the integration capacity of its gas network with Romanian and European gas networks."
+   },
+   "sursa": "https://www.eib.org/en/projects/pipelines/all/20130294",
+   "citat": "Construction of a natural gas pipeline with a length of 120km … The project will enable the country to diversify its sources of supply. … The project will enable Moldova to improve integration capacity of its gas network with Romanian and European gas networks.",
+   "nota": "Fișa BEI «Ungheni-Chisinau Gas Pipeline» (20130294): împrumut de 41 mil. EUR (3 + 38 mil. EUR) semnat la 19.12.2016, cost total estimat 92 mil. EUR. Rândul BERD are aceeași denumire, aceeași sumă și aceeași dată (19.12.2016)."
+  },
+  {
+   "acte": [
+    "HG473/2017",
+    "DPRM2516/2016",
+    "DPRM2477/2016"
+   ],
+   "obiective": {
+    "ro": "Construcția unei conducte de gaze naturale de 120 km, de la interconexiunea existentă Moldova–România de la Ungheni până la Chișinău, pentru diversificarea surselor de aprovizionare și îmbunătățirea capacității de integrare a rețelei de gaze a Moldovei cu rețelele românești și europene.",
+    "en": "Construction of a 120 km natural gas pipeline from the existing Moldova-Romania gas interconnection at Ungheni to Chisinau, enabling Moldova to diversify its sources of supply and improve the integration capacity of its gas network with Romanian and European gas networks."
+   },
+   "sursa": "https://www.eib.org/en/projects/pipelines/all/20130294",
+   "citat": "Construction of a natural gas pipeline with a length of 120km … The project will enable the country to diversify its sources of supply. … The project will enable Moldova to improve integration capacity of its gas network with Romanian and European gas networks.",
+   "nota": "Fișa BEI «Ungheni-Chisinau Gas Pipeline» (20130294): împrumut de 41 mil. EUR (3 + 38 mil. EUR) semnat la 19.12.2016, cost total estimat 92 mil. EUR. Rândul BERD are aceeași denumire, aceeași sumă și aceeași dată (19.12.2016)."
+  },
+  {
+   "acte": [
+    "DP273/2025",
+    "LP166/2025",
+    "HG385/2025"
+   ],
+   "obiective": {
+    "ro": "Construcția interconexiunii electrice Isaccea–Vulcănești–Chișinău între Republica Moldova și România (stație de conversie la Vulcănești, linie de 400 kV Vulcănești–Chișinău și extinderea stațiilor existente), pentru diversificarea aprovizionării, securitatea energetică a țării și conectarea la piața europeană a energiei electrice.",
+    "en": "Construction of the Isaccea – Vulcanesti – Chisinau power interconnection between Moldova and Romania (converter station in Vulcanesti, 400kV line Vulcanesti–Chisinau and extensions of existing substations), contributing to supply diversification, energy security and connection to the European electricity market."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20080194",
+   "citat": "The project consists of the construction of the power interconnection Isaccea – Vulcanesti – Chisinau between the Republic of Moldova and Romania. … The project will contribute to the diversification of supply and the energy security of the country. … The project will also contribute to connecting the country to the European electricity market",
+   "nota": "Fișa BEI «Moldova Romania Electricity Interconnection» (20080194): împrumut de 80 mil. EUR semnat la 20.12.2017, cost total estimat 270 mil. EUR; promotor: Moldelectrica."
+  },
+  {
+   "acte": [
+    "DP316/2025",
+    "LP203/2025",
+    "HG430/2025"
+   ],
+   "obiective": {
+    "ro": "Rezolvarea problemelor de infrastructură moștenite ale rețelei de termoficare din Chișinău: lucrările de reabilitare vor îmbunătăți eficiența și performanța energetică, vor permite reluarea furnizării apei calde menajere în apartamente și vor contribui la decarbonizare.",
+    "en": "To address legacy infrastructure issues of the Chisinau district heating network: the rehabilitation works will improve efficiency and energy performance, allow the reinstatement of domestic hot water supply in apartments and therefore contribute to decarbonisation."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20240698",
+   "citat": "The project intends to address legacy infrastructure issues of the Chisinau district heating network. The rehabilitation works will improve efficiency and energy performance, allow the reinstatement of domestic hot water supply in apartments and therefore contribute to decarbonisation.",
+   "nota": "Fișa BEI «Chisinau District Heating Project» (20240698): împrumut de 143,5 mil. EUR semnat la 03.07.2025, cost total estimat 326 mil. EUR; promotor: Termoelectrica SA."
+  },
+  {
+   "acte": [
+    "DP296/2025",
+    "LP202/2025",
+    "HG433/2025"
+   ],
+   "obiective": {
+    "ro": "Creșterea eficienței energetice a clădirilor publice și rezidențiale din mai multe orașe ale Republicii Moldova, printr-un împrumut-cadru (o parte din alocări, renovarea a 139 de clădiri publice, este deja identificată), cu un impact semnificativ asupra reducerii emisiilor de CO2 și, prin aceasta, asupra atenuării schimbărilor climatice.",
+    "en": "To increase the energy efficiency of public and residential buildings in various cities of Moldova through a framework loan (part of the allocations, the refurbishment of 139 public buildings, is already identified), with a significant impact on CO2 emission reduction and thus on climate change mitigation."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20170017",
+   "citat": "The operation is a framework loan (FL) in support of sustainable energy efficiency improvements targeting public and residential buildings in various cities in the Republic of Moldova. … refurbishment of 139 public buildings … The main objective of this operation is to increase the energy efficiency of public and residential buildings, which has a significant impact on CO2 emission reduction and thus contributes to climate change mitigation.",
+   "nota": "Fișa BEI «Moldova Energy Efficiency» (20170017): împrumut de 30 mil. EUR semnat la 10.12.2021 și granturi de investiții din Platforma de Investiții pentru Vecinătate (12,4 mil. EUR semnat la 16.09.2022 și 10 mil. EUR la 12.06.2026); promotor: Agenția pentru Eficiență Energetică. Rândul de asistență tehnică («Eficiența Energetică în Republica Moldova», 15 mil. EUR) se leagă de proiect prin denumirea identică."
+  },
+  {
+   "acte": [
+    "OME49/2026",
+    "HG270/2026",
+    "DP314/2025"
+   ],
+   "obiective": {
+    "ro": "Creșterea eficienței energetice a clădirilor publice și rezidențiale din mai multe orașe ale Republicii Moldova, printr-un împrumut-cadru (o parte din alocări, renovarea a 139 de clădiri publice, este deja identificată), cu un impact semnificativ asupra reducerii emisiilor de CO2 și, prin aceasta, asupra atenuării schimbărilor climatice.",
+    "en": "To increase the energy efficiency of public and residential buildings in various cities of Moldova through a framework loan (part of the allocations, the refurbishment of 139 public buildings, is already identified), with a significant impact on CO2 emission reduction and thus on climate change mitigation."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20170017",
+   "citat": "The operation is a framework loan (FL) in support of sustainable energy efficiency improvements targeting public and residential buildings in various cities in the Republic of Moldova. … refurbishment of 139 public buildings … The main objective of this operation is to increase the energy efficiency of public and residential buildings, which has a significant impact on CO2 emission reduction and thus contributes to climate change mitigation.",
+   "nota": "Fișa BEI «Moldova Energy Efficiency» (20170017): împrumut de 30 mil. EUR semnat la 10.12.2021 și granturi de investiții din Platforma de Investiții pentru Vecinătate (12,4 mil. EUR semnat la 16.09.2022 și 10 mil. EUR la 12.06.2026); promotor: Agenția pentru Eficiență Energetică. Rândul de asistență tehnică («Eficiența Energetică în Republica Moldova», 15 mil. EUR) se leagă de proiect prin denumirea identică."
+  },
+  {
+   "acte": [
+    "HG373/2021"
+   ],
+   "obiective": {
+    "ro": "Creșterea eficienței energetice a clădirilor publice și rezidențiale din mai multe orașe ale Republicii Moldova, printr-un împrumut-cadru (o parte din alocări, renovarea a 139 de clădiri publice, este deja identificată), cu un impact semnificativ asupra reducerii emisiilor de CO2 și, prin aceasta, asupra atenuării schimbărilor climatice.",
+    "en": "To increase the energy efficiency of public and residential buildings in various cities of Moldova through a framework loan (part of the allocations, the refurbishment of 139 public buildings, is already identified), with a significant impact on CO2 emission reduction and thus on climate change mitigation."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20170017",
+   "citat": "The operation is a framework loan (FL) in support of sustainable energy efficiency improvements targeting public and residential buildings in various cities in the Republic of Moldova. … refurbishment of 139 public buildings … The main objective of this operation is to increase the energy efficiency of public and residential buildings, which has a significant impact on CO2 emission reduction and thus contributes to climate change mitigation.",
+   "nota": "Fișa BEI «Moldova Energy Efficiency» (20170017): împrumut de 30 mil. EUR semnat la 10.12.2021 și granturi de investiții din Platforma de Investiții pentru Vecinătate (12,4 mil. EUR semnat la 16.09.2022 și 10 mil. EUR la 12.06.2026); promotor: Agenția pentru Eficiență Energetică. Rândul de asistență tehnică («Eficiența Energetică în Republica Moldova», 15 mil. EUR) se leagă de proiect prin denumirea identică."
+  },
+  {
+   "acte": [
+    "DP36/2011",
+    "LP13/2011",
+    "HG880/2010"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea și extinderea sistemelor de alimentare cu apă și canalizare din mai multe orașe mici din Republica Moldova, pentru respectarea standardelor de calitate a apei și de servicii stabilite de directivele UE, îmbunătățirea mediului și reducerea riscurilor pentru sănătatea publică prin alimentarea adecvată cu apă potabilă și colectarea, tratarea și evacuarea apelor uzate.",
+    "en": "Rehabilitation and extension of water supply and sanitation systems in a number of smaller towns, to comply with the water quality and service standards set by EU directives, improve the environment and reduce public health risks through adequate drinking water supply and wastewater collection, treatment and disposal."
+   },
+   "sursa": "https://www.eib.org/en/projects/all/20080144",
+   "citat": "The project concerns the rehabilitation and extension of water supply and sanitation systems in a number of smaller towns in the Republic of Moldova. … The main objective of the project is compliance with the water quality and service standards as set by the EU directives and partially transposed into national law, in order to improve the quality of the environment and reduce public health risks via the adequate supply of drinking water and collection, treatment and disposal of wastewater.",
+   "nota": "Fișa BEI «Moldova Water Sector Project» (20080144): împrumut de 10 mil. EUR semnat la 16.09.2010, cost total estimat 32 mil. EUR; promotor: Ministerul Mediului."
+  },
+  {
+   "acte": [
+    "DP459/2010",
+    "LP203/2010",
+    "HG585/2010"
+   ],
+   "obiective": {
+    "ro": "Reabilitarea și extinderea sistemelor de alimentare cu apă și canalizare în șase orașe și în satele învecinate (Ceadîr-Lunga, Florești, Hîncești, Leova, Orhei și Soroca; 200 000 de locuitori), pentru a spori accesul populației la apă potabilă și a reduce poluarea apelor subterane și de suprafață locale.",
+    "en": "Rehabilitation and extension of water supply and sanitation systems in six towns and neighbouring villages (Ceadir-Lunga, Floresti, Hincesti, Leova, Orhei and Soroca; total population of 200 000), to increase the population's access to drinking water and reduce the pollution of local ground and surface waters."
+   },
+   "sursa": "https://www.eib.org/en/press/all/2010-143-eib-supports-water-projects-in-moldova",
+   "citat": "The project concerns the rehabilitation and extension of water supply and sanitation systems in six towns and neighbouring villages with a total population of 200 000: Ceadir-Lunga, Floresti, Hincesti, Leova, Orhei and Soroca. … The project will increase the population’s access to drinking water, and will contribute towards reducing the pollution of local ground and surface waters. … The project is being co-financed by the European Bank for Reconstruction and Development (EBRD) as well as the EU Commission through its Neighbourhood Investment Facility (NIF).",
+   "nota": "Comunicatul BEI din 16 septembrie 2010 despre programul din sectorul apei (împrumut BEI de 10 mil. EUR, rândul hg880/2010 la BEI); potrivit comunicatului, programul e cofinanțat de BERD. Rândul BERD (Programul de dezvoltare a serviciilor de aprovizionare cu apă potabilă) se leagă de program prin cofinanțarea BERD menționată, anul și suma."
+  },
+  {
+   "acte": [
+    "DP1419/2019",
+    "LP176/2019",
+    "HG591/2019"
+   ],
+   "obiective": {
+    "ro": "Modernizarea sectorului energetic al Moldovei prin modernizarea rețelei de transport al energiei electrice a Moldelectrica: proiectarea și reabilitarea unor stații, transformatoare și linii de transport, pentru ca operatorul să-și îmbunătățească eficiența și fiabilitatea rețelei.",
+    "en": "To support the modernisation of Moldova's power sector by upgrading Moldelectrica's transmission network: design and rehabilitation of a number of substations, transformers and transmission lines, enabling Moldelectrica to improve the efficiency and reliability of its transmission network."
+   },
+   "sursa": "https://www.ebrd.com/news/2012/modernisation-of-moldovas-energy-infrastructure.html",
+   "citat": "The EBRD is supporting the modernisation of Moldova’s power sector with a US$ 20 million sovereign loan to benefit Moldelectrica, state-owned energy transmission company, to finance the upgrade of the country’s transmission network. … The EBRD loan will be used to part-finance the design and rehabilitation of a number of substations, transformers and transmission lines, which will enable Moldelectrica to improve the efficiency and reliability of its transmission network.",
+   "nota": "Comunicat BERD din 2012 (data nu apare în pagină): împrumut suveran de 20 mil. USD pentru Moldelectrica, cofinanțat de BEI (rândul hg480/2012 la BEI)."
+  },
+  {
+   "acte": [
+    "DP1185/2023",
+    "LP328/2023",
+    "HG830/2023"
+   ],
+   "obiective": {
+    "ro": "Finanțarea parțială a construcției și echipării unui spital de îngrijiri terțiare pentru regiunea de nord a Moldovei (centru de îngrijiri ambulatorii, centru oncologic, săli de operație și secții de internare; 340 de paturi de internare și 78 de paturi de zi), pentru servicii medicale terțiare publice mai bune și mai accesibile și condiții de muncă, studiu și cercetare mai bune pentru personalul spitalului și studenții la medicină.",
+    "en": "To partially finance the construction and equipment of a tertiary care hospital for the North Region of Moldova (ambulatory care centre, cancer centre, operating theatres and inpatient wards; 340 inpatient beds and 78 day-beds), providing better and more accessible public tertiary healthcare and improved work, study and research conditions for hospital staff and medical students."
+   },
+   "sursa": "https://coebank.org/en/project-financing/projects-approved-administrative-council/balti-regional-hospital/",
+   "citat": "The aim of the Project loan is to partially finance eligible investments for the construction and equipment of a tertiary care hospital for the North Region of Moldova with, amongst other elements, an ambulatory care centre, cancer centre, operating theatres and inpatient wards, with a capacity of 340 inpatient beds and 78 day-beds, providing better and more accessible public tertiary healthcare to the population and offering improved work, study and research conditions for hospital staff and medical students.",
+   "nota": "Fișa CEB «Balti Regional Hospital» (împrumut de 86 mil. EUR, aprobat la 27.01.2023). Rândul de grant (hg107/2025, 3 mil. EUR) poartă aceeași denumire; BEI finanțează în paralel spitalele regionale Bălți și Cahul (fișa BEI «Moldova Regional Hospitals»)."
+  },
+  {
+   "acte": [
+    "OMS492/2025",
+    "HG107/2025"
+   ],
+   "obiective": {
+    "ro": "Finanțarea parțială a construcției și echipării unui spital de îngrijiri terțiare pentru regiunea de nord a Moldovei (centru de îngrijiri ambulatorii, centru oncologic, săli de operație și secții de internare; 340 de paturi de internare și 78 de paturi de zi), pentru servicii medicale terțiare publice mai bune și mai accesibile și condiții de muncă, studiu și cercetare mai bune pentru personalul spitalului și studenții la medicină.",
+    "en": "To partially finance the construction and equipment of a tertiary care hospital for the North Region of Moldova (ambulatory care centre, cancer centre, operating theatres and inpatient wards; 340 inpatient beds and 78 day-beds), providing better and more accessible public tertiary healthcare and improved work, study and research conditions for hospital staff and medical students."
+   },
+   "sursa": "https://coebank.org/en/project-financing/projects-approved-administrative-council/balti-regional-hospital/",
+   "citat": "The aim of the Project loan is to partially finance eligible investments for the construction and equipment of a tertiary care hospital for the North Region of Moldova with, amongst other elements, an ambulatory care centre, cancer centre, operating theatres and inpatient wards, with a capacity of 340 inpatient beds and 78 day-beds, providing better and more accessible public tertiary healthcare to the population and offering improved work, study and research conditions for hospital staff and medical students.",
+   "nota": "Fișa CEB «Balti Regional Hospital» (împrumut de 86 mil. EUR, aprobat la 27.01.2023). Rândul de grant (hg107/2025, 3 mil. EUR) poartă aceeași denumire; BEI finanțează în paralel spitalele regionale Bălți și Cahul (fișa BEI «Moldova Regional Hospitals»)."
+  },
+  {
+   "acte": [
+    "DP770/2026",
+    "LP199/2026",
+    "DP281/2025"
+   ],
+   "obiective": {
+    "ro": "Facilitate de finanțare a sectorului public pentru extinderea investițiilor în «școli-model», pentru o educație de calitate: finanțarea parțială a modernizării a până la 15 școli conform conceptului de reformă a școlilor-model (zece în orașe și sate rurale, cinci în Chișinău).",
+    "en": "A Public sector Financing Facility to support the Government in expanding its Model School investments to provide quality education across the country, partially financing the modernisation of up to 15 schools according to the Model School reform concept (ten in rural towns and villages, five in Chisinau)."
+   },
+   "sursa": "https://coebank.org/en/project-financing/projects-approved-administrative-council/schools-modernisation/",
+   "citat": "A Public sector Financing Facility (PFF) to support the Borrower in expanding its Model School investments to provide quality education for students across the country. The PFF will partially finance eligible investments for modernisation of up to 15 schools according to the Model School reform concept, with ten schools located in rural towns and villages, and five in the capital city Chișinău.",
+   "nota": "Fișa CEB «Schools modernisation» (împrumut de 30 mil. EUR, aprobat la 05.04.2025)."
+  },
+  {
+   "acte": [
+    "DP1428/2024",
+    "LP101/2024",
+    "HG266/2024"
+   ],
+   "obiective": {
+    "ro": "Finanțarea parțială a renovării și transformării clădirilor existente pentru a mări fondul de locuințe sociale de închiriere și pentru a crea cămine studențești și cămine pentru vârstnici noi, cu îmbunătățirea eficienței energetice a clădirilor.",
+    "en": "To partially finance the refurbishment and conversion of existing buildings to increase the stock of rental social housing and to provide new student residences as well as new elderly homes, also improving the energy efficiency of these buildings."
+   },
+   "sursa": "https://coebank.org/en/project-financing/projects-approved-administrative-council/social-housing-iii/",
+   "citat": "The Programme loan will partially finance the refurbishment and conversion of existing buildings to increase the stock of rental social housing and to provide new student residences as well as new elderly homes. The programme also aims at improving the energy efficiency of these buildings.",
+   "nota": "Fișa CEB «Social Housing III» (împrumut de 20 mil. EUR, aprobat la 16.03.2023). Rândul de grant (1 mil. EUR) poartă aceeași denumire."
+  },
+  {
+   "acte": [
+    "DP1535/2024",
+    "LP184/2024",
+    "HG487/2024"
+   ],
+   "obiective": {
+    "ro": "Finanțarea parțială a renovării și transformării clădirilor existente pentru a mări fondul de locuințe sociale de închiriere și pentru a crea cămine studențești și cămine pentru vârstnici noi, cu îmbunătățirea eficienței energetice a clădirilor.",
+    "en": "To partially finance the refurbishment and conversion of existing buildings to increase the stock of rental social housing and to provide new student residences as well as new elderly homes, also improving the energy efficiency of these buildings."
+   },
+   "sursa": "https://coebank.org/en/project-financing/projects-approved-administrative-council/social-housing-iii/",
+   "citat": "The Programme loan will partially finance the refurbishment and conversion of existing buildings to increase the stock of rental social housing and to provide new student residences as well as new elderly homes. The programme also aims at improving the energy efficiency of these buildings.",
+   "nota": "Fișa CEB «Social Housing III» (împrumut de 20 mil. EUR, aprobat la 16.03.2023). Rândul de grant (1 mil. EUR) poartă aceeași denumire."
+  },
+  {
+   "acte": [
+    "DP216/2012",
+    "LP182/2012",
+    "HG482/2012"
+   ],
+   "obiective": {
+    "ro": "Asigurarea de locuințe sociale durabile pentru populația vulnerabilă și cu venituri mici, inclusiv familii tinere cu copii, în Republica Moldova.",
+    "en": "Provision of sustainable social housing to vulnerable and low-income population, including young families with children, in the Republic of Moldova."
+   },
+   "sursa": "https://coebank.org/en/project-financing/projects-approved-administrative-council/social-housing-vulnerable-low-income-population-md/",
+   "citat": "Provision of sustainable social housing to vulnerable and low-income population, including young families with children, in the Republic of Moldova.",
+   "nota": "Fișa CEB «Social Housing to vulnerable and low-income population (phase II)» (împrumut de 13,4 mil. EUR, aprobat la 17.11.2011)."
+  },
+  {
+   "acte": [
+    "DP1513/2024",
+    "LP158/2024",
+    "HG389/2024"
+   ],
+   "obiective": {
+    "ro": "Finanțarea parțială a investițiilor pentru construcția unui nou penitenciar la Chișinău, pentru îmbunătățirea condițiilor fizice de detenție și consolidarea capacității Departamentului Instituțiilor Penitenciare de a proiecta, construi și gestiona o infrastructură penitenciară modernă.",
+    "en": "Part-financing of investments for the construction of a new Chisinau penitentiary to enhance the physical conditions of detention and strengthen the capacity of the Department for Penitentiary Institutions for designing, building and managing modern penitentiary infrastructure."
+   },
+   "sursa": "https://coebank.org/en/project-financing/projects-approved-administrative-council/construction-chisinau-penitentiary/",
+   "citat": "Part-financing of investments for the construction of a new Chişinau penitentiary to enhance the physical conditions of detention and strengthen the capacity of the Department for Penitentiary Institutions for designing, building and managing modern penitentiary infrastructure.",
+   "nota": "Fișa CEB «Construction of Chişinau Penitentiary» (aprobat la 14.06.2013). Atenție: fișa CEB indică un împrumut de 39 mil. EUR, iar registrul are 49 mil. EUR pentru acest rând — de verificat."
+  },
+  {
+   "acte": [
+    "DP830/2018",
+    "LP171/2018",
+    "HG651/2018"
+   ],
+   "obiective": {
+    "ro": "Modernizarea parcului de ambulanțe al Centrului Național de Asistență Medicală Urgentă Prespitalicească (CNAMUP) prin achiziția a 168 de ambulanțe noi, pentru o disponibilitate mai bună a asistenței medicale de urgență, în special pentru populația din zonele îndepărtate și rurale.",
+    "en": "Upgrading of the National Centre for Pre-Hospital Emergency Care's ambulance fleet through the procurement of 168 new ambulances, improving the availability of emergency care assistance, particularly for populations in remote and rural areas."
+   },
+   "sursa": "https://coebank.org/en/project-financing/projects-approved-administrative-council/upgrading-national-centre-pre-hospital-emergency-cares-ambulance-fleet/",
+   "citat": "Upgrading of the emergency services’ fleet at the National Centre for Pre-Hospital Emergency Care (NCPHEC) consisting of the procurement of 168 new ambulances. … The final beneficiaries will be the inhabitants of the Republic of Moldova who will benefit from upgraded and improved availability of emergency care assistance. … Those populations residing furthest away from medical institutions, mainly those in remote and rural areas, will benefit particularly from the project.",
+   "nota": "Fișa CEB «Upgrading of National Centre for Pre-Hospital Emergency Care's Ambulance Fleet» (împrumut de 12 mil. EUR, aprobat la 15.06.2018)."
+  },
+  {
+   "acte": [
+    "DP1758/2020",
+    "LP168/2020",
+    "HG603/2020"
+   ],
+   "obiective": {
+    "ro": "Atenuarea impactului COVID-19 asupra sănătății și locurilor de muncă: 40 mil. EUR pentru componenta de sănătate (achiziția, în procedură de urgență, de echipamente și consumabile medicale, reabilitarea și transformarea spațiilor și unităților medicale, expertiză suplimentară) și 30 mil. EUR pentru sprijinirea întreprinderilor micro, mici și mijlocii.",
+    "en": "To mitigate the impact of COVID-19 on healthcare and employment: EUR 40 million for the health component (emergency acquisition of medical equipment and consumables, rehabilitation and transformation of medical spaces and units, additional expertise) and EUR 30 million to support micro, small and medium-size enterprises."
+   },
+   "sursa": "https://coebank.org/en/news-and-publications/news/ceb-and-republic-of-moldova-sign-a-70-million-loan-agreement-to-support-emergency-response-to-covid-19/",
+   "citat": "signed a €70 million loan agreement to mitigate the impact of COVID-19 on healthcare and employment. … Out of the total sum a €40 million will be dedicated to the health component and will finance the following types of expenses: acquisition, under emergency procedures, of medical equipment and consumables; rehabilitation and transformation of medical spaces and units; and the mobilization of additional expertise, to ensure emergency response measures to COVID-19. … Another €30 million will be made available to support micro, small and medium-size enterprises",
+   "nota": "Comunicat CEB din 4 august 2020: acord de împrumut de 70 mil. EUR cu Ministerul Finanțelor."
+  },
+  {
+   "acte": [
+    "DP659/2022",
+    "LP279/2022",
+    "HG637/2022"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea furnizării de servicii medicale pentru refugiații din Ucraina prin sistemul național de sănătate al Moldovei (grantul acoperă cheltuieli medicale pentru circa 2 500 de cazuri tratate).",
+    "en": "To support the provision of healthcare services to refugees from Ukraine via the Moldovan national health system (the grant covers medical expenditure for around 2500 treated cases)."
+   },
+   "sursa": "https://coebank.org/en/news-and-publications/news/ceb-disbursed-grant-financing-healthcare-services-provided-republic-moldova-ukraine-refugees/",
+   "citat": "a grant amounting to €900 000 to the Republic of Moldova through the Migrant and Refugee Fund (MRF). … The grant will support the provision of healthcare services to refugees from Ukraine via the Moldovan national health system. … The grant covers medical expenditures for around 2500 treated cases of refugees from Ukraine.",
+   "nota": "Comunicat CEB din 20 decembrie 2022: grant de 900 000 EUR prin Fondul pentru Migranți și Refugiați, virat la 16.12.2022."
+  },
+  {
+   "acte": [
+    "DP257/2025",
+    "LP147/2025",
+    "HG341/2025"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea orientării spre piața muncii, a internaționalizării, a cercetării științifice și a transferului de tehnologie în învățământul superior.",
+    "en": "To improve the labor market orientation, internationalization, scientific research and technology transfer in higher education."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099111224135015777/pdf/P167790-c5cdf35e-1999-45cc-a4cc-d751f149de3b.pdf",
+   "citat": "The new revised PDO is to improve the labor market orientation, internationalization, scientific research and technology transfer in higher education. … financed by an International Development Association Credit of US$40 million",
+   "nota": "Moldova Higher Education Project (Banca Mondială, P167790). Obiectivul revizuit apare în Planul de implicare a părților interesate (revizuit în noiembrie 2024, pentru restructurare și finanțare suplimentară). Obiectivul inițial, din comunicatul BM din 5 martie 2020 (https://www.worldbank.org/en/news/loans-credits/2020/03/05/moldova-higher-education-project): «The project aims to improve the quality, relevance and efficiency of the country’s higher education system so that Moldovans can gain the necessary skills and education to access greater opportunities and improve their lives.» Același comunicat: «IDA Credit – Equivalent of $ 39.4 million»."
+  },
+  {
+   "acte": [
+    "DP258/2025",
+    "LP148/2025",
+    "HG342/2025"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea orientării spre piața muncii, a internaționalizării, a cercetării științifice și a transferului de tehnologie în învățământul superior.",
+    "en": "To improve the labor market orientation, internationalization, scientific research and technology transfer in higher education."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099111224135015777/pdf/P167790-c5cdf35e-1999-45cc-a4cc-d751f149de3b.pdf",
+   "citat": "The new revised PDO is to improve the labor market orientation, internationalization, scientific research and technology transfer in higher education. … Additional Financing: was requested by MoER to expand the scope of core activities",
+   "nota": "Finanțare suplimentară din 2025 (BIRD) la proiectul «Învățământul superior» (Moldova Higher Education Project, Banca Mondială, P167790). Legătura se bazează pe denumirea proiectului și pe faptul că documentul BM din noiembrie 2024 vorbește despre restructurare și finanțare suplimentară; documentul nu menționează un împrumut BIRD. Obiectivul inițial (2020) e dat la rândul AID al aceluiași proiect."
+  },
+  {
+   "acte": [
+    "DP865/2023",
+    "LP56/2023",
+    "HG64/2023"
+   ],
+   "obiective": {
+    "ro": "Prevenirea, depistarea și combaterea amenințării reprezentate de pandemia de COVID-19 în Republica Moldova.",
+    "en": "To prevent, detect and respond to the threat posed by the COVID-19 pandemic in Republic of Moldova."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/697331628528146352/pdf/Moldova-Emergency-COVID-19-Response-Project-Restructuring-and-Additional-Financing.pdf",
+   "citat": "The objectives of the Project are to prevent, detect and respond to the threat posed by the COVID-19 pandemic in Republic of Moldova. … in the amount of EUR 24.8 million (US$ 30.0 million equivalent) for an Additional Financing (AF)",
+   "nota": "Moldova Emergency COVID-19 Response Project (Banca Mondială, P173776), finanțare adițională din aprilie 2021: credit AID de 24,8 mil. EUR (echivalentul a 30 mil. USD), suma din registru."
+  },
+  {
+   "acte": [
+    "DP747/2022",
+    "LP346/2022",
+    "HG843/2022"
+   ],
+   "obiective": {
+    "ro": "Restructurarea fundamentală a sistemului de administrare fiscală, prin implementarea unui sistem fiscal centralizat și unificat, pentru îmbunătățirea colectării veniturilor, a conformării fiscale și a serviciilor pentru contribuabili.",
+    "en": "To support the fundamental restructuring of the tax administration system, by implementing a centralized and unified tax system to improve revenue collection, tax compliance and taxpayer services."
+   },
+   "sursa": "https://www.worldbank.org/en/news/press-release/2016/06/06/world-bank-is-helping-moldova-modernize-its-tax-administration-system",
+   "citat": "The project will support the fundamental restructuring of the tax administration system, by implementing a centralized and unified tax system to improve revenue collection, tax compliance and taxpayer services. … US$20 million in financing for the Tax Administration Modernization Project in Moldova … (US$7.42 million IDA credit and US$12.58 million IBRD loan)",
+   "nota": "Tax Administration Modernization Project (Banca Mondială, P127734), aprobat la 6 iunie 2016: 20 mil. USD în total (credit AID 7,42 mil. USD + împrumut BIRD 12,58 mil. USD), suma din registru. Obiectivul a fost actualizat în septembrie 2020 (https://www.worldbank.org/en/news/loans-credits/2020/09/25/moldova-tax-administration-modernization-project): «The updated Project objective is to support business survival and sustain employment in the context of the COVID-19 pandemic, through temporary tax relief, and improve taxpayer services in the Republic of Moldova.»"
+  },
+  {
+   "acte": [
+    "DPRM1519/2015",
+    "LP44/2015",
+    "HG76/2015"
+   ],
+   "obiective": {
+    "ro": "Restructurarea fundamentală a sistemului de administrare fiscală, prin implementarea unui sistem fiscal centralizat și unificat, pentru îmbunătățirea colectării veniturilor, a conformării fiscale și a serviciilor pentru contribuabili.",
+    "en": "To support the fundamental restructuring of the tax administration system, by implementing a centralized and unified tax system to improve revenue collection, tax compliance and taxpayer services."
+   },
+   "sursa": "https://www.worldbank.org/en/news/press-release/2016/06/06/world-bank-is-helping-moldova-modernize-its-tax-administration-system",
+   "citat": "The project will support the fundamental restructuring of the tax administration system, by implementing a centralized and unified tax system to improve revenue collection, tax compliance and taxpayer services. … US$20 million in financing for the Tax Administration Modernization Project in Moldova … (US$7.42 million IDA credit and US$12.58 million IBRD loan)",
+   "nota": "Rând din 2014 cu aceeași denumire (TAMP), anterior aprobării proiectului din 2016; legat doar prin denumirea identică cu Tax Administration Modernization Project (Banca Mondială, P127734)."
+  },
+  {
+   "acte": [
+    "DP358/2022",
+    "LP34/2022",
+    "HG29/2022"
+   ],
+   "obiective": {
+    "ro": "Contribuția la reducerea riscurilor-cheie pentru bolile netransmisibile și la îmbunătățirea eficienței serviciilor de sănătate din Moldova.",
+    "en": "To contribute to reducing key risks for non-communicable diseases and improving efficiency of health services in Moldova."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/423461608668455549/pdf/Disclosable-Restructuring-Paper-Moldova-Health-Transformation-Project-P144892.pdf",
+   "citat": "The Program Development Objective is to contribute to reducing key risks for non-communicable diseases and improving efficiency of … health services in Moldova. … SDR 18.6 million (US$28.7 million equivalent) … SDR 1.4 million (US$2.1 million equivalent) … 11-Jul-2014",
+   "nota": "Moldova Health Transformation Project/Operation (Banca Mondială, P144892): două credite AID semnate la 11.07.2014 — 5469-MD (18,6 mil. DST) și 5470-MD (1,4 mil. DST), în total 20 mil. DST, adică suma și data din registru. Denumirea din registru («Modernizarea sectorului sănătății») diferă de cea a Băncii Mondiale; legătura se bazează pe sumă și dată. Documentul de restructurare (decembrie 2020) propunea completarea obiectivului cu «non-communicable and infectious diseases, including COVID-19»."
+  },
+  {
+   "acte": [
+    "DP1587/2020",
+    "LP77/2020",
+    "HG113/2020"
+   ],
+   "obiective": {
+    "ro": "Creșterea competitivității la export a întreprinderilor din Moldova și reducerea poverii de reglementare cu care se confruntă acestea.",
+    "en": "To increase the export competitiveness of Moldovan enterprises and decrease the regulatory burden they face."
+   },
+   "sursa": "https://www.worldbank.org/en/news/loans-credits/2014/07/11/moldova-second-competitiveness-enhancement-project",
+   "citat": "The objective of the project is to increase the export competitiveness of Moldovan enterprises and decrease the regulatory burden they face. … IBRD Loan: US $30.0 million equivalent … IDA Credit: US $15.0 million equivalent",
+   "nota": "Second Competitiveness Enhancement Project (Banca Mondială, P144103): împrumut BIRD de 30 mil. USD și credit AID de 15 mil. USD echivalent. Împrumutul BIRD coincide cu suma din registru (30 mil. USD); creditul AID e dat în registru în DST (9,7 mil.)."
+  },
+  {
+   "acte": [
+    "DP1394/2019",
+    "DPRM1270/2014",
+    "LP165/2014"
+   ],
+   "obiective": {
+    "ro": "Creșterea competitivității la export a întreprinderilor din Moldova și reducerea poverii de reglementare cu care se confruntă acestea.",
+    "en": "To increase the export competitiveness of Moldovan enterprises and decrease the regulatory burden they face."
+   },
+   "sursa": "https://www.worldbank.org/en/news/loans-credits/2014/07/11/moldova-second-competitiveness-enhancement-project",
+   "citat": "The objective of the project is to increase the export competitiveness of Moldovan enterprises and decrease the regulatory burden they face. … IBRD Loan: US $30.0 million equivalent … IDA Credit: US $15.0 million equivalent",
+   "nota": "Second Competitiveness Enhancement Project (Banca Mondială, P144103): împrumut BIRD de 30 mil. USD și credit AID de 15 mil. USD echivalent. Împrumutul BIRD coincide cu suma din registru (30 mil. USD); creditul AID e dat în registru în DST (9,7 mil.)."
+  },
+  {
+   "acte": [
+    "DPRM1148/2014",
+    "LP72/2014",
+    "HG219/2014"
+   ],
+   "obiective": {
+    "ro": "Creșterea competitivității la export a întreprinderilor din Moldova și reducerea poverii de reglementare cu care se confruntă acestea.",
+    "en": "To increase the export competitiveness of Moldovan enterprises and decrease the regulatory burden they face."
+   },
+   "sursa": "https://www.worldbank.org/en/news/loans-credits/2014/07/11/moldova-second-competitiveness-enhancement-project",
+   "citat": "The objective of the project is to increase the export competitiveness of Moldovan enterprises and decrease the regulatory burden they face. … IBRD Loan: US $30.0 million equivalent … IDA Credit: US $15.0 million equivalent",
+   "nota": "Rând din februarie–martie 2014, anterior aprobării proiectului (iulie 2014), cu aceeași denumire (PAC II); legat doar prin denumire cu Second Competitiveness Enhancement Project (Banca Mondială, P144103)."
+  },
+  {
+   "acte": [
+    "DP776/2018",
+    "LP127/2018",
+    "HG655/2018"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Republicii Moldova în reducerea riscurilor fiscale și în crearea unor condiții de concurență echitabile pentru dezvoltarea sectorului privat.",
+    "en": "To help the Republic of Moldova reduce fiscal risks and level the playing field for private sector development."
+   },
+   "sursa": "https://www.worldbank.org/en/news/loans-credits/2018/07/05/economic-governance-development-policy-operation-for-moldova",
+   "citat": "EGDPO provides resources to help the Republic of Moldova reduce fiscal risks and level the playing field for private sector development. … IDA Credit: US$ 30 million equivalent … Project ID: P156963",
+   "nota": "Economic Governance Development Policy Operation (Banca Mondială, P156963), aprobat la 5 iulie 2018: credit AID de 30 mil. USD echivalent (în registru: 24,9 mil. EUR)."
+  },
+  {
+   "acte": [
+    "DPRM284/2017",
+    "LP129/2017",
+    "HG405/2017"
+   ],
+   "obiective": {
+    "ro": "Consolidarea calității educației, concomitent cu sprijinirea reformelor de eficientizare implementate în sectorul educației.",
+    "en": "To strengthen the quality of education while supporting the efficiency reforms being implemented in the education sector."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/640971468054615750/txt/Moldova-Moldova-Education-Reform-Project-P127388-Implementation-Status-Results-Report-Sequence-07.txt",
+   "citat": "The Project Development Objective (PDO) is to strengthen the quality of education while supporting the efficiency reforms being implemented in the education sector. … Bank Approval Date: 24-Jan-2013 … 07-Feb-2013",
+   "nota": "Moldova Education Reform Project (Banca Mondială, P127388): raportul de stare dă aprobarea la 24.01.2013 și semnarea la 07.02.2013, adică data semnării din registru."
+  },
+  {
+   "acte": [
+    "DPRM737/2018",
+    "LP88/2018",
+    "HG337/2018"
+   ],
+   "obiective": {
+    "ro": "Consolidarea calității educației, concomitent cu sprijinirea reformelor de eficientizare implementate în sectorul educației.",
+    "en": "To strengthen the quality of education while supporting the efficiency reforms being implemented in the education sector."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/640971468054615750/txt/Moldova-Moldova-Education-Reform-Project-P127388-Implementation-Status-Results-Report-Sequence-07.txt",
+   "citat": "The Project Development Objective (PDO) is to strengthen the quality of education while supporting the efficiency reforms being implemented in the education sector. … Bank Approval Date: 24-Jan-2013 … 07-Feb-2013",
+   "nota": "Rând din 2018 cu aceeași denumire («Proiectul Reforma Învățământului în Moldova»), probabil finanțare suplimentară; legat doar prin denumire cu Moldova Education Reform Project (Banca Mondială, P127388)."
+  },
+  {
+   "acte": [
+    "DP644/2018",
+    "LP25/2018",
+    "HG52/2018"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea unui acces îmbunătățit, a unei eficiențe mai bune și a unei calități mai înalte a unor servicii administrative publice selectate pentru cetățenii Moldovei.",
+    "en": "To support improved access, better efficiency and higher quality of selected government administrative services for Moldovan citizens."
+   },
+   "sursa": "https://www.worldbank.org/en/news/loans-credits/2017/08/22/modernization-of-government-services-in-the-republic-of-moldova",
+   "citat": "The Modernization of Government Services Project will support improved access, better efficiency and higher quality of selected government administrative services for Moldovan citizens … IBRD Loan: US $5 million … IDA Credit: US $15 million equivalent",
+   "nota": "Modernization of Government Services Project (Banca Mondială, P148537), aprobat la 22 august 2017. Sumele din sursă (BIRD 5 mil. USD, AID 15 mil. USD echivalent) nu coincid cu suma din registru (1 753 220,85 USD); legătura se bazează pe denumire."
+  },
+  {
+   "acte": [
+    "HG417/2016"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea unui acces îmbunătățit, a unei eficiențe mai bune și a unei calități mai înalte a unor servicii administrative publice selectate pentru cetățenii Moldovei.",
+    "en": "To support improved access, better efficiency and higher quality of selected government administrative services for Moldovan citizens."
+   },
+   "sursa": "https://www.worldbank.org/en/news/loans-credits/2017/08/22/modernization-of-government-services-in-the-republic-of-moldova",
+   "citat": "The Modernization of Government Services Project will support improved access, better efficiency and higher quality of selected government administrative services for Moldovan citizens … IBRD Loan: US $5 million … IDA Credit: US $15 million equivalent",
+   "nota": "Modernization of Government Services Project (Banca Mondială, P148537), aprobat la 22 august 2017. Sumele din sursă (BIRD 5 mil. USD, AID 15 mil. USD echivalent) nu coincid cu suma din registru (1 753 220,85 USD); legătura se bazează pe denumire."
+  },
+  {
+   "acte": [
+    "DPRM371/2017",
+    "DPRM161/2017"
+   ],
+   "obiective": {
+    "ro": "Sporirea adoptării practicilor adaptate la schimbările climatice în agricultură, silvicultură și gestionarea pășunilor, în peisajele-țintă, și consolidarea sistemelor naționale de gestionare a dezastrelor.",
+    "en": "To enhance the adoption of climate-smart practices in agriculture, forestry and pasture management in targeted landscapes and strengthen national disaster management systems."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/617551497232845961/pdf/Moldova-PAD-05222017.pdf",
+   "citat": "The Project Development Objective (PDO) is to enhance the adoption of climate-smart practices in agriculture, forestry and pasture management in targeted landscapes and strengthen national disaster management systems. … International Bank for Reconstruction and Development 12.40 … Climate Adaptation Project (P155968)",
+   "nota": "Climate Adaptation Project (Banca Mondială, P155968; document de evaluare PAD2246): componenta BIRD de 12,40 mil. USD coincide cu suma din registru (12,4 mil. USD). Al doilea rând (HG1012/2016, fără sumă) poartă denumirea «Adaptarea la schimbările climatice și silvicultura» și e legat prin denumire."
+  },
+  {
+   "acte": [
+    "HG1012/2016"
+   ],
+   "obiective": {
+    "ro": "Sporirea adoptării practicilor adaptate la schimbările climatice în agricultură, silvicultură și gestionarea pășunilor, în peisajele-țintă, și consolidarea sistemelor naționale de gestionare a dezastrelor.",
+    "en": "To enhance the adoption of climate-smart practices in agriculture, forestry and pasture management in targeted landscapes and strengthen national disaster management systems."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/617551497232845961/pdf/Moldova-PAD-05222017.pdf",
+   "citat": "The Project Development Objective (PDO) is to enhance the adoption of climate-smart practices in agriculture, forestry and pasture management in targeted landscapes and strengthen national disaster management systems. … International Bank for Reconstruction and Development 12.40 … Climate Adaptation Project (P155968)",
+   "nota": "Climate Adaptation Project (Banca Mondială, P155968; document de evaluare PAD2246): componenta BIRD de 12,40 mil. USD coincide cu suma din registru (12,4 mil. USD). Al doilea rând (HG1012/2016, fără sumă) poartă denumirea «Adaptarea la schimbările climatice și silvicultura» și e legat prin denumire."
+  },
+  {
+   "acte": [
+    "DPRM2543/2016",
+    "LP293/2016",
+    "HG1306/2016"
+   ],
+   "obiective": {
+    "ro": "Trei piloni: (A) consolidarea cadrului de reglementare, pentru un mediu de afaceri mai previzibil, concurență facilitată și costuri de conformare mai mici; (B) consolidarea stabilității sectorului financiar, transparența acționariatului și acces mai ușor la finanțare; (C) îmbunătățirea cadrului de gestionare a investițiilor publice, subvenții agricole mai eficiente și echitabile și o acoperire mai bună a programelor de asistență socială bine țintite.",
+    "en": "Three pillars: (A) strengthen the regulatory framework to improve predictability of the business environment, facilitate competition, and reduce regulatory compliance costs; (B) strengthen financial sector stability, promote transparency of shareholding, and ease conditions for access to finance; (C) improve the public investment management framework, make investment subsidies in agriculture more efficient and equitable, and improve the coverage of well-targeted social assistance programs."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/729481653597358984/pdf/Moldova-Second-Development-Policy-Operation-Project.pdf",
+   "citat": "The proposed operation is built around three pillars, which are also the PDOs: … Pillar A: Strengthen the regulatory framework to improve predictability of the business environment, facilitate competition, and reduce regulatory compliance costs … Pillar B: Strengthen financial sector stability, promote transparency of shareholding, and ease conditions for access to finance … Pillar C: Improve the public investment management framework, make investment subsidies in agriculture more efficient and equitable, and improve the coverage of well-targeted social assistance programs … IBRD Loan: US$27.2 million … IDA Credit: Regular; Amount: SDR 10 million; Hard: SDR 3 million",
+   "nota": "Second Moldova Development Policy Operation (Banca Mondială, P149555), document de program din 15 noiembrie 2016: împrumut BIRD de 27,2 mil. USD și credit AID de 10 + 3 mil. DST, adică cele 13 mil. DST din registru. Al doilea rând (HG1214/2016) e hotărârea Guvernului privind același program."
+  },
+  {
+   "acte": [
+    "HG1214/2016"
+   ],
+   "obiective": {
+    "ro": "Trei piloni: (A) consolidarea cadrului de reglementare, pentru un mediu de afaceri mai previzibil, concurență facilitată și costuri de conformare mai mici; (B) consolidarea stabilității sectorului financiar, transparența acționariatului și acces mai ușor la finanțare; (C) îmbunătățirea cadrului de gestionare a investițiilor publice, subvenții agricole mai eficiente și echitabile și o acoperire mai bună a programelor de asistență socială bine țintite.",
+    "en": "Three pillars: (A) strengthen the regulatory framework to improve predictability of the business environment, facilitate competition, and reduce regulatory compliance costs; (B) strengthen financial sector stability, promote transparency of shareholding, and ease conditions for access to finance; (C) improve the public investment management framework, make investment subsidies in agriculture more efficient and equitable, and improve the coverage of well-targeted social assistance programs."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/729481653597358984/pdf/Moldova-Second-Development-Policy-Operation-Project.pdf",
+   "citat": "The proposed operation is built around three pillars, which are also the PDOs: … Pillar A: Strengthen the regulatory framework to improve predictability of the business environment, facilitate competition, and reduce regulatory compliance costs … Pillar B: Strengthen financial sector stability, promote transparency of shareholding, and ease conditions for access to finance … Pillar C: Improve the public investment management framework, make investment subsidies in agriculture more efficient and equitable, and improve the coverage of well-targeted social assistance programs … IBRD Loan: US$27.2 million … IDA Credit: Regular; Amount: SDR 10 million; Hard: SDR 3 million",
+   "nota": "Second Moldova Development Policy Operation (Banca Mondială, P149555), document de program din 15 noiembrie 2016: împrumut BIRD de 27,2 mil. USD și credit AID de 10 + 3 mil. DST, adică cele 13 mil. DST din registru. Al doilea rând (HG1214/2016) e hotărârea Guvernului privind același program."
+  },
+  {
+   "acte": [
+    "DP1668/2024",
+    "LP260/2024",
+    "HG735/2024"
+   ],
+   "obiective": {
+    "ro": "Fond fiduciar multidonator al Băncii Mondiale pentru sprijinirea Guvernului în investiții și în consolidarea instituțiilor, ca țara să devină mai competitivă, mai rezilientă și mai incluzivă în procesul de aderare la UE; mecanism coordonat de finanțare pentru mobilizarea finanțării proiectelor transformatoare.",
+    "en": "A multi-donor trust fund program to support the Government of Moldova in investing and strengthening its institutions to become more competitive, resilient, and inclusive as the country pursues EU accession; a coordinated financing mechanism to help mobilize financing for transformative projects."
+   },
+   "sursa": "https://www.worldbank.org/en/news/press-release/2024/03/25/new-trust-fund-for-resilience-and-opportunities-for-well-being-established-for-moldova",
+   "citat": "a multi-donor trust fund program aimed at supporting the Government of Moldova in investing and strengthening its institutions to become more competitive, resilient, and inclusive as the country is pursuing the EU accession … to assist the Government of Moldova in mobilizing financing for transformative projects … contributed the equivalent of $23.8 million",
+   "nota": "Programul M-GROW (Moldova Growth, Resilience and Opportunities for Well-Being), fond fiduciar multidonator al Băncii Mondiale; donatori fondatori: Irlanda, Norvegia și Regatul Unit (23,8 mil. USD echivalent). Rândul se leagă de program prin denumire; suma din registru (4,5 mil. USD) nu apare în comunicat."
+  },
+  {
+   "acte": [
+    "HG277/2025"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea eforturilor Guvernului de a spori concurența, transparența, eficiența și raportul calitate-preț, inclusiv achizițiile durabile, în sistemul de achiziții publice.",
+    "en": "To support the Government's efforts to enhance competition, transparency, efficiency, and value for money, including sustainable procurement, in the public procurement system."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099031825084018314/pdf/P507197-7ae94a82-ab4c-48d4-81dd-149fb917ccc2.pdf",
+   "citat": "To support the Government's efforts to enhance competition, transparency, efficiency, and value for money, including sustainable procurement, in the public procurement system. … Supporting Public Procurement Efficiency and Value for Money in Moldova … IN THE AMOUNT OF US$ 3.60 MILLION",
+   "nota": "Supporting Public Procurement Efficiency and Value for Money in Moldova (Banca Mondială, P507197), document de proiect din 14 februarie 2025: grant de 3,60 mil. USD din fondul fiduciar M-GROW, adică suma din registru."
+  },
+  {
+   "acte": [
+    "OMM23/2026",
+    "HG573/2025"
+   ],
+   "obiective": {
+    "ro": "Creșterea suprafeței aflate sub practici durabile de gestionare a peisajului în bazinul râului Nistru, un bazin hidrografic critic din punct de vedere ecologic și socio-economic în Moldova.",
+    "en": "To increase the area under sustainable landscape management practices within the Dniester River Basin, an environmentally and socio-economically critical watershed in Moldova."
+   },
+   "sursa": "https://www.worldbank.org/en/news/press-release/2025/10/22/moldova-to-restore-ecosystems-and-prevent-pollution-with-world-bank-support",
+   "citat": "The RE-MAP project aims to increase the area under sustainable landscape management practices within the Dniester River Basin, an environmentally and socio-economical critical watershed in Moldova. … a grant of US$7.9 million for the Restoring Ecosystems for Marine Pollution Prevention Project (RE-MAP)",
+   "nota": "Restoring Ecosystems for Marine Pollution Prevention Project (RE-MAP, Banca Mondială): grant de 7,9 mil. USD aprobat la 22 octombrie 2025, adică suma din registru (7 903 975 USD)."
+  },
+  {
+   "acte": [
+    "DPRM1714/2015",
+    "LP152/2015",
+    "HG357/2015"
+   ],
+   "obiective": {
+    "ro": "Consolidarea capacității Serviciului Hidrometeorologic de Stat de a prognoza fenomenele meteorologice severe și îmbunătățirea capacității Moldovei de a se pregăti pentru dezastre naturale și de a le face față.",
+    "en": "To strengthen the State Hydrometeorological Service's ability to forecast severe weather and improve Moldova's capacity to prepare for and respond to natural disasters."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/160251468054615000/pdf/530500PAD0IDA11B01OFFICIAL0USE01091.pdf",
+   "citat": "The Project development objective (PDO) is to strengthen the State Hydrometeorological Service’s ability to forecast severe weather and improve Moldova’s capacity to prepare for and respond to natural disasters. … IN THE AMOUNT OF SDR6.80 MILLION … JULY 6, 2010",
+   "nota": "Disaster and Climate Risk Management Project (Banca Mondială): credit AID nr. 4794-MD de 6,8 mil. DST, acord din 12 august 2010 (copia conformă: https://documents1.worldbank.org/curated/en/523151468281046575/pdf/C47940DCRMP0FA0Conformed.pdf). Rândul din registru include actele din 2010 și modificarea din 2015 și are aceeași sumă (6,8 mil. DST) și aceeași denumire."
+  },
+  {
+   "acte": [
+    "DP525/2022",
+    "DP524/2022",
+    "LP166/2022"
+   ],
+   "obiective": {
+    "ro": "Creșterea competitivității sectorului agroalimentar prin sprijinirea modernizării sistemului de gestionare a siguranței alimentelor, facilitarea accesului fermierilor la piețe și integrarea practicilor agro-ecologice și de gestionare durabilă a terenurilor.",
+    "en": "To enhance the competitiveness of the agro-food sector by supporting the modernization of the food safety management system, facilitating market access for farmers, and mainstreaming agro-environmental and sustainable land management practices."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/735681594752616586/pdf/Moldova-Agriculture-Competitiveness-Project-Third-Additional-Financing.pdf",
+   "citat": "The Project Development Objective is to enhance the competitiveness of the agro-food sector by supporting the modernization of the food safety management system, facilitating market access for farmers, and mainstreaming agro-environmental and sustainable land management practices.",
+   "nota": "Rânduri ale aceluiași proiect (Moldova Agriculture Competitiveness Project, Banca Mondială, P118518); denumirea din registru («MAC-P») coincide. Comunicatul BM din 28 mai 2012 (https://www.worldbank.org/en/news/press-release/2012/05/28/world-bank-support-to-improve-moldovas-agricultural-competitiveness-and-farmers-livelihood) descrie același obiectiv și o finanțare de 18 mil. USD (credit AID) și 4,4 mil. USD (grant GEF); sumele din registru nu au fost comparate cu ele."
+  },
+  {
+   "acte": [
+    "DP523/2022",
+    "LP168/2022",
+    "HG354/2022"
+   ],
+   "obiective": {
+    "ro": "Creșterea competitivității sectorului agroalimentar prin sprijinirea modernizării sistemului de gestionare a siguranței alimentelor, facilitarea accesului fermierilor la piețe și integrarea practicilor agro-ecologice și de gestionare durabilă a terenurilor.",
+    "en": "To enhance the competitiveness of the agro-food sector by supporting the modernization of the food safety management system, facilitating market access for farmers, and mainstreaming agro-environmental and sustainable land management practices."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/735681594752616586/pdf/Moldova-Agriculture-Competitiveness-Project-Third-Additional-Financing.pdf",
+   "citat": "The Project Development Objective is to enhance the competitiveness of the agro-food sector by supporting the modernization of the food safety management system, facilitating market access for farmers, and mainstreaming agro-environmental and sustainable land management practices.",
+   "nota": "Rânduri ale aceluiași proiect (Moldova Agriculture Competitiveness Project, Banca Mondială, P118518); denumirea din registru («MAC-P») coincide. Comunicatul BM din 28 mai 2012 (https://www.worldbank.org/en/news/press-release/2012/05/28/world-bank-support-to-improve-moldovas-agricultural-competitiveness-and-farmers-livelihood) descrie același obiectiv și o finanțare de 18 mil. USD (credit AID) și 4,4 mil. USD (grant GEF); sumele din registru nu au fost comparate cu ele."
+  },
+  {
+   "acte": [
+    "DPRM1659/2015"
+   ],
+   "obiective": {
+    "ro": "Asigurarea accesibilității rutiere locale, sigure și durabile, la educație, sănătate și piață.",
+    "en": "To provide safe and sustainable local road accessibility to education, health and market."
+   },
+   "sursa": "https://documents.worldbank.org/en/publication/documents-reports/documentdetail/556451548974174940/disclosable-restructuring-paper-local-roads-improvement-project-p150357",
+   "citat": "The development objective of Local Roads Improvement Project for Moldova is to provide safe and sustainable local road accessibility to education, health and market .",
+   "nota": "Rând din 2015 cu aceeași denumire («Îmbunătățirea drumurilor locale», AID); legat doar prin denumirea identică cu Local Roads Improvement Project (Banca Mondială, P150357)."
+  },
+  {
+   "acte": [
+    "DP754/2022",
+    "LP349/2022"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Guvernului în crearea bazelor pentru: (i) atenuarea impactului războiului din Ucraina asupra refugiaților și a gospodăriilor; (ii) consolidarea rezilienței și a competitivității, pentru a reduce vulnerabilitățile la șocurile viitoare.",
+    "en": "To support the Borrower in setting foundations to: (i) mitigate the impact of the war in Ukraine on refugees and households; and (ii) build resilience and enhance competitiveness to reduce vulnerabilities to future shocks."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099920007082213657/pdf/P17564007e02760830a3e0049dda77c219e.pdf",
+   "citat": "the Program aimed to support the Borrower set foundations to: (i) mitigate the impact of the war in Ukraine on refugees and households, (ii) build resilience and enhance competitiveness to reduce vulnerabilities to future shocks.",
+   "nota": "Fond fiduciar multidonator care cofinanțează programul «Moldova, măsuri în situație de urgență, reziliență și competitivitate. Operațiunea de politici de dezvoltare» (Banca Mondială, P175640); obiectivul este al programului cofinanțat. Legătura se bazează pe denumirea programului din chiar titlul rândului."
+  },
+  {
+   "acte": [
+    "DP1088/2023",
+    "LP254/2023",
+    "HG585/2023"
+   ],
+   "obiective": {
+    "ro": "(i) Creșterea sprijinului pentru refugiați și gospodării; (ii) consolidarea rezilienței și a competitivității, pentru a reduce vulnerabilitățile la șocurile viitoare.",
+    "en": "(i) To increase support to refugees and households; and (ii) to build resilience and enhance competitiveness to reduce vulnerabilities to future shocks."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099050423045023666/pdf/BOSIB0ff8efd3b02c08cdf0dc4e98e6c5af.pdf",
+   "citat": "The DPO aims to (i) increase support to refugees and households, and (ii) build resilience and enhance competitiveness to reduce vulnerabilities to future shocks.",
+   "nota": "Fond fiduciar multidonator care cofinanțează suplimentar programul «Moldova, măsuri în situație de urgență, reziliență și competitivitate. Operațiunea de politici de dezvoltare 2» (Banca Mondială, P179086); obiectivul este al programului cofinanțat. Legătura se bazează pe denumirea programului din chiar titlul rândului."
+  },
+  {
+   "acte": [
+    "HG398/2025",
+    "HG750/2022"
+   ],
+   "obiective": {
+    "ro": "Contribuția la o dezvoltare economică rezilientă, durabilă și incluzivă în Moldova, inclusiv prin sprijinirea IMM-urilor, îmbunătățirea climatului de afaceri prin facilitarea comerțului și creșterea capacității de angajare; sprijin și pentru o Agendă Verde transformatoare, în vederea unei dezvoltări economice durabile.",
+    "en": "To contribute to resilient, sustainable and inclusive economic development in Moldova, including by supporting SMEs, improving the business climate through trade facilitation, and improving employability; also to support a transformative Green Agenda for Moldova to deliver a sustainable economic development."
+   },
+   "sursa": "https://enlargement.ec.europa.eu/news/eu-announces-additional-eu52-million-support-long-term-resilience-recovery-and-reforms-republic-2022-05-05_en",
+   "citat": "EU4Recovery and Resilience: this action will contribute to resilient, sustainable and inclusive economic development in Moldova, including by supporting SMEs, improving the business climate through trade facilitation, and improving employability. … It will also support a transformative Green Agenda for Moldova to deliver a sustainable economic development. … The European Union will mobilise an additional €52 million for the Republic of Moldova",
+   "nota": "Comunicatul Comisiei Europene din 5 mai 2022 descrie împreună «EU4Reforms» și «EU4Recovery and Resilience» (52 mil. EUR suplimentari, fără sume separate); sumele din registru (25 + 27 = 52 mil. EUR) se potrivesc cu totalul. Legătura se bazează pe denumire."
+  },
+  {
+   "acte": [
+    "HG399/2025",
+    "HG751/2022"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Moldovei în implementarea reformelor legate de Acordul de Asociere UE–Moldova și de Zona de Liber Schimb Aprofundat și Cuprinzător; sprijinul pentru eforturile de comunicare strategică va ajuta în special lupta împotriva dezinformării.",
+    "en": "To support Moldova in the implementation of reforms linked to the EU-Moldova Association Agreement and Deep and Comprehensive Free Trade Area; support to strategic communication efforts in Moldova will particularly help the fight against disinformation."
+   },
+   "sursa": "https://enlargement.ec.europa.eu/news/eu-announces-additional-eu52-million-support-long-term-resilience-recovery-and-reforms-republic-2022-05-05_en",
+   "citat": "EU4Reforms: this action will support Moldova in the implementation of reforms linked to the EU-Moldova Association Agreement and Deep and Comprehensive Free Trade Area. … Support to strategic communication efforts in Moldova will particularly help the fight against disinformation. … The European Union will mobilise an additional €52 million for the Republic of Moldova",
+   "nota": "Comunicatul Comisiei Europene din 5 mai 2022 descrie împreună «EU4Reforms» și «EU4Recovery and Resilience» (52 mil. EUR suplimentari, fără sume separate); sumele din registru (25 + 27 = 52 mil. EUR) se potrivesc cu totalul. Legătura se bazează pe denumire."
+  },
+  {
+   "acte": [
+    "DP974/2023",
+    "LP154/2023",
+    "HG353/2023"
+   ],
+   "obiective": {
+    "ro": "Consolidarea rezilienței statului și a societății și a redresării socio-economice, cu accent pe stabilitate și pace, și crearea de oportunități pentru toți, în mod incluziv. Obiective specifice: dezvoltarea capitalului uman și egalitatea de gen, pentru o mai bună potrivire cu cererea pieței muncii; stabilitatea națională și integritatea teritorială; sisteme agroalimentare consolidate, durabile și reziliente la șocuri externe; dialog politic, diplomație publică și coordonare Team Europe.",
+    "en": "To enhance state and societal resilience and socio-economic recovery, with a particular focus on stability and peace, as well as providing opportunities for all in an inclusive manner. Specific objectives: human capital development and gender equality for better matching labour market demands; national stability and territorial integrity; agri-food systems strengthened, more sustainable and resilient to external shocks; policy dialogue, public diplomacy and Team Europe coordination."
+   },
+   "sursa": "https://enlargement.ec.europa.eu/system/files/2022-12/C_2022_9686_1_EN_annexe_aap-2022-moldova.pdf",
+   "citat": "The Overall Objective (Impact) of this action is to enhance state and societal resilience and socio-economic recovery, with a particular focus on stability and peace, as well as providing opportunities for all in an inclusive manner. … Support the country's human capital development and advancing gender equality and women's empowerment for better matching the labour market demands through inclusive and gender-responsive policies and improved employment and labour policies and institutional capacities. … Contribute to national stability and territory integrity, in a deteriorating regional security environment through the reinforcement of national human, institutional, operational and societal capacities. … Agri-food systems are strengthened, more sustainable and resilient to external shocks and crisis.",
+   "nota": "Action Document for EU4 Resilience and Governance (planul anual de acțiune pentru Moldova 2022, Decizia C(2022) 9686), contribuție UE de 40 000 000 EUR, adică suma din registru; denumirea din registru («UE pentru reziliență și guvernanță») e traducerea titlului."
+  },
+  {
+   "acte": [
+    "HG136/2024",
+    "HG110/2024"
+   ],
+   "obiective": {
+    "ro": "Consolidarea rezilienței statului și a societății și a redresării socio-economice, cu accent pe securitate și stabilitate, adaptarea la schimbările climatice a sectorului agroalimentar și integrarea în UE. Obiective specifice: capacități naționale sporite pentru securitate și migrație; agricultură mai durabilă și competitivă; reforme în finanțe publice, justiție, concurență, eficiență energetică, muncă și media, în linie cu acquis-ul UE și standardele OIM.",
+    "en": "To enhance state and societal resilience and socio-economic recovery, with a particular focus on security and stability, climate change adaptation of the agri-food sector and EU integration. Specific objectives: enhanced national capacities on security threats and migratory challenges; a more sustainable and competitive agricultural sector; reforms in public finance management, justice, competition, energy efficiency, labour and media in line with the EU acquis and ILO standards."
+   },
+   "sursa": "https://enlargement.ec.europa.eu/document/download/c73f9b8d-dd3b-44da-8229-f4d6685dbe79_en?filename=C_2023_9067_ANNEX.PDF",
+   "citat": "The Overall Objective/Impact of this action is to enhance state and societal resilience and socio-economic recovery, with a particular focus on security and stability, climate change adaptation of the agri-food sector and EU integration. … National capacities to better address security threats and migratory challenges are enhanced. … The sustainability and competitiveness of the agricultural sector are reinforced, contributing to farmers' resilience to external shocks and crisis, including climate change. … Reforms in the areas of Public Finance Management, justice, competition, energy efficiency, labour and media are adopted in line with the EU acquis and ILO standards.",
+   "nota": "Action Document for EU4 Moldova Integration and Stability (planul anual de acțiune 2023, Decizia C(2023) 9067), cost total estimat 31 000 000 EUR, adică suma din registru."
+  },
+  {
+   "acte": [
+    "HG178/2025",
+    "HG90/2025"
+   ],
+   "obiective": {
+    "ro": "Consolidarea rezilienței Moldovei și sprijinirea unei agende de reforme orientate spre aderare, cu accent pe energie, capital uman și competențe, și agricultură. Obiective specifice: securitate energetică sporită prin reducerea consumului de energie și consolidarea energiei regenerabile produse local; forță de muncă mai bine pregătită pentru piața muncii; modernizare, inovare și aliniere la standarde a producătorilor agricoli și a operatorilor agroalimentari.",
+    "en": "To strengthen Moldova's resilience and support an accession-oriented reform agenda, with a particular focus on energy, human capital and skills and agriculture. Specific objectives: enhanced energy security by decreasing energy consumption and strengthening locally generated renewable energy; improved employability of the workforce in line with labour market needs; modernisation, innovation and alignment to standards by agriculture producers and agri-food operators."
+   },
+   "sursa": "https://enlargement.ec.europa.eu/document/download/daaccc43-3308-4f11-a1ac-ebfcfe908b87_en?filename=C_2024_9169_1_EN_annexe_acte_autonome_nlw_part1_v3.pdf&prefLang=uk",
+   "citat": "The Overall Objective/Impact of this action is to strengthen Moldova’s resilience and support an accession-oriented reform agenda, with a particular focus on energy, human capital and skills and agriculture. … Enhance energy security by decreasing energy consumption and strengthening locally generated renewable energy. … Improved employability of the workforce in Moldova in line with the labour market needs. … Modernisation, innovation, and alignment to standards by agriculture producers and agri-food operators. … Total estimated cost: EUR 64 000 000.00",
+   "nota": "Action Document for Multi-sectorial Budget Support (planul anual de acțiune 2024, partea 2, Decizia C(2024) 9169): cost total estimat 64 000 000 EUR, adică suma din registru. Titlul din registru («Contractul de performanță pentru reforma sectorială») diferă de titlul documentului; legătura se bazează pe sumă și an (acordul a fost semnat la 31.01.2025)."
+  },
+  {
+   "acte": [
+    "DP219/2025",
+    "LP118/2025",
+    "HG307/2025"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Moldovei în realizarea reformelor legate de UE, precum și în accelerarea creșterii și atingerea convergenței economice cu UE.",
+    "en": "To support Moldova in undertaking EU-related reforms, as well as in accelerating growth and achieving economic convergence with the EU."
+   },
+   "sursa": "https://www.consilium.europa.eu/en/press/press-releases/2025/03/18/moldova-council-gives-final-green-light-to-support-reforms-and-economic-growth-with-almost-2-billion/",
+   "citat": "The Facility will support Moldova in undertaking EU-related reforms, as well as in accelerating growth and achieving economic convergence with the EU. … It will support Moldova during the period from 2025 to 2027 and is expected to provide up to €385 million in grants and €1.5 billion in loans.",
+   "nota": "Facilitatea de reformă și creștere pentru Moldova (2025–2027), din 1,9 mld. EUR în total: până la 385 mil. EUR granturi și 1,5 mld. EUR împrumuturi (comunicatul Consiliului UE din 18 martie 2025). Componenta de împrumuturi (1,5 mld. EUR) coincide cu suma din registru."
+  },
+  {
+   "acte": [
+    "DP648/2026",
+    "LP97/2026",
+    "HG274/2026"
+   ],
+   "obiective": {
+    "ro": "Consolidarea rezilienței sectorului agricol la schimbările climatice, prin reabilitarea a două rețele publice de irigații și repararea unor mici infrastructuri de colectare și stocare a apei.",
+    "en": "To strengthen the resilience of the agricultural sector to climate change, through the rehabilitation of two public irrigation networks and the restoration of small water collection and storage infrastructures."
+   },
+   "inceput": "2026-05-14",
+   "sfarsit": "2031-05-14",
+   "sursa": "https://www.afd.fr/fr/projets/programme-de-developpement-integre-de-agriculture-et-de-irrigation",
+   "citat": "Afin de renforcer la résilience du secteur agricole face au changement climatique, le projet prévoit la réhabilitation de deux réseaux publics d’irrigation ainsi que la remise en état de petites infrastructures de collecte et de stockage de l’eau. … Montant du financement AFD 45 000 000 € … Date de début du projet 14 mai 2026 … Date de fin du projet 14 mai 2031",
+   "nota": "Fișa AFD «Programme de développement intégré de l’agriculture et de l’irrigation (iDRIP)» (text original în franceză; engleza e traducerea): finanțare AFD 45 000 000 € (suma din registru), finanțare globală 61 600 000 €. Datele sunt cele din fișă («Date de début du projet» și «Date de fin du projet»); data de început coincide cu data semnării din registru."
+  },
+  {
+   "acte": [
+    "DP647/2026",
+    "LP96/2026",
+    "HG252/2026"
+   ],
+   "obiective": {
+    "ro": "Consolidarea rezilienței sectorului agricol la schimbările climatice, prin reabilitarea a două rețele publice de irigații și repararea unor mici infrastructuri de colectare și stocare a apei.",
+    "en": "To strengthen the resilience of the agricultural sector to climate change, through the rehabilitation of two public irrigation networks and the restoration of small water collection and storage infrastructures."
+   },
+   "sursa": "https://www.afd.fr/fr/projets/programme-de-developpement-integre-de-agriculture-et-de-irrigation",
+   "citat": "Afin de renforcer la résilience du secteur agricole face au changement climatique, le projet prévoit la réhabilitation de deux réseaux publics d’irrigation ainsi que la remise en état de petites infrastructures de collecte et de stockage de l’eau.",
+   "nota": "Alt rând cu aceeași denumire (iDRIP, 11,2 mil. EUR), legat doar prin denumire de fișa AFD (text original în franceză; engleza e traducerea). Datele din fișă (14.05.2026–14.05.2031) sunt ale împrumutului AFD de 45 mil. EUR și nu s-au copiat aici."
+  },
+  {
+   "acte": [
+    "DP211/2025",
+    "LP106/2025",
+    "HG263/2025"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea eficienței energetice a clădirilor publice și a accesului la servicii publice, prin renovarea clădirilor de învățământ superior și de sănătate, în contextul angajamentului Moldovei de a reduce intensitatea energetică a țării.",
+    "en": "In a context where Moldova is committed to reduce the energy intensity of the country, to improve energy efficiency of public buildings and access to public services through the renovation of higher education and health buildings."
+   },
+   "inceput": "2025-03-10",
+   "sursa": "https://www.afd.fr/en/projects/energy-efficiency-public-buildings-inspiree",
+   "citat": "In a context where Moldova is committed to reduce the energy intensity of the country, the INSPIREE project aims at improving energy efficiency of public buildings and access to public services through the renovation of higher education and health buildings. … AFD financing amount € 30 000 000 … Project start date March 10, 2025",
+   "nota": "Fișa AFD «Energy efficiency in public buildings - INSPIREE»: finanțare AFD 30 000 000 € (suma din registru); «Project start date» 10.03.2025 coincide cu data semnării din registru. Fișa dă și «Project end date» 10.03.2040 (durata de 15 ani), care nu s-a introdus ca dată de finalizare a lucrărilor."
+  },
+  {
+   "acte": [
+    "DP1644/2024",
+    "LP250/2024",
+    "HG681/2024"
+   ],
+   "obiective": {
+    "ro": "Contribuția directă la decarbonizarea sectorului energetic al țării, printr-un împrumut-program de 25 mil. EUR acordat de AFD și dezvoltat împreună cu Guvernul Moldovei, pe o perioadă de șase ani (2023–2028).",
+    "en": "To contribute directly to the decarbonisation of the country’s energy sector, through a EUR 25 million programme loan granted by AFD and developed jointly with the Moldovan government, over a six-year period (2023-2028)."
+   },
+   "inceput": "2023",
+   "sfarsit": "2028",
+   "sursa": "https://www.afd.fr/fr/commmuniques-de-presse/la-moldavie-et-la-france-renforcent-leur-partenariat-avec-un-financement-de",
+   "citat": "Le prêt-programme de 25 millions d’euros accordé par l’AFD, développé conjointement avec le gouvernement moldave, contribuera directement à la décarbonation du secteur énergétique du pays sur une période de six ans (2023-2028). … La cérémonie de signature, qui s'est tenue le 17 septembre 2024",
+   "nota": "Comunicatul AFD din 17 septembrie 2024 (în franceză; engleza e traducerea), la semnarea împrumutului-program de 25 mil. EUR pentru tranziția energetică verde: data semnării și suma coincid cu rândul din registru (17.09.2024; 25 mil. EUR). Anii 2023 și 2028 sunt perioada programului, cum o dă comunicatul."
+  },
+  {
+   "acte": [
+    "DP455/2025",
+    "LP292/2025",
+    "HG703/2025"
+   ],
+   "obiective": {
+    "ro": "Contribuția directă la decarbonizarea sectorului energetic al țării, printr-un împrumut-program de 25 mil. EUR acordat de AFD și dezvoltat împreună cu Guvernul Moldovei, pe o perioadă de șase ani (2023–2028).",
+    "en": "To contribute directly to the decarbonisation of the country’s energy sector, through a EUR 25 million programme loan granted by AFD and developed jointly with the Moldovan government, over a six-year period (2023-2028)."
+   },
+   "sursa": "https://www.afd.fr/fr/commmuniques-de-presse/la-moldavie-et-la-france-renforcent-leur-partenariat-avec-un-financement-de",
+   "citat": "Le prêt-programme de 25 millions d’euros accordé par l’AFD, développé conjointement avec le gouvernement moldave, contribuera directement à la décarbonation du secteur énergétique du pays sur une période de six ans (2023-2028). … La cérémonie de signature, qui s'est tenue le 17 septembre 2024",
+   "nota": "Rând cu denumirea «Programul pentru tranziția energetică verde» (25 mil. EUR, 2025), legat de programul din comunicatul AFD din 17 septembrie 2024 doar prin denumire și sumă; nu s-a stabilit dacă e același acord sau unul ulterior. Datele programului nu s-au copiat aici."
+  },
+  {
+   "acte": [
+    "HG784/2023",
+    "HG411/2023"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea reformei sectorului energetic al Moldovei în perspectiva aderării la UE: împrumuturi concesionale AFD (prima tranșă de 40 mil. EUR în 2023), cu decontări legate de implementarea reformelor convenite, și asistență tehnică finanțată printr-un grant UE de 5 mil. EUR, pentru ministere și instituții publice, în implementarea și monitorizarea reformei.",
+    "en": "To support the reform of the country’s energy sector ahead of EU accession: concessional AFD loans (first tranche of EUR 40 million in 2023), with disbursements linked to the implementation of agreed reforms, and a technical assistance programme funded by a EUR 5 million EU grant to support the ministries and public institutions in implementing and monitoring the reform."
+   },
+   "inceput": "2023",
+   "sursa": "https://www.afd.fr/fr/actualites/communique-de-presse/afd-et-ue-soutiennent-securite-energetique-reforme-secteur-energie-republique-moldavie",
+   "citat": "Le 23 juin, les ministères de l'Énergie, des Finances, de l'Environnement, du Travail et de la Protection sociale du gouvernement de la République de Moldavie et l'Agence française de développement (AFD) ont signé un protocole d'accord pour soutenir la réforme du secteur énergétique du pays dans la perspective de son adhésion à l'Union européenne. … Les prêts concessionnels accordés par l'AFD (première tranche de 40 millions d'euros en 2023), dont les décaissements sont liés à la mise en œuvre des réformes convenues. … Ce don vise à soutenir les ministères moldaves et les institutions publiques dans la mise en œuvre et le suivi de la réforme. … Le programme commencera en 2023 et durera six ans.",
+   "nota": "Comunicatul AFD (text original în franceză; engleza e traducerea) despre memorandumul semnat la 23 iunie 2023 de ministerele Energiei, Finanțelor, Mediului și Muncii și Protecției Sociale cu AFD, adică memorandumul din registru. Anul 2023 e anul de început al programului, cum îl dă comunicatul."
+  },
+  {
+   "acte": [
+    "DP1184/2023",
+    "LP324/2023",
+    "HG813/2023"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea reformei sectorului energetic al Moldovei în perspectiva aderării la UE: împrumuturi concesionale AFD (prima tranșă de 40 mil. EUR în 2023), cu decontări legate de implementarea reformelor convenite, și asistență tehnică finanțată printr-un grant UE de 5 mil. EUR, pentru ministere și instituții publice, în implementarea și monitorizarea reformei.",
+    "en": "To support the reform of the country’s energy sector ahead of EU accession: concessional AFD loans (first tranche of EUR 40 million in 2023), with disbursements linked to the implementation of agreed reforms, and a technical assistance programme funded by a EUR 5 million EU grant to support the ministries and public institutions in implementing and monitoring the reform."
+   },
+   "sursa": "https://www.afd.fr/fr/actualites/communique-de-presse/afd-et-ue-soutiennent-securite-energetique-reforme-secteur-energie-republique-moldavie",
+   "citat": "Le 23 juin, les ministères de l'Énergie, des Finances, de l'Environnement, du Travail et de la Protection sociale du gouvernement de la République de Moldavie et l'Agence française de développement (AFD) ont signé un protocole d'accord pour soutenir la réforme du secteur énergétique du pays dans la perspective de son adhésion à l'Union européenne. … Les prêts concessionnels accordés par l'AFD (première tranche de 40 millions d'euros en 2023), dont les décaissements sont liés à la mise en œuvre des réformes convenues. … Ce don vise à soutenir les ministères moldaves et les institutions publiques dans la mise en œuvre et le suivi de la réforme. … Le programme commencera en 2023 et durera six ans.",
+   "nota": "Credit AFD de 40 mil. EUR din 2023 (semnat la 17.10.2023 în registru), legat de programul de reformă energetică din comunicatul AFD prin suma și anul primei tranșe («première tranche de 40 millions d’euros en 2023»); comunicatul nu citează numărul acordului. Text original în franceză; engleza e traducerea."
+  },
+  {
+   "acte": [
+    "OMS737/2025",
+    "HG949/2020",
+    "HG1388/2016"
+   ],
+   "obiective": {
+    "ro": "Contribuția la îmbunătățirea stării de sănătate a populației Moldovei prin reducerea poverii bolilor netransmisibile. Rezultate: instituțiile naționale de sănătate promovează măsurile „best buys” ale OMS și lucrează bazat pe dovezi și multisectorial pentru a spori alfabetizarea populației în materie de sănătate; serviciile integrate de calitate previn și tratează mai bine bolile netransmisibile; femeile și bărbații își asumă răspunderea pentru propria sănătate, își cer drepturile și cer socoteală factorilor de decizie, inclusiv pentru pacienții cei mai vulnerabili.",
+    "en": "To contribute to the improvement of the health status of the Moldovan population through the reduction of the burden of NCDs. Outcomes: national health institutions promote WHO best buys and work in an evidence-based, multi-sectoral manner to increase health literacy; quality integrated services improve the prevention and management of NCDs; men and women take responsibility for their own health, demand their rights and hold decision-makers to account for reaching even the most vulnerable NCD patients."
+   },
+   "inceput": "2015-01-01",
+   "sfarsit": "2028-06-30",
+   "sursa": "https://www.eda.admin.ch/deza/en/home/projekte/projekte.filterResults.olddesign.par_projectfilter_copy_page1.html/content/dezaprojects/SDC/en/2015/7F06103/phase3.html?oldPagePath=%2Fcontent%2Fdeza%2Fen%2Fhome%2Fprojekte%2Fprojekte.html",
+   "citat": "To contribute to the improvement of the health status of the Moldovan population through the reduction of the burden of NCDs. … National health institutions (and their territorial structures) promote WHO best buys and work in an evidence-based, multi-sectoral manner to increase health literacy of the population. … Quality integrated services, under-pinned by regulations and education of service providers, improve the prevention and management of NCDs. … Men and women take responsibility for their own health, demand their rights, and hold decision-makers to account for reaching even the most vulnerable NCD patients. … Phase 1 01.01.2015 - 30.09.2020 (Completed) … Phase 3 01.10.2024 - 30.06.2028 (Current phase)",
+   "nota": "Fișa SDC «Reducing the burden of non-communicable diseases – Healthy Life Project» listează faza 1 (01.01.2015–30.09.2020, încheiată) și faza 3 (01.10.2024–30.06.2028, în curs); faza 2 nu apare în listă. Data de început e cea a fazei 1, data de finalizare — cea a fazei 3 în curs. Bugetul elvețian al fazei 3 (5 120 000 CHF) coincide cu suma din registru (acordul OMS737/2025); rândul reunește mai multe acte (HG1252/2016, HG1388/2016, HG949/2020, OMS737/2025). Obiectivul și rezultatele sunt cele ale fazei 3 (text original în engleză)."
+  },
+  {
+   "acte": [
+    "OP357/2025"
+   ],
+   "obiective": {
+    "ro": "Practici parlamentare îmbunătățite ireversibil, care să asigure democrația parlamentară, reziliența și independența instituției. Rezultate: legislație adoptată de Parlament de calitate mai bună; control parlamentar mai consecvent și mai eficace; comunicare mai bună între Parlament și cetățeni.",
+    "en": "Irreversibly improved parliamentary practices, ensuring parliamentary democracy and resilience, and independence of the institution. Outcomes: improved quality of legislation adopted by the parliament; more consistent and effective parliamentary oversight; improved communication between parliament and citizens."
+   },
+   "inceput": "2024-02-01",
+   "sfarsit": "2029-03-31",
+   "sursa": "https://www.eda.admin.ch/deza/en/home/projekte/projekte.html/content/dezaprojects/SDC/en/2018/7F09960/phase1",
+   "citat": "Irreversibly improved parliamentary practices, ensuring parliamentary democracy and resilience, and independence of the institution. … Improved quality of legislation adopted by the parliament … More consistent and effective parliamentary oversight … Improved communication between parliament and citizens … 01.02.2024 - 31.03.2029",
+   "nota": "Fișa SDC «Strengthening Parliamentary Democracy in Moldova (PADEM)», faza 1 (text original în engleză): perioada 01.02.2024–31.03.2029; bugetul elvețian din fișă e de 5 300 000 CHF, față de 5 000 000 CHF în registru (OP357/2025) — diferența nu e explicată în surse. Datele sunt ale fazei din fișă, nu ale semnării acordului."
+  },
+  {
+   "acte": [
+    "OMS128/2025"
+   ],
+   "obiective": {
+    "ro": "În Moldova (inclusiv în regiunea transnistreană), persoanele aflate în risc sau cu afecțiuni urgente, care pun viața în pericol, au șanse mai mari de supraviețuire și recuperare în situații de urgențe medicale și de crize de sănătate publică.",
+    "en": "In Moldova (including Transnistrian region), people at risk or with urgent, life-threatening conditions have increased chances of survival and recovery in situations of medical emergencies and public health crises."
+   },
+   "inceput": "2024-10-01",
+   "sfarsit": "2028-09-30",
+   "sursa": "https://www.eda.admin.ch/deza/de/home/projekte/projekte.html/content/dezaprojects/SDC/en/2024/7F11244/phase1",
+   "citat": "In Moldova (including Transnistrian region), people at risk or with urgent, life-threatening conditions have increased chances of survival and recovery in situations of medical emergencies and public health crises. … 01.10.2024 - 30.09.2028",
+   "nota": "Fișa SDC «Moldova: Continuity of care in case of catastrophic health events – Care4Living», faza 1 (text original în engleză): perioada 01.10.2024–30.09.2028; contribuția elvețiană din fișă e de 9 943 200 CHF, față de 8 300 000 CHF în registru (OMS128/2025) — diferența nu e explicată în surse; fișa numește parteneri PNUD, Banca Mondială și OMS. Datele sunt ale fazei din fișă, nu ale semnării acordului."
+  },
+  {
+   "acte": [
+    "HG465/2016"
+   ],
+   "obiective": {
+    "ro": "Instituțiile moldovenești de la toate nivelurile răspund nevoilor de alimentare cu apă și de servicii de sanitație ale populației rurale, inclusiv ale celor mai vulnerabili.",
+    "en": "Moldovan institutions at all levels respond to the needs for water supply and sanitation services of the rural population, including the most vulnerable."
+   },
+   "sursa": "https://www.entwicklung.at/en/projects/detail-en/water-and-sanitation-apasan-project-in-the-republic-of-moldova-phase-3",
+   "citat": "The objective of the third phase of the Water and Sanitation Project ApaSan is: Moldovan institutions at all levels respond to the needs for water supply and sanitation services of the rural population, including the most vulnerable.",
+   "nota": "Fișa Agenției Austriece de Dezvoltare (ADA/ADC) pentru «Water and Sanitation (ApaSan) Project in the Republic of Moldova, Phase 3» (text original în engleză; faza 3: început 01.06.2015, final 30.09.2019 în fișa ADA, dar 31.05.2019 pe pagina SKAT — sursele diferă, de aceea nu s-au introdus date). Rândul din registru are un singur act (HG465/2016, 15.04.2016) și din surse nu s-a putut verifica la ce fază se referă; obiectivul e cel al fazei 3."
+  }
+ ]
+}

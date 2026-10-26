@@ -102,6 +102,19 @@
    ],
    "langa": "LP301/2003",
    "nota": "AID, Facilitarea Comerțului și Transportului în Europa de Sud-Est (2003): hotărârea e a acordului ratificat prin LP301/2003, nu a creditelor din 1999 de pe rândul ei."
+  },
+  {
+   "acte": [
+    "DP976/2023",
+    "LP223/2023",
+    "DP1059/2023",
+    "HG755/2024",
+    "LP273/2024",
+    "DP1627/2024",
+    "DP1674/2024"
+   ],
+   "langa": "HG456/2023",
+   "nota": "BIRD, „Îmbunătățirea calității educației”: două granturi distincte, al Fondului fiduciar ELP (5 mil. USD) și al Parteneriatului Global pentru Educație (GPE, 4,8 mil. USD). Actele de semnare, ratificare și amendament ale grantului ELP erau pe rândul GPE; rândul ELP rămăsese doar cu inițierea negocierilor și proiectul de lege."
   }
  ],
  "uneste": [
@@ -749,6 +762,27 @@
     "HG362/2025"
    ],
    "nota": "BDCE, același acord-cadru de 30 mil. EUR: hotărârile îl numesc „Extinderea rețelei școlilor-model”, legea de ratificare „Modernizarea școlilor (facilitatea de finanțare publică)”."
+  },
+  {
+   "acte": [
+    "HG772/2007",
+    "HG788/2011"
+   ],
+   "nota": "AID, Proiectul „Servicii de sănătate și asistență socială”: HG788/2011 (26.10.2011) inițiază negocierile pentru finanțarea suplimentară, semnată la 20.12.2011 (HG955/2011, HG98/2012, LP79/2012, DP58/2012, deja pe rândul acordului din 2007). Rămăsese pe un rând separat, fără sumă."
+  },
+  {
+   "acte": [
+    "HG456/2023"
+   ],
+   "nume": "Îmbunătățirea calității educației — grantul Fondului fiduciar ELP (învățarea timpurie)",
+   "nota": "Doar denumirea: cele două granturi ale proiectului (ELP și GPE) aveau același nume în listă."
+  },
+  {
+   "acte": [
+    "HG455/2023"
+   ],
+   "nume": "Îmbunătățirea calității educației — grantul Parteneriatului Global pentru Educație (GPE)",
+   "nota": "Doar denumirea: cele două granturi ale proiectului (ELP și GPE) aveau același nume în listă."
   }
  ]
 }
