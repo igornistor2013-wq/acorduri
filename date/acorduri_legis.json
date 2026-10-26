@@ -1,5 +1,77 @@
 [
  {
+  "act": "O139/2026",
+  "data_editie": "22.10.2026",
+  "tip": "Ordin",
+  "titlu": "Ordin cu privire la aprobarea Instrucțiunii privind determinarea eligibilității operatorilor economici, precum și determinarea originii mărfurilor de către autoritățile publice în procesul de implementare a cotei de cofinanțare a Republicii Moldova în cadrul proiectelor investiționale, aprobate prin Platforma de investiții pentru politica de vecinătate în cadrul Mecanismului de reformă și creștere pentru Republica Moldova",
+  "categorie": "Asistență financiară",
+  "partener": "",
+  "semnat": "",
+  "editie": "MO 520-523",
+  "suport_bugetar": "",
+  "link": "https://www.legis.md/cautare/getResults?document_status=0&nr_doc=139&datepicker1=20.10.2026&publication_status=+-+TOATE+-+&nr=&publish_date=&search_type=1&search_string="
+ },
+ {
+  "act": "HG569/2026",
+  "data_editie": "16.10.2026",
+  "tip": "Hotărâre",
+  "titlu": "Hotărâre cu privire la inițierea negocierilor asupra proiectului Acordului de împrumut dintre Guvernul Republicii Moldova și Agenția Japoneză pentru Cooperare Internațională pentru realizarea Proiectului „Modernizarea tehnicii și echipamentelor agricole (etapa a II-a) și împuternicirea delegației oficiale pentru negocierea acestuia”",
+  "categorie": "Împrumut",
+  "partener": "JICA",
+  "semnat": "",
+  "editie": "MO 512-515",
+  "suport_bugetar": "",
+  "link": "https://www.legis.md/cautare/getResults?document_status=0&nr_doc=569&datepicker1=15.10.2026&publication_status=+-+TOATE+-+&nr=&publish_date=&search_type=1&search_string="
+ },
+ {
+  "act": "HG568/2026",
+  "data_editie": "16.10.2026",
+  "tip": "Hotărâre",
+  "titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Acordului, întocmit prin schimb de note, dintre Guvernul Republicii Moldova şi Guvernul Japoniei privind acordarea unui împrumut pentru realizarea proiectului „Modernizarea tehnicii și echipamentelor agricole (etapa a II-a)”",
+  "categorie": "Împrumut",
+  "partener": "Japonia",
+  "semnat": "",
+  "editie": "MO 512-515",
+  "suport_bugetar": "",
+  "link": "https://www.legis.md/cautare/getResults?document_status=0&nr_doc=568&datepicker1=15.10.2026&publication_status=+-+TOATE+-+&nr=&publish_date=&search_type=1&search_string="
+ },
+ {
+  "act": "HG567/2026",
+  "data_editie": "16.10.2026",
+  "tip": "Hotărâre",
+  "titlu": "Hotărâre cu privire la inițierea negocierilor asupra proiectului Acordului de împrumut dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare în vederea implementării proiectului „Mecanismul de eficiență energetică Revolving din Moldova (MEERM)” și împuternicirea delegației pentru negocierea acestuia",
+  "categorie": "Împrumut",
+  "partener": "BIRD",
+  "semnat": "",
+  "editie": "MO 512-515",
+  "suport_bugetar": "",
+  "link": "https://www.legis.md/cautare/getResults?document_status=0&nr_doc=567&datepicker1=15.10.2026&publication_status=+-+TOATE+-+&nr=&publish_date=&search_type=1&search_string="
+ },
+ {
+  "act": "HG562/2026",
+  "data_editie": "16.10.2026",
+  "tip": "Hotărâre",
+  "titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Acordului-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei „Modernizarea instituțiilor de învățământ profesional tehnic”",
+  "categorie": "Împrumut",
+  "partener": "CEB",
+  "semnat": "",
+  "editie": "MO 512-515",
+  "suport_bugetar": "",
+  "link": "https://www.legis.md/cautare/getResults?document_status=0&nr_doc=562&datepicker1=15.10.2026&publication_status=+-+TOATE+-+&nr=&publish_date=&search_type=1&search_string="
+ },
+ {
+  "act": "HG557/2026",
+  "data_editie": "08.10.2026",
+  "tip": "Hotărâre",
+  "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare pentru realizarea Proiectului „Moldova – Proiect de alimentare durabilă cu apă (irigații)”",
+  "categorie": "Împrumut",
+  "partener": "BERD",
+  "semnat": "",
+  "editie": "MO 500-503",
+  "suport_bugetar": "",
+  "link": "https://www.legis.md/cautare/getResults?document_status=0&nr_doc=557&datepicker1=07.10.2026&publication_status=+-+TOATE+-+&nr=&publish_date=&search_type=1&search_string="
+ },
+ {
   "act": "HG546/2026",
   "data_editie": "01.10.2026",
   "tip": "Hotărâre",
