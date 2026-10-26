@@ -369,14 +369,16 @@ tabelului („obiective N/M · început N/M · finalizare N/M", cu cifrele de la
 Un utilizator poate corecta oricând un câmp din pagină; `date/proiecte_manual.json` e pentru ce se poate
 dovedi cu un document oficial.
 
-La data acestei versiuni, `date/proiecte_manual.json` are obiective pentru 143 din cele 460 de rânduri listate
-(Banca Mondială 62, BERD 34, BEI 20, CEB 10, AFD 7, Uniunea Europeană 6, Elveția 4), fiecare cu adresa
-documentului oficial și citatul exact. Restul (Japonia, Germania, China, SUA, FIDA și majoritatea acordurilor
-Elveției, ale UE și ale Băncii Mondiale mai vechi) rămân „neintroduse", până se găsește o sursă; se pot
-completa direct din pagină, cu codul de acces, sau în fișier, cu o intrare nouă (sursă + citat). Datele de
-început și de finalizare vin deocamdată din AMP (la proiectele legate sigur) și din 8 intrări oficiale
-(DHEIP-1, patru de la AFD, trei de la Elveția/SDC); la fiecare, `nota` spune ce reprezintă data (perioada
-unei faze, anul de început al programului etc.).
+La data acestei versiuni, `date/proiecte_manual.json` are obiective pentru 170 din cele 460 de rânduri listate
+(Banca Mondială 62, BERD 34, BEI 20, CEB 10, Japonia/JICA 10, FIDA 9 — toate —, AFD 7, Germania 7 — KfW și GIZ —,
+Uniunea Europeană 6, Elveția 4, SUA/MCC 1), fiecare cu adresa documentului oficial și citatul exact. Restul (China,
+SUA/USAID, cea mai mare parte din Japonia și Germania, majoritatea acordurilor Elveției, ale UE și ale Băncii Mondiale
+mai vechi) rămân „neintroduse", până se găsește o sursă; se pot completa direct din pagină, cu codul de acces, sau în
+fișier, cu o intrare nouă (sursă + citat). Datele de început și de finalizare vin deocamdată din AMP (la proiectele
+legate sigur) și din 26 de intrări oficiale (opt de la FIDA — șapte doar cu data finalizării —, cinci de la
+JICA/Japonia, patru de la GIZ/Germania, patru de la AFD, trei de la Elveția/SDC, DHEIP-1 și MCC); la fiecare, `nota`
+spune ce reprezintă data (perioada unei faze, anul de început al programului, data intrării în vigoare sau a închiderii
+proiectului etc.) și când legătura cu rândul din registru se bazează doar pe denumire sau pe sumă.
 
 **Codul de acces și „baza de date".** Site-ul e static (GitHub Pages): n-are server care să primească
 date. Singurul loc în care o pagină poate scrie fără un serviciu în plus e chiar repository-ul, prin

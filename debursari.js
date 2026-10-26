@@ -978,7 +978,8 @@ function foaieProiecte(c, o) {
     foaie: o.foaie, titlu: o.titlu, subtitlu: o.subtitlu,
     antete: cols.map(function (x) { return x[0]; }), tipuri: cols.map(function (x) { return x[1]; }).join(''), randuri: randuri, latimi: latimi,
     total: { eticheta: t('Total (rândurile vizibile)', 'Total (visible rows)'), suma: [cEur, cDebEur, cRest, cNr] },
-    inghetaColoane: 1, maxLinii: 3, paginiLatime: 'auto', bare: [cPct],
+    /* maxLinii 10: obiectivele (cel mult 600 de caractere) încap întregi în coloana „Descriere succintă”; un rând mai scurt își ia singur înălțimea */
+    inghetaColoane: 1, maxLinii: 10, paginiLatime: 'auto', bare: [cPct],
     grupe: [{ de: cProiect, pana: cSfa, text: t('PROIECTUL', 'THE PROJECT') }, { de: cTip, pana: cSemnat, text: t('ACORDUL', 'THE AGREEMENT') },
             { de: cSuma, pana: cEur, text: t('SUMA PROIECTULUI', 'PROJECT AMOUNT') },
             { de: cDebVal, pana: cUltima, text: t('DEBURSĂRI', 'DISBURSEMENTS') }, { de: cInTotal, pana: cLink, text: t('DETALII', 'DETAILS') }],
