@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debursări pe acorduri — Asistență Externă, Republica Moldova</title>
+<meta name="description" content="Acordurile din registrul legis.md, repartizate pe donatori: proiectele fiecăruia, suma lor și debursările introduse manual, cu export în Excel pe donator sau total.">
+<meta property="og:title" content="Debursări pe acorduri — Republica Moldova">
+<meta property="og:description" content="Acordurile din registrul legis.md, repartizate pe donatori: proiectele fiecăruia, suma lor și debursările introduse manual, cu export în Excel pe donator sau total.">
+<meta property="og:image" content="https://nistor.vivi.md/og.png">
+<meta property="og:url" content="https://nistor.vivi.md/debursari.html">
+<link rel="canonical" href="https://nistor.vivi.md/debursari.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<style>
+  :root{
+    --bg:#ffffff;--panel:#ffffff;--line:#e4e7ef;--line-strong:#c9ceda;
+    --ink:#1c2230;--ink-dim:#5f6679;--navy:#22406b;--navy-deep:#16294a;
+    --blue-bg:#eaf0fb;--gold:#c8871a;--gold-bg:#fdf1dc;--red:#a3311e;--red-bg:#fbe8e3;
+    --green-bg:#e6f4ea;--green-ink:#276c3e;--purple:#6b4a85;--purple-bg:#f1ebf6;
+    --teal-ink:#155a52;--teal-bg:#e0f2f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,'Courier New',monospace;
+    --radius:10px;--shadow:0 1px 2px rgba(20,30,60,.04), 0 4px 14px rgba(20,30,60,.05);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1400px;margin:0 auto;padding:32px 24px 60px}
+  @media (max-width:720px){.wrap{padding:16px 12px 40px}}
+  button,input,select{font-family:inherit}
+  a{color:var(--navy)}
+  [hidden]{display:none !important}
+
+  .top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;
+    padding-bottom:22px;margin-bottom:24px;border-bottom:1px solid var(--line-strong)}
+  .top > div:first-child{flex:1 1 560px;min-width:0}
+  .title-row{display:flex;align-items:center;gap:13px}
+  .logo-badge{width:38px;height:38px;border-radius:9px;flex:none;
+    background:linear-gradient(135deg,var(--navy),#2f5691);display:flex;align-items:center;justify-content:center}
+  .logo-badge svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+  h1{font-weight:800;font-size:clamp(26px,3.2vw,38px);line-height:1.12;margin:0;color:var(--navy-deep);letter-spacing:-.015em}
+  .top-sub{margin:9px 0 0;color:var(--ink-dim);font-size:13.5px;max-width:110ch}
+  .top-meta{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);display:flex;flex-direction:column;gap:4px}
+  .top-meta b{color:var(--navy-deep);font-weight:700}
+
+  /* bara de acces: cine poate scrie, și ce se întâmplă cu salvarea */
+  .acces{display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 16px;margin-bottom:20px;border-left:4px solid var(--line-strong)}
+  .acces.deblocat{border-left-color:var(--green-ink);background:#f6fbf7}
+  .acces.nesalvat{border-left-color:var(--gold)}
+  .acces.eroare{border-left-color:var(--red);background:#fdf6f4}
+  .acces-ico{width:34px;height:34px;border-radius:9px;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;flex:none}
+  .acces.deblocat .acces-ico{background:var(--green-bg)}
+  .acces-ico svg{width:17px;height:17px;stroke:var(--navy);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .acces.deblocat .acces-ico svg{stroke:var(--green-ink)}
+  .acces-txt{flex:1 1 320px;min-width:0}
+  .acces-txt b{display:block;font-size:13.5px;color:var(--navy-deep)}
+  .acces-txt span{display:block;font-size:12.5px;color:var(--ink-dim);line-height:1.45}
+  .acces-txt .rau{color:var(--red);font-weight:600}
+  .acces-btns{display:flex;gap:8px;flex-wrap:wrap}
+
+  .btn{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line-strong);color:var(--navy);
+    font-size:12.5px;font-weight:700;border-radius:7px;padding:8px 13px;cursor:pointer;white-space:nowrap;line-height:1.2}
+  .btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .btn:hover{background:var(--blue-bg)}
+  .btn:focus-visible,.exp:focus-visible,.don input:focus-visible,.chip:focus-visible,select:focus-visible,input:focus-visible,.lnk:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .btn.p{background:linear-gradient(135deg,var(--navy),#2f5691);border-color:var(--navy);color:#fff}
+  .btn.p:hover{filter:brightness(1.1)}
+  .btn[disabled]{opacity:.55;cursor:not-allowed}
+  .btn.mic{padding:5px 9px;font-size:12px}
+  .btn.rosu{color:var(--red);border-color:#e3b8ae}
+  .btn.rosu:hover{background:var(--red-bg)}
+  .lnk{background:none;border:none;padding:0;color:var(--navy);text-decoration:underline;cursor:pointer;font-size:inherit;font-weight:600}
+
+  /* indicatori */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+  .kpi{position:relative;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px 14px;overflow:hidden;min-width:0}
+  .kpi::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--navy) 0%,#2f5691 62%,var(--gold) 100%)}
+  .kpi .lbl{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;line-height:1.4;margin:1px 40px 8px 0}
+  .kpi-ico{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:9px;background:var(--blue-bg);display:flex;align-items:center;justify-content:center}
+  .kpi-ico svg{width:16px;height:16px;stroke:var(--navy);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .kpi .val{font-size:29px;font-weight:800;color:var(--navy-deep);line-height:1.1;letter-spacing:-.02em;overflow-wrap:anywhere}
+  .kpi .val small{font-size:12px;font-weight:600;color:var(--ink-dim);letter-spacing:0;margin-left:5px}
+  .kpi .sub{font-size:11.5px;color:var(--ink-dim);margin-top:7px;font-family:var(--mono);line-height:1.45}
+  .kpi .bar{margin-top:10px}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--line)}
+  h2{font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);margin:0;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  h2 small{font-size:11.5px;letter-spacing:0;text-transform:none;font-weight:500;color:var(--ink-dim)}
+  .panel-body{padding:16px 18px}
+  h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--navy);margin:0 0 9px;font-weight:700}
+
+  /* două coloane: donatorii (lipiți în stânga) și, în dreapta, indicatorii și tabelele */
+  .cols{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
+  .col-picker{position:sticky;top:12px;align-self:start;min-width:0}
+  .col-picker .panel{margin-bottom:0;display:flex;flex-direction:column;max-height:calc(100vh - 24px)}
+  .col-picker .panel-head{padding:12px 14px}
+  .col-picker .head-btns{width:100%}
+  .col-picker .head-btns .btn{flex:1;justify-content:center;padding:7px 8px}
+  .col-picker .picker-tools{padding:10px 14px}
+  .col-picker .seek,.col-picker .sel{flex:1 1 100%;min-width:0;max-width:none}
+  .col-picker .picker-tools .n{margin-left:0;flex-basis:100%}
+  .col-picker .don-lista{grid-template-columns:1fr;max-height:none;flex:1 1 auto;min-height:130px;padding:10px 12px;gap:6px}
+  .col-picker .don{padding:8px 10px}
+  .col-main{min-width:0}
+  @media (max-width:1100px){
+    .cols{grid-template-columns:1fr}
+    .col-picker{position:static}
+    .col-picker .panel{max-height:none;margin-bottom:20px}
+    .col-picker .don-lista{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));max-height:300px}
+    .col-picker .seek{flex:1 1 200px}
+    .col-picker .sel{flex:0 1 auto}
+    .col-picker .picker-tools .n{flex-basis:auto;margin-left:auto}
+  }
+
+  /* lista donatorilor */
+  .picker-tools{display:flex;gap:8px 10px;flex-wrap:wrap;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);background:#fbfcfe}
+  .seek,.sel{border:1px solid var(--line-strong);border-radius:6px;padding:7px 11px;font-size:12.5px;color:var(--ink);background:#fff}
+  .seek{min-width:200px;flex:1;max-width:340px}
+  .sel{padding-right:6px}
+  .picker-tools .n{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink-dim)}
+  .don-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:8px;padding:14px 18px;overflow:auto;align-content:start}
+  .don{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:9px 11px;cursor:pointer;background:#fff;min-width:0}
+  .don:hover{background:#f7f9fd;border-color:var(--line-strong)}
+  .don.on{background:var(--blue-bg);border-color:var(--navy)}
+  .don input{width:17px;height:17px;margin:2px 0 0;accent-color:var(--navy);grid-row:1 / span 3;align-self:start;cursor:pointer}
+  .don b{font-size:13.5px;color:var(--navy-deep);line-height:1.25;min-width:0;overflow-wrap:anywhere}
+  .don small{grid-column:2;font-size:11px;color:var(--ink-dim);line-height:1.35;font-family:var(--mono);min-width:0;overflow-wrap:anywhere}
+  .don .nm{grid-column:2;font-size:11px;color:var(--ink-dim);line-height:1.3;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  .gol-msg{padding:26px 18px;text-align:center;color:var(--ink-dim)}
+  .gol-msg b{display:block;color:var(--navy-deep);font-size:15px;margin-bottom:4px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+  .chip{background:#fff;border:1px solid var(--line-strong);border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:700;color:var(--navy);cursor:pointer}
+  .chip:hover{background:var(--blue-bg)}
+
+  .toolbar{display:flex;gap:8px 10px;flex-wrap:wrap;align-items:center;margin:0 0 16px}
+  .toolbar .seek{flex:1 1 220px}
+  .toolbar .sp{flex:1}
+
+  /* tabelul proiectelor */
+  .dsum{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);display:flex;gap:4px 14px;flex-wrap:wrap}
+  .dsum b{color:var(--navy-deep)}
+  .head-btns{display:flex;gap:8px;flex-wrap:wrap}
+  .tbl-scroll{overflow-x:auto}
+  table.deb-tbl{border-collapse:collapse;width:100%;table-layout:fixed;min-width:860px}
+  .deb-tbl > thead > tr > th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;text-align:left;padding:11px 12px;border-bottom:1px solid var(--line-strong);background:#fbfcfe;line-height:1.3;vertical-align:bottom;overflow-wrap:anywhere}
+  .deb-tbl > thead > tr > th.num,.deb-tbl > tbody > tr > td.num{text-align:right}
+  .deb-tbl > tbody > tr > td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  .deb-tbl > thead > tr > th:nth-child(1){width:23%}
+  .deb-tbl > thead > tr > th:nth-child(2){width:27%}
+  .deb-tbl > thead > tr > th:nth-child(3){width:12%}
+  .deb-tbl > thead > tr > th:nth-child(4){width:15%}
+  .deb-tbl > thead > tr > th:nth-child(5){width:17%}
+  .deb-tbl > thead > tr > th:nth-child(6){width:6%}
+  tr.ac{cursor:pointer}
+  tr.ac:hover{background:#fafbfd}
+  tr.ac.deschis{background:#f7f9fd}
+  tr.ac.deschis > td{border-bottom-color:transparent}
+  .pname{font-size:13.5px;font-weight:700;color:var(--navy-deep);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+  .pmeta{margin-top:5px;display:flex;gap:4px 6px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--ink-dim)}
+  .pdesc{font-size:12.5px;color:#39405a;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+  tr.deschis .pdesc,tr.deschis .pname{-webkit-line-clamp:unset;overflow:visible}
+  .tag{display:inline-block;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+  .t-grant{background:var(--teal-bg);color:var(--teal-ink)}
+  .t-imprumut{background:var(--red-bg);color:var(--red)}
+  .t-tehnica{background:#e8eef7;color:#3d5a80}
+  .t-alt{background:#eef0f4;color:var(--ink-dim)}
+  .stg{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;white-space:nowrap;background:#eef0f4;color:#4f5668}
+  .stg.vig{background:var(--green-bg);color:var(--green-ink)}
+  .stg.prm,.stg.rat{background:var(--blue-bg);color:var(--navy)}
+  .stg.plg,.stg.sem{background:var(--gold-bg);color:#8a5c0d}
+  .cof{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim)}
+  .amt{font-family:var(--mono);font-weight:700;color:var(--navy);font-size:13px;white-space:nowrap}
+  .amt .cur{font-size:11px;font-weight:600;color:var(--ink-dim)}
+  .amt-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-top:3px;line-height:1.4}
+  .amt-sub.nuadun{color:#8a5c0d}
+  .amt-src{border-bottom:1px dotted currentColor;cursor:help}
+  .nil{color:var(--line-strong);font-weight:400}
+  .bar{height:6px;border-radius:3px;background:#e8edf6;overflow:hidden;margin-top:7px}
+  .bar i{display:block;height:100%;border-radius:3px;background:var(--navy)}
+  .bar.peste i{background:var(--red)}
+  .pct{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);margin-top:3px}
+  .pct b{color:var(--navy-deep)}
+  .exp{background:none;border:1px solid var(--line-strong);border-radius:6px;width:34px;height:30px;color:var(--navy);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+  .exp svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+  tr.deschis .exp svg{transform:rotate(180deg)}
+  .exp:hover{background:var(--blue-bg)}
+  td.act{text-align:center}
+  .badge{display:inline-block;min-width:17px;padding:0 5px;border-radius:9px;background:var(--navy);color:#fff;font-size:10px;font-weight:800;line-height:17px;margin-left:5px;font-family:var(--mono)}
+
+  /* detalii: debursări, formular, date despre acord */
+  .deb-tbl > tbody > tr.det > td{background:#fbfcfe;padding:16px 18px 18px;cursor:default;border-bottom:1px solid var(--line-strong)}
+  .det-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px 26px}
+  @media (max-width:900px){.det-grid{grid-template-columns:1fr}}
+  .det-info{grid-column:1 / -1;border-top:1px dashed var(--line-strong);padding-top:12px;font-size:12.5px;color:#39405a}
+  .det-info dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:4px 14px}
+  .det-info dt{color:var(--ink-dim);font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;padding-top:2px}
+  .det-info dd{margin:0;min-width:0;overflow-wrap:anywhere}
+  .det-info .acte{display:flex;flex-wrap:wrap;gap:4px 8px}
+  .det-info .acte a{font-family:var(--mono);font-size:11px;text-decoration:none;border:1px solid var(--line-strong);border-radius:5px;padding:1px 7px;background:#fff}
+  .det-info .acte a:hover{background:var(--blue-bg)}
+  table.deb-ent{border-collapse:collapse;width:100%;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .deb-ent th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;text-align:left;padding:7px 10px;border-bottom:1px solid var(--line-strong);background:#f5f7fb}
+  .deb-ent td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .deb-ent .num{text-align:right;font-family:var(--mono);white-space:nowrap}
+  .deb-ent tfoot td{font-weight:700;color:var(--navy-deep);background:#f5f7fb;border-bottom:none}
+  .deb-ent .ea{text-align:right;white-space:nowrap;width:1%}
+  .deb-ent .nota{color:#39405a;overflow-wrap:anywhere}
+  .deb-ent input,.deb-ent select{width:100%;min-width:0;border:1px solid var(--line-strong);border-radius:5px;padding:5px 7px;font-size:12.5px;background:#fff}
+  .deb-ent tr.conf td{background:var(--red-bg)}
+  .nes{display:inline-block;font-size:10px;font-weight:700;color:#8a5c0d;background:var(--gold-bg);border-radius:4px;padding:0 6px;margin-left:6px;white-space:nowrap}
+  .nimic{font-size:12.5px;color:var(--ink-dim);padding:10px 0}
+  form.deb-form{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;position:relative}
+  form.deb-form label{display:flex;flex-direction:column;gap:3px;font-size:11px;font-weight:700;color:var(--ink-dim);letter-spacing:.04em;text-transform:uppercase;min-width:0}
+  form.deb-form label.w,form.deb-form .full{grid-column:1 / -1}
+  form.deb-form input,form.deb-form select{border:1px solid var(--line-strong);border-radius:6px;padding:8px 10px;font-size:13.5px;color:var(--ink);background:#fff;min-width:0;width:100%;text-transform:none;letter-spacing:0;font-weight:400}
+  form.deb-form input:disabled,form.deb-form select:disabled{background:#f1f3f8;color:#8a91a3;cursor:not-allowed}
+  form.deb-form input[aria-invalid="true"]{border-color:var(--red);background:#fffafa}
+  .prev{font-family:var(--mono);font-size:11.5px;color:var(--navy-deep);min-height:17px}
+  .ferr{font-size:12px;color:var(--red);font-weight:600;min-height:0}
+  .ferr:empty{display:none}
+  .blocat{grid-column:1 / -1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--gold-bg);border:1px dashed var(--gold);border-radius:8px;padding:9px 12px;font-size:12.5px;color:#6b4a10}
+  .blocat svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  .panel[data-d]{scroll-margin-top:10px}
+  .note{font-size:12.5px;color:var(--ink-dim);line-height:1.6;max-width:120ch;margin:26px 0 0}
+  .note p{margin:0 0 8px}
+  .footer-nav{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px}
+  .footer-nav a{color:var(--navy);text-decoration:none;font-weight:600}
+  .footer-nav a:hover{text-decoration:underline}
+  .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .eroare-mare{padding:34px 20px;text-align:center}
+  .eroare-mare b{display:block;font-size:16px;color:var(--red);margin-bottom:6px}
+
+  /* fereastra codului */
+  dialog{border:none;border-radius:14px;padding:0;width:min(520px,calc(100vw - 24px));box-shadow:0 20px 60px rgba(10,20,40,.35);color:var(--ink)}
+  dialog::backdrop{background:rgba(15,25,45,.5)}
+  .dlg-in{padding:22px 24px 20px}
+  .dlg-in h2{font-size:15px;text-transform:none;letter-spacing:0;margin:0 0 6px;color:var(--navy-deep)}
+  .dlg-in p{margin:0 0 12px;font-size:13px;color:#39405a}
+  .dlg-in label{display:block;font-size:11px;font-weight:700;color:var(--ink-dim);letter-spacing:.04em;text-transform:uppercase;margin:12px 0 4px}
+  .dlg-in input[type=password],.dlg-in input[type=text]{width:100%;border:1px solid var(--line-strong);border-radius:7px;padding:10px 12px;font-size:14px;font-family:var(--mono);background:#fff}
+  .dlg-in .rand{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px}
+  .dlg-in .rand input{width:16px;height:16px;accent-color:var(--navy)}
+  .dlg-in .acte-dlg{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+  .dlg-in .ferr{margin-top:10px}
+  .dlg-in details{margin-top:14px;font-size:12.5px;color:#39405a;border-top:1px solid var(--line);padding-top:10px}
+  .dlg-in summary{cursor:pointer;font-weight:700;color:var(--navy)}
+  .dlg-in ol{margin:8px 0 0;padding-left:20px}
+  .dlg-in li{margin:3px 0}
+  .dlg-in code{font-family:var(--mono);font-size:11.5px;background:#f1f3f8;border-radius:4px;padding:0 4px}
+
+  /* telefon: tabelul devine o listă de cartonașe */
+  @media (max-width:820px){
+    .tbl-scroll{overflow:visible;padding-bottom:14px}
+    table.deb-tbl{min-width:0;display:block}
+    .deb-tbl > thead{display:none}
+    .deb-tbl > tbody{display:block}
+    .deb-tbl > tbody > tr.ac{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;border:1px solid var(--line);border-radius:10px;margin:10px 12px 0;padding:10px 12px 12px;background:#fff}
+    .deb-tbl > tbody > tr.ac.deschis{border-color:var(--navy);border-bottom:none;border-bottom-left-radius:0;border-bottom-right-radius:0;padding-bottom:4px}
+    .deb-tbl > tbody > tr.ac > td{display:block;border:none;padding:4px 0;min-width:0;text-align:left !important}
+    .deb-tbl > tbody > tr.ac > td:nth-child(1),.deb-tbl > tbody > tr.ac > td:nth-child(2){grid-column:1 / -1}
+    .deb-tbl > tbody > tr.ac > td[data-l]::before{content:attr(data-l);display:block;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;margin-bottom:2px}
+    .deb-tbl > tbody > tr.ac > td.act{grid-column:1 / -1;text-align:right !important}
+    .exp{width:auto;padding:0 12px}
+    .deb-tbl > tbody > tr.det{display:block;margin:0 12px}
+    .deb-tbl > tbody > tr.det > td{display:block;border:1px solid var(--navy);border-top:none;border-radius:0 0 10px 10px;padding:14px 12px 16px}
+    .deb-ent{font-size:12px}
+    .deb-ent th:nth-child(3),.deb-ent td:nth-child(3){display:none}
+    .panel-head{padding:12px 14px}
+    .col-picker .don-lista{padding:12px}
+    form.deb-form{grid-template-columns:1fr}
+  }
+  @media print{
+    .acces,.col-picker,.toolbar,.head-btns,.exp,.btn,form.deb-form,.footer-nav{display:none !important}
+    .cols{display:block}
+    .panel{break-inside:auto;box-shadow:none}
+    table.deb-tbl{min-width:0}
+    .tbl-scroll{overflow:visible}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <script src="meniu.js" data-pagina="debursari"></script>
+
+  <div id="debRoot" data-no-tr>
+    <header class="top">
+      <div>
+        <div class="title-row">
+          <div class="logo-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
+          </div>
+          <h1 id="tTitlu">Debursări pe acorduri</h1>
+        </div>
+        <p class="top-sub" id="tSub">Acordurile din registrul legis.md, repartizate pe donatori. Bifează un donator ca să vezi proiectele lui; sumele debursate se introduc de mână, după ce introduci codul de acces.</p>
+      </div>
+      <div class="top-meta" id="topMeta"></div>
+    </header>
+
+    <noscript><div class="panel"><div class="gol-msg"><b>Pagina are nevoie de JavaScript</b>Activează-l ca să vezi acordurile și debursările.</div></div></noscript>
+
+    <div id="sAcces"></div>
+    <div class="cols">
+      <aside class="col-picker" id="sPicker"></aside>
+      <div class="col-main">
+        <div id="sKpi"></div>
+        <div id="sTool"></div>
+        <div id="sRez"></div>
+        <div id="sOrfane"></div>
+      </div>
+    </div>
+    <div id="sNote"></div>
+
+    <nav class="footer-nav" id="sNav"></nav>
+    <div class="vh" role="status" aria-live="polite" id="live"></div>
+  </div>
+</div>
+
+<dialog id="dlg" data-no-tr aria-labelledby="dlgTitlu"></dialog>
+
+<script src="traducere.js" defer></script>
+<script src="debursari.js"></script>
+<script src="debursari-ui.js"></script>
+</body>
+</html>

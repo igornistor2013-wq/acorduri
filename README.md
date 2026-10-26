@@ -7,8 +7,9 @@ Paginile care arată, din surse oficiale, cine finanțează Republica Moldova
 
 | Pagina | Ce arată | Sursa |
 |---|---|---|
-| `index.html` | Donatori, proiecte, sume — tabloul principal, cu analize avansate și export. Butonul **Acorduri** deschide un meniu cu cele două registre de acorduri și cu „De la lege la bani" (acordurile legate de proiectele AMP) | Platforma AMP (live) + arhiva 1993–2022, verificare încrucișată cu IATI |
+| `index.html` | Donatori, proiecte, sume — tabloul principal, cu analize avansate și export. Butonul **Acorduri** deschide un meniu cu cele două registre de acorduri, cu „De la lege la bani" (acordurile legate de proiectele AMP) și cu „Debursări pe acorduri" | Platforma AMP (live) + arhiva 1993–2022, verificare încrucișată cu IATI |
 | `acorduri.html` | Registrul acordurilor de asistență externă, act cu act, cu etapa la care a ajuns fiecare | Cuprinsurile Monitorului Oficial |
+| `debursari.html` | Debursări pe acorduri: pe donatori, la bifarea unuia apar proiectele lui (denumire, descriere, tip de finanțare, suma proiectului) și debursările introduse de mână după un cod de acces; Excel pe donator sau total | Registrul legis.md (`date/acorduri_legare.json`) + debursările din `date/debursari.json` |
 | `hg246.html` | Compară anexa nr. 1 la HG 246/2010 cu baza AMP și scoate în Word proiectele expirate | Documentul încărcat de utilizator + AMP |
 
 ## Registrul acordurilor — cum se actualizează
@@ -194,6 +195,12 @@ care legis.md îl primește.
 | `legatura_acorduri.py` | Scrie `date/acorduri_legare.json`: deschide pagina registrului într-un browser fără ecran și îi cere lista acordurilor așa cum le vede ea (grupate, denumite, cu suma aleasă și trecută în euro). Are nevoie de Playwright |
 | `date/acorduri_legare.json` | Acordurile din registru, gata grupate, un acord pe linie. Citit de pagina „De la lege la bani". Se rescrie doar când se schimbă ceva |
 | `date/legaturi_amp.json` | Legăturile acord ↔ proiect AMP confirmate de oameni (vezi mai jos). Se completează de mână sau din pagină |
+| `debursari.html` | Pagina „Debursări pe acorduri”: structura și stilurile. Scripturile ei sunt `debursari.js` și `debursari-ui.js` (vezi „Debursări pe acorduri”) |
+| `debursari.js` | Logica paginii, fără DOM, ca s-o poată testa Node: donatorii și proiectele lor, descrierile, totalurile (aceleași reguli ca în registru), operațiile asupra fișierului de date și salvarea lui prin API-ul GitHub („Depozit”), păstrarea codului cu PIN („Seif”) și specificațiile celor trei fișiere Excel |
+| `debursari-ui.js` | Interfața paginii: alegerea donatorilor, tabelul, fereastra cu codul, formularele de debursare, butoanele Excel, engleza și varianta pentru telefon. Nu ține codul nicăieri în afara memoriei paginii |
+| `date/debursari.json` | „Baza de date” a paginii: debursările introduse de mână, o înregistrare pe linie. Fișier public; îl scrie doar pagina, prin API-ul GitHub, cu codul de acces. Fiecare salvare e un commit |
+| `teste_debursari.js` | Testele logicii (descrieri, totaluri, operații, conflicte de scriere, PIN, specificațiile Excel). Rulare: `node teste_debursari.js` |
+| `teste_debursari.py` | Verifică fișierele paginii și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”) |
 | `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi. Le scrie `legis_watch.py`; apar în repository după prima rulare reușită a lui `legis_local.bat` |
 | `CNAME` | Domeniul propriu |
 
@@ -286,6 +293,128 @@ unde browserul nu lasă paginile să citească alte fișiere — deschide site-u
 măsurată. Pentru acordurile fără sumă cunoscută nu există nicio confirmare automată, doar „de
 verificat". Proiectele din AMP fără angajamente apar cu zero, iar legătura prin „valoarea propusă"
 arată doar că proiectul există.
+
+## Debursări pe acorduri — introduse de mână, păstrate în repository
+
+Pagina **Acorduri → Debursări pe acorduri** (`debursari.html`) arată, pentru fiecare donator, proiectele
+(acordurile) din registrul legis.md pe care le finanțează și, alături de suma proiectului, cât s-a
+debursat. Debursările nu vin dintr-o sursă oficială: se introduc de mână, după ce un cod de acces
+deblochează câmpurile, și se salvează în fișierul `date/debursari.json` din repository.
+
+**Ce arată.** Pagina ia acordurile din `date/acorduri_legare.json` (scris de `legatura_acorduri.py`
+chiar din registru) și le repartizează pe donatori: partenerii din registru, cum îi numește și filtrul
+registrului. Un acord cofinanțat apare la fiecare donator, dar în totaluri se numără o singură dată;
+fără partener în registru, donatorul e „(neidentificat)". Bifezi unul sau mai mulți donatori și apare
+lista proiectelor lor: denumirea, o descriere succintă, tipul de finanțare, suma proiectului (în valuta
+acordului și în euro), suma debursărilor și procentul debursat. Se poate căuta (denumire, act, partener),
+filtra (tip de finanțare, cu sau fără debursări) și sorta. Donatorii bifați și filtrele rămân în adresa
+paginii (`#d=BERD|BEI&tip=…`), deci o selecție se trimite ca link. Pe telefon tabelul devine fișe; pagina
+are și varianta în engleză.
+
+**Sumele.** Aceleași reguli ca în panoul „Sumele acordurilor" din registru: un rând intră în total doar
+dacă îl numără registrul (`inTotal` din `date/acorduri_legare.json`: `numarat`, `fara_suma`, `fara_total` sau
+`fara_curs`), în euro, la cursurile BCE din `cursuri` și `curs_data` ale aceluiași fișier (le scrie
+`legatura_acorduri.py` odată cu lista, ca regulile registrului să nu fie repetate în pagină). „% debursat"
+compară debursările la proiectele numărate cu suma lor; cardul „Debursat" adună toate debursările introduse.
+Un proiect fără sumă rămâne în listă („suma nu e cunoscută") și poate primi debursări, dar nu intră în
+procent. Nu se numără sume în lei (registrul n-are curs pentru ei) și nici o valută fără curs: o debursare
+se introduce într-o valută care are curs în fișier.
+
+**Descrierea.** Registrul nu are o descriere a acordurilor, deci pagina o compune. Când acordul are o
+denumire completă (mai lungă decât numele scurt, începută cu literă mare, cifră, ghilimele sau paranteză;
+un început cu literă mică e un fragment de titlu și se ignoră), aceea e descrierea. Altfel e o propoziție
+făcută din tip, finanțator, data semnării, primele trei acte și stadiu: „Împrumut de la BERD, semnat la
+27.06.2023. Acte: DP763/2026 din 03.09.2026, LP188/2026 din 24.08.2026, HG374/2026 din 22.07.2026 și încă 11.
+Stadiu: promulgat." Aproape jumătate din acorduri (211 din 466, în octombrie 2026) n-au o denumire completă,
+deci au descriere compusă. Descrierea din Excel e aceeași.
+
+**Codul de acces și „baza de date".** Site-ul e static (GitHub Pages): n-are server care să primească
+date. Singurul loc în care o pagină poate scrie fără un serviciu în plus e chiar repository-ul, prin
+API-ul „Contents" al GitHub. „Baza de date" e deci fișierul `date/debursari.json`; pagina îl citește ca pe
+un fișier public, iar pentru scriere folosește „codul": un *fine-grained personal access token* cu drept
+doar pe acest repository. Fără cod pagina se poate citi, iar câmpurile de debursare sunt blocate
+(„Introdu codul").
+
+Cum faci codul, o singură dată:
+
+1. Cu contul care deține repository-ul, deschide https://github.com/settings/personal-access-tokens/new
+   (în fereastra „Introdu codul", „Cum obțin codul?" → „Deschide GitHub" deschide pagina cu o parte din
+   câmpuri completate).
+2. **Repository access** → *Only select repositories* → `acorduri` (alegerea o faci tu; nu se poate
+   completa din link).
+3. **Permissions → Repository permissions → Contents** → *Read and write*. Nimic altceva.
+4. **Generate token** și copiază codul (începe cu `github_pat_`; se arată o singură dată). Expiră după
+   ce ai ales (90 de zile în link); când expiră, pagina spune „Codul nu e valid sau a expirat" și faci
+   unul nou.
+5. În pagină: **Introdu codul** → lipești codul → **Deblochează**. Poți bifa „Ține minte codul pe acest
+   dispozitiv, protejat cu un PIN": codul se păstrează în browser criptat (PBKDF2-SHA256 cu 250.000 de
+   iterații + AES-GCM) și la următoarea vizită se deblochează cu PIN-ul. Fără PIN, codul rămâne doar în
+   memoria paginii și dispare la reîncărcare. „Blochează" îl scoate din memorie.
+
+**Codul nu se pune niciodată într-un fișier, într-o pagină sau într-un mesaj** (nici în acest repository,
+nici în cod): oricine îl vede poate scrie în repository. Pagina îl trimite numai către `api.github.com`,
+în antetul `Authorization`; testele verifică asta (nicio cerere în afara paginii și a GitHub, codul nu apare
+în stocarea browserului decât criptat, nici în HTML). GitHub nu poate limita un cod la un singur fișier: cine
+îl are poate scrie în tot repository-ul (nu și în `.github/workflows`, pentru care GitHub cere un drept
+separat), deci și în paginile site-ului. De aceea codul se face doar pe repository-ul `acorduri`, cu termen
+de expirare, și se șterge când nu mai e nevoie. Dacă un cod a ajuns undeva unde nu trebuia, se șterge din
+GitHub (Settings → Developer settings → Personal access tokens) și se face altul.
+
+**Ce se întâmplă la o salvare.** Fiecare debursare are: data, suma, valuta, o notă (cel mult 200 de
+caractere) și acordul. Adăugarea, editarea și ștergerea sunt operații pe fișier: pagina citește starea
+de acum a fișierului prin API, aplică operația și îl scrie înapoi, cu `sha`-ul citit. Dacă între timp altcineva
+a scris (GitHub răspunde 409 sau 422), pagina citește din nou și reaplică aceleași operații, de cel mult
+patru ori: nimeni nu pierde ce a introdus. Fiecare salvare e un commit, cu un mesaj de felul
+`Debursări: adăugat: <proiectul> — 1.250.000 EUR (2026-09-30)`, deci istoricul se vede în GitHub
+(fila *History* a fișierului) și o greșeală se poate anula acolo. Dacă salvarea nu reușește (fără internet,
+cod expirat), modificarea rămâne într-o coadă păstrată în browser și se trimite la deblocarea următoare;
+fereastra spune ce n-a mers.
+
+**Ce știe oricine.** Debursările din `date/debursari.json` sunt publice, ca tot restul repository-ului:
+oricine deschide pagina le vede, fără cod. Site-ul de pe GitHub Pages se actualizează cu o întârziere de
+1–2 minute după un commit; ca omul care a salvat să nu vadă o stare veche, pagina ține în browser o copie
+a ultimei salvări, valabilă zece minute. Un alt dispozitiv vede salvarea după publicare.
+
+**Debursări fără acord găsit.** Fiecare debursare păstrează și codurile actelor acordului (`acte`, cel mult
+12). Dacă registrul se schimbă (un acord e unit cu altul, i se schimbă id-ul), debursarea își regăsește
+acordul după aceste coduri. Dacă nu-l găsește, apare în panoul „Debursări fără acord găsit": nu se pierde,
+nu intră în totalurile pe donatori și se vede în „Excel · total".
+
+**Excel.** Trei butoane, toate cu fișiere stilizate (`xlsx-stil.js`, ca restul exporturilor), care urmează
+filtrele active (căutarea, tipul, cu/fără debursări) și le trec în subtitlul foii:
+
+| Buton | Fișier | Foi |
+|---|---|---|
+| **Excel · BERD** (numele donatorului, în capul tabelului lui) | `debursari-berd-2026-10-26.xlsx` (donatorul și data) | foaia donatorului (un rând pe proiect: denumire, descriere, tip, stadiu, semnat, suma proiectului, valuta, echivalent EUR, debursat în valuta proiectului și în EUR, % debursat, rest de debursat, număr de debursări, ultima debursare, „Intră în total?”, link legis.md) și „Debursări" (fiecare debursare introdusă) |
+| **Excel · total** | `debursari-total-2026-10-26.xlsx` | „Total" (fiecare proiect o singură dată, cu coloana „Donatori"), „Pe donatori" (rezumat) și „Debursări" |
+| **Excel · pe donatori** | `debursari-pe-donatori-2026-10-26.xlsx` | „Rezumat", câte o foaie pentru fiecare donator și „Debursări" |
+
+Cu donatori bifați, „total" și „pe donatori" cuprind doar donatorii bifați; fără niciunul, pe toți (și
+debursările fără acord găsit). Pe foile cu proiecte și pe cea cu debursări, rândul de total e formulă
+`SUBTOTAL`, deci se recalculează când filtrezi în Excel. În foaia „Pe donatori" („Rezumat"), rândul „Total
+general" numără un acord cofinanțat o singură dată, deci nu coincide cu suma coloanei.
+
+**Unde se schimbă ce.** Repository-ul, ramura și calea fișierului de date sunt în `CONFIG`, la începutul
+lui `debursari.js` (de schimbat dacă repository-ul se mută sau se redenumește). Lista donatorilor, cu
+denumirile lor complete (indiciul de sub acronim), e `NUME_DONATOR` din același fișier; un donator nou
+din registru apare singur, doar fără denumire completă.
+
+**Teste.** `node teste_debursari.js` (logica: sume față de o socoteală independentă, descrieri, operații,
+conflicte, PIN, specificațiile Excel). `python teste_debursari.py` verifică fișierele paginii (scripturi
+prezente, niciun cod GitHub în fișiere, forma lui `date/debursari.json`); cu `--browser` deschide pagina
+cu Chromium împotriva unui GitHub simulat (coduri greșite sau fără drept de scriere, conflicte de scriere,
+rețea căzută, fișier lipsă) și parcurge: donatorii și tabelul față de o socoteală independentă, câmpurile
+blocate, deblocarea, adăugarea, editarea și ștergerea cu verificarea fișierului scris și a mesajelor commit,
+coada nesalvată după reîncărcare, PIN-ul, debursări existente și orfane, cele trei fișiere Excel (deschise cu
+openpyxl), engleza, telefonul, starea din adresă, tastatura, lipsa erorilor JavaScript și a cererilor spre
+alte adrese decât pagina și `api.github.com`.
+
+**Limite.** Debursările sunt cele introduse de oameni și nu sunt verificate față de AMP sau o altă sursă;
+pagina nu le leagă de proiectele AMP („De la lege la bani" arată debursările din AMP). Descrierea compusă
+spune doar ce se știe din registru (tip, finanțator, acte, stadiu), nu ce finanțează proiectul. Un acord
+al cărui partener nu e recunoscut în registru apare la „(neidentificat)". Data „semnat" e cea din registru;
+la câteva rânduri registrul o arată greșit (coloana `Semnat` din registrul legis.md, de pildă la HG174/2006),
+iar pagina o preia ca atare.
 
 ## Exporturile Excel ale graficelor și tabelelor
 

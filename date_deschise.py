@@ -134,8 +134,8 @@ def sitemap(ultima, cel_mai_nou=None):
     m = re.match(r'(\d{2})\.(\d{2})\.(\d{4})', cel_mai_nou or '') or re.match(r'(\d{2})\.(\d{2})\.(\d{4})', ultima or '')
     azi = f'{m.group(3)}-{m.group(2)}-{m.group(1)}' if m else datetime.date.today().isoformat()
     pagini = [('', 'index.html', '1.0'), ('acorduri.html', 'acorduri.html', '0.9'),
-              ('legis_acorduri.html', 'legis_acorduri.html', '0.9'), ('hg246.html', 'hg246.html', '0.6'),
-              ('despre.html', 'despre.html', '0.5')]
+              ('legis_acorduri.html', 'legis_acorduri.html', '0.9'), ('debursari.html', 'debursari.html', '0.7'),
+              ('hg246.html', 'hg246.html', '0.6'), ('despre.html', 'despre.html', '0.5')]
     rows = []
     for url, fisier, prio in pagini:
         f = AICI / fisier

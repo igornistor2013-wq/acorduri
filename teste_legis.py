@@ -482,6 +482,40 @@ verifica('data scrierii nu schimbă conținutul', lga.fara_data(_nou) == lga.far
 _real = json.load(open(AICI / 'date' / 'acorduri_legare.json', encoding='utf-8'))
 verifica('fișierul din repository e coerent: numărul scris = numărul real, fără probleme de validare',
          _real['numar'] == len(_real['acorduri']) and lga.valideaza(_real['acorduri']) == [], lga.valideaza(_real['acorduri']))
+# pagina „Debursări pe acorduri” (debursari.html) citește de aici și regulile de total, și cursurile: trebuie să fie scrise și coerente
+_cu_cursuri = lga.continut(_bune[:3], '1 iulie 2026', '2026-10-07 10:00', {'EUR': 1, 'USD': 1.1383})
+verifica('cursurile registrului se scriu în fișier, înaintea listei, și se citesc înapoi la fel',
+         _cu_cursuri.get('cursuri') == {'EUR': 1, 'USD': 1.1383} and json.loads(lga.text_json(_cu_cursuri)) == _cu_cursuri
+         and lga.text_json(_cu_cursuri).index('"cursuri"') < lga.text_json(_cu_cursuri).index('"acorduri"'))
+verifica('fără cursuri, cheia lipsește (fișierul vechi rămâne valid)', 'cursuri' not in _nou)
+_cursuri = _real.get('cursuri') or {}
+verifica('date/acorduri_legare.json: cursurile (EUR = 1, toate pozitive) și data lor sunt scrise',
+         _cursuri.get('EUR') == 1 and all(isinstance(v, (int, float)) and v > 0 for v in _cursuri.values()) and bool(_real.get('curs_data')),
+         _cursuri)
+_stari = {'numarat', 'dublura', 'fara_suma', 'fara_total', 'fara_curs'}
+_it = {}
+for _a in _real['acorduri']:
+    _it[_a.get('inTotal')] = _it.get(_a.get('inTotal'), 0) + 1
+verifica('fiecare acord are „inTotal” (numarat, dublura, fara_suma, fara_total sau fara_curs)',
+         set(_it) <= _stari and sum(_it.values()) == len(_real['acorduri']), _it)
+_prost = []
+for _a in _real['acorduri']:
+    _s, _t = _a.get('suma'), _a.get('inTotal')
+    if _t == 'fara_suma' and _s:
+        _prost.append((_a['id'], 'fara_suma, dar are sumă'))
+    elif _t == 'numarat' and not (_s and isinstance(_s.get('eur'), (int, float)) and not _a.get('faraTotal')):
+        _prost.append((_a['id'], 'numarat, dar fără sumă în euro sau marcat fara_total'))
+    elif _t == 'fara_total' and not (_s and _a.get('faraTotal')):
+        _prost.append((_a['id'], 'fara_total, dar fără sumă sau fără marcaj'))
+    elif _t == 'dublura' and not _s:
+        _prost.append((_a['id'], 'dublura, dar fără sumă'))
+    elif _t == 'fara_curs' and not (_s and _s['val'] not in _cursuri):
+        _prost.append((_a['id'], 'fara_curs, dar valuta are curs'))
+    if _s and isinstance(_s.get('eur'), (int, float)) and _s['val'] in _cursuri:
+        _calc = _s['v'] / _cursuri[_s['val']]
+        if abs(_calc - _s['eur']) > max(1, abs(_calc) * 1e-6):
+            _prost.append((_a['id'], 'echivalentul în euro nu e suma împărțită la curs', _s['eur'], _calc))
+verifica('„inTotal” e coerent cu suma și cu cursurile (și echivalentul în euro = suma / curs)', _prost == [], _prost[:5])
 _conf = json.load(open(AICI / 'date' / 'legaturi_amp.json', encoding='utf-8'))
 verifica('date/legaturi_amp.json are cele trei liste așteptate de pagină',
          isinstance(_conf.get('confirmate'), dict) and isinstance(_conf.get('respinse'), dict) and isinstance(_conf.get('fara_proiect'), list))

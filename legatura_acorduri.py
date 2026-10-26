@@ -58,8 +58,9 @@ class _Server(socketserver.ThreadingMixIn, http.server.HTTPServer):
     allow_reuse_address = True
 
 
-def citeste_acorduri(radacina=AICI, pagina=PAGINA, asteapta_max=45):
-    """Deschide pagina și întoarce (lista de acorduri, data cursurilor)."""
+def citeste_acorduri(radacina=AICI, pagina=PAGINA, asteapta_max=45, cu_cursuri=False):
+    """Deschide pagina și întoarce (lista de acorduri, data cursurilor); cu cu_cursuri=True, și cursurile însele (unități de
+    valută pentru 1 EUR), pe care le folosește pagina „Debursări” ca să adune sumele în euro la fel ca registrul."""
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -94,13 +95,14 @@ def citeste_acorduri(radacina=AICI, pagina=PAGINA, asteapta_max=45):
                     ultim = acum
                 acorduri = page.evaluate('window.__ACORDURI__()')
                 curs = page.evaluate('window.__ACORDURI__.curs || ""')
+                cursuri = page.evaluate('window.__ACORDURI__.cursuri || {}')
                 if erori:
                     print('Avertisment: pagina a dat erori JavaScript:', erori[:3], file=sys.stderr)
             finally:
                 browser.close()
     finally:
         server.shutdown()
-    return acorduri, curs
+    return (acorduri, curs, cursuri) if cu_cursuri else (acorduri, curs)
 
 
 def valideaza(acorduri, anterior=None):
@@ -124,8 +126,12 @@ def valideaza(acorduri, anterior=None):
     return probleme
 
 
-def continut(acorduri, curs, actualizat):
-    return {'actualizat': actualizat, 'curs_data': curs, 'numar': len(acorduri), 'acorduri': acorduri}
+def continut(acorduri, curs, actualizat, cursuri=None):
+    nou = {'actualizat': actualizat, 'curs_data': curs}
+    if cursuri:
+        nou['cursuri'] = cursuri
+    nou.update({'numar': len(acorduri), 'acorduri': acorduri})
+    return nou
 
 
 def text_json(nou):
@@ -150,7 +156,7 @@ def main(argv=None):
     a = ap.parse_args(argv)
     iesire = Path(a.iesire)
 
-    acorduri, curs = citeste_acorduri(pagina=a.pagina)
+    acorduri, curs, cursuri = citeste_acorduri(pagina=a.pagina, cu_cursuri=True)
     try:
         anterior = json.load(open(iesire, encoding='utf-8'))
     except Exception:
@@ -160,7 +166,7 @@ def main(argv=None):
         print('Nu scriu: ' + '; '.join(probleme), file=sys.stderr)
         return 1
 
-    nou = continut(acorduri, curs, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'))
+    nou = continut(acorduri, curs, datetime.datetime.now().strftime('%Y-%m-%d %H:%M'), cursuri)
     cu_suma = sum(1 for x in acorduri if x.get('suma'))
     print('%d acorduri, din care %d cu sumă (curs: %s)' % (len(acorduri), cu_suma, curs or '—'))
     if fara_data(nou) == fara_data(anterior):

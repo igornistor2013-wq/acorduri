@@ -17,6 +17,7 @@
 
   var EXACT = {
     // antet, indicatori
+    'Debursări pe acorduri': 'Disbursements by agreement',
     'Acorduri de asistență externă': 'External assistance agreements',
     'Acorduri de asistență externă · Registrul de stat': 'External assistance agreements · State Register',
     'Un acord, un rând. Actele publicate în Monitorul Oficial sunt grupate pe acordul din care fac parte, cu etapa la care a ajuns fiecare.':

@@ -39,6 +39,7 @@
     ['index.html#dportal', 'Dashboard IATI d-portal', 'IATI d-portal dashboard', 'iati activități publicatori'],
     ['legis_acorduri.html', 'Acorduri · legis.md', 'Agreements · legis.md', 'registrul de stat acte juridice acorduri împrumut grant'],
     ['acorduri.html', 'Acorduri · Monitorul Oficial', 'Agreements · Official Gazette', 'monitorul oficial acorduri etape ratificare'],
+    ['debursari.html', 'Debursări pe acorduri', 'Disbursements by agreement', 'debursări pe donatori acorduri proiecte sume tip finanțare introdu manual cod excel'],
     ['hg246.html', 'HG 246 — proiecte expirate', 'HG 246 — expired projects', 'hg 246 anexa facilități fiscale vamale'],
     ['despre.html', 'Despre date și metodologie', 'About the data and methodology', 'metodologie surse date deschise csv json rss']
   ];

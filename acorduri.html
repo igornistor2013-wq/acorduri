@@ -1167,7 +1167,12 @@
     var plat = function(g, s, nume){
       return s ? { v: s.v, val: s.val, eur: eur(s), sursa: nume || sursa(g, s), act: s.act || '' } : null;
     };
-    return (window.__GRUPURI__ || []).map(function(g){
+    /* inTotal: dacă rândul intră în totalul în euro din panoul „Sumele acordurilor” și de ce nu (aceleași reguli ca la
+       exportul Excel, vezi statSume): 'numarat', 'dublura' (același acord, numărat pe alt rând), 'fara_total' (suma e pe
+       rând, dar nu se adună), 'fara_curs' (valută fără curs) sau 'fara_suma'. Pagina „Debursări” își face totalurile după
+       el, ca cifrele ei să coincidă cu ale registrului. */
+    var stari = statSume(window.__GRUPURI__ || []).stare;
+    return (window.__GRUPURI__ || []).map(function(g, i){
       var s = sumaAfisata(g), alte = [], vazut = {};
       [[g.sumaA && g.sumaA.extern ? 'extern' : 'acord', g.sumaA], ['titlu', g.suma], ['text', g.sumaT], ['guvern', g.sumaG]].forEach(function(p){
         var x = plat(g, p[1], p[0]);
@@ -1183,7 +1188,7 @@
         id: idAcord(g), nume: g.nume, scurt: g.numeScurt || g.nume,
         parteneri: g.parteneri || '', categorie: g.categorie || '', semnat: g.semnat || '',
         primul: ro(datele[0]), ultimul: ro(datele[datele.length - 1]), et: Object.keys(g.et || {}),
-        suma: s ? plat(g, s) : null, faraTotal: !!(s && s.faraTotal),
+        suma: s ? plat(g, s) : null, faraTotal: !!(s && s.faraTotal), inTotal: stari[i] || 'fara_suma',
         alte: alte, cost: g.cost ? { v: g.cost.v, val: g.cost.val, eur: eur(g.cost) } : null,
         acte: g.acte.map(function(a){
           return { act: a.act || '', tip: a.tip || String(a.titlu || '').split(' ')[0], data: a.data_editie || '', editie: a.editie || '',
@@ -1193,6 +1198,7 @@
     });
   };
   window.__ACORDURI__.curs = CURS_DATA;        // data cursurilor folosite la conversia în euro
+  window.__ACORDURI__.cursuri = PER_EUR;       // cursurile însele (unități de valută pentru 1 EUR): le folosește și pagina „Debursări”
   function fmtEur(v){
     var z = function(x, d){ return x.toFixed(d).replace(/\.?0+$/, '').replace('.', ','); };
     return v >= 1e9 ? z(v / 1e9, 2) + ' mld. EUR' : v >= 1e6 ? z(v / 1e6, 1) + ' mil. EUR'

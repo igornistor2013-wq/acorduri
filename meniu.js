@@ -9,7 +9,7 @@
    Se include acolo unde trebuie să apară bara:
      <script src="meniu.js" data-pagina="acorduri-mo"></script>
    data-pagina marchează butonul paginii curente:
-     index | acorduri-mo | acorduri-legis | hg246
+     index | acorduri-mo | acorduri-legis | debursari | hg246
    Pe index, vederea curentă se marchează din pagină: Meniu.activ('iati').
    data-limba="da" adaugă comutatorul RO/EN (doar pe index, singura pagină
    tradusă); pagina îl leagă singură la setLanguage().
@@ -33,6 +33,7 @@
       acorduri: 'Acorduri', legis: 'Acorduri · legis.md', legisSub: 'Registrul de stat al actelor juridice, 1992 până azi',
       mo: 'Acorduri · Monitorul Oficial', moSub: 'Cuprinsurile Monitorului, actualizat zilnic, din 2024',
       lege: 'De la lege la bani', legeSub: 'Acordurile legate de proiectele din AMP: cât s-a angajat și debursat',
+      deb: 'Debursări pe acorduri', debSub: 'Pe donatori: proiecte, sume și debursări introduse de mână',
       hg: 'HG 246', hgSub: '', meniu: 'Navigare', doarRo: '',
       acasaS: 'Donatori', analizeS: 'Analize', acorduriS: 'Acorduri', despre: 'Despre date', cauta: 'Caută', cautaLung: 'Caută pe site (tasta /)', print: 'Printează sau salvează ca PDF'
     },
@@ -43,6 +44,7 @@
       acorduri: 'Agreements', legis: 'Agreements · legis.md', legisSub: 'State Register of Legal Acts, 1992 to date',
       mo: 'Agreements · Official Gazette', moSub: 'Official Gazette contents, updated daily, since 2024',
       lege: 'From law to money', legeSub: 'Agreements linked to AMP projects: how much was committed and disbursed',
+      deb: 'Disbursements by agreement', debSub: 'By donor: projects, amounts and disbursements entered by hand',
       hg: 'HG 246', hgSub: '', meniu: 'Navigation', doarRo: ' · in Romanian',
       acasaS: 'Donors', analizeS: 'Analytics', acorduriS: 'Agreements', despre: 'About the data', cauta: 'Search', cautaLung: 'Search the site (key /)', print: 'Print or save as PDF'
     }
@@ -57,6 +59,7 @@
     dash: '<path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="13" y="6" width="3" height="11"/>',
     acord: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
     lant: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    monede: '<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/>',
     carte: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
     hg: '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>',
     sag: '<polyline points="6 9 12 15 18 9"/>',
@@ -165,6 +168,7 @@
             '<a class="mg-opt" role="menuitem" data-k="acorduri-legis" href="legis_acorduri.html">' + svg('carte') + '<span><b>' + t('legis') + '</b><small>' + t('legisSub') + noteRo + '</small></span></a>' +
             '<a class="mg-opt" role="menuitem" data-k="acorduri-mo" href="acorduri.html">' + svg('acord') + '<span><b>' + t('mo') + '</b><small>' + t('moSub') + noteRo + '</small></span></a>' +
             '<a class="mg-opt" role="menuitem" data-k="legaturi" id="acorduriOptLegaturi" href="index.html#legaturi">' + svg('lant') + '<span><b>' + t('lege') + '</b><small>' + t('legeSub') + '</small></span></a>' +
+            '<a class="mg-opt" role="menuitem" data-k="debursari" id="acorduriOptDebursari" href="debursari.html">' + svg('monede') + '<span><b>' + t('deb') + '</b><small>' + t('debSub') + '</small></span></a>' +
           '</div>' +
         '</div>' +
         '<a class="mg-b mg-hg" data-k="hg246" id="hg246NavBtn" href="hg246.html">' + svg('hg') + lab('hg') + '</a>' +
@@ -222,7 +226,7 @@
   var cheieActiva = '';
   function activ(k) {
     cheieActiva = k || '';
-    var grup = { iati: 'iati', dportal: 'iati', 'acorduri-mo': 'acorduri', 'acorduri-legis': 'acorduri', legaturi: 'acorduri' }[cheieActiva] || cheieActiva;
+    var grup = { iati: 'iati', dportal: 'iati', 'acorduri-mo': 'acorduri', 'acorduri-legis': 'acorduri', legaturi: 'acorduri', debursari: 'acorduri' }[cheieActiva] || cheieActiva;
     nav.querySelectorAll('.mg-b').forEach(function (b) {
       var on = b.getAttribute('data-k') === grup;
       b.classList.toggle('activ', on);
@@ -313,7 +317,7 @@
       nav.querySelectorAll('.mg-limba button').forEach(function (b) { b.classList.toggle('active', b.dataset.lang === limba); });
       var o = nav.querySelectorAll('.mg-opt');
       var txt = [[t('iatiCheck'), t('iatiCheckSub')], [t('iatiDash'), t('iatiDashSub')],
-                 [t('legis'), t('legisSub') + t('doarRo')], [t('mo'), t('moSub') + t('doarRo')], [t('lege'), t('legeSub')]];
+                 [t('legis'), t('legisSub') + t('doarRo')], [t('mo'), t('moSub') + t('doarRo')], [t('lege'), t('legeSub')], [t('deb'), t('debSub')]];
       o.forEach(function (el, i) { el.querySelector('b').textContent = txt[i][0]; el.querySelector('small').textContent = txt[i][1]; });
     }
   };

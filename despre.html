@@ -184,6 +184,7 @@
             <tr><td><a href="index.html#iati">IATI</a></td><td>Verificarea încrucișată a proiectelor AMP cu activitățile raportate în standardul internațional IATI și tabloul activităților IATI pentru Moldova.</td></tr>
             <tr><td><a href="acorduri.html">Acorduri · Monitorul Oficial</a></td><td>Registrul acordurilor de asistență externă din 2024, act cu act, cu etapa la care a ajuns fiecare acord, pâlnia etapelor și durata procedurii.</td></tr>
             <tr><td><a href="legis_acorduri.html">Acorduri · legis.md</a></td><td>Același registru, construit din Registrul de stat al actelor juridice, din 1992 până azi.</td></tr>
+            <tr><td><a href="debursari.html">Debursări pe acorduri</a></td><td>Acordurile din legis.md, pe donatori: proiectele fiecărui donator cu suma lor și cu debursările, introduse de mână după un cod de acces. Excel pe donator sau total.</td></tr>
             <tr><td><a href="hg246.html">HG 246</a></td><td>Compararea anexei nr. 1 la Hotărârea Guvernului nr. 246/2010 cu baza AMP: ce proiecte au expirat.</td></tr>
           </tbody>
         </table></div>
@@ -241,6 +242,7 @@
         <p>Un act intră în registru doar dacă e despre un document încheiat cu un partener (acord, memorandum, înțelegere, protocol, contract, schimb de note) sau numește direct un împrumut, grant ori credit. Actele de cadru — de pildă modificările HG 246/2010 — sunt excluse. Actele aceluiași acord sunt grupate pe un rând.</p>
         <p><b>Pâlnia etapelor</b> socotește doar acordurile a căror negociere a început acum mai bine de un an; cele recente sunt încă pe drum. O etapă ulterioară înseamnă că și cele dinainte au fost parcurse. <b>Durata</b> e numărul de zile dintre edițiile în care au apărut actele succesive; se arată mediana (durata tipică) și intervalul în care se încadrează jumătate din acorduri.</p>
         <p><b>Suma acordului</b> se citește, în această ordine, din documentul acordului atașat actului pe legis.md, din titlul actului, din textul lui integral și din nota Guvernului la proiectul de hotărâre; sumele în alte valute se trec în euro la cursul din data afișată în antet. Când niciuna dintre aceste surse nu are suma, ea se găsește uneori la finanțator (decizia de finanțare a UE, pagina oficială a proiectului) sau într-un comunicat oficial; atunci suma se introduce de mână, apare marcată „ext.” și trimite la sursă. Rândul rămâne fără sumă (—) când n-am găsit-o nicăieri: de pildă memorandumurile și asistența tehnică fără buget, sau acordurile aflate în negociere, al căror text nu e încă public.</p>
+        <p><b>Debursările pe acorduri</b> (pagina <a href="debursari.html">Debursări pe acorduri</a>) nu provin dintr-o sursă oficială: le introduc oameni, după ce un cod de acces deblochează câmpurile, și se păstrează în fișierul <code>date/debursari.json</code> din repository, care e public; fiecare modificare e un commit, deci istoricul se vede pe GitHub. Procentul debursat compară debursările la proiectele cu sumă, care intră în total după aceleași reguli ca în registru, cu suma lor. Debursările nu sunt verificate față de AMP; pentru cele din AMP, vezi „De la lege la bani” din meniul Acorduri.</p>
       </section>
 
       <section id="limite">
@@ -259,6 +261,7 @@
           <a href="date/acorduri_legis.csv" download><b>Acorduri · legis.md</b><small>actele din 1992 până azi</small><code>CSV</code></a>
           <a href="date/acorduri_legis.json" download><b>Acorduri · legis.md</b><small>aceleași acte, pentru programe</small><code>JSON</code></a>
           <a href="date/acorduri_legare.json" download><b>Acorduri, grupate</b><small>un acord pe linie, cu suma în euro (pentru „De la lege la bani”)</small><code>JSON</code></a>
+          <a href="date/debursari.json" download><b>Debursări pe acorduri</b><small>debursările introduse de mână, una pe linie</small><code>JSON</code></a>
           <a href="amp-arhiva.json" download><b>Arhiva AMP 1993–2022</b><small>proiectele din arhivă, cu datele lor</small><code>JSON</code></a>
           <a href="date.json" download><b>Baza colectorului din Monitor</b><small>inclusiv edițiile parcurse</small><code>JSON</code></a>
           <a href="legis_brut.json" download><b>Căutările brute pe legis.md</b><small>toate rezultatele, înainte de filtrare</small><code>JSON</code></a>
@@ -322,6 +325,7 @@
             <tr><td><a href="index.html#iati">IATI</a></td><td>Cross-check of AMP projects against activities reported to the international IATI standard, and a dashboard of IATI activities for Moldova.</td></tr>
             <tr><td><a href="acorduri.html">Agreements · Official Gazette</a></td><td>The register of external assistance agreements since 2024, act by act, with the stage each agreement has reached, the stage funnel and procedure durations. Interface in English; official act titles stay in Romanian.</td></tr>
             <tr><td><a href="legis_acorduri.html">Agreements · legis.md</a></td><td>The same register, built from the State Register of Legal Acts, from 1992 to date.</td></tr>
+            <tr><td><a href="debursari.html">Disbursements by agreement</a></td><td>The agreements from legis.md, by donor: each donor's projects with their amount and the disbursements, entered by hand after an access code. Excel per donor or total.</td></tr>
             <tr><td><a href="hg246.html">HG 246</a></td><td>Compares annex no. 1 to Government Decision no. 246/2010 with the AMP database: which projects have expired.</td></tr>
           </tbody>
         </table></div>
@@ -379,6 +383,7 @@
         <p>An act enters a register only if it concerns a document concluded with a partner (agreement, memorandum, understanding, protocol, contract, exchange of notes) or directly names a loan, grant or credit. Framework acts — such as the amendments to Government Decision 246/2010 — are excluded. Acts of the same agreement are grouped on one row.</p>
         <p><b>The stage funnel</b> counts only agreements whose negotiations started more than a year ago; recent ones are still under way. A later stage implies the earlier ones were completed. <b>Duration</b> is the number of days between the editions in which successive acts appeared; the median (typical duration) and the range covering half of the agreements are shown.</p>
         <p><b>The agreement amount</b> is read, in this order, from the agreement document attached to the act on legis.md, from the act title, from the act's full text and from the Government's note on the draft decision; amounts in other currencies are converted to euro at the rate of the date shown in the header. When none of these sources has the amount, it can sometimes be found at the financier (the EU financing decision, the official project page) or in an official press release; it is then entered by hand, marked "ext." and linked to its source. The row stays without an amount (—) when it has not been found anywhere: for instance memoranda and technical assistance without a budget, or agreements still being negotiated whose text is not yet public.</p>
+        <p><b>Disbursements by agreement</b> (the <a href="debursari.html">Disbursements by agreement</a> page) do not come from an official source: people enter them, after an access code unlocks the fields, and they are kept in the <code>date/debursari.json</code> file in the repository, which is public; every change is a commit, so the history can be seen on GitHub. The disbursed percentage compares the disbursements on projects with an amount, which count in the total by the same rules as in the register, with their amount. The disbursements are not checked against AMP; for those in AMP, see “De la lege la bani” in the Acorduri menu.</p>
       </section>
 
       <section id="en-limits">
@@ -397,6 +402,7 @@
           <a href="date/acorduri_legis.csv" download><b>Agreements · legis.md</b><small>acts from 1992 to date</small><code>CSV</code></a>
           <a href="date/acorduri_legis.json" download><b>Agreements · legis.md</b><small>the same acts, for software</small><code>JSON</code></a>
           <a href="date/acorduri_legare.json" download><b>Agreements, grouped</b><small>one agreement per line, with the amount in euro (for “From law to money”)</small><code>JSON</code></a>
+          <a href="date/debursari.json" download><b>Disbursements by agreement</b><small>the disbursements entered by hand, one per line</small><code>JSON</code></a>
           <a href="amp-arhiva.json" download><b>AMP archive 1993–2022</b><small>archived projects with their dates</small><code>JSON</code></a>
           <a href="date.json" download><b>Gazette collector database</b><small>including the editions read</small><code>JSON</code></a>
           <a href="legis_brut.json" download><b>Raw legis.md searches</b><small>all results, before filtering</small><code>JSON</code></a>
