@@ -4386,6 +4386,30 @@
       "editie_id": "3361",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3361"
+    },
+    "nr. 184, 22 octombrie 2026|3364": {
+      "act": "nr. 184, 22 octombrie 2026",
+      "titlu": "Ordin cu privire la aducerea la cunoștința publică a datei intrării în vigoare a Acordului de Grant dintre Ministerul Dezvoltării Economice și Digitalizării al Republicii Moldova și Swedfund International AB privind serviciile de consultanță pentru studiul de fezabilitate pentru Centrul de Date",
+      "categorie": "Grant",
+      "partener": "Suedia",
+      "semnat": "",
+      "editie": "528-530",
+      "data_editie": "27.10.2026",
+      "editie_id": "3364",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3364"
+    },
+    "nr. 185, 22 octombrie 2026|3364": {
+      "act": "nr. 185, 22 octombrie 2026",
+      "titlu": "Ordin cu privire la aducerea la cunoștința publică a datei intrării în vigoare a Acordului de grant dintre Ministerul Dezvoltării Economice și Digitalizării al Republicii Moldova și Swedfund International AB privind continuarea serviciilor de consultanță pentru implementarea setului de instrumente al UE pentru securitatea 5G",
+      "categorie": "Grant",
+      "partener": "Suedia",
+      "semnat": "",
+      "editie": "528-530",
+      "data_editie": "27.10.2026",
+      "editie_id": "3364",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3364"
     }
   },
   "editii_vazute": [
@@ -4438,11 +4462,15 @@
     "3359",
     "3360",
     "3361",
-    "3362"
+    "3362",
+    "3364"
   ],
-  "ultima_rulare": "26.10.2026 14:28",
-  "editii_lipsa": [],
+  "ultima_rulare": "27.10.2026 10:37",
+  "editii_lipsa": [
+    "3363"
+  ],
   "editii_esuate": {
-    "3333": 5
+    "3333": 5,
+    "3363": 1
   }
 }
