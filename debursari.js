@@ -69,7 +69,8 @@ const SURSE_SUMA = {
   extern: ['sursă externă', 'external source'],
   titlu: ['din titlul actului', 'from the act title'],
   text: ['din textul actului', 'from the act text'],
-  guvern: ['din nota Guvernului', 'from the Government note']
+  guvern: ['din nota Guvernului', 'from the Government note'],
+  utilizator: ['corectată de utilizator', 'corrected by a user']
 };
 /* Denumirile complete ale donatorilor, pentru indiciul de sub acronim și pentru căutare. Acronimele sunt cele din registru. */
 const NUME_DONATOR = {
@@ -359,6 +360,7 @@ function pregateste(json, manualBrut) {
       semnat: a.semnat || '', primul: a.primul || '', ultimul: a.ultimul || '',
       suma: s, sursaSuma: s ? (s.sursa || '') : '', actSuma: s ? (s.act || '') : '',
       eur: eur, inTotal: inTotal, eurTotal: inTotal === 'numarat' ? eur : null,
+      registru: { suma: s, sursaSuma: s ? (s.sursa || '') : '', actSuma: s ? (s.act || '') : '', eur: eur, inTotal: inTotal },   // suma din registru, neatinsă: aplicaSume o repune când o corectură dispare
       alte: a.alte || [], cost: a.cost || null,
       acte: acte, coduri: acte.map(function (y) { return y.act; }).filter(Boolean),
       url: (acte.filter(function (y) { return y.url; })[0] || {}).url || '',
@@ -537,9 +539,11 @@ function intrareDin(acord, valoare, acum) {
     la: (acum || new Date()).toISOString()
   };
 }
-/* Ce scrie omul în formularul „Date despre proiect”: obiective, început, finalizare, notă. Toate sunt opționale, dar măcar unul trebuie completat
-   (altfel înregistrarea se șterge). Datele pot fi întregi sau parțiale (vezi parseDataPartiala). */
-function valideazaProiect(c) {
+/* Ce scrie omul în formularul „Date despre proiect” și în celulele tabelului: obiective, început, finalizare, suma proiectului (cu valută) și nota.
+   Toate sunt opționale, dar măcar unul trebuie completat (altfel înregistrarea se șterge). Datele pot fi întregi sau parțiale (vezi parseDataPartiala).
+   Suma goală = „folosește suma din registru”; completată, ea înlocuiește suma din registru la acest acord (vezi aplicaSume). `cursuri` (opțional):
+   valuta trebuie să aibă curs de schimb cunoscut. */
+function valideazaProiect(c, cursuri) {
   const erori = {}, v = {};
   v.obiective = String(c.obiective || '').replace(/\s+/g, ' ').trim();
   if (v.obiective.length > MAX_OBIECTIVE) erori.obiective = 'lunga';
@@ -548,9 +552,20 @@ function valideazaProiect(c) {
   v.sfarsit = parseDataPartiala(c.sfarsit);
   if (v.sfarsit === null) { erori.sfarsit = 'format'; v.sfarsit = ''; }
   if (!erori.inceput && !erori.sfarsit && v.inceput && v.sfarsit && inceputDupaSfarsit(v.inceput, v.sfarsit)) erori.sfarsit = 'ordine';
+  v.suma = null; v.val = '';
+  const txtSuma = String(c.suma == null ? '' : c.suma).trim();
+  if (txtSuma) {
+    const n = parseSuma(txtSuma);
+    if (!numar(n)) erori.suma = 'format';
+    else if (n <= 0) erori.suma = 'zero';
+    else if (n > MAX_SUMA) erori.suma = 'mare';
+    else v.suma = Math.round(n * 100) / 100;
+    v.val = String(c.val || '').trim().toUpperCase();
+    if (!v.val || (cursuri && !cursDe(cursuri, v.val))) erori.val = 'valuta';
+  }
   v.nota = String(c.nota || '').replace(/\s+/g, ' ').trim();
   if (v.nota.length > MAX_NOTA) erori.nota = 'lunga';
-  v.gol = !v.obiective && !v.inceput && !v.sfarsit;
+  v.gol = !v.obiective && !v.inceput && !v.sfarsit && v.suma == null && !erori.suma;
   return { ok: !Object.keys(erori).length, erori: erori, valoare: v };
 }
 function proiectDin(acord, valoare, acum, id) {
@@ -558,13 +573,43 @@ function proiectDin(acord, valoare, acum, id) {
   if (valoare.obiective) e.obiective = valoare.obiective;
   if (valoare.inceput) e.inceput = valoare.inceput;
   if (valoare.sfarsit) e.sfarsit = valoare.sfarsit;
+  if (numar(valoare.suma) && valoare.suma > 0 && valoare.val) { e.suma = Math.round(valoare.suma * 100) / 100; e.val = valoare.val; }
   if (valoare.nota) e.nota = valoare.nota;
   e.la = (acum || new Date()).toISOString();
   return e;
 }
+/* O înregistrare poartă o sumă corectată dacă are suma pozitivă și valuta. */
+function areSumaProiect(e) {
+  return !!(e && numar(e.suma) && e.suma > 0 && typeof e.val === 'string' && e.val);
+}
 function proiectDbValid(e) {
   return !!(e && typeof e.id === 'string' && e.id && typeof e.acord === 'string' &&
-            ((typeof e.obiective === 'string' && e.obiective.trim()) || esteDataPartiala(e.inceput) || esteDataPartiala(e.sfarsit)));
+            ((typeof e.obiective === 'string' && e.obiective.trim()) || esteDataPartiala(e.inceput) || esteDataPartiala(e.sfarsit) || areSumaProiect(e)));
+}
+/* Pune pe fiecare rând suma corectată de utilizator (`peAcord`: Map id rând → înregistrare din date/debursari.json, vezi legaProiecte) sau, unde nu
+   există, suma din registru (`a.registru`). Se schimbă rândurile pe loc, ca listele de donatori să rămână legate de ele; se poate apela de câte ori
+   e nevoie. Un rând care nu intra în total (dublură, nu se adună) rămâne în afara totalului și cu suma corectată. Întoarce numărul de sume corectate. */
+function aplicaSume(baza, peAcord) {
+  let n = 0;
+  (baza.acorduri || []).forEach(function (a) {
+    const r = a.registru, e = peAcord && peAcord.get ? peAcord.get(a.id) : null;
+    if (!r) return;
+    const c = e && areSumaProiect(e) && cursDe(baza.cursuri, e.val) ? e : null;
+    if (c) {
+      const eur = c.suma / cursDe(baza.cursuri, c.val);
+      const inTotal = r.inTotal === 'dublura' || r.inTotal === 'fara_total' ? r.inTotal : 'numarat';
+      a.suma = { v: c.suma, val: c.val, sursa: 'utilizator', act: '' };
+      a.sursaSuma = 'utilizator'; a.actSuma = '';
+      a.eur = eur; a.inTotal = inTotal; a.eurTotal = inTotal === 'numarat' ? eur : null;
+      a.sumaCorectata = true;
+      n++;
+    } else {
+      a.suma = r.suma; a.sursaSuma = r.sursaSuma; a.actSuma = r.actSuma;
+      a.eur = r.eur; a.inTotal = r.inTotal; a.eurTotal = r.inTotal === 'numarat' ? r.eur : null;
+      a.sumaCorectata = false;
+    }
+  });
+  return n;
 }
 /* Leagă înregistrările „Date despre proiect” de rânduri: una pe rând (cea mai nouă); celelalte, mai vechi, rămân în fișier dar nu se arată.
    Fără rând (acordul nu mai e în registru sau s-a schimbat atât de mult încât nu se mai recunoaște) → orfane. */
@@ -968,6 +1013,12 @@ function foaieProiecte(c, o) {
   ];
   note.push(t('Descrierea succintă e obiectivele proiectului; datele de început și de finalizare sunt cele ale proiectului. Fiecare informație vine, în ordine, din: ce a introdus un utilizator în pagină; o sursă oficială (adresa documentului e în coloana „Sursa obiectivelor și a datelor”); AMP, platforma de gestionare a asistenței externe, doar pentru proiectele legate sigur de acord (denumire, finanțator și sumă coincid; acolo, „Data finalizării” e data propusă de terminare). Unde celula e goală, nu s-a găsit o sursă. O dată întreagă e o dată adevărată în Excel (se poate sorta); una cunoscută doar cu luna și anul (03.2026) sau doar cu anul (2026) rămâne text, cât spune sursa. Aici: obiective la ' + nr.obiective + ' din ' + nr.n + ' proiecte, data de început la ' + nr.inceput + ', data finalizării la ' + nr.sfarsit + '.',
     'The short description is the project objectives; the start and completion dates are those of the project. Each item comes, in this order, from: what a user entered in the page; an official source (the address of the document is in the "Source of objectives and dates" column); AMP, the external assistance management platform, only for projects linked with certainty to the agreement (name, funder and amount all agree; there, the completion date is the proposed completion date). An empty cell means no source was found. A full date is a real Excel date (it sorts); one known only as month and year (03.2026) or only as a year (2026) stays text, as far as the source goes. Here: objectives for ' + nr.obiective + ' of ' + nr.n + ' projects, start date for ' + nr.inceput + ', completion date for ' + nr.sfarsit + '.'));
+  const corectate = o.acorduri.filter(function (a) { return a.sumaCorectata; });
+  if (corectate.length) {
+    const lst = corectate.slice(0, 12).map(function (a) { return numeAfisat(a, en) + ' (' + (a.registru.suma ? fmtBani(a.registru.suma.v, en) + ' ' + a.registru.suma.val : t('fără sumă', 'no amount')) + ' → ' + fmtBani(a.suma.v, en) + ' ' + a.suma.val + ')'; }).join('; ');
+    note.push(t('La ' + corectate.length + ' proiecte suma a fost corectată de un utilizator în pagină și înlocuiește suma din registru (între paranteze: suma din registru → suma corectată): ' + lst + (corectate.length > 12 ? '; …' : '') + '.',
+      'For ' + corectate.length + ' projects the amount was corrected by a user in the page and replaces the register amount (in brackets: register amount → corrected amount): ' + lst + (corectate.length > 12 ? '; …' : '') + '.'));
+  }
   if (c.ampNota) note.push(c.ampNota);                // ce s-a întâmplat cu citirea datelor din AMP (raport live, arhivă)
   if (c.omise && c.omise.length) note.push(t('Nu sunt incluse ' + c.omise.length + ' rânduri-umbrelă din registru (negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu aceleași sume): ' + c.omise.map(function (x) { return x.a.nume; }).join('; ') + '.',
     c.omise.length + ' umbrella rows of the register are not included (negotiations or memoranda for agreements that already have their own rows, with the same amounts): ' + c.omise.map(function (x) { return x.a.nume; }).join('; ') + '.'));
@@ -1103,6 +1154,7 @@ return {
   dataPartiala: dataPartiala, esteDataPartiala: esteDataPartiala, fmtDataPartiala: fmtDataPartiala, parseDataPartiala: parseDataPartiala, inceputDupaSfarsit: inceputDupaSfarsit,
   infoProiect: infoProiect, etichetaSursaProiect: etichetaSursaProiect, textSursaProiect: textSursaProiect, legaturaSursaProiect: legaturaSursaProiect,
   valideazaProiect: valideazaProiect, proiectDin: proiectDin, proiectDbValid: proiectDbValid, legaProiecte: legaProiecte,
+  aplicaSume: aplicaSume, areSumaProiect: areSumaProiect,
   idNou: idNou, eurIntrare: eurIntrare, intrareValida: intrareValida, valideazaFormular: valideazaFormular, intrareDin: intrareDin, lega: lega,
   agregaAcord: agregaAcord, rezumat: rezumat, potriveste: potriveste, ordoneaza: ordoneaza, ordoneazaDonatori: ordoneazaDonatori,
   citesteHash: citesteHash, scrieHash: scrieHash,

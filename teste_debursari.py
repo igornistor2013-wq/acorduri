@@ -12,7 +12,8 @@ Ce se verifică, pe scurt:
   · fără dubluri: fiecare act dintr-un singur rând, rândurile-umbrelă omise și enumerate cu motivul, denumiri deosebite la același donator;
   · obiectivele și datele: din surse oficiale (cu citat și adresă), din AMP (arhiva și raportul live, doar legături sigure; cele probabile
     doar ca indiciu), introduse în pagină (formularul „Date despre proiect”), cu prioritatea dintre ele; salvarea în date/debursari.json;
-  · câmpurile blocate până la introducerea codului; cod greșit, fără drept de scriere, fără rețea;
+  · fără cod: doar citire, fără formulare și fără bannere pe acorduri; o singură deblocare (bara fixă de sus) pentru toate acordurile; cod greșit, fără drept de scriere, fără rețea;
+  · după deblocare: editare în tabel a datei de început, a datei finalizării și a sumei proiectului, plus debursările;
   · adăugare, editare, ștergere de debursări → ce ajunge, de fapt, în fișierul date/debursari.json (și în mesajul commit-ului);
   · conflict la salvare (altcineva a scris între timp): nimic nu se pierde; coada de modificări nesalvate supraviețuiește reîncărcării;
   · codul păstrat cu PIN: nicăieri în clar; PIN greșit; „uită codul”;
@@ -588,22 +589,30 @@ try:
             ctx.close()
 
             # ---------------------------------------------------------------- 2. câmpuri blocate, cod greșit
-            print('\n2. Câmpuri blocate; cod greșit, fără drept, fără rețea')
+            print('\n2. Fără cod: doar citire, o singură deblocare pentru toate acordurile; cod greșit, fără drept, fără rețea')
             fals = GitHubFals(intrari=[])
             ctx = context(b)
             pg = pagina(ctx, fals)
             bifeaza(pg, 'BERD')
             a0 = BERD[0]
             det = deschide_rand(pg, 'BERD', a0)
-            campuri = det.locator('form.deb-form input, form.deb-form select, form.deb-form button[type=submit]')
-            verifica('blocat: toate câmpurile formularului sunt dezactivate', all(campuri.nth(i).is_disabled() for i in range(campuri.count())) and campuri.count() >= 5, campuri.count())
-            verifica('blocat: mesajul cere codul de acces', 'Introdu codul' in det.locator('form.deb-form .blocat').inner_text())
-            campuri_p = det.locator('form.proj-form input, form.proj-form textarea, form.proj-form button[type=submit]')
-            verifica('blocat: și formularul „Date despre proiect” e dezactivat (obiective, început, finalizare, sursă, buton)', campuri_p.count() >= 5 and all(campuri_p.nth(i).is_disabled() for i in range(campuri_p.count())), campuri_p.count())
-            verifica('blocat: formularul de proiect cere și el codul', 'Introdu codul' in det.locator('form.proj-form .blocat').inner_text())
+            verifica('blocat: în detaliile acordului nu apare niciun formular, nici vreun banner de blocare (câmpurile nu se repetă la fiecare acord)', det.locator('form').count() == 0 and det.locator('.blocat').count() == 0 and pg.locator('#sRez .blocat').count() == 0, det.locator('form').count())
+            det1 = deschide_rand(pg, 'BERD', BERD[1])
+            verifica('blocat, al doilea acord deschis: la fel, fără formulare și fără banner', det1.locator('form').count() == 0 and pg.locator('#sRez form').count() == 0 and pg.locator('#sRez [data-act="unlock"]').count() == 0)
+            egal('blocat: un singur buton de deblocare în toată pagina, în bara de acces', [pg.locator('[data-act="unlock"]').count(), pg.locator('#sAcces [data-act="unlock"]').count()], [1, 1])
+            verifica('blocat: fără creioane de editare și fără butonul „Debursare” în tabel', pg.locator('#sRez .edt').count() == 0 and pg.locator('#sRez [data-act="adauga"]').count() == 0)
+            verifica('blocat: detaliile se văd în continuare (datele proiectului, datele despre acord), doar în citire', det.locator('.det-proiect .dlp').count() == 1 and det.locator('.det-info').count() == 1 and det.locator('.det-grid.solo').count() == 1)
             egal('blocat: bara de acces spune „Doar citire”', pg.locator('#sAcces b').inner_text(), 'Doar citire')
+            verifica('blocat: bara spune că un singur cod deblochează totul (început, finalizare, sumă, debursări)', all(x in pg.locator('#sAcces .acces-txt').inner_text() for x in ('Un singur cod', 'toate acordurile', 'data de început', 'data finalizării', 'suma proiectului', 'debursările')), pg.locator('#sAcces .acces-txt').inner_text())
+            egal('bara de acces e „fixă” (position: sticky)', pg.evaluate('getComputedStyle(document.querySelector("#sAcces")).position'), 'sticky')
+            pg.evaluate('window.scrollTo(0, Math.max(0, document.documentElement.scrollHeight / 2))')
+            pg.wait_for_timeout(200)
+            sus = pg.evaluate('[document.querySelector("#sAcces").getBoundingClientRect().top, window.scrollY, document.querySelector("#sAcces").getBoundingClientRect().height]')
+            verifica('bara de acces rămâne în capul ferestrei la derulare (deblocarea e la îndemână de la orice acord)', -1 <= sus[0] <= 1 and sus[1] > 300, sus)
+            verifica('înălțimea barei e măsurată (--acces-h), ca lista donatorilor să se așeze sub ea', pg.evaluate('parseInt(getComputedStyle(document.documentElement).getPropertyValue("--acces-h"))') >= 30)
+            pg.evaluate('window.scrollTo(0, 0)')
             verifica('blocat: nicio cerere către GitHub până nu se cere deblocarea', len(fals.cereri) == 0, fals.cereri)
-            det.locator('form.deb-form .blocat [data-act="unlock"]').click()
+            pg.click('#sAcces [data-act="unlock"]')
             pg.wait_for_selector('#dlg[open]')
             verifica('dialogul: focus pe câmpul pentru cod', pg.evaluate('document.activeElement.id') == 'inCod')
             verifica('dialogul: câmpul codului e de tip „password”', pg.get_attribute('#inCod', 'type') == 'password')
@@ -640,7 +649,7 @@ try:
             bifeaza(pg, 'BERD')
             debloca(pg)
             verifica('cod corect: pagina se deblochează', deblocat(pg))
-            egal('bara de acces spune „Modificări permise”', pg.locator('#sAcces b').inner_text(), 'Modificări permise')
+            egal('bara de acces spune „Editare deblocată pentru toate acordurile”', pg.locator('#sAcces b').inner_text(), 'Editare deblocată pentru toate acordurile')
             stoc = pg.evaluate('JSON.stringify([Object.entries(localStorage), Object.entries(sessionStorage)])')
             verifica('cheia nu e în localStorage/sessionStorage', TOKEN not in stoc, stoc[:200])
             verifica('cheia nu e nicăieri în pagina HTML', TOKEN not in pg.content())
@@ -650,6 +659,12 @@ try:
             det = deschide_rand(pg, 'BERD', a1)
             campuri = det.locator('form.deb-form input, form.deb-form select, form.deb-form button[type=submit]')
             verifica('deblocat: câmpurile formularului sunt active', all(campuri.nth(i).is_enabled() for i in range(campuri.count())))
+            altul = [a for a in BERD if a['id'] != a1['id']][0]
+            det2 = deschide_rand(pg, 'BERD', altul)
+            tot2 = det2.locator('form input, form select, form textarea, form button[type=submit]')
+            verifica('o singură deblocare pentru toate acordurile: alt acord are formularele (debursare și proiect) active, fără alt cod', det2.locator('form.deb-form').count() == 1 and det2.locator('form.proj-form').count() == 1 and tot2.count() >= 10 and all(tot2.nth(i).is_enabled() for i in range(tot2.count())) and pg.locator('[data-act="unlock"]').count() == 0, tot2.count())
+            verifica('formularul de proiect are și suma proiectului, cu valută', det2.locator('form.proj-form [name=suma]').count() == 1 and det2.locator('form.proj-form [name=val]').count() == 1)
+            rand_acord(pg, 'BERD', altul['id']).locator('.exp').click()
             f = completeaza(det, suma='1.250.000,50', data='2026-10-01', val='EUR', nota='Tranșa 1, cererea nr. 4')
             verifica('previzualizarea arată cum a fost citită suma', '1.250.000,50 EUR' in det.locator('.prev').inner_text(), det.locator('.prev').inner_text())
             f.locator('button[type=submit]').click()
@@ -664,7 +679,7 @@ try:
             verifica('intrarea poartă actele acordului (pentru re-legare) și un id', e['acte'] == [x['act'] for x in a1['acte']][:12] and len(e['id']) > 5, e)
             verifica('mesajul commit-ului descrie modificarea', fals.commituri[0].startswith('Debursări: adăugat: ') and '1.250.000,50 EUR' in fals.commituri[0], fals.commituri)
             egal('bara de acces: „Totul e salvat”', pg.locator('#sAcces .acces-txt span').first.inner_text().startswith('Totul e salvat'), True)
-            verifica('formularul păstrează data și valuta și golește suma', det.locator('[name=suma]').input_value() == '' and det.locator('[name=data]').input_value() == '2026-10-01')
+            verifica('formularul păstrează data și valuta și golește suma', det.locator('form.deb-form [name=suma]').input_value() == '' and det.locator('form.deb-form [name=data]').input_value() == '2026-10-01')
             # cifrele
             eur_in = 1250000.5
             verifica('rândul: suma debursată în euro și numărul de debursări',
@@ -717,7 +732,7 @@ try:
             pg.click('#sAcces [data-act="lock"]')
             pg.wait_for_timeout(200)
             pg.screenshot(path=str(DESC / 'desktop-deblocat.png'))
-            verifica('„Blochează” dezactivează din nou formularul', not deblocat(pg) and pg.locator('section.panel[data-d="BERD"] tr.det form.deb-form [name=suma]').first.is_disabled())
+            verifica('„Blochează” scoate din nou formularele, la toate acordurile deodată', not deblocat(pg) and pg.locator('section.panel[data-d="BERD"] tr.det form').count() == 0 and pg.locator('#sRez .edt').count() == 0 and pg.locator('#sAcces [data-act="unlock"]').count() == 1)
             # reîncărcare: citit public
             pg.reload(wait_until='networkidle')
             pg.wait_for_selector('.don')
@@ -1150,7 +1165,7 @@ try:
             # blocarea la loc și citirea publică, fără cod
             pg.click('#sAcces [data-act="lock"]')
             pg.wait_for_timeout(200)
-            verifica('„Blochează” dezactivează și formularul de proiect', all(pg.locator('form.proj-form').nth(i).locator('textarea').is_disabled() for i in range(pg.locator('form.proj-form').count())))
+            verifica('„Blochează” scoate și formularul de proiect', pg.locator('form.proj-form').count() == 0 and pg.locator('#sRez .edt').count() == 0)
             pg.reload(wait_until='networkidle')
             pg.wait_for_selector('section.panel[data-d="BERD"] tr.ac')
             egal('după reîncărcare, datele salvate se văd public, fără cod', rand_acord(pg, 'BERD', pC['id']).locator('td').nth(1).locator('.pdesc').inner_text(), 'Sprijin pentru reforma sectorului energetic și securitatea aprovizionării.')
@@ -1421,6 +1436,220 @@ try:
             tx_en = pg.locator('#sOmise details.omise').first.inner_text()
             verifica('lista omiselor în engleză: titlul, motivul în engleză, „Counted under”', 'rows of the register do not appear in the lists' in tx_en and 'Counted under:' in tx_en and
                      all(any(o['motiv_en'][:40] in tx_en for o in MANUAL_REAL['omise']) for _ in (0,)), tx_en[:400])
+            ctx.close()
+
+        # ---------------------------------------------------------------- 17. editare în tabel
+        if rulez(17):
+            print('\n17. Editare în tabel, după o singură deblocare: data de început, data finalizării, suma proiectului')
+            fals = GitHubFals(intrari=[])
+            ctx = context(b)
+            pg = pagina(ctx, fals, hash_='#d=BERD', manual=OF, arhiva=False)
+            rC = rand_acord(pg, 'BERD', pC['id'])
+            reg_txt = fmt_bani_ro(pC['suma']['v']) + ' ' + pC['suma']['val']
+            amt0 = rC.locator('td').nth(5).inner_text().replace('\xa0', ' ')
+            verifica('blocat: fără creioane în tabel', pg.locator('#sRez .edt').count() == 0)
+            debloca(pg)
+            verifica('deblocat: fiecare rând are trei creioane (început, finalizare, sumă)', all(rand_acord(pg, 'BERD', a['id']).locator('.edt').count() == 3 for a in BERD), [rand_acord(pg, 'BERD', a['id']).locator('.edt').count() for a in BERD][:5])
+            egal('creioanele spun ce editează și la ce proiect', [rC.locator('.edt[data-f="%s"]' % f).get_attribute('aria-label').split(':')[0] for f in ('inceput', 'sfarsit', 'suma')],
+                 ['Editează data efectivă de începere', 'Editează data finalizării', 'Editează suma proiectului'])
+            egal('bara de acces spune cum se editează', 'Creionul din tabel' in pg.locator('#sAcces .acces-txt').inner_text(), True)
+            # --- deschiderea editorului
+            rC.locator('.edt[data-f="inceput"]').click()
+            pg.wait_for_selector('tr.ac.edit[data-k="BERD|%s"]' % pC['id'])
+            verifica('rândul intră în editare: câmpuri pentru început, finalizare, sumă și valută, și o bară cu Salvează / Anulează', all(rC.locator('[data-re=%s]' % n).count() == 1 for n in ('inceput', 'sfarsit', 'suma', 'val')) and
+                     pg.locator('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pC['id']).count() == 1 and pg.locator('tr.re[data-k="BERD|%s"] [data-act="rand-anuleaza"]' % pC['id']).count() == 1)
+            egal('focus pe câmpul al cărui creion a fost apăsat', pg.evaluate('document.activeElement.getAttribute("data-re")'), 'inceput')
+            egal('câmpurile pornesc de la ce se vede acum: datele goale, suma și valuta din registru', [rC.locator('[data-re=inceput]').input_value(), rC.locator('[data-re=sfarsit]').input_value(), rC.locator('[data-re=suma]').input_value(), rC.locator('[data-re=val]').input_value()],
+                 ['', '', fmt_bani_ro(pC['suma']['v']), pC['suma']['val']])
+            verifica('lângă sumă se vede suma din registru', ('în registru: ' + reg_txt) in rC.locator('td').nth(5).inner_text().replace('\xa0', ' '), rC.locator('td').nth(5).inner_text())
+            # --- validare
+            rC.locator('[data-re=inceput]').fill('abc')
+            antes = fals.n_put
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pC['id'])
+            pg.wait_for_timeout(200)
+            verifica('validare: „Nu înțeleg data de început”, câmpul are aria-invalid, nimic scris', 'Nu înțeleg data de început' in pg.locator('tr.re .ferr').inner_text() and rC.locator('[data-re=inceput]').get_attribute('aria-invalid') == 'true' and fals.n_put == antes, pg.locator('tr.re .ferr').inner_text())
+            egal('după eroare, focus pe câmpul greșit; ce a scris omul rămâne scris', [pg.evaluate('document.activeElement.getAttribute("data-re")'), rC.locator('[data-re=inceput]').input_value()], ['inceput', 'abc'])
+            rC.locator('[data-re=inceput]').fill('15.03.2024')
+            rC.locator('[data-re=sfarsit]').fill('01.01.2023')
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pC['id'])
+            pg.wait_for_timeout(200)
+            verifica('validare: finalizarea nu poate fi înaintea începutului', 'nu poate fi înaintea' in pg.locator('tr.re .ferr').inner_text() and fals.n_put == antes, pg.locator('tr.re .ferr').inner_text())
+            rC.locator('[data-re=sfarsit]').fill('12.2028')
+            verifica('eroarea dispare când omul corectează câmpul', rC.locator('[data-re=sfarsit]').get_attribute('aria-invalid') is None and pg.locator('tr.re .ferr').inner_text().strip() == '')
+            rC.locator('[data-re=suma]').fill('abc')
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pC['id'])
+            pg.wait_for_timeout(200)
+            verifica('validare: „Nu înțeleg suma”', 'Nu înțeleg suma' in pg.locator('tr.re .ferr').inner_text() and fals.n_put == antes, pg.locator('tr.re .ferr').inner_text())
+            rC.locator('[data-re=suma]').fill(fmt_bani_ro(pC['suma']['v']))
+            # --- salvare: doar ce s-a schimbat
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pC['id'])
+            asteapta_salvat(pg, fals, 1)
+            e = fals.proiecte()[0] if fals.proiecte() else {}
+            egal('fișierul: doar datele schimbate (ISO / parțiale); suma rămasă neschimbată nu se scrie ca sumă a utilizatorului', [e.get('acord'), e.get('inceput'), e.get('sfarsit'), 'suma' in e, 'val' in e, 'obiective' in e], [pC['id'], '2024-03-15', '2028-12', False, False, False])
+            verifica('mesajul commit-ului: „Date proiecte: salvat: …”', fals.commituri[0].startswith('Date proiecte: salvat: '), fals.commituri)
+            rC = rand_acord(pg, 'BERD', pC['id'])
+            egal('tabel: datele introduse, cu eticheta „introdus de utilizator”', [celula_data(rC, 2)[1].split('\n')[0], celula_data(rC, 3)[1].split('\n')[0], sursa_celulei(rC, 2), sursa_celulei(rC, 3)],
+                 [ '15.03.2024', '12.2028', ['introdus de utilizator'], ['introdus de utilizator']])
+            verifica('după salvare rândul iese din editare, iar focusul se întoarce pe creion', pg.locator('tr.ac.edit').count() == 0 and pg.locator('tr.re').count() == 0 and pg.evaluate('document.activeElement.classList.contains("edt")'))
+            egal('suma rămâne cea din registru, fără marcaj de corectură', [reg_txt.split(' ')[0] in rC.locator('td').nth(5).inner_text().replace('\xa0', ' '), 'corectată' in rC.locator('td').nth(5).inner_text()], [True, False])
+            # --- suma corectată
+            suma_inainte = suma_numarata(BERD)
+            rC.locator('.edt[data-f="suma"]').click()
+            pg.wait_for_selector('tr.ac.edit')
+            egal('focus pe suma', pg.evaluate('document.activeElement.getAttribute("data-re")'), 'suma')
+            egal('câmpurile de date pornesc de la ce a fost introdus', [rC.locator('[data-re=inceput]').input_value(), rC.locator('[data-re=sfarsit]').input_value()], ['15.03.2024', '12.2028'])
+            rC.locator('[data-re=suma]').fill('12.345.678,90')
+            rC.locator('[data-re=val]').select_option('USD')
+            rC.locator('[data-re=suma]').press('Enter')
+            asteapta_salvat(pg, fals, 2)
+            e = fals.proiecte()[0]
+            egal('fișierul: aceeași înregistrare, cu suma și valuta noi; datele introduse înainte rămân', [len(fals.proiecte()), e.get('suma'), e.get('val'), e.get('inceput'), e.get('sfarsit')], [1, 12345678.9, 'USD', '2024-03-15', '2028-12'])
+            rC = rand_acord(pg, 'BERD', pC['id'])
+            tx = rC.locator('td').nth(5).inner_text().replace('\xa0', ' ')
+            eur_nou = 12345678.9 / CURSURI['USD']
+            verifica('tabel: suma nouă, echivalentul în euro, „corectată de utilizator” și suma din registru alături', '12.345.678,90 USD' in tx and ('≈ ' + fmt_ro(rotunjit(eur_nou), 0) + ' EUR') in tx and 'corectată de utilizator' in tx and ('în registru: ' + reg_txt) in tx, tx)
+            if pC['inTotal'] == 'numarat':
+                asteptat = suma_inainte - eur(pC) + eur_nou
+                dsum = pg.locator('section.panel[data-d="BERD"] .dsum').inner_text().replace('\xa0', ' ')
+                verifica('antetul donatorului: totalul sumelor ține seama de suma corectată', ('suma ' + fmt_ro(rotunjit(asteptat), 0) + ' EUR') in dsum, (dsum, asteptat))
+            # --- în detalii: formularul de proiect arată suma, iar „Suma din registru” apare separat
+            detC = deschide_rand(pg, 'BERD', pC)
+            egal('detalii: formularul de proiect arată suma corectată și valuta', [detC.locator('form.proj-form [name=suma]').input_value(), detC.locator('form.proj-form [name=val]').input_value()], ['12.345.678,90', 'USD'])
+            inf = detC.locator('.det-info').inner_text().replace('\xa0', ' ')
+            verifica('detalii: „Suma din registru” cu valoarea de acolo, iar „Suma” spune că e corectată', 'suma din registru' in inf.lower() and reg_txt in inf and 'corectată de utilizator' in inf, inf)
+            # --- Excel: suma nouă și nota
+            with pg.expect_download(timeout=60000) as d:
+                pg.click('section.panel[data-d="BERD"] [data-act="excel-donator"]')
+            cale = DESC / 'berd-suma-corectata.xlsx'
+            d.value.save_as(str(cale))
+            wsb = openpyxl.load_workbook(cale)['BERD']
+            for rr in wsb.iter_rows(min_row=1, max_row=12):
+                if 'Proiectul' in [c.value for c in rr]:
+                    antet, rand_antet = [c.value for c in rr], rr[0].row
+                    break
+            iP, iS, iV = antet.index('Proiectul'), antet.index('Suma proiectului'), antet.index('Suma proiectului') + 1
+            rx = [x for x in wsb.iter_rows(min_row=rand_antet + 1) if x[iP].value == rC.locator('.pname').inner_text()][0]
+            egal('Excel: rândul cu suma corectată (suma, valuta)', [rx[iS].value, rx[iV].value], [12345678.9, 'USD'])
+            note = ' '.join(toate_foile(cale))
+            verifica('Excel: nota spune că suma a fost corectată și arată registru → corectată', 'suma a fost corectată de un utilizator' in note and (reg_txt + ' → 12.345.678,90 USD') in note, note[-600:])
+            # --- golirea sumei: se revine la registru
+            rC.locator('.edt[data-f="suma"]').click()
+            rC.locator('[data-re=suma]').fill('')
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pC['id'])
+            asteapta_salvat(pg, fals, 3)
+            e = fals.proiecte()[0]
+            egal('suma goală: corectura dispare din fișier, datele rămân', [len(fals.proiecte()), 'suma' in e, 'val' in e, e.get('inceput')], [1, False, False, '2024-03-15'])
+            rC = rand_acord(pg, 'BERD', pC['id'])
+            verifica('tabel: suma din registru revine, fără marcaj', 'corectată' not in rC.locator('td').nth(5).inner_text() and reg_txt.split(' ')[0] in rC.locator('td').nth(5).inner_text().replace('\xa0', ' '), rC.locator('td').nth(5).inner_text())
+            # --- Anulează și Esc nu scriu nimic
+            antes = fals.n_put
+            rC.locator('.edt[data-f="sfarsit"]').click()
+            rC.locator('[data-re=sfarsit]').fill('2040')
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-anuleaza"]' % pC['id'])
+            pg.wait_for_timeout(200)
+            verifica('„Anulează”: rândul revine la ce era, fără scriere', pg.locator('tr.ac.edit').count() == 0 and celula_data(rand_acord(pg, 'BERD', pC['id']), 3)[1].split('\n')[0] == '12.2028' and fals.n_put == antes)
+            rand_acord(pg, 'BERD', pC['id']).locator('.edt[data-f="sfarsit"]').click()
+            pg.fill('[data-fk="BERD|%s|re_sfarsit"]' % pC['id'], '2041')
+            pg.keyboard.press('Escape')
+            pg.wait_for_timeout(200)
+            verifica('Esc anulează editarea, fără scriere', pg.locator('tr.ac.edit').count() == 0 and celula_data(rand_acord(pg, 'BERD', pC['id']), 3)[1].split('\n')[0] == '12.2028' and fals.n_put == antes)
+            rand_acord(pg, 'BERD', pC['id']).locator('.edt[data-f="inceput"]').click()
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pC['id'])
+            pg.wait_for_timeout(200)
+            verifica('„Salvează” fără nicio schimbare nu scrie nimic (nu apare un commit nou)', fals.n_put == antes and pg.locator('tr.ac.edit').count() == 0, fals.n_put)
+            # --- golirea tuturor câmpurilor șterge înregistrarea
+            rand_acord(pg, 'BERD', pC['id']).locator('.edt[data-f="inceput"]').click()
+            pg.fill('[data-fk="BERD|%s|re_inceput"]' % pC['id'], '')
+            pg.fill('[data-fk="BERD|%s|re_sfarsit"]' % pC['id'], '')
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pC['id'])
+            asteapta_salvat(pg, fals, 4)
+            egal('toate câmpurile goale: înregistrarea se șterge, rândul revine la „—”', [fals.proiecte(), celula_data(rand_acord(pg, 'BERD', pC['id']), 2)[1], celula_data(rand_acord(pg, 'BERD', pC['id']), 3)[1]], [[], '—', '—'])
+            verifica('mesajul commit-ului: „Date proiecte: șters: …”', fals.commituri[3].startswith('Date proiecte: șters: '), fals.commituri)
+            # --- rând cu date din sursă oficială: editorul pornește de la valoarea oficială; se salvează doar ce se schimbă
+            rA = rand_acord(pg, 'BERD', pA['id'])
+            rA.locator('.edt[data-f="inceput"]').click()
+            egal('sursă oficială: câmpurile pornesc de la datele oficiale', [rA.locator('[data-re=inceput]').input_value(), rA.locator('[data-re=sfarsit]').input_value()], ['14.05.2019', '12.2027'])
+            rA.locator('[data-re=inceput]').fill('01.02.2020')
+            rA.locator('[data-re=inceput]').press('Enter')
+            asteapta_salvat(pg, fals, 5)
+            e = fals.proiecte()[0]
+            egal('fișierul are doar începutul scris de om; finalizarea oficială nu se copiază', [e.get('inceput'), 'sfarsit' in e, 'obiective' in e, 'suma' in e], ['2020-02-01', False, False, False])
+            rA = rand_acord(pg, 'BERD', pA['id'])
+            egal('tabel: începutul e al utilizatorului, finalizarea rămâne oficială', [celula_data(rA, 2)[1].split('\n')[0], celula_data(rA, 3)[1].split('\n')[0], sursa_celulei(rA, 2), sursa_celulei(rA, 3)], ['01.02.2020', '12.2027', ['introdus de utilizator'], ['sursă oficială']])
+            rA.locator('.edt[data-f="inceput"]').click()
+            rA.locator('[data-re=inceput]').fill('')
+            rA.locator('[data-re=inceput]').press('Enter')
+            asteapta_salvat(pg, fals, 6)
+            egal('golirea câmpului scris de om: rândul revine la sursa oficială', [fals.proiecte(), celula_data(rand_acord(pg, 'BERD', pA['id']), 2)[1].split('\n')[0], sursa_celulei(rand_acord(pg, 'BERD', pA['id']), 2)], [[], '14.05.2019', ['sursă oficială']])
+            # --- nota (sursa informației) din bara rândului
+            rA = rand_acord(pg, 'BERD', pA['id'])
+            rA.locator('.edt[data-f="sfarsit"]').click()
+            rA.locator('[data-re=sfarsit]').fill('2030')
+            pg.fill('[data-fk="BERD|%s|re_nota"]' % pA['id'], 'raport anual, pag. 3')
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pA['id'])
+            asteapta_salvat(pg, fals, 7)
+            egal('nota din bara rândului ajunge în înregistrare', [fals.proiecte()[0].get('sfarsit'), fals.proiecte()[0].get('nota')], ['2030', 'raport anual, pag. 3'])
+            # --- o notă fără nicio valoare nu se salvează
+            rB = rand_acord(pg, 'BERD', pC['id'])
+            antes = fals.n_put
+            rB.locator('.edt[data-f="inceput"]').click()
+            pg.fill('[data-fk="BERD|%s|re_nota"]' % pC['id'], 'doar o notă')
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pC['id'])
+            pg.wait_for_timeout(200)
+            verifica('doar o notă, fără nicio valoare: „Completează cel puțin un câmp”, nimic scris', 'Completează cel puțin un câmp' in pg.locator('tr.re .ferr').inner_text() and fals.n_put == antes, pg.locator('tr.re .ferr').inner_text())
+            # --- Blochează închide editoarele și scoate creioanele, la toate rândurile
+            pg.click('#sAcces [data-act="lock"]')
+            pg.wait_for_timeout(200)
+            verifica('„Blochează”: niciun editor deschis, niciun creion; redeblocarea nu readuce editorul', pg.locator('tr.ac.edit').count() == 0 and pg.locator('#sRez .edt').count() == 0 and pg.locator('[data-re]').count() == 0)
+            debloca(pg)
+            verifica('după redeblocare: creioanele sunt înapoi, editoarele rămân închise', pg.locator('#sRez .edt').count() == 3 * len(BERD) and pg.locator('tr.ac.edit').count() == 0)
+            pg.screenshot(path=str(DESC / 'desktop-editare-rand.png'))
+            ctx.close()
+
+            # engleză și telefon: editorul din rând
+            print('   · engleză și telefon')
+            fals = GitHubFals(intrari=[])
+            ctx = context(b, viewport=(390, 844))
+            pg = pagina(ctx, fals, hash_='#d=BERD', lang='en', manual=OF, arhiva=False)
+            debloca(pg)
+            egal('engleză: titlul barei', pg.locator('#sAcces b').inner_text(), 'Editing unlocked for all agreements')
+            rC = rand_acord(pg, 'BERD', pC['id'])
+            egal('engleză: creioanele', [rC.locator('.edt[data-f="%s"]' % f).get_attribute('aria-label').split(':')[0] for f in ('inceput', 'sfarsit', 'suma')], ['Edit the actual start date', 'Edit the completion date', 'Edit the project amount'])
+            rC.locator('.edt[data-f="suma"]').click()
+            verifica('engleză: suma în format englezesc, „in the register”, butoanele Save / Cancel', rC.locator('[data-re=suma]').input_value() == fmt_en(pC['suma']['v'], 2) and 'in the register' in rC.inner_text() and
+                     pg.locator('tr.re [data-act="rand-salveaza"]').inner_text() == 'Save' and pg.locator('tr.re [data-act="rand-anuleaza"]').inner_text() == 'Cancel', rC.locator('[data-re=suma]').input_value())
+            rC.locator('[data-re=suma]').fill('1,500,000.50')
+            rC.locator('[data-re=val]').select_option('EUR')
+            verifica('telefon: fără derulare orizontală cu editorul deschis', pg.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), pg.evaluate('[document.documentElement.scrollWidth, window.innerWidth]'))
+            pg.screenshot(path=str(DESC / 'telefon-editare-rand.png'))
+            pg.click('tr.re[data-k="BERD|%s"] [data-act="rand-salveaza"]' % pC['id'])
+            asteapta_salvat(pg, fals, 1)
+            egal('engleză: suma scrisă „1,500,000.50” se citește corect', [fals.proiecte()[0].get('suma'), fals.proiecte()[0].get('val')], [1500000.5, 'EUR'])
+            verifica('engleză: „corrected by a user” și „in the register”', 'corrected by a user' in rand_acord(pg, 'BERD', pC['id']).locator('td').nth(5).inner_text() and 'in the register' in rand_acord(pg, 'BERD', pC['id']).locator('td').nth(5).inner_text())
+            ctx.close()
+
+            # salvare eșuată: modificarea rămâne în coadă, marcată „nesalvat”, și se salvează după deblocare
+            print('   · salvare eșuată: coada')
+            fals = GitHubFals(intrari=[])
+            ctx = context(b)
+            pg = pagina(ctx, fals, hash_='#d=BERD', manual=OF, arhiva=False)
+            debloca(pg)
+            fals.cade_reteaua = True
+            rC = rand_acord(pg, 'BERD', pC['id'])
+            rC.locator('.edt[data-f="suma"]').click()
+            rC.locator('[data-re=suma]').fill('777000')
+            rC.locator('[data-re=val]').select_option('EUR')
+            rC.locator('[data-re=suma]').press('Enter')
+            pg.wait_for_function('document.querySelector("#sAcces").textContent.includes("Nu pot ajunge la GitHub")', timeout=10000)
+            tx = rand_acord(pg, 'BERD', pC['id']).locator('td').nth(5).inner_text().replace('\xa0', ' ')
+            verifica('eșec: suma nouă se vede în tabel, marcată „nesalvat”', '777.000 EUR' in tx and 'nesalvat' in tx, tx)
+            pg.reload(wait_until='networkidle')
+            pg.wait_for_selector('section.panel[data-d="BERD"] tr.ac')
+            verifica('după reîncărcare: suma nesalvată se vede în continuare', '777.000 EUR' in rand_acord(pg, 'BERD', pC['id']).locator('td').nth(5).inner_text().replace('\xa0', ' '))
+            fals.cade_reteaua = False
+            debloca(pg)
+            pg.wait_for_function('window.DebursariUI.stare().coada === 0', timeout=15000)
+            egal('după deblocare, coada se salvează singură', [x.get('suma') for x in fals.proiecte()], [777000])
             ctx.close()
         b.close()
 except Exception as e:                                           # o eroare a testului însuși trebuie să se vadă

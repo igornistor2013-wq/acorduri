@@ -277,6 +277,48 @@ egal('înregistrările legate de rânduri: cea mai nouă pe rând; cea veche ră
 egal('o înregistrare fără obiective și fără date nu se ia în seamă', LP.peAcord.has('px') || LP.orfane.some(e => e.id === 'px') || LP.vechi.some(e => e.id === 'px'), false);
 egal('căutarea poate folosi și textul obiectivelor', [B.acorduri.filter(a => D.potriveste(a, { peAcord: new Map(), q: 'extinderea canalizarii', extra: new Map([['a2', 'extinderea canalizării']]) })).map(a => a.id), B.acorduri.filter(a => D.potriveste(a, { peAcord: new Map(), q: 'extinderea canalizarii' })).length], [['a2'], 0]);
 
+console.log('\nSuma proiectului corectată de utilizator');
+const VPS = (c, cur) => D.valideazaProiect(c, cur);
+vp = VPS({ suma: '1.250.000,50', val: 'eur' }, CURSURI);
+egal('suma corectată: se citește, valuta se scrie cu majuscule, rotunjire la bani', [vp.ok, vp.valoare.suma, vp.valoare.val, vp.valoare.gol], [true, 1250000.5, 'EUR', false]);
+egal('suma goală = „folosește suma din registru”: nu cere valuta, nu e eroare, formularul rămâne gol', (vp = VPS({ suma: '  ', val: 'XYZ' }, CURSURI), [vp.ok, vp.valoare.suma, vp.valoare.gol]), [true, null, true]);
+egal('suma: erori — format, zero, prea mare', [VPS({ suma: 'abc', val: 'EUR' }).erori.suma, VPS({ suma: '0', val: 'EUR' }).erori.suma, VPS({ suma: '1.000.000.000.000.000', val: 'EUR' }).erori.suma], ['format', 'zero', 'mare']);
+egal('suma: valuta trebuie să aibă curs de schimb (când se dau cursurile) și să fie scrisă', [VPS({ suma: '5', val: 'XYZ' }, CURSURI).erori.val, VPS({ suma: '5', val: '' }, CURSURI).erori.val, VPS({ suma: '5', val: 'USD' }, CURSURI).ok], ['valuta', 'valuta', true]);
+egal('suma singură ajunge (celelalte câmpuri pot lipsi), nu e „gol”', [VPS({ suma: '5', val: 'EUR' }, CURSURI).ok, VPS({ suma: '5', val: 'EUR' }, CURSURI).valoare.gol, VPS({ suma: '5', val: 'EUR', inceput: '2020' }, CURSURI).valoare.inceput], [true, false, '2020']);
+egal('formularul vechi (fără sumă) merge ca înainte', [VP({ obiective: 'x' }).valoare.suma, VP({ obiective: 'x' }).valoare.val, VP({ obiective: 'x' }).ok], [null, '', true]);
+const PS1 = D.proiectDin(A1, VPS({ suma: '12.000.000', val: 'EUR', inceput: '2021' }, CURSURI).valoare, ACUM);
+egal('înregistrarea cu sumă: suma și valuta se scriu doar când există', [PS1.suma, PS1.val, PS1.inceput, 'suma' in P1, 'val' in P1], [12000000, 'EUR', '2021', false, false]);
+egal('o înregistrare doar cu sumă e validă; fără valută, cu sumă zero sau negativă nu', [D.proiectDbValid({ id: 'p1', acord: 'a1', suma: 5, val: 'EUR' }), D.proiectDbValid({ id: 'p1', acord: 'a1', suma: 5 }), D.proiectDbValid({ id: 'p1', acord: 'a1', suma: 0, val: 'EUR' }),
+     D.proiectDbValid({ id: 'p1', acord: 'a1', suma: -3, val: 'EUR' }), D.proiectDbValid({ id: 'p1', acord: 'a1' })], [true, false, false, false, false]);
+const LPS = D.legaProiecte([{ id: 'ps', acord: 'a1', suma: 7, val: 'EUR', la: '2026-02-01T00:00:00.000Z' }], B);
+egal('o înregistrare doar cu sumă se leagă de rând', LPS.peAcord.has('a1'), true);
+
+const BS = D.pregateste(JSON_TEST);
+const sumaEurTotal = () => D.rezumat(BS.acorduri, new Map(), CURSURI).sumaEur;
+const sumaInitiala = sumaEurTotal();
+const a1s = BS.peId.get('a1');
+egal('înainte de corectură: suma din registru e și „registru”, fără marcaj', [a1s.suma.v, a1s.suma.val, a1s.registru.suma.v, a1s.sumaCorectata, a1s.sursaSuma], [10000000, 'USD', 10000000, undefined, 'acord']);
+let nc = D.aplicaSume(BS, new Map([['a1', { id: 'p1', acord: 'a1', suma: 12000000, val: 'EUR' }]]));
+egal('suma corectată înlocuiește pe rând suma, valuta, echivalentul în euro, sursa și cifra din total', [nc, a1s.suma.v, a1s.suma.val, a1s.eur, a1s.eurTotal, a1s.inTotal, a1s.sursaSuma, a1s.sumaCorectata],
+     [1, 12000000, 'EUR', 12000000, 12000000, 'numarat', 'utilizator', true]);
+egal('suma din registru rămâne la îndemână pe rând', [a1s.registru.suma.v, a1s.registru.suma.val, a1s.registru.sursaSuma], [10000000, 'USD', 'acord']);
+aproape('totalul pe donatori ține seama de suma corectată (12 000 000 EUR în loc de 10 000 000 USD)', sumaEurTotal(), sumaInitiala - 10000000 / 1.1383 + 12000000, 1e-6);
+D.aplicaSume(BS, new Map([['a1', { id: 'p1', acord: 'a1', suma: 12000000, val: 'EUR' }]]));
+aproape('aplicată a doua oară, nimic nu se schimbă (nu se adună, nu se strică)', sumaEurTotal(), sumaInitiala - 10000000 / 1.1383 + 12000000, 1e-6);
+egal('procentul debursat se judecă față de suma corectată', D.agregaAcord(a1s, [{ id: 'e', acord: 'a1', suma: 6000000, val: 'EUR', data: '2026-01-01' }], CURSURI).pct, 0.5);
+D.aplicaSume(BS, new Map());
+egal('fără corectură (ștearsă), suma din registru revine întreagă', [a1s.suma.v, a1s.suma.val, a1s.sursaSuma, a1s.sumaCorectata, a1s.inTotal], [10000000, 'USD', 'acord', false, 'numarat']);
+aproape('…și totalul la fel', sumaEurTotal(), sumaInitiala, 1e-6);
+nc = D.aplicaSume(BS, new Map([['a3', { id: 'p3', acord: 'a3', suma: 2500000, val: 'EUR' }], ['a4', { id: 'p4', acord: 'a4', suma: 9000000, val: 'EUR' }], ['a7', { id: 'p7', acord: 'a7', suma: 4000, val: 'EUR' }], ['a2', { id: 'p2', acord: 'a2', suma: 1, val: 'XYZ' }]]));
+const [a3s, a4s, a7s, a2s] = ['a3', 'a4', 'a7', 'a2'].map(i => BS.peId.get(i));
+egal('rând fără sumă → cu sumă corectată intră în total', [a3s.suma.v, a3s.inTotal, a3s.eurTotal], [2500000, 'numarat', 2500000]);
+egal('rând care nu se adună în total (dublură / „nu se adună”) rămâne în afara totalului, dar arată suma corectată', [a4s.suma.v, a4s.inTotal, a4s.eurTotal, a4s.sumaCorectata], [9000000, 'fara_total', null, true]);
+egal('rând în valută fără curs → corectat în euro, intră în total', [a7s.suma.v, a7s.suma.val, a7s.inTotal, a7s.eurTotal], [4000, 'EUR', 'numarat', 4000]);
+egal('valută fără curs de schimb în înregistrare: corectura se ignoră, rămâne suma din registru; se numără doar corecturile aplicate', [a2s.suma.v, a2s.sumaCorectata, nc], [5000000, false, 3]);
+D.aplicaSume(BS, new Map());
+egal('toate rândurile revin la registru', BS.acorduri.every(a => a.suma === a.registru.suma && a.eur === a.registru.eur && a.inTotal === a.registru.inTotal && a.sumaCorectata === false), true);
+egal('etichetele sursei sumei au și „corectată de utilizator”', [D.SURSE_SUMA.utilizator[0], D.SURSE_SUMA.utilizator[1]], ['corectată de utilizator', 'corrected by a user']);
+
 console.log('\nDenumiri la fel, rânduri deosebite');
 const JSON_NUME = {
   cursuri: CURSURI,
@@ -474,6 +516,16 @@ const X = require('./xlsx-stil.js');
 const PEA = LL.peAcord;
 const ctx = (en) => ({ t: (ro, e) => en ? e : ro, en: !!en, baza: 'https://nistor.vivi.md/debursari.html', cursuri: cursuri, cursData: '1 iulie 2026', peAcord: PEA, generat: '26.10.2026, 12:00' });
 const donUE = B.donatori.filter(d => d.cheie === 'UE')[0], donBIRD = B.donatori.filter(d => d.cheie === 'BIRD')[0];
+D.aplicaSume(BS, new Map([['a1', { id: 'p1', acord: 'a1', suma: 12000000, val: 'EUR' }]]));
+const donBS = BS.donatori.filter(d => d.cheie === 'BIRD')[0];
+const xsC = D.excelDonator(ctx(false), donBS);
+const foaieC = xsC.foi[0], cSC = foaieC.antete.indexOf('Suma proiectului');
+egal('Excel: rândul cu suma corectată arată suma nouă și valuta nouă', [foaieC.randuri[0][cSC], foaieC.randuri[0][cSC + 1]], [12000000, 'EUR']);
+verifica('Excel: nota spune că suma a fost corectată de un utilizator și arată ambele sume (registru → corectată)', foaieC.note.some(n => typeof n === 'string' && n.indexOf('suma a fost corectată de un utilizator') > 0 && n.indexOf('10.000.000 USD → 12.000.000 EUR') > 0), foaieC.note.filter(n => typeof n === 'string').map(n => n.slice(0, 80)));
+verifica('Excel în engleză: nota despre suma corectată', D.excelDonator(ctx(true), donBS).foi[0].note.some(n => typeof n === 'string' && n.indexOf('amount was corrected by a user') > 0 && n.indexOf('10,000,000 USD → 12,000,000 EUR') > 0));
+verifica('Excel: fără corecturi, nota lipsește', !D.excelDonator(ctx(false), donUE).foi[0].note.some(n => typeof n === 'string' && n.indexOf('corectată de un utilizator') >= 0));
+D.aplicaSume(BS, new Map());
+D.aplicaSume(BS, new Map());
 function verificaSpec(nume, spec) {
   const foi = spec.foi;
   const coerent = foi.every(f => {

@@ -203,7 +203,7 @@ care legis.md îl primește.
 | `date/proiecte_manual.json` | Date despre proiecte, scrise de mână și cu sursă. „omise”: rândurile-umbrelă ale registrului, care nu apar în lista de proiecte (cu motivul). „proiecte”: obiectivele proiectului și, când sursa le dă, data de început și de finalizare; fiecare intrare are adresa documentului oficial și citatul exact — fără ele nu se citește. Vezi „Debursări pe acorduri” |
 | `date/debursari.json` | „Baza de date” a paginii: debursările introduse de mână, o înregistrare pe linie, și — la cheia `proiecte`, scrisă doar când nu e goală — datele despre proiecte introduse în pagină (obiective, început, finalizare). Fișier public; îl scrie doar pagina, prin API-ul GitHub, cu codul de acces. Fiecare salvare e un commit |
 | `teste_debursari.js` | Testele logicii (obiective și date cu sursele lor, rânduri omise, totaluri, operații, conflicte de scriere, PIN, specificațiile Excel). Rulare: `node teste_debursari.js` |
-| `teste_debursari.py` | Verifică fișierele paginii (inclusiv `date/proiecte_manual.json`) și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”); `--doar 13,14` rulează doar secțiunile numerotate |
+| `teste_debursari.py` | Verifică fișierele paginii (inclusiv `date/proiecte_manual.json`) și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”, inclusiv deblocarea unică și editarea în tabel); `--doar 13,14` rulează doar secțiunile numerotate (de la 13 în sus; 1–12 rulează doar fără `--doar`) |
 | `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi. Le scrie `legis_watch.py`; apar în repository după prima rulare reușită a lui `legis_local.bat` |
 | `CNAME` | Domeniul propriu |
 
@@ -302,7 +302,24 @@ arată doar că proiectul există.
 Pagina **Acorduri → Debursări pe acorduri** (`debursari.html`) arată, pentru fiecare donator, proiectele
 (acordurile) din registrul legis.md pe care le finanțează și, alături de suma proiectului, cât s-a
 debursat. Debursările nu vin dintr-o sursă oficială: se introduc de mână, după ce un cod de acces
-deblochează câmpurile, și se salvează în fișierul `date/debursari.json` din repository.
+deblochează editarea, și se salvează în fișierul `date/debursari.json` din repository.
+
+**O singură deblocare, pentru toate acordurile.** Fără cod, pagina e doar pentru citire: nu apar formulare
+și niciun banner de blocare la acorduri; singurul buton „Introdu codul" e în bara de acces din capul paginii,
+care rămâne vizibilă la derulare. După ce pui codul o dată, se deblochează tot, la toate acordurile deodată:
+
+- **în tabel**, un creion lângă *data efectivă de începere*, *data finalizării* și *suma proiectului* deschide
+  editarea rândului (câmpuri în celule, o notă opțională cu sursa informației, „Salvează" / „Anulează"; Enter
+  salvează, Esc anulează). Se scrie în fișier doar ce a schimbat omul: o dată luată dintr-o sursă oficială sau
+  din AMP, lăsată neschimbată, nu se copiază ca valoare scrisă de utilizator; golești un câmp ca să revii la
+  sursă (la sumă, la cea din registru);
+- **suma proiectului** scrisă de utilizator (cu valută) înlocuiește suma din registru doar la acel acord, în
+  pagină (totaluri, procentul debursat, ordonări) și în Excel; rândul o marchează „corectată de utilizator" și
+  arată alături suma din registru, iar Excel are o notă cu lista „registru → corectată". Un rând care nu intră
+  în total (dublură, „nu se adună") rămâne în afara totalului și cu suma corectată. Se păstrează în
+  `date/debursari.json`, în înregistrarea „Date despre proiect" a rândului (`suma` și `val`);
+- **debursările** se adaugă din butonul „Debursare" al rândului (deschide detaliile, la formular) și se
+  modifică sau se șterg din lista din detalii; formularul „Date despre proiect" din detalii are și el suma.
 
 **Ce arată.** Pagina ia acordurile din `date/acorduri_legare.json` (scris de `legatura_acorduri.py`
 chiar din registru) și le repartizează pe donatori: finanțatorii numiți în acordul însuși
@@ -344,7 +361,7 @@ efectivă de începere" și „Data finalizării" sunt datele proiectului, cum l
 începutul, finalizarea) se ia, în ordine, din prima sursă care îl are:
 
 1. **Ce a introdus un utilizator în pagină**, după ce a pus codul (secțiunea „Date despre proiect" din
-   detalii). Se salvează în `date/debursari.json`, la cheia `proiecte`, cu data salvării și o notă.
+   detalii, sau creionul din tabel). Se salvează în `date/debursari.json`, la cheia `proiecte`, cu data salvării și o notă.
 2. **O sursă oficială, scrisă de mână** în `date/proiecte_manual.json`, la „proiecte": `acte` (orice cod de act al
    rândului), `obiective` (`ro` și `en`), `inceput` și `sfarsit` (`AAAA-LL-ZZ`, `AAAA-LL` sau `AAAA`, după cât spune
    sursa), `sursa` (adresa documentului oficial), `citat` (fragmentul exact din document care susține ce s-a
@@ -385,8 +402,8 @@ aprobării sau a semnării, nu perioada proiectului, deci la ele datele vin numa
 date. Singurul loc în care o pagină poate scrie fără un serviciu în plus e chiar repository-ul, prin
 API-ul „Contents" al GitHub. „Baza de date" e deci fișierul `date/debursari.json`; pagina îl citește ca pe
 un fișier public, iar pentru scriere folosește „codul": un *fine-grained personal access token* cu drept
-doar pe acest repository. Fără cod pagina se poate citi, iar câmpurile de debursare sunt blocate
-(„Introdu codul").
+doar pe acest repository. Fără cod pagina se poate citi, iar editarea (datele de început și de finalizare,
+suma proiectului, debursările) e blocată pentru toate acordurile deodată; „Introdu codul" e în bara de sus.
 
 Cum faci codul, o singură dată:
 
@@ -399,7 +416,7 @@ Cum faci codul, o singură dată:
 4. **Generate token** și copiază codul (începe cu `github_pat_`; se arată o singură dată). Expiră după
    ce ai ales (90 de zile în link); când expiră, pagina spune „Codul nu e valid sau a expirat" și faci
    unul nou.
-5. În pagină: **Introdu codul** → lipești codul → **Deblochează**. Poți bifa „Ține minte codul pe acest
+5. În pagină, în bara de sus: **Introdu codul** → lipești codul → **Deblochează** (o singură dată, pentru toate acordurile). Poți bifa „Ține minte codul pe acest
    dispozitiv, protejat cu un PIN": codul se păstrează în browser criptat (PBKDF2-SHA256 cu 250.000 de
    iterații + AES-GCM) și la următoarea vizită se deblochează cu PIN-ul. Fără PIN, codul rămâne doar în
    memoria paginii și dispare la reîncărcare. „Blochează" îl scoate din memorie.
