@@ -69,69 +69,69 @@
   };
   function svg(k, cls) { return '<svg class="' + (cls || 'mg-ico') + '" viewBox="0 0 24 24" aria-hidden="true">' + I[k] + '</svg>'; }
 
-  /* Aspectul barei: „Raport editorial" luminos — file cu linie dedesubt (cea activă are
-     linia aurie), câmp de căutare, comutator RO/EN segmentat. Structura (id-uri, clase,
-     comportament) a rămas neschimbată; aici se schimbă doar prezentarea. */
   var CSS = '' +
-    '.mg{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:0 0 30px;padding:0;border-bottom:1px solid #E1E6EF;' +
-      'font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-variant-numeric:tabular-nums}' +
-    '.mg-btns{display:flex;flex-wrap:wrap;gap:0 24px;align-items:stretch;flex:1;min-width:0}' +
-    '.mg-b{display:inline-flex;align-items:center;gap:6px;padding:17px 1px 14px;font-size:15px;font-weight:600;color:#4A5470;' +
-      'white-space:nowrap;cursor:pointer;text-decoration:none;border:0;border-bottom:3px solid transparent;border-radius:0;background:none;' +
-      'font-family:inherit;line-height:1.2;position:relative;letter-spacing:0;transition:color .15s ease,border-color .15s ease}' +
-    /* index.html are reguli generale pe button (ridicare, umbră, strălucire) și vechi pe id-uri (overflow:hidden):
-       în bară nu trebuie să se aplice */
-    '.mg .mg-b,.mg .mg-b:hover,.mg .mg-b:active{transform:none;filter:none;box-shadow:none;background:none}' +
+    '.mg{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 22px;padding:0 0 18px;border-bottom:1px solid #c9ceda;' +
+      'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}' +
+    '.mg-btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center;flex:1;min-width:0}' +
+    '.mg-b{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:11px 18px;font-size:14px;font-weight:800;' +
+      'white-space:nowrap;cursor:pointer;text-decoration:none;letter-spacing:.01em;border:1.5px solid transparent;font-family:inherit;line-height:1.2;' +
+      'position:relative;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .25s ease,background .25s ease,filter .2s ease}' +
+    '.mg-b:hover{transform:translateY(-2px);filter:brightness(1.07)}' +
+    /* index.html are reguli vechi pe id-uri (overflow:hidden) care ar tăia bara aurie */
     '.mg .mg-b{overflow:visible !important}' +
-    '.mg .mg-b:hover{color:#12244A;border-bottom-color:#C9CFDD}' +
-    '.mg .mg-b.activ{color:#12244A;font-weight:700;border-bottom-color:#B87714}' +
-    '.mg .mg-b:focus-visible{outline:2px solid #12244A;outline-offset:-2px;border-radius:6px}' +
-    '.mg-b .mg-ico{display:none}' +
-    '.mg-ico{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2.2}' +
-    '.mg-sag{width:14px;height:14px;flex:none;stroke:currentColor;fill:none;stroke-width:2.4;transition:transform .15s ease}' +
+    '.mg-b:active{transform:translateY(0) scale(.98)}' +
+    '.mg-b:focus-visible{outline:2px solid #c8871a;outline-offset:3px}' +
+    '.mg-ico{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2.3}' +
+    '.mg-sag{width:14px;height:14px;flex:none;stroke:currentColor;fill:none;stroke-width:2.3;transition:transform .15s ease}' +
     '.mg-dd.deschis .mg-sag{transform:rotate(180deg)}' +
-    '.mg-dd{position:relative;display:flex}' +
-    '.mg-pop{display:none;position:absolute;top:calc(100% + 6px);left:-14px;width:330px;max-width:calc(100vw - 32px);background:#fff;' +
-      'border:1px solid #E1E6EF;border-radius:14px;box-shadow:0 18px 40px -14px rgba(18,36,74,.3);overflow:hidden;z-index:60}' +
+    '.mg-acasa{background:#fff;color:#22406b;border-color:#22406b}' +
+    '.mg-acasa:hover{background:#eaf0fb}' +
+    '.mg-analize{background:linear-gradient(135deg,#c8871a,#e0a545);color:#3a2a00;box-shadow:0 3px 10px rgba(200,135,26,.35)}' +
+    '.mg-export{background:linear-gradient(135deg,#159d7a,#0d7a5f);color:#fff;box-shadow:0 3px 10px rgba(13,122,95,.3)}' +
+    '.mg-iati{background:linear-gradient(135deg,#22406b,#2f5691);color:#fff;box-shadow:0 3px 10px rgba(34,64,107,.28)}' +
+    '.mg-acorduri,.mg-hg{background:linear-gradient(135deg,#16294a,#22406b);color:#fff;box-shadow:0 3px 10px rgba(22,41,74,.28)}' +
+    /* pagina curentă: bară aurie sub buton + chenar */
+    '.mg-b.activ{box-shadow:0 0 0 2px #fff,0 0 0 4px #c8871a}' +
+    '.mg-b.activ::after{content:"";position:absolute;left:14px;right:14px;bottom:-9px;height:3px;border-radius:2px;background:#c8871a}' +
+    '.mg-dd{position:relative;display:inline-block}' +
+    '.mg-pop{display:none;position:absolute;top:calc(100% + 8px);left:0;width:310px;max-width:calc(100vw - 32px);background:#fff;' +
+      'border:1px solid #c9ceda;border-radius:10px;box-shadow:0 12px 28px -8px rgba(20,35,60,.28);overflow:hidden;z-index:60}' +
     '.mg-dd.deschis .mg-pop{display:block}' +
-    '.mg-opt{display:flex;align-items:flex-start;gap:12px;padding:13px 18px;text-decoration:none;color:#141B2D;border-bottom:1px solid #EEF2F9}' +
+    '.mg-opt{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;text-decoration:none;color:#1c2230;border-bottom:1px solid #e3e7f0}' +
     '.mg-opt:last-child{border-bottom:none}' +
-    '.mg-opt:hover,.mg-opt:focus-visible{background:#F5F7FB;outline:none}' +
-    '.mg-opt.activ{background:#EEF2F9;box-shadow:inset 3px 0 0 #B87714}' +
-    '.mg-opt .mg-ico{stroke:#1F3D6E;margin-top:2px}' +
-    '.mg-opt b{display:block;font-size:14px;font-weight:650;color:#12244A}' +
-    '.mg-opt small{display:block;font-size:12.5px;color:#5B6478;margin-top:2px;white-space:normal;line-height:1.4}' +
-    '.mg-unealta{display:inline-flex;align-items:center;gap:8px;height:40px;border:1px solid #C9CFDD;background:#fff;color:#4A5470;border-radius:10px;' +
-      'padding:0 12px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}' +
-    '.mg .mg-unealta:hover{background:#F5F7FB;color:#12244A;border-color:#1F3D6E;transform:none;filter:none;box-shadow:none}' +
-    '.mg-unealta:focus-visible{outline:2px solid #12244A;outline-offset:2px}' +
-    '.mg-unealta .mg-ico{display:block;width:16px;height:16px}' +
-    '.mg-cauta{margin-left:auto;min-width:210px;justify-content:flex-start;background:#F5F7FB;border-color:#E1E6EF}' +
-    '.mg-cauta kbd{margin-left:auto;border:1px solid #C9CFDD;border-bottom-width:2px;border-radius:5px;padding:0 6px;font-size:11.5px;line-height:18px;background:#fff;color:#4A5470;font-family:inherit}' +
-    '.mg-print{width:40px;padding:0;justify-content:center}' +
-    '.mg-despre{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#4A5470;text-decoration:none;padding:8px 2px;border-radius:8px;white-space:nowrap}' +
-    '.mg-despre .mg-ico{display:none}' +
-    '.mg-despre:hover{color:#12244A;text-decoration:underline;text-decoration-color:#B87714;text-decoration-thickness:2px;text-underline-offset:6px}' +
-    '.mg-despre.activ{color:#12244A;text-decoration:underline;text-decoration-color:#B87714;text-decoration-thickness:2px;text-underline-offset:6px}' +
-    '.mg-despre:focus-visible{outline:2px solid #12244A;outline-offset:2px}' +
-    '.mg .mg-limba{display:flex;gap:2px;background:#F5F7FB;border:1px solid #E1E6EF;border-radius:10px;padding:3px}' +
-    '.mg .mg-limba button{border:none;background:transparent;color:#4A5470;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:7px;cursor:pointer;letter-spacing:.04em;font-family:inherit;line-height:1.2}' +
-    '.mg .mg-limba button:hover:not(.active){color:#12244A;background:#EEF2F9;transform:none;filter:none;box-shadow:none}' +
-    '.mg .mg-limba button.active{background:#12244A;color:#fff}' +
+    '.mg-opt:hover,.mg-opt:focus-visible{background:#eaf0fb;outline:none}' +
+    '.mg-opt.activ{background:#fdf1dc}' +
+    '.mg-opt .mg-ico{stroke:#22406b;margin-top:2px}' +
+    '.mg-opt b{display:block;font-size:13.5px}' +
+    '.mg-opt small{display:block;font-size:11.5px;color:#6b7284;margin-top:2px;white-space:normal;line-height:1.35}' +
+    '.mg-unealta{display:inline-flex;align-items:center;gap:7px;border:1px solid #c9ceda;background:#fff;color:#22406b;border-radius:8px;padding:7px 10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}' +
+    '.mg-unealta:hover{background:#eaf0fb}.mg-unealta:focus-visible{outline:2px solid #c8871a;outline-offset:2px}' +
+    '.mg-unealta .mg-ico{width:15px;height:15px}' +
+    '.mg-cauta{margin-left:auto;min-width:150px;justify-content:flex-start;color:#4f5668}' +
+    '.mg-cauta kbd{margin-left:auto;border:1px solid #c9ceda;border-bottom-width:2px;border-radius:4px;padding:0 5px;font-size:11px;background:#f5f6f9;color:#4f5668;font-family:inherit}' +
+    '.mg-despre{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#22406b;text-decoration:none;padding:8px 6px;border-radius:8px;white-space:nowrap}' +
+    '.mg-despre:hover{color:#c8871a}.mg-despre.activ{color:#8a5a0e;text-decoration:underline;text-underline-offset:4px}' +
+    '.mg-despre:focus-visible{outline:2px solid #c8871a;outline-offset:2px}' +
+    '.mg-limba{display:flex;gap:4px;background:#f5f6f9;border:1px solid #c9ceda;border-radius:8px;padding:3px}' +
+    '.mg-limba button{border:none;background:transparent;color:#4f5668;font-size:12px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;letter-spacing:.03em;font-family:inherit}' +
+    '.mg-limba button.active{background:#22406b;color:#fff}' +
     '.mg-s{display:none}' +
-    /* telefon: trei file pe rând, etichete scurte; căutarea, Despre și limba sus */
+    /* telefon: două rânduri de câte trei butoane egale, etichete scurte;
+       comutatorul de limbă sus, în dreapta */
     '@media (max-width:720px){' +
-      '.mg{gap:8px;margin-bottom:18px;padding-bottom:0;justify-content:flex-end}' +
+      '.mg{gap:10px;margin-bottom:16px;padding-bottom:14px;justify-content:flex-end}' +
       '.mg-limba{order:-1}' +
-      '.mg-despre{order:-2;margin-left:0;margin-right:auto;font-size:13px}' +
-      '.mg-cauta{order:-2;min-width:0;margin-left:0;height:36px}.mg-cauta kbd,.mg-cauta-t{display:none}.mg-print{order:-2;height:36px;width:36px}' +
-      '.mg-btns{flex-basis:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 4px;position:relative;border-top:1px solid #E1E6EF}' +
+      '.mg-despre{order:-2;margin-left:0;margin-right:auto;font-size:12.5px}' +
+      '.mg-cauta{order:-2;min-width:0;margin-left:0}.mg-cauta kbd,.mg-cauta-t{display:none}.mg-print{order:-2}' +
+      '.mg-btns{flex-basis:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;position:relative}' +
       '.mg-dd{display:block;position:static}' +
-      '.mg-b{width:100%;justify-content:center;padding:12px 2px 10px;font-size:13.5px;gap:4px}' +
+      '.mg-b{width:100%;justify-content:center;padding:9px 6px;font-size:12.5px;gap:5px;border-radius:8px}' +
+      '.mg-ico{width:14px;height:14px}' +
       '.mg-l{display:none}.mg-s{display:inline;overflow:hidden;text-overflow:ellipsis}' +
-      '.mg-pop{left:0 !important;right:0;width:auto;max-width:none;top:100%}' +
+      '.mg-b.activ::after{bottom:-6px;left:20%;right:20%}' +
+      '.mg-pop{left:0 !important;right:0;width:auto;max-width:none}' +
     '}' +
-    '@media (prefers-reduced-motion:reduce){.mg-b,.mg-sag{transition:none}}' +
+    '@media (prefers-reduced-motion:reduce){.mg-b,.mg-sag{transition:none}.mg-b:hover{transform:none}}' +
     /* printare / PDF curat, pe toate paginile: fără meniu și butoane de lucru, fără
        umbre, tabelele și listele întregi (fără derulare internă), panourile nerupte */
     '@media print{@page{margin:14mm}html,body{background:#fff !important}.mg,.cg-ov,.map-zoom-controls,.map-mod,.map-back,.rmap-mod,.rmap-back,.mai-mult,.mai-mult-td,.link-acord,.xls,#dataStatus button,.btns .dd,.seek{display:none !important}' +
