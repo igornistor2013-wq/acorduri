@@ -1,0 +1,402 @@
+/* =====================================================================
+   tema.css — aspectul comun al site-ului: „Raport editorial", varianta luminoasă.
+   ---------------------------------------------------------------------
+   Se leagă ULTIMA în <head>, după stilurile fiecărei pagini:
+       <link rel="stylesheet" href="tema.css?v=2026-10-28">
+   (la fiecare schimbare a acestui fișier se urcă data din ?v=, ca browserele să nu
+   arate versiunea veche din cache — vezi README, „Aspectul site-ului").
+
+   Fișierul NU schimbă marcajul, id-urile, scripturile sau comportamentul: doar
+   culorile, fonturile, spațierile și forma componentelor. Dacă îl ștergi, site-ul
+   funcționează la fel, cu aspectul vechi.
+
+   Fonturi proprii (fonturi/): Inter pentru text și cifre, Newsreader pentru titluri
+   și cifrele mari. Niciun serviciu extern.
+   ===================================================================== */
+
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 800;font-display:swap;
+  src:url(fonturi/inter-var.woff2) format('woff2');}
+@font-face{font-family:'Newsreader';font-style:normal;font-weight:400 600;font-display:swap;
+  src:url(fonturi/newsreader-var.woff2) format('woff2');}
+
+/* ---------- 1. Jetoane (culorile și rotunjirile sunt citite de toate paginile) ---------- */
+:root{
+  --bg:#ffffff;
+  --panel:#ffffff;
+  --panel-2:#F5F7FB;
+  --line:#E1E6EF;
+  --line-strong:#C9CFDD;
+  --ink:#141B2D;
+  --ink-2:#4A5470;
+  --ink-dim:#5B6478;
+  --navy:#1F3D6E;
+  --navy-deep:#12244A;
+  --navy-tint:#D7E0F0;
+  --blue-bg:#EEF2F9;
+  --gold:#B87714;           /* accent: bare, linii (nu pentru text mic) */
+  --gold-ink:#7A4F00;       /* aurul pentru text: contrast 7:1 pe alb */
+  --gold-bg:#FBF3E4;
+  --red:#A3311E;
+  --red-bg:#FBEBE7;
+  --green-bg:#E7F3EA;
+  --green-ink:#1F6A3A;
+  --radius:14px;
+  --radius-sm:10px;
+  --shadow:none;
+  --sans:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --serif:Newsreader,Georgia,'Times New Roman',serif;
+  --mono:var(--sans);        /* cifrele sunt acum Inter cu cifre tabulare, nu monospațiu */
+  /* tabloul de bord „închis" de odinioară (hartă, sectoare): acum același limbaj luminos */
+  --dk-bg:#ffffff;--dk-panel:#ffffff;--dk-panel-alt:#F5F7FB;
+  --dk-ink:#141B2D;--dk-ink-dim:#5B6478;
+  --dk-line:#E1E6EF;--dk-line-strong:#C9CFDD;
+  --amber:#B87714;--amber-dim:#7A4F00;--teal:#1F3D6E;--teal-dim:#12244A;
+}
+
+/* ---------- 2. Bază ---------- */
+html{-webkit-text-size-adjust:100%;}
+body{
+  font-family:var(--sans);color:var(--ink);background:var(--bg);
+  font-size:15px;line-height:1.5;font-feature-settings:'cv11','ss03';
+  -webkit-font-smoothing:antialiased;
+}
+/* banda tricoloră (steagul), peste tot, deasupra antetului */
+body::before{
+  content:"";display:block;height:6px;
+  background:linear-gradient(90deg,#0046AE 0 33.34%,#FFD200 33.34% 66.67%,#CC092F 66.67% 100%);
+}
+button,input,select,textarea{font-family:inherit;}
+code,pre,samp{font-family:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,'Courier New',monospace;}
+a{color:var(--navy);}
+::selection{background:var(--navy-tint);color:var(--navy-deep);}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{
+  outline:2px solid var(--navy-deep);outline-offset:2px;border-radius:6px;
+}
+.wrap{max-width:1400px;padding-top:0;}
+
+/* ---------- 3. Titlul paginii (antetul vederilor) ---------- */
+header.top{
+  align-items:flex-end;gap:28px;padding:6px 0 26px;margin-bottom:26px;
+  border-bottom:1px solid var(--line);
+}
+.title-row{gap:18px;align-items:center;}
+h1{
+  font-family:var(--serif);font-weight:500;letter-spacing:-.022em;
+  font-size:clamp(30px,3.7vw,48px);line-height:1.08;color:var(--navy-deep);margin:0;
+  font-variant-numeric:lining-nums;text-wrap:balance;
+}
+/* pagina principală: titlul mare, pe două rânduri (editorial) */
+#mainView header.top h1{font-size:clamp(34px,4.4vw,60px);line-height:1.05;}
+#mainView header.top .title-row h1{max-width:11.4em;}
+/* „Republica Moldova": nu mai e degradeu (tricolorul e acum în bandă) */
+h1 span.md-flag-text,.md-flag-text{
+  background:none !important;-webkit-text-fill-color:currentColor !important;color:inherit !important;
+}
+.logo-badge{width:58px;height:58px;}
+.eyebrow{font-family:var(--sans);font-size:12.5px;letter-spacing:.1em;font-weight:700;text-transform:uppercase;color:var(--navy);margin:0 0 10px;}
+.top-meta{font-size:13.5px;color:var(--ink-dim);line-height:1.7;}
+.top-meta b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;}
+
+/* butoanele de lângă titlu (Copiază linkul, Raport PDF) și indicatorul de proaspăt */
+.unealta{
+  height:34px;padding:0 14px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:#fff;
+  color:var(--navy-deep);font-size:13px;font-weight:600;
+}
+.unealta:hover{background:var(--navy-deep);color:#fff;border-color:var(--navy-deep);}
+.prospetime{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel-2);font-size:12.5px;color:var(--ink-2);padding:0 12px;height:34px;}
+
+/* ---------- 4. Carduri KPI ---------- */
+.kpis{gap:16px;margin-bottom:26px;}
+.kpi{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:none;
+  padding:22px 24px 20px;transition:border-color .15s ease;
+}
+.kpi::before{display:none !important;}
+.kpi:hover{transform:none;box-shadow:none;border-color:var(--line-strong);}
+.kpi .lbl{
+  font-family:var(--sans);font-size:12px;letter-spacing:.09em;font-weight:700;text-transform:uppercase;
+  color:var(--ink-dim);margin-bottom:12px;
+}
+.kpi{container-type:inline-size;}
+.kpi .val{
+  font-family:var(--serif);font-weight:500;font-size:clamp(28px,3.5vw,50px);line-height:1;
+  letter-spacing:-.02em;color:var(--navy-deep);font-variant-numeric:lining-nums tabular-nums;
+}
+.kpi .val small{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--gold-ink);margin-left:8px;}
+.kpi .sub{font-size:13px;color:var(--ink-dim);margin-top:10px;font-variant-numeric:tabular-nums;}
+/* bara de execuție (debursat din angajat) */
+.kpi .kpi-bar{height:10px;border-radius:6px;background:var(--blue-bg);margin-top:14px;overflow:hidden;}
+.kpi .kpi-bar i{display:block;height:100%;border-radius:6px;background:var(--navy);}
+
+/* ---------- 5. Panouri ---------- */
+.grid{gap:24px;}
+.main-col,.grid>div{gap:24px;}
+.panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:none;overflow:hidden;
+  transition:none;
+}
+.panel:hover{box-shadow:none;}
+.panel-head,#mapPanel .panel-head,#sectorPanel .panel-head,#beneficiaryPanel .panel-head{
+  background:transparent;border-bottom:1px solid var(--line);padding:18px 20px;gap:12px;
+}
+.panel-head h2,#mapPanel .panel-head h2,#sectorPanel .panel-head h2,#beneficiaryPanel .panel-head h2{
+  font-family:var(--serif);font-weight:500;font-size:22px;letter-spacing:-.01em;text-transform:none;
+  color:var(--navy-deep);line-height:1.2;gap:10px;
+}
+.panel-head h2 .ico{display:none;}
+.badge:empty{display:none;}
+.panel-head h2 .badge,.badge{
+  font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:0;padding:3px 10px;border-radius:999px;
+  background:var(--blue-bg);color:var(--navy);margin-left:6px;
+}
+.panel-head button,#sectorPanel .panel-head button,#beneficiaryPanel .panel-head button,#mapSide .map-side-head button,.panel-head .unealta-panou{
+  height:34px;padding:0 13px;white-space:nowrap;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:#fff;
+  color:var(--ink-2);font-size:13px;font-weight:600;font-family:var(--sans);
+}
+.panel-head button:hover,#sectorPanel .panel-head button:hover,#beneficiaryPanel .panel-head button:hover{
+  background:var(--blue-bg);color:var(--navy-deep);border-color:var(--navy);
+}
+.panel-head button.metric-active,.panel-head button[aria-pressed="true"]{background:var(--navy-deep);color:#fff;border-color:var(--navy-deep);}
+.chart-note{font-size:12.5px;font-style:normal;color:var(--ink-dim);padding:0 22px 16px;line-height:1.5;}
+.empty-state{color:var(--ink-dim);font-size:14px;}
+.data-status{border-radius:var(--radius-sm);font-size:14px;}
+
+/* ---------- 6. Filtre: ani și donatori ---------- */
+#yearSlicerPanel .panel-head,#donorSlicerPanel .panel-head{padding:16px 18px;}
+#yearSlicerPanel .panel-head h2,#donorSlicerPanel .panel-head h2{font-size:19px;white-space:nowrap;}
+#yearSlicerPanel .panel-head button,#donorSlicerPanel .panel-head button{padding:0 11px;}
+#mapSide .map-side-head button{height:30px;font-size:12px;padding:0 10px;letter-spacing:0;text-transform:none;}
+#yearSlicer{padding:20px 22px;}
+.year-window{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:18px;text-align:left;}
+.year-window .yw-label{color:var(--ink-dim);font-size:11.5px;letter-spacing:.09em;font-weight:700;}
+.year-window .yw-value{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--navy-deep);letter-spacing:-.01em;}
+.year-window .yw-value.multi{font-size:19px;color:var(--navy-deep);font-weight:500;}
+.year-hint{font-size:12.5px;color:var(--ink-dim);text-align:left;margin:0 0 14px;font-style:normal;}
+#yearSlicer .year-chips{grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;}
+.year-chip,#yearSlicer .year-chip{
+  border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:#fff;color:var(--ink);
+  font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;transition:border-color .12s ease,background-color .12s ease;
+}
+.year-chip:hover{transform:none;border-color:var(--navy);color:var(--navy-deep);background:var(--blue-bg);}
+.year-chip.active{background:var(--navy-deep);border-color:var(--navy-deep);color:#fff;box-shadow:none;}
+.year-chip .yc-bar{height:4px;background:var(--blue-bg);}
+.year-chip .yc-bar i{background:var(--gold);}
+.year-chip.active .yc-bar{background:rgba(255,255,255,.25);}
+.year-chip.active .yc-bar i{background:#FFD98A;}
+#yearSlicer.toti .year-chip.active{background:#fff;color:var(--ink);border-color:var(--line-strong);}
+#yearSlicer.toti .year-chip.active .yc-bar{background:var(--blue-bg);}
+#yearSlicer.toti .year-chip.active .yc-bar i{background:var(--gold);}
+.na-year-row{border-radius:var(--radius-sm);border-color:var(--line-strong);}
+.na-year-row:hover{background:var(--blue-bg);}
+.na-year-row.active{background:var(--gold-bg);border-color:var(--gold);}
+.na-year-row.active .na-label{color:var(--gold-ink);}
+.search-box{padding:14px 18px;border-bottom:1px solid var(--line);}
+.search-box input{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 13px;font-size:14px;color:var(--ink);}
+.search-box input:focus{border-color:var(--navy);background:#fff;outline:none;box-shadow:0 0 0 3px rgba(31,61,110,.14);}
+.donor-sel{padding:14px 18px;font-size:13.5px;color:var(--ink-2);}
+.donor-sel .chip{background:var(--navy-deep);border-radius:999px;}
+.donor-list{padding:8px;}
+.donor-group-header{background:var(--panel-2);color:var(--navy-deep);border-radius:var(--radius-sm);font-size:13.5px;padding:9px 11px;}
+.donor-group-header:hover{opacity:1;background:var(--blue-bg);}
+.donor-group-header .group-count,.donor-group-header .group-sum,.donor-item .sum{color:var(--ink-dim);}
+.donor-group-header.all-checked,.donor-group-header.partial{background:var(--blue-bg);color:var(--navy-deep);}
+.donor-row,.donor-item{border-radius:var(--radius-sm);padding:8px 10px;}
+.donor-row:hover,.donor-item:hover{background:var(--panel-2);transform:none;}
+.donor-row.checked,.donor-item.checked{background:var(--blue-bg);}
+.donor-row.checked .name,.donor-item.checked .name{color:var(--navy-deep);font-weight:600;}
+.donor-row .bar-bg,.donor-item .bar-bg{background:rgba(184,119,20,.10);border-radius:var(--radius-sm);}
+.donor-list.toti .donor-group-header.all-checked{background:var(--panel-2);color:var(--navy-deep);}
+.donor-item .name,.donor-row .name{font-size:13.5px;}
+
+/* ---------- 7. Bare ---------- */
+.bar-row{padding:7px 0;gap:14px;}
+.bar-row .bname{font-size:13.5px;color:var(--ink-2);}
+.bar-track,#sectorPanel .bar-track,#beneficiaryPanel .bar-track{background:var(--blue-bg);height:12px;border-radius:7px;}
+.bar-fill,#sectorPanel .bar-fill,#dpStatusBody .bar-fill{background:var(--navy);border-radius:7px;}
+#sectorPanel .bar-track,#beneficiaryPanel .bar-track,#dpStatusBody .bar-track,#dpYearChartBody .bar-track,#dpSectorBody .bar-track{height:9px;}
+#beneficiaryPanel .bar-fill,#dpYearChartBody .bar-fill{background:var(--gold);}
+.bar-val,#sectorPanel .bar-val,#beneficiaryPanel .bar-val{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
+.bar-row:hover .bar-fill{filter:none;}
+#chartPanel .panel-body,#sectorPanel .panel-body,#beneficiaryPanel .panel-body{padding:18px 22px;}
+#sectorPanel,#beneficiaryPanel{background:var(--panel);border-color:var(--line);}
+#sectorPanel .bar-row .bname,#beneficiaryPanel .bar-row .bname{color:var(--ink-2);}
+#sectorPanel .chart-note,#beneficiaryPanel .chart-note,#sectorPanel .empty-state,#beneficiaryPanel .empty-state{color:var(--ink-dim);}
+
+/* ---------- 8. Tabele ---------- */
+table{font-variant-numeric:tabular-nums;}
+th,td{padding:11px 14px;font-size:13.5px;border-bottom:1px solid var(--line);}
+th{
+  font-family:var(--sans);font-size:11.5px;letter-spacing:.055em;font-weight:700;text-transform:uppercase;
+  color:var(--ink-2);background:#fff;border-bottom:2px solid var(--navy);
+}
+th:hover{background:var(--panel-2);color:var(--navy-deep);}
+th.num,td.num{font-family:var(--sans);}
+tbody tr:hover,table tbody tr:hover{background:var(--panel-2);filter:none;}
+td.donor-name{font-weight:600;color:var(--navy-deep);}
+td.years-cell{color:var(--ink-dim);}
+tfoot td{background:var(--panel-2);color:var(--navy-deep);border-top:2px solid var(--navy);}
+.table-scroll{border:none;border-radius:0;}
+.table-scroll thead th,#mapProjTable th{background:#fff;color:var(--ink-2);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;border-bottom:2px solid var(--navy);}
+.table-scroll thead th:hover,#mapProjTable th:hover{background:var(--panel-2);color:var(--navy-deep);}
+#mapProjTable td{background:transparent;color:var(--ink);border-bottom-color:var(--line);}
+#mapProjTable tbody tr:hover td{background:var(--panel-2);}
+#mapProjTable tfoot td{background:var(--panel-2);color:var(--navy-deep);border-top:2px solid var(--navy);}
+
+/* ---------- 9. Butoane și câmpuri (restul paginii) ---------- */
+button{transition:background-color .12s ease,border-color .12s ease,color .12s ease;}
+button:not(:disabled):hover{transform:none;box-shadow:none;filter:none;}
+button:not(:disabled):active{transform:none;filter:none;}
+button[style*="var(--navy)"]{background-image:none;}
+input[type=text],input[type=search],input[type=number],input[type=date],select,textarea{border-radius:var(--radius-sm);}
+select{border:1px solid var(--line-strong);background-color:#fff;color:var(--ink);font-size:14px;padding:8px 12px;min-height:38px;}
+select:focus,input[type=text]:focus,input[type=search]:focus,input[type=number]:focus,input[type=date]:focus,textarea:focus{border-color:var(--navy);outline:none;box-shadow:0 0 0 3px rgba(31,61,110,.14);}
+input[type=checkbox],input[type=radio]{accent-color:var(--navy-deep);}
+
+/* ---------- 10. Harta ---------- */
+#mapPanel{margin:0 0 26px;border-color:var(--line);}
+#mapPanel .map-layout{grid-template-columns:minmax(0,1fr) 340px;background:#fff;}
+.map-svg-wrap{background:var(--panel-2);padding:16px;}
+.land-path{fill:#E3E8F1;stroke:#fff;}
+.moldova-path{fill:var(--gold);stroke:var(--navy-deep);filter:none;}
+.sw.moldova{background:var(--gold);box-shadow:0 0 0 1px var(--navy-deep) inset;}
+.scala-bara{background:linear-gradient(90deg,#DCE8F7,#8FB3E2,#3F75BD,#15386E);border:none;border-radius:5px;height:10px;}
+.map-legend{border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-dim);padding:12px 22px;}
+.scala-min,.scala-max{font-family:var(--sans);font-size:12px;color:var(--ink-dim);font-variant-numeric:tabular-nums;}
+.map-mod{border-radius:var(--radius-sm);border-color:var(--line-strong);box-shadow:none;}
+.map-mod button{font-size:12.5px;padding:8px 12px;color:var(--ink-2);}
+.map-mod button[aria-pressed="true"]{background:var(--navy-deep);color:#fff;}
+.map-zoom-controls button{border-radius:var(--radius-sm);color:var(--navy-deep);}
+.map-zoom-controls button:hover{background:var(--navy-deep);color:#fff;border-color:var(--navy-deep);}
+.map-back{border-radius:var(--radius-sm);color:var(--navy-deep);box-shadow:none;}
+.map-side,#mapSide{border-left:1px solid var(--line);background:#fff;}
+.map-side-head{background:var(--panel-2);color:var(--ink-2);font-size:12px;letter-spacing:.08em;padding:13px 18px;border-bottom:1px solid var(--line);}
+.map-row{padding:9px 18px;border-bottom:1px solid var(--line);}
+.map-row:hover{background:var(--panel-2);transform:none;}
+.map-row .nm{font-size:13.5px;color:var(--ink);}
+.map-row .ct{color:var(--navy-deep);font-family:var(--sans);font-size:13px;font-weight:700;}
+.map-row .rank{color:var(--ink-dim);font-family:var(--sans);}
+.map-row .bar{background:var(--blue-bg);height:6px;}
+.map-row .bar i{background:var(--navy);}
+.map-row.aleasa{background:var(--blue-bg);}
+.map-row.aleasa .bar i{background:var(--gold);}
+.map-card{padding:18px;border-bottom:1px solid var(--line);}
+.mc-tit{font-family:var(--serif);font-weight:500;font-size:24px;color:var(--navy-deep);}
+.mc-kpi div{background:var(--panel-2);border-radius:var(--radius-sm);padding:9px;}
+.mc-kpi b{font-size:15px;color:var(--navy-deep);}
+.mc-kpi span{font-size:11px;color:var(--ink-dim);}
+.mc-sub{color:var(--ink-dim);letter-spacing:.08em;}
+.geo-tip{border-radius:var(--radius-sm);box-shadow:0 12px 30px -10px rgba(18,36,74,.3);}
+.geo-tip b{color:var(--navy-deep);}
+.rmap-box{background:var(--panel-2);border-radius:var(--radius);}
+@media (max-width:900px){#mapPanel .map-layout{grid-template-columns:1fr;}}
+
+/* ---------- 11. Subsol ---------- */
+footer{margin-top:36px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-dim);}
+.footer-owner{font-size:12.5px;border-top:1px solid var(--line);}
+.footer-owner b{color:var(--navy-deep);}
+
+/* ---------- 12. Telefon ---------- */
+@media (max-width:760px){
+  header.top{padding:4px 0 18px;margin-bottom:18px;background:none;}
+  h1{font-size:clamp(30px,9vw,40px);}
+  .logo-badge{width:46px;height:46px;}
+  .kpi{padding:16px 16px 14px;}
+  .kpi .val{font-size:clamp(28px,8vw,36px);}
+  .panel-head,#mapPanel .panel-head,#sectorPanel .panel-head,#beneficiaryPanel .panel-head{padding:14px 16px;}
+  .panel-head h2,#mapPanel .panel-head h2,#sectorPanel .panel-head h2,#beneficiaryPanel .panel-head h2{font-size:19px;}
+  .panel-head button{height:32px;padding:0 10px;font-size:12.5px;}
+  #yearSlicer{padding:16px;}
+  #chartPanel .panel-body,#sectorPanel .panel-body,#beneficiaryPanel .panel-body{padding:14px 16px;}
+}
+
+/* ---------- 13. Vederile din index.html (Analize, Export, IATI, d-portal, De la lege la bani) ---------- */
+#advancedView .panel-note,.panel-note{padding:0 22px 14px;font-size:13px;color:var(--ink-dim);line-height:1.55;}
+#advancedView .panel-body{padding:18px 22px;}
+#advancedView #topProjectsBody,#advancedView #ongoingBody{padding:0;}
+#advancedView .panel{margin-bottom:24px;}
+#advancedView .grid2{gap:24px;}
+#advancedView .exec-name{font-size:13px;color:var(--ink-2);}
+#advancedView .exec-pct{font-size:13px;font-weight:700;}
+#advancedView .bar-track{background:var(--blue-bg);height:12px;border-radius:7px;}
+#advancedView .bar-fill{border-radius:7px;}
+#advancedView .rank-badge{background:var(--gold-bg);color:var(--gold-ink);}
+#advancedView .ong-year-chip{border-radius:var(--radius-sm);background:#fff;border:1px solid var(--line-strong);color:var(--ink);font-weight:600;padding:7px 12px;font-variant-numeric:tabular-nums;}
+#advancedView .ong-year-chip:hover{border-color:var(--navy);background:var(--blue-bg);}
+#advancedView .ong-year-chip.active{background:var(--navy-deep);border-color:var(--navy-deep);color:#fff;}
+#advancedView .cal-bar{background:var(--navy);}
+#advancedView .btns.seg{border-radius:var(--radius-sm);border-color:var(--line-strong);}
+#advancedView .btns.seg button{border-radius:0;height:34px;border:none;}
+#advancedView .btns.seg button[aria-pressed="true"]{background:var(--navy-deep);color:#fff;}
+#advancedView .sd-tab th{background:transparent;border-bottom:none;text-transform:none;letter-spacing:0;color:var(--ink-2);font-size:12px;}
+#advancedView .sd-tab td{border-bottom:none;padding:0;}
+#advancedView .grid2 th,#advancedView .grid2 td,.two-col th,.two-col td{padding:10px 10px;}
+.adv-tabel summary{color:var(--navy);font-weight:600;}
+.rmap-mod{border-radius:var(--radius-sm);border-color:var(--line-strong);}
+.rmap-mod button[aria-pressed="true"]{background:var(--navy-deep);color:#fff;}
+.rs-tit,.dif-tit{font-family:var(--serif);font-weight:500;color:var(--navy-deep);}
+.rs-bar i,.rmap-leg i{border-radius:3px;}
+.rs-kpi div{background:var(--panel-2);border-radius:var(--radius-sm);}
+.rmap-side{border-radius:var(--radius);border-color:var(--line);}
+
+/* De la lege la bani: bara de sus din vedere dubla meniul (la fel ca în Export / IATI), iar chenarul dubla marginile */
+#legaturiView > .wrap{padding:0 0 40px;max-width:none;}
+#legaturiView > .wrap > .panel-head:first-child{display:none !important;}
+.leg-kpis{gap:16px;}
+.leg-kpis .kpi{padding:20px 20px 18px;}
+.leg-kpis .kpi .val{font-size:clamp(28px,2.5vw,36px);}
+.leg-kpis .kpi .val small{margin-left:6px;}
+.leg-status{border-radius:var(--radius-sm);font-size:13.5px;padding:11px 14px;}
+.leg-bara{padding:14px 22px;}
+.leg-bara input[type=text],.leg-bara select{border-radius:var(--radius-sm);font-size:14px;padding:9px 12px;}
+.leg-tabs{border-radius:var(--radius-sm);}
+.leg-tabs button{height:34px;padding:0 14px;font-size:13px;color:var(--ink-2);}
+.leg-tabs button.activ{background:var(--navy-deep);color:#fff;}
+.leg-badge{border-radius:999px;padding:2px 9px;font-size:11.5px;}
+.leg-badge.confirmat{background:var(--navy-deep);}
+.leg-badge.suma{background:var(--green-bg);color:var(--green-ink);}
+.leg-btn{border-radius:var(--radius-sm);padding:6px 12px;font-size:13px;}
+.leg-btn.ok{background:var(--navy-deep);border-color:var(--navy-deep);}
+#legTabel{font-size:13.5px;}
+#legTabel th{padding:11px 14px;font-size:11.5px;letter-spacing:.055em;color:var(--ink-2);background:#fff;border-bottom:2px solid var(--navy);}
+#legTabel td{padding:12px 14px;border-top:1px solid var(--line);}
+#legTabel .num{font-family:var(--sans);font-size:13px;font-variant-numeric:tabular-nums;}
+.leg-nume{color:var(--navy-deep);}
+.leg-sub,.leg-aprox,.leg-sumaText,.leg-act,.leg-manual{font-size:12.5px;}
+.leg-chip{border-radius:999px;font-size:11.5px;}
+
+/* grafice din registrele de acorduri */
+.pal-t,.dur-t{background:var(--blue-bg);}
+.pal-t i{background:var(--navy);}
+.pal-l,.dur-l{font-size:13px;}
+.pal-v,.dur-v{font-size:12.5px;}
+
+/* ---------- 14. Pagina „Despre date" și subsolurile de navigare ---------- */
+nav.toc ~ * h2,nav.toc ~ h2{font-family:var(--serif);font-weight:500;font-size:30px;letter-spacing:-.015em;margin-bottom:14px;}
+nav.toc ~ * h3{font-family:var(--sans);font-weight:700;}
+.toc{border-radius:var(--radius);padding:18px 20px;}
+.toc b{color:var(--ink-dim);letter-spacing:.09em;font-weight:700;}
+.toc a:hover,.footer-nav a:hover,.det-ex a:hover,td.a-src a:hover,.acte-list .a-src a:hover{color:var(--gold-ink);}
+.footer-nav a{font-weight:600;}
+.top-sub{font-size:16px;color:var(--ink-2);line-height:1.6;max-width:72ch;margin:14px 0 0;}
+
+/* cifrele mari se potrivesc lățimii cardului (cardurile înguste, ex. 5 pe rând, nu rup cifra pe două rânduri) */
+@supports (width:1cqw){
+  .kpi .val{font-size:clamp(26px,15.5cqw,50px);}
+  .leg-kpis .kpi .val{font-size:clamp(24px,13cqw,36px);}
+}
+/* subtitlurile mici din titlurile panourilor ("bifează unul sau mai mulți") rămân text obișnuit, nu serif */
+.panel-head h2 small,h2 small{font-family:var(--sans);font-size:12.5px;font-weight:500;letter-spacing:0;color:var(--ink-dim);margin-left:6px;}
+
+/* ---------- 15. Ferestrele deschise din pagină (fișa donatorului, căutarea, meniul roții dințate) ---------- */
+.fd{border-radius:var(--radius);}
+.fd .fd-h h2{font-family:var(--serif);font-weight:500;font-size:28px;letter-spacing:-.015em;color:var(--navy-deep);}
+.fd .fd-kpi div{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);}
+.fd .fd-kpi b{font-family:var(--serif);font-weight:500;font-size:24px;color:var(--navy-deep);}
+.fd .fd-sub{letter-spacing:.09em;}
+.fd .fd-x,.fd .fd-act button{border-radius:var(--radius-sm);}
+.fd .fd-act button.pr{background:var(--navy-deep);border-color:var(--navy-deep);}
+.fd .fd-t th{border-bottom:2px solid var(--navy);color:var(--ink-2);}
+.cg-top input,.cg-top input:focus,.cg-top input:focus-visible{outline:none;box-shadow:none;border:none;}
+
+/* 404 */
+.box .n{font-family:var(--serif);font-weight:500;color:var(--navy-deep);font-size:clamp(84px,12vw,128px);letter-spacing:-.03em;}
