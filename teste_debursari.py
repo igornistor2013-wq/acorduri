@@ -241,6 +241,10 @@ html = (AICI / 'debursari.html').read_text(encoding='utf-8')
 for fisier in re.findall(r'<script[^>]+src="([^"?]+)', html):
     verifica('debursari.html: scriptul „%s” există' % fisier, (AICI / fisier).exists())
 verifica('debursari.html: titlul începe cu „Debursări pe acorduri —” (pentru traducerea titlului)', '<title>Debursări pe acorduri — ' in html)
+# fără „?v=” browserul poate păstra ore în șir un debursari-ui.js vechi lângă o pagină nouă (se vedea doar butonul „Debursare”, fără creioane)
+for fisier in ('debursari.js', 'debursari-ui.js'):
+    verifica('debursari.html: „%s” se încarcă cu versiune (?v=AAAA-LL-ZZ), ca să nu rămână o variantă veche în cache' % fisier,
+             re.search(r'<script src="%s\?v=\d{4}-\d{2}-\d{2}"></script>' % re.escape(fisier), html) is not None)
 # regula de securitate: o cheie GitHub nu se scrie în niciun fișier din repository (oricine o vede poate scrie în el); se caută în toate fișierele text
 _cheie = re.compile(r'github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{30,}')
 _gasite = []
