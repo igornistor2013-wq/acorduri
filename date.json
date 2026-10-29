@@ -4410,6 +4410,30 @@
       "editie_id": "3364",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3364"
+    },
+    "nr. 595, 28 octombrie 2026|3366": {
+      "act": "nr. 595, 28 octombrie 2026",
+      "titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Amendamentului nr. 3 la Acordul-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei pentru realizarea Proiectului de construcție a penitenciarului din Chișinău",
+      "categorie": "Împrumut",
+      "partener": "CEB",
+      "semnat": "",
+      "editie": "535-538",
+      "data_editie": "29.10.2026",
+      "editie_id": "3366",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3366"
+    },
+    "nr. 596, 28 octombrie 2026|3366": {
+      "act": "nr. 596, 28 octombrie 2026",
+      "titlu": "Hotărâre cu privire la inițierea negocierilor asupra proiectului Acordului de facilitate de credit dintre Republica Moldova și Agenția Franceză pentru Dezvoltare nr. CMD 1023 01 E „Programul pentru tranziția energetică verde” și acordarea împuternicirilor pentru negocierea acestuia",
+      "categorie": "Împrumut",
+      "partener": "AFD",
+      "semnat": "",
+      "editie": "535-538",
+      "data_editie": "29.10.2026",
+      "editie_id": "3366",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3366"
     }
   },
   "editii_vazute": [
@@ -4464,14 +4488,13 @@
     "3361",
     "3362",
     "3364",
-    "3365"
+    "3365",
+    "3366"
   ],
-  "ultima_rulare": "28.10.2026 14:20",
-  "editii_lipsa": [
-    "3363"
-  ],
+  "ultima_rulare": "29.10.2026 14:29",
+  "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5,
-    "3363": 4
+    "3363": 5
   }
 }
