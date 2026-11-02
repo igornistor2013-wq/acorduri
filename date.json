@@ -4434,6 +4434,30 @@
       "editie_id": "3366",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3366"
+    },
+    "nr. 839-X, 29 octombrie 2026|3368": {
+      "act": "nr. 839-X, 29 octombrie 2026",
+      "titlu": "Decret cu privire la promulgarea Legii pentru ratificarea Amendamentului la acordurile de finanțare dintre Republica Moldova și Asociația Internațională pentru Dezvoltare privind Proiectul de dezvoltare a sistemului electroenergetic",
+      "categorie": "Împrumut",
+      "partener": "AID",
+      "semnat": "",
+      "editie": "543-544",
+      "data_editie": "31.10.2026",
+      "editie_id": "3368",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3368"
+    },
+    "nr. 248, 22 octombrie 2026|3368": {
+      "act": "nr. 248, 22 octombrie 2026",
+      "titlu": "Lege pentru ratificarea Amendamentului la acordurile de finanțare dintre Republica Moldova și Asociația Internațională pentru Dezvoltare privind Proiectul de dezvoltare a sistemului electroenergetic",
+      "categorie": "Împrumut",
+      "partener": "AID",
+      "semnat": "",
+      "editie": "543-544",
+      "data_editie": "31.10.2026",
+      "editie_id": "3368",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3368"
     }
   },
   "editii_vazute": [
@@ -4490,9 +4514,10 @@
     "3364",
     "3365",
     "3366",
-    "3367"
+    "3367",
+    "3368"
   ],
-  "ultima_rulare": "30.10.2026 14:21",
+  "ultima_rulare": "02.11.2026 14:21",
   "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5,
