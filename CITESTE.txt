@@ -1,0 +1,3 @@
+Aceste fișiere sunt versiunea cu aspectul VECHI (cel din arhiva acorduri-main_10) plus datele din PDF.
+Pune-le în depozit peste cele existente (aceleași nume și aceleași foldere), apoi șterge folderul fonturi/
+(nu mai e folosit; nu strică dacă rămâne). Nu atinge nimic altceva, iar fișierele de date zilnice rămân cum sunt.

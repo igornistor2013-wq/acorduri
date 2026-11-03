@@ -92,17 +92,7 @@ h1{
 h1 span.md-flag-text,.md-flag-text{
   background:none !important;-webkit-text-fill-color:currentColor !important;color:inherit !important;
 }
-.logo-badge{width:76px;height:76px;padding:6px;box-sizing:border-box;overflow:hidden;
-  background:var(--blue-bg);border:1px solid var(--line);border-radius:var(--radius);
-  transition:border-color .2s ease,background-color .2s ease;}
-.logo-badge[style*="48px"]{padding:4px;border-radius:12px;}
-.logo-badge:hover{border-color:var(--navy);background:#fff;}
-/* harta din logo: siluetă plată navy, fluxuri subțiri în culorile tricolorului, inel auriu */
-.logo-badge .md-shape{fill:var(--navy);stroke:var(--navy-deep);stroke-width:1.2;filter:none;}
-.logo-badge:hover .md-shape{filter:none;}
-.logo-badge .flow-line{stroke-width:3.6;opacity:.55;}
-.logo-badge:hover .flow-line{opacity:.9;}
-.logo-badge .pulse-ring{stroke:var(--gold);stroke-width:2.6;}
+.logo-badge{width:58px;height:58px;}
 .eyebrow{font-family:var(--sans);font-size:12.5px;letter-spacing:.1em;font-weight:700;text-transform:uppercase;color:var(--navy);margin:0 0 10px;}
 .top-meta{font-size:13.5px;color:var(--ink-dim);line-height:1.7;}
 .top-meta b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;}
@@ -309,7 +299,7 @@ footer{margin-top:36px;padding-top:20px;border-top:1px solid var(--line);font-si
 @media (max-width:760px){
   header.top{padding:4px 0 18px;margin-bottom:18px;background:none;}
   h1{font-size:clamp(30px,9vw,40px);}
-  .logo-badge{width:56px;height:56px;padding:5px;border-radius:12px;}
+  .logo-badge{width:46px;height:46px;}
   .kpi{padding:16px 16px 14px;}
   .kpi .val{font-size:clamp(28px,8vw,36px);}
   .panel-head,#mapPanel .panel-head,#sectorPanel .panel-head,#beneficiaryPanel .panel-head{padding:14px 16px;}
@@ -410,28 +400,3 @@ nav.toc ~ * h3{font-family:var(--sans);font-weight:700;}
 
 /* 404 */
 .box .n{font-family:var(--serif);font-weight:500;color:var(--navy-deep);font-size:clamp(84px,12vw,128px);letter-spacing:-.03em;}
-
-/* ---------- 16. Animația de la deschidere (numărătoarea pe ani) și mișcările din pagină ---------- */
-/* ceasul din antet: ia locul textului de sub titlu cât rulează numărătoarea, apoi dispare */
-.top-dreapta{position:relative;}
-.intro-ticker{position:absolute;top:0;right:0;width:236px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;
-  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s ease,visibility 0s linear .35s;}
-.top-meta{transition:opacity .35s ease;}
-body.intro-playing .intro-ticker{opacity:1;visibility:visible;transition:opacity .25s ease;}
-body.intro-playing .top-meta{opacity:0;}
-.intro-ticker .it-year{font-family:var(--serif);font-weight:500;font-size:30px;line-height:1;letter-spacing:-.02em;
-  color:var(--navy-deep);font-variant-numeric:lining-nums tabular-nums;}
-.intro-ticker .it-line{display:flex;align-items:center;gap:8px;width:100%;font-size:11.5px;font-weight:600;line-height:1;
-  letter-spacing:.03em;color:var(--ink-dim);font-variant-numeric:tabular-nums;}
-.intro-ticker .it-rail{display:block;flex:1;height:4px;border-radius:2px;background:var(--line);overflow:hidden;}
-.intro-ticker .it-rail i{display:block;height:100%;width:0;border-radius:2px;background:var(--gold);}
-@media (max-width:800px){
-  .intro-ticker{right:auto;left:0;align-items:flex-start;width:min(236px,100%);}
-}
-@media print{.intro-ticker{display:none;}}
-/* anul din filtru, în timpul numărătorii: același navy, nu auriu pe alb; o pulsație mică, nu un salt */
-#yearWindowVal.counting{color:var(--navy-deep);animation-name:introTickSoft;animation-duration:.35s;}
-@keyframes introTickSoft{from{opacity:.55;transform:translateY(3px);}to{opacity:1;transform:none;}}
-.intro-wait-note{color:var(--ink-2);background:var(--blue-bg);border:1px solid var(--line);border-radius:var(--radius-sm);}
-/* bara de execuție crește lin odată cu cifrele */
-body.intro-playing .kpi .kpi-bar i{transition:width .18s linear;}

@@ -154,10 +154,7 @@ care legis.md îl primește.
 | `amp-vechi.json` | AMP ID → activityId pe serverul vechi AMP (87.255.68.120:8888), pentru cele 3.008 proiecte ale arhivei. Construit o singură dată, deschizând paginile publice ale serverului vechi |
 | `acorduri.html` | Registrul acordurilor. Citește `date.json` la fiecare deschidere. Sumele acordurilor le ia din patru locuri, în ordinea: documentul atașat actului pe legis.md, titlul, textul actului, nota Guvernului. Primele două cercetări (`date/legis_sume.json`, `date/sume_manual.json`) sunt făcute pe actele din legis.md; ca registrul din Monitor să le folosească și el, fiecare act primește fișa lui legis.md din `date/legaturi_legis.json` (cheia actului din Monitor → `doc_id` legis.md). Un act foarte nou, încă fără fișă pe legis.md, primește sumele și categoria hotărâte de mână după codul scos din numărul și tipul lui. Butonul „Excel” scrie un fișier stilizat cu `xlsx-stil.js` (încărcat la primul clic) sau, dacă acesta lipsește, vechea foaie simplă: vezi „Exportul Excel din registrele de acorduri” |
 | `hg246.html` | Comparația cu anexa HG 246. Citește `amp-arhiva.json` |
-| `meniu.js` | Bara de navigare comună, aceeași pe toate paginile (Donatori, Analize, Export, IATI, Acorduri, HG 246). Un buton nou se adaugă o singură dată, aici. Aspectul ei (file cu linie aurie sub cea activă, câmp de căutare, RO/EN) e în șirul `CSS` din fișier |
-| `tema.css` | Aspectul comun al tuturor paginilor („Raport editorial”, varianta luminoasă): culori, fonturi, antet, carduri KPI, panouri, tabele, bare, hărți. Se leagă ultima în `<head>`, cu `?v=` (vezi „Aspectul site-ului”) |
-| `fonturi/` | Fonturile proprii, subset latin, WOFF2: `inter-var.woff2` (text și cifre), `newsreader-var.woff2` (titluri și cifre mari), plus `LICENTA.txt` (SIL OFL 1.1). Niciun serviciu extern de fonturi |
-| `teste_tema.py` | Testele aspectului: legătura `tema.css?v=` în toate paginile, aceeași versiune, fonturile și licența, contrastul culorilor (WCAG), iar cu `--browser`: fonturile se încarcă, banda tricoloră, meniul (file, meniuri derulante, RO/EN, căutare), bara de execuție din KPI, harta sub KPI, fără scroll orizontal pe desktop și telefon |
+| `meniu.js` | Bara de navigare comună, aceeași pe toate paginile (Donatori, Analize, Export, IATI, Acorduri, HG 246). Un buton nou se adaugă o singură dată, aici |
 | `traducere.js` | Engleza pentru paginile de acorduri, HG 246 și Despre: dicționar de fraze ale interfeței; denumirile oficiale ale actelor rămân în română |
 | `despre.html` | Despre date și metodologie: surse, termeni, calcule, limite, date deschise, RSS (în română și engleză) |
 | `date_deschise.py` | Scrie `date/acorduri_monitor.csv/.json`, `date/acorduri_legis.csv/.json`, `date/cautare.json` (indexul căutării), `rss.xml`, `sitemap.xml` și `date/stare.json` (data ultimei verificări, citită de registrul legis.md la deschidere); rulat de `monitor.yml`. Categoria din fișierele CSV/JSON ține cont de deciziile de mână din `date/categorii_manual.json`, ca în pagini. Doar `date/stare.json` se schimbă în fiecare zi; celelalte, când apar acte noi |
@@ -415,7 +412,9 @@ scrie Legea 314/2025, registrul LP106/2025; creditul BIRD „Conectivitate rural
   (șase câmpuri, mai jos); la fel cum o dată din AMP rămâne unde anexa nu spune nimic. Începutul și finalul spun în notă ce reprezintă.
 * **Debursările**, la 31 de rânduri: câte o înregistrare cumulată, datată 30.09.2026, în euro (anexa dă mii EUR; suma = mii EUR × 1000).
   Suma lor, 1.015.106.200 EUR, este totalul din anexă. La cele 11 acorduri fără nicio tragere (anexa: 0,00) nu s-a scris nimic.
-* **Nu s-au scris** sumele proiectelor, obiectivele și tipul finanțării: anexa nu are obiective, iar la sume diferă de registru la șapte rânduri (mai jos).
+* **Sumele proiectelor**: la 35 din cele 42 de rânduri suma din anexă (în moneda acordului) e identică cu cea din registru, deci pagina o arată
+  deja și nu s-a scris încă o dată. La celelalte șapte diferă (tabelul de mai jos): rămâne suma din registru, iar nota rândului spune ce dă anexa.
+* **Nu s-au scris** obiectivele și tipul finanțării: anexa nu le are.
 
 Discrepanțe, rămase pentru decizia ta (nu s-a schimbat nimic în registru):
 
@@ -439,6 +438,7 @@ intrarea în vigoare din 31.07.2025). Rândul BERD „CET-Nord” al registrului
 
 Un utilizator poate corecta oricând aceste înregistrări din pagină (creionul din tabel); `teste_debursari.js` verifică fișierul: fiecare
 înregistrare are rând, notele au cel mult 200 de caractere, totalul MF se potrivește, iar nicio dată nu se scrie peste una oficială.
+
 
 **Codul de acces și „baza de date".** Site-ul e static (GitHub Pages): n-are server care să primească
 date. Singurul loc în care o pagină poate scrie fără un serviciu în plus e chiar repository-ul, prin
@@ -728,34 +728,6 @@ singură dată, iar o notă de sub tabel spune asta.
 
 **Teste.** `python teste_sectoare.py` (logica, diagrama și datele pentru Excel, cu Node) și
 `python teste_sectoare.py --browser` (panoul în română și engleză, cu fișierele descărcate).
-
-## Aspectul site-ului (tema.css)
-
-Toate paginile au același aspect: bandă tricoloră sus, meniu cu file (fila activă are linie aurie), titluri și cifre mari în Newsreader
-(serif), text și tabele în Inter cu cifre tabulare, panouri albe cu chenar subțire, bare plate (donatori și sectoare în navy, beneficiari în
-auriu), antete de tabel cu linie navy. Harta donatorilor stă sub cardurile KPI, iar cardul „Debursări totale” arată și gradul de execuție
-(câți % din angajamente sunt debursați; în engleză, textul vine din cheia `kpiExecSub`).
-
-**Mișcările din pagină.** Logo-ul animat (harta Moldovei cu fluxurile de asistență, în `mountAnimatedLogo` din `index.html`) stă într-un
-chenar luminos; silueta e plată (navy), fluxurile și particulele au culorile tricolorului în tonurile site-ului (albastru, auriu, roșu), iar
-inelul pulsatoriu e auriu. Animația de la deschidere (numărătoarea pe ani 1993 → 2024) are în antet un ceas: anul curent, în Newsreader, și o
-riglă care se umple; apare doar cât rulează numărătoarea (`body.intro-playing`) și ia locul textului de sub titlu. Se schimbă în secțiunea 16 din
-`tema.css` și în `paintIntroTicker` din `index.html`; cu „mișcare redusă” în sistem numărătoarea nu pornește, deci nici ceasul. Săgețile
-animate de pe hartă (fluxul unui donator spre Moldova) sunt aurii, ca inelul din logo.
-
-* **Unde se schimbă ce.** Culorile și rotunjirile sunt jetoane în `:root` din `tema.css` (`--navy`, `--gold`, `--ink`, `--radius` …): schimbi
-  un jeton și se schimbă peste tot. Meniul își are stilurile în `meniu.js` (șirul `CSS`). Paginile își păstrează stilurile lor; `tema.css`
-  vine după ele și le suprascrie doar unde trebuie. Fără `tema.css` site-ul funcționează la fel, cu aspectul vechi.
-* **Versiunea din `?v=`.** Fiecare pagină are `<link rel="stylesheet" href="tema.css?v=2026-11-03">`. Când schimbi `tema.css`, urcă data din
-  `?v=` în TOATE paginile (`index.html`, `acorduri.html`, `hg246.html`, `despre.html`, `debursari.html`, `404.html`; `legis_acorduri.html`
-  se reface cu `python3 legis_pagina.py`, care ia legătura din `acorduri.html`) — altfel browserele pot arăta stilul vechi din cache.
-  `python3 teste_tema.py` verifică că toate paginile au aceeași versiune.
-* **Fonturile** stau în `fonturi/` (subset latin, cu ă â î ș ț), cu `font-display:swap`: textul apare imediat cu fontul de rezervă, apoi se
-  schimbă. Nu se încarcă nimic de pe alte servere. Licența (SIL OFL 1.1) e în `fonturi/LICENTA.txt`.
-* **Culorile din grafice** care vin din scripturi (fluxul donator → sector → beneficiar, treemap, hărți) sunt în `index.html`; paleta
-  categorială a graficelor „tipul de asistență pe ani” (albastru, portocaliu, verde, galben) e cea validată pentru daltonism și s-a păstrat.
-* **Contrast.** Textele mici stau în `--ink` / `--ink-2` / `--ink-dim` (cel puțin 4,5:1 pe alb); auriul `--gold` e doar pentru bare și linii,
-  iar pentru text se folosește `--gold-ink`. Testul `teste_tema.py` calculează raporturile.
 
 ## Importul din arhive PDF
 
