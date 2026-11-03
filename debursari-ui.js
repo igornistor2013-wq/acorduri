@@ -323,8 +323,8 @@ function scrieHash() {
 /* ------------------------------------------------------------------ randare: capul și bara de acces */
 function randeazaCap() {
   $('#tTitlu').textContent = L('Debursări pe acorduri', 'Disbursements by agreement');
-  $('#tSub').textContent = L('Acordurile din registrul legis.md, repartizate pe donatori. Bifează un donator ca să vezi proiectele lui, cu obiectivele, data de început, data finalizării și suma; datele de început și de finalizare, suma proiectului și debursările se pot edita după ce introduci codul de acces, o singură dată pentru toate acordurile.',
-                              'The agreements from the legis.md register, grouped by donor. Tick a donor to see its projects, with their objectives, start date, completion date and amount; the start and completion dates, the project amount and the disbursements can be edited once you enter the access code, one time for all agreements.');
+  $('#tSub').textContent = L('Acordurile din registrul legis.md, repartizate pe donatori. Bifează un donator ca să vezi proiectele lui, cu data de început, data finalizării și suma; descrierea (obiectivele) apare când deschizi proiectul. Datele de început și de finalizare, suma proiectului și debursările se pot edita după ce introduci codul de acces, o singură dată pentru toate acordurile.',
+                              'The agreements from the legis.md register, grouped by donor. Tick a donor to see its projects, with their start date, completion date and amount; the description (objectives) appears when you open a project. The start and completion dates, the project amount and the disbursements can be edited once you enter the access code, one time for all agreements.');
   if (!S.baza) { $('#topMeta').innerHTML = ''; return; }
   var nd = S.intrari.length;
   $('#topMeta').innerHTML =
@@ -534,10 +534,12 @@ function etSursa(x, camp) {
 function nesalvatP(info, x) {
   return x && x.tip === 'manual' && info.db && S.nesalvateP.has(info.db.id) ? '<span class="nes">' + esc(L('nesalvat', 'unsaved')) + '</span>' : '';
 }
-function htmlObiective(a, info) {
-  var desc = D.descriere(a, S.en, info);
-  if (!desc) return '<div class="pdesc gol">' + esc(L('Obiective neintroduse', 'Objectives not entered')) + '</div>';
-  return '<div class="pdesc" title="' + esc(desc) + '">' + esc(desc) + '</div><div class="psrc">' + etSursa(info.obiective) + nesalvatP(info, info.obiective) + '</div>';
+/* descrierea succintă (= obiectivele proiectului): nu mai are coloană în tabel, se vede doar când proiectul e deschis, sus în detalii */
+function htmlDescriere(a, info) {
+  var o = info.obiective, desc = D.descriere(a, S.en, info);
+  return '<div class="det-desc"><div class="dd-l">' + esc(L('Descriere succintă', 'Short description')) + '<span class="dd-s">' + esc(L('obiectivele proiectului', 'project objectives')) + '</span></div>' +
+    (desc ? '<div class="dd-t">' + esc(desc) + '</div><div class="psrc">' + etSursa(o) + nesalvatP(info, o) + '</div>' + detaliiSursa(o)
+          : '<div class="dd-t gol">' + esc(L('Obiective neintroduse', 'Objectives not entered')) + '</div>') + '</div>';
 }
 function etCamp(camp, nume) {
   return (camp === 'inceput' ? L('Data efectivă de începere: ', 'Actual start date: ') : L('Data finalizării: ', 'Completion date: ')) + nume;
@@ -566,7 +568,7 @@ function htmlSumaEd(a, k, nume) {
 }
 function htmlBaraRand(a, k) {
   var re = S.re.get(a.id);
-  return '<tr class="re" data-k="' + esc(k) + '"><td colspan="8"><div class="re-bar">' +
+  return '<tr class="re" data-k="' + esc(k) + '"><td colspan="7"><div class="re-bar">' +
     '<label>' + esc(L('Sursa informației (opțional)', 'Source of the information (optional)')) + '<input type="text" data-re="nota" maxlength="' + D.MAX_NOTA + '" autocomplete="off" data-fk="' + esc(k + '|re_nota') +
       '" value="' + esc(re.f.nota) + '" placeholder="' + esc(L('de pildă: raportul anual al proiectului, pag. 3', 'for example: the project annual report, p. 3')) + '"></label>' +
     '<div class="re-btns"><button type="button" class="btn p" data-act="rand-salveaza">' + esc(L('Salvează', 'Save')) + '</button><button type="button" class="btn" data-act="rand-anuleaza">' + esc(L('Anulează', 'Cancel')) + '</button></div>' +
@@ -585,7 +587,6 @@ function htmlRand(d, a) {
   var ed = inEditare(a);
   return '<tr class="ac' + (deschis ? ' deschis' : '') + (ed ? ' edit' : '') + '" data-k="' + esc(k) + '">' +
     '<td data-l="' + esc(L('Proiectul', 'Project')) + '"><div class="pname">' + esc(nume) + '</div><div class="pmeta">' + meta.join(' · ') + '</div></td>' +
-    '<td data-l="' + esc(L('Descriere succintă (obiectivele proiectului)', 'Short description (project objectives)')) + '">' + htmlObiective(a, info) + '</td>' +
     '<td class="dcol" data-l="' + esc(L('Data efectivă de începere', 'Actual start date')) + '">' + htmlData(info, 'inceput', a, k, nume) + '</td>' +
     '<td class="dcol" data-l="' + esc(L('Data finalizării', 'Completion date')) + '">' + htmlData(info, 'sfarsit', a, k, nume) + '</td>' +
     '<td data-l="' + esc(L('Tip de finanțare', 'Type of financing')) + '"><span class="tag ' + (CLASA_TIP[a.categorie] || 't-alt') + '">' + esc(D.etichetaTip(a.categorie, S.en) || '—') + '</span></td>' +
@@ -749,10 +750,7 @@ function randAmp(a, info) {
   return ['AMP', h];
 }
 function htmlProiect(a, k) {
-  var info = infoDe(a), dl = [], o = info.obiective;
-  dl.push([L('Obiectivele proiectului', 'Project objectives'),
-    o ? '<div>' + esc(S.en ? (o.en || o.ro) : o.ro) + '</div><div class="psrc">' + etSursa(o) + nesalvatP(info, o) + '</div>' + detaliiSursa(o)
-      : '<span class="nil">' + esc(L('neintroduse', 'not entered')) + '</span>']);
+  var info = infoDe(a), dl = [];
   [['inceput', L('Data efectivă de începere', 'Actual start date')], ['sfarsit', L('Data finalizării', 'Completion date')]].forEach(function (c) {
     var x = info[c[0]];
     dl.push([c[1], x ? '<b>' + esc(D.fmtDataPartiala(x.v)) + '</b> <span class="psrc">' + etSursa(x, c[0]) + nesalvatP(info, x) + '</span>' + detaliiSursa(x)
@@ -796,7 +794,7 @@ function formularProiect(a, k, sterge) {
 }
 function htmlDetalii(d, a, g, k) {
   var intrari = S.peAcord.get(a.id) || [];
-  return '<tr class="det" data-k="' + esc(k) + '"><td colspan="8"><div class="det-grid' + (cod ? '' : ' solo') + '"><div>' + htmlIntrari(a, intrari, g) + '</div>' + (cod ? '<div>' + htmlForm(a, k) + '</div>' : '') +
+  return '<tr class="det" data-k="' + esc(k) + '"><td colspan="7"><div class="det-grid' + (cod ? '' : ' solo') + '">' + htmlDescriere(a, infoDe(a)) + '<div>' + htmlIntrari(a, intrari, g) + '</div>' + (cod ? '<div>' + htmlForm(a, k) + '</div>' : '') +
     htmlProiect(a, k) + htmlInfo(a) + '</div></td></tr>';
 }
 
@@ -820,8 +818,7 @@ function htmlPanou(d) {
     corp = '<div class="gol-msg"><b>' + esc(L('Niciun proiect nu corespunde filtrelor.', 'No project matches the filters.')) + '</b>' + esc(L('Acest donator are ' + total + ' proiecte în total.', 'This donor has ' + total + ' projects in total.')) +
       '<div class="chips"><button type="button" class="chip" data-act="sterge-filtre">' + esc(L('Șterge filtrele', 'Clear filters')) + '</button></div></div>';
   } else {
-    corp = '<div class="tbl-scroll"><table class="deb-tbl"><thead><tr><th>' + esc(L('Proiectul', 'Project')) + '</th><th>' + esc(L('Descriere succintă', 'Short description')) +
-      '<span class="th-sub">' + esc(L('obiectivele proiectului', 'project objectives')) + '</span></th><th>' + esc(L('Data efectivă de începere', 'Actual start date')) + '</th><th>' + esc(L('Data finalizării', 'Completion date')) +
+    corp = '<div class="tbl-scroll"><table class="deb-tbl"><thead><tr><th>' + esc(L('Proiectul', 'Project')) + '</th><th>' + esc(L('Data efectivă de începere', 'Actual start date')) + '</th><th>' + esc(L('Data finalizării', 'Completion date')) +
       '</th><th>' + esc(L('Tip de finanțare', 'Type of financing')) +
       '</th><th class="num">' + esc(L('Suma proiectului', 'Project amount')) + '</th><th class="num">' + esc(L('Suma debursărilor', 'Disbursed amount')) + '</th><th><span class="vh">' + esc(L('Detalii', 'Details')) + '</span></th></tr></thead><tbody>' +
       lista.map(function (a) { return htmlRand(d, a); }).join('') + '</tbody></table></div>';
@@ -934,8 +931,8 @@ function randeazaNote() {
        'The projects are the agreements from the legis.md register (one row combines all acts of the same agreement). "Project amount" is the agreement amount as the register shows it, except on rows where a user corrected it in the page (those are marked "corrected by a user", with the register amount shown next to it); the euro equivalent uses the ECB rates of ' + cursData() +
        '. An agreement financed by several partners appears under each of them, but is counted once in the totals.')],
     [L('Obiectivele și datele proiectelor. ', 'Project objectives and dates. '),
-     L('„Descriere succintă” înseamnă obiectivele proiectului, iar datele sunt data efectivă de începere și data finalizării proiectului. Fiecare informație vine, în ordine, din: ce a introdus un utilizator în pagină (după ce a pus codul); o sursă oficială (un document cu adresă și citat exact, scrise în date/proiecte_manual.json); AMP, platforma de gestionare a asistenței externe, doar pentru proiectele legate sigur de acord (denumirea, finanțatorul și suma coincid; în AMP, data finalizării e data propusă de terminare). Obiectivele nu vin din AMP. O celulă goală înseamnă că nu s-a găsit încă o sursă: pagina nu completează cu presupuneri.',
-       '"Short description" means the objectives of the project, and the dates are the actual start date and the completion date of the project. Each item comes, in this order, from: what a user entered in the page (after entering the code); an official source (a document with its address and an exact quote, written in date/proiecte_manual.json); AMP, the external assistance management platform, only for projects linked with certainty to the agreement (name, funder and amount agree; in AMP, the completion date is the proposed completion date). The objectives do not come from AMP. An empty cell means no source has been found yet: the page does not fill in guesses.')],
+     L('„Descrierea succintă” înseamnă obiectivele proiectului și apare doar când deschizi proiectul (săgeata din dreapta rândului); în tabel sunt datele, data efectivă de începere și data finalizării proiectului. Fiecare informație vine, în ordine, din: ce a introdus un utilizator în pagină (după ce a pus codul); o sursă oficială (un document cu adresă și citat exact, scrise în date/proiecte_manual.json); AMP, platforma de gestionare a asistenței externe, doar pentru proiectele legate sigur de acord (denumirea, finanțatorul și suma coincid; în AMP, data finalizării e data propusă de terminare). Obiectivele nu vin din AMP. O celulă goală (sau „Obiective neintroduse” în rândul deschis) înseamnă că nu s-a găsit încă o sursă: pagina nu completează cu presupuneri.',
+       'The "short description" means the objectives of the project and appears only when you open a project (the arrow at the right of the row); the table shows the dates, which are the actual start date and the completion date of the project. Each item comes, in this order, from: what a user entered in the page (after entering the code); an official source (a document with its address and an exact quote, written in date/proiecte_manual.json); AMP, the external assistance management platform, only for projects linked with certainty to the agreement (name, funder and amount agree; in AMP, the completion date is the proposed completion date). The objectives do not come from AMP. An empty cell (or "Objectives not entered" in the opened row) means no source has been found yet: the page does not fill in guesses.')],
     [L('Fără dubluri. ', 'No duplicates. '),
      L('Fiecare act din registru se află într-un singur rând, iar rândurile cu aceeași denumire la același donator se deosebesc printr-o mențiune (tipul și anul semnării, la nevoie și suma). ' +
        (S.baza.omise.length ? 'Cele ' + S.baza.omise.length + ' rânduri-umbrelă (negocieri sau memorandumuri care repetă acorduri existente) nu apar în liste; ele sunt enumerate mai jos, cu motivul.' : ''),

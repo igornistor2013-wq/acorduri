@@ -327,10 +327,11 @@ chiar din registru) și le repartizează pe donatori: finanțatorii numiți în 
 doar fiindcă un act al grupului vorbește de ambele bănci. Un acord cofinanțat apare la fiecare finanțator
 al lui, dar în totaluri se numără o singură dată; fără partener în registru, donatorul e „(neidentificat)".
 Bifezi unul sau mai mulți donatori și apare lista proiectelor lor, cu coloanele **Proiectul**,
-**Descriere succintă** (obiectivele proiectului), **Data efectivă de începere**, **Data finalizării**,
-**Tip de finanțare**, **Suma proiectului** (în valuta acordului și în euro) și **Suma debursărilor** (cu
-procentul debursat). Butonul din dreapta deschide detaliile: debursările, datele despre proiect (cu sursa și
-citatul), proiectul AMP legat, actele. Se poate căuta (denumire, obiective, act, partener), filtra (tip de
+**Data efectivă de începere**, **Data finalizării**, **Tip de finanțare**, **Suma proiectului** (în valuta
+acordului și în euro) și **Suma debursărilor** (cu procentul debursat). **Descrierea succintă** (obiectivele
+proiectului) nu are coloană: apare doar când deschizi proiectul, sus în detalii, cu sursa și citatul ei. Butonul
+din dreapta deschide detaliile: descrierea, debursările, datele despre proiect (cu sursa și citatul), proiectul AMP
+legat, actele. Se poate căuta (denumire, obiective, act, partener), filtra (tip de
 finanțare, cu sau fără debursări) și sorta. Donatorii bifați și filtrele rămân în adresa paginii
 (`#d=BERD|BEI&tip=…`), deci o selecție se trimite ca link. Pe telefon tabelul devine fișe; pagina are și
 varianta în engleză.
@@ -355,7 +356,7 @@ Un proiect fără sumă rămâne în listă („suma nu e cunoscută") și poate
 procent. Nu se numără sume în lei (registrul n-are curs pentru ei) și nici o valută fără curs: o debursare
 se introduce într-o valută care are curs în fișier.
 
-**Obiectivele și datele proiectelor.** „Descriere succintă" înseamnă obiectivele proiectului, iar „Data
+**Obiectivele și datele proiectelor.** „Descriere succintă" înseamnă obiectivele proiectului (se vede doar în proiectul deschis), iar „Data
 efectivă de începere" și „Data finalizării" sunt datele proiectului, cum le numește AMP („Actual Start Date" și
 „Proposed Completion Date"). Registrul legis.md nu are nimic din acestea, deci fiecare câmp (obiectivele,
 începutul, finalizarea) se ia, în ordine, din prima sursă care îl are:

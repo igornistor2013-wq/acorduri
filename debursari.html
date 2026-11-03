@@ -154,14 +154,13 @@
   .deb-tbl > thead > tr > th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;text-align:left;padding:11px 12px;border-bottom:1px solid var(--line-strong);background:#fbfcfe;line-height:1.3;vertical-align:bottom;overflow-wrap:anywhere}
   .deb-tbl > thead > tr > th.num,.deb-tbl > tbody > tr > td.num{text-align:right}
   .deb-tbl > tbody > tr > td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-  .deb-tbl > thead > tr > th:nth-child(1){width:16%}
-  .deb-tbl > thead > tr > th:nth-child(2){width:21%}
-  .deb-tbl > thead > tr > th:nth-child(3){width:10%}
-  .deb-tbl > thead > tr > th:nth-child(4){width:10%}
-  .deb-tbl > thead > tr > th:nth-child(5){width:10%}
-  .deb-tbl > thead > tr > th:nth-child(6){width:14%}
-  .deb-tbl > thead > tr > th:nth-child(7){width:14%}
-  .deb-tbl > thead > tr > th:nth-child(8){width:5%}
+  .deb-tbl > thead > tr > th:nth-child(1){width:25%}
+  .deb-tbl > thead > tr > th:nth-child(2){width:12%}
+  .deb-tbl > thead > tr > th:nth-child(3){width:12%}
+  .deb-tbl > thead > tr > th:nth-child(4){width:11%}
+  .deb-tbl > thead > tr > th:nth-child(5){width:17%}
+  .deb-tbl > thead > tr > th:nth-child(6){width:17%}
+  .deb-tbl > thead > tr > th:nth-child(7){width:6%}
   .th-sub{display:block;text-transform:none;letter-spacing:0;font-weight:500;font-size:10px;margin-top:1px}
   tr.ac{cursor:pointer}
   tr.ac:hover{background:#fafbfd}
@@ -169,9 +168,7 @@
   tr.ac.deschis > td{border-bottom-color:transparent}
   .pname{font-size:13.5px;font-weight:700;color:var(--navy-deep);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
   .pmeta{margin-top:5px;display:flex;gap:4px 6px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--ink-dim)}
-  .pdesc{font-size:12.5px;color:#39405a;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
-  tr.deschis .pdesc,tr.deschis .pname{-webkit-line-clamp:unset;overflow:visible}
-  .pdesc.gol{color:var(--ink-dim);font-style:italic}
+  tr.deschis .pname{-webkit-line-clamp:unset;overflow:visible}
   .psrc{margin-top:4px;display:flex;gap:4px 6px;flex-wrap:wrap;align-items:center}
   .src{display:inline-block;font-size:10px;font-weight:700;line-height:1.5;padding:0 6px;border-radius:4px;background:#eef0f4;color:#4f5668;white-space:nowrap;text-decoration:none}
   .src.s-oficial{background:var(--green-bg);color:var(--green-ink)}
@@ -211,6 +208,12 @@
 
   /* detalii: debursări, formular, date despre acord */
   .deb-tbl > tbody > tr.det > td{background:#fbfcfe;padding:16px 18px 18px;cursor:default;border-bottom:1px solid var(--line-strong)}
+  /* descrierea succintă (obiectivele): sus în partea deschisă a proiectului, pe toată lățimea */
+  .det-desc{grid-column:1 / -1;padding-bottom:14px;border-bottom:1px dashed var(--line-strong)}
+  .dd-l{font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:var(--ink-dim);margin-bottom:6px}
+  .dd-s{text-transform:none;letter-spacing:0;font-weight:500;font-size:10.5px;margin-left:8px}
+  .dd-t{font-size:13.5px;color:#39405a;line-height:1.6;overflow-wrap:anywhere;max-width:96ch}
+  .dd-t.gol{color:var(--ink-dim);font-style:italic}
   .det-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px 26px}
   @media (max-width:900px){.det-grid{grid-template-columns:1fr}}
   .det-proiect{grid-column:1 / -1;border-top:1px dashed var(--line-strong);padding-top:14px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px 26px}
@@ -321,7 +324,7 @@
     .deb-tbl > tbody > tr.ac{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;border:1px solid var(--line);border-radius:10px;margin:10px 12px 0;padding:10px 12px 12px;background:#fff}
     .deb-tbl > tbody > tr.ac.deschis{border-color:var(--navy);border-bottom:none;border-bottom-left-radius:0;border-bottom-right-radius:0;padding-bottom:4px}
     .deb-tbl > tbody > tr.ac > td{display:block;border:none;padding:4px 0;min-width:0;text-align:left !important}
-    .deb-tbl > tbody > tr.ac > td:nth-child(1),.deb-tbl > tbody > tr.ac > td:nth-child(2),.deb-tbl > tbody > tr.ac > td:nth-child(7){grid-column:1 / -1}
+    .deb-tbl > tbody > tr.ac > td:nth-child(1),.deb-tbl > tbody > tr.ac > td:nth-child(6){grid-column:1 / -1}
     .deb-tbl > tbody > tr.ac > td[data-l]::before{content:attr(data-l);display:block;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;margin-bottom:2px}
     .deb-tbl > tbody > tr.ac > td.act{grid-column:1 / -1;text-align:right !important}
     .exp{width:auto;padding:0 12px}
@@ -394,6 +397,6 @@
 <script src="debursari.js?v=2026-10-28"></script>
 <script src="legatura-amp.js"></script>
 <script src="amp-date.js"></script>
-<script src="debursari-ui.js?v=2026-10-28"></script>
+<script src="debursari-ui.js?v=2026-11-03"></script>
 </body>
 </html>
