@@ -660,6 +660,23 @@ const xt = D.excelPeDonatori(Object.assign(ctx(false), { peAcord: peRand }), R.d
 verificaSpec('toți donatorii reali', xt);
 verifica('un fișier cu toți donatorii (' + R.donatori.length + ' foi + rezumat + debursări) se scrie', Buffer.from(await (await X.construieste(xt)).arrayBuffer()).slice(0, 2).toString() === 'PK');
 
+
+// fișierul date/debursari.json din repository (completat și din scrisoarea Ministerului Finanțelor, situația la 30.09.2026)
+console.log('\nFișierul date/debursari.json din repository');
+const DB = D.citesteText(fs.readFileSync(path.join(__dirname, 'date', 'debursari.json'), 'utf8'));
+egal('înregistrările din fișier au id-uri unice (debursări și date despre proiecte)', [new Set(DB.intrari.map(e => e.id)).size === DB.intrari.length, new Set(DB.proiecte.map(e => e.id)).size === DB.proiecte.length], [true, true]);
+egal('fiecare debursare din fișier are un rând în registru (nicio orfană)', DB.intrari.filter(e => !D.gasesteAcord(e, R)).map(e => e.id), []);
+egal('fiecare înregistrare „Date despre proiect” din fișier are un rând în registru (nicio orfană)', D.legaProiecte(DB.proiecte, R).orfane.map(e => e.id), []);
+egal('un singur rând de date despre proiect pe acord (nu rămân înregistrări vechi, ascunse)', D.legaProiecte(DB.proiecte, R).vechi.length, 0);
+egal('debursările: dată reală, nu în viitor, sumă pozitivă, valută cu curs, notă de cel mult 200 de caractere', DB.intrari.filter(e => !D.esteDataIso(e.data) || e.data > '2026-12-31' || !(e.suma > 0) || !(R.cursuri[e.val] > 0) || String(e.nota || '').length > 200).map(e => e.id), []);
+egal('datele despre proiecte: format de dată corect, începutul nu e după sfârșit, nota de cel mult 200 de caractere', DB.proiecte.filter(e => (e.inceput && !D.esteDataPartiala(e.inceput)) || (e.sfarsit && !D.esteDataPartiala(e.sfarsit)) || D.inceputDupaSfarsit(e.inceput, e.sfarsit) || String(e.nota || '').length > 200).map(e => e.id), []);
+egal('înregistrările din anexa Ministerului Finanțelor spun în notă de unde vin (scrisoarea nr. 11/1-3/512/1729)', DB.intrari.concat(DB.proiecte).filter(e => /^(d|p)-mf30092026-/.test(e.id) && String(e.nota || '').indexOf('11/1-3/512/1729') < 0).map(e => e.id), []);
+egal('anexa MF: debursările introduse însumează 1.015.106.200 EUR (totalul din anexă, 1.015.106,2 mii EUR)', Math.round(DB.intrari.filter(e => /^d-mf30092026-/.test(e.id)).reduce((t, e) => t + e.suma, 0)), 1015106200);
+egal('anexa MF: nu se scrie o dată peste una care are deja o sursă oficială (datele din proiecte_manual.json rămân ale lui)', DB.proiecte.filter(e => /^p-mf30092026-/.test(e.id)).filter(e => {
+  const a = D.gasesteAcord(e, R); const info = D.infoProiect(a, { manual: R.proiecteManual });
+  return (e.inceput && info.inceput && info.inceput.tip === 'oficial') || (e.sfarsit && info.sfarsit && info.sfarsit.tip === 'oficial');
+}).map(e => e.id), []);
+
 console.log('\n' + (esuate.length ? esuate.length + ' teste au picat: ' + esuate.join('; ') : 'Toate testele au trecut (' + ok + ').'));
 process.exit(esuate.length ? 1 : 0);
 })().catch(function (e) { console.error(e); process.exit(2); });
