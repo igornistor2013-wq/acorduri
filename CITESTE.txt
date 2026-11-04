@@ -1,7 +1,8 @@
-Date din Banca Mondială (Finances One, situația la 30.09.2026). Trei fișiere, doar date și text; designul nu e atins.
+Date din Banca Mondială + registrul IATI (UE, KfW, GIZ, AFD, JICA) + documente FIDA. Trei fișiere, doar date și text; designul nu e atins.
 Pune-le în repository la aceleași căi:
-  date/proiecte_manual.json  (26 intrări noi: început / final, cu adresa și citatul înregistrării oficiale)
-  date/debursari.json        (35 debursări cumulate, în USD, adăugate după cele 31 din scrisoarea MF)
-  README.md                  (secțiunea „Datele din Banca Mondială”)
-ATENȚIE: date/debursari.json înlocuiește fișierul din site. La 04.11.2026 fișierul live era identic cu cel de la care am pornit
-(31 debursări, actualizat 2026-11-03T06:05). Dacă între timp ai introdus debursări din pagină, nu-l înlocui: spune-mi și le îmbin.
+  date/proiecte_manual.json  (46 intrări noi față de setul inițial: 26 Banca Mondială + 20 IATI/FIDA, fiecare cu adresă și citat)
+  date/debursari.json        (38 debursări noi: 35 Banca Mondială + 3 IATI, adăugate după cele 31 din scrisoarea MF)
+  README.md                  (secțiunile „Datele din Banca Mondială” și „Date din registrul IATI și din documente FIDA”)
+Fișierele conțin și datele din pachetul trecut (doar-fisierele-schimbate-bm.zip): dacă l-ai încărcat deja, poți încărca direct acesta.
+ATENȚIE: date/debursari.json înlocuiește fișierul din site. La 04.11.2026 fișierul live avea 31 de debursări (actualizat 2026-11-03T06:05).
+Dacă între timp ai introdus debursări din pagină, nu-l înlocui: spune-mi și le îmbin.

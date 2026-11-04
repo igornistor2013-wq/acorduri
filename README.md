@@ -457,6 +457,22 @@ față de BM: s-au legat după sumă, registrul nu s-a schimbat). Ce s-a scris:
 * **Nu s-au schimbat** sumele proiectelor din registru și datele deja existente; diferențele (12 câmpuri, mai ales termene prelungite
   de BM după aprobare) sunt în foaia „Diferențe de date” din `banca_mondiala_potriviri.xlsx`, cu tot ce n-a putut fi legat.
 
+**Date din registrul IATI și din documente FIDA.** IATI e registrul în care finanțatorii își publică singuri activitățile (data de început
+și de final, angajamentul, plățile); `d-portal.org` îl afișează, iar `q.xml?aid=…` dă activitatea exact cum a publicat-o finanțatorul.
+S-au legat de rânduri 18 activități: UE (11, DG NEAR), KfW și GIZ (4), AFD (1) și JICA (2), numai când finanțatorul, titlul și suma
+(în moneda acordului) coincid. Alte 2 date (FIDA, programele RBDP și RFSADP) vin din documente FIDA/IOE.
+
+* **`date/proiecte_manual.json`**: 20 de intrări noi, doar unde câmpul nu avea sursă. `sursa` e adresa activității, `citat` elementele
+  `activity-date` exacte; `nota` spune dacă data e reală („Actual”) sau planificată („Planned”). La UE, începutul e data reală a acțiunii,
+  finalul e sfârșitul planificat al perioadei de implementare. La `hg786/2024` și `hg90/2025` (activități „în pregătire”, cu două date
+  de început care nu se potrivesc) s-a scris doar finalul; la JICA `hg277/2023` (creditul de politici) doar finalul, fiindcă începutul
+  planificat (01.01.2023) e înainte de semnare.
+* **`date/debursari.json`**: 3 debursări cumulate, doar la acorduri plătite integral (UE `hg432/2021`, 60 mil. EUR; KfW `hg1108/2010`,
+  5 mil. EUR; AFD `hg462/2022`, 60 mil. EUR). La activitățile încă în plată nu s-a scris nimic: IATI nu spune la ce dată e totalul.
+* **Ce nu spune IATI**: BERD și BEI publică doar data aprobării/semnării (nu perioada proiectului) și nicio plată, iar la nivelul deciziilor
+  UE „plătit” e 0 (plățile sunt la nivelul contractelor), deci nu s-au folosit. Legăturile doar după sumă (sume rotunde: 5, 25, 40, 60 mil.)
+  nu s-au scris; lista lor e în `surse_oficiale_potriviri.xlsx`.
+
 **Codul de acces și „baza de date".** Site-ul e static (GitHub Pages): n-are server care să primească
 date. Singurul loc în care o pagină poate scrie fără un serviciu în plus e chiar repository-ul, prin
 API-ul „Contents" al GitHub. „Baza de date" e deci fișierul `date/debursari.json`; pagina îl citește ca pe
