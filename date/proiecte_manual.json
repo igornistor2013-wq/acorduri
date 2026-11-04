@@ -2472,6 +2472,357 @@
    "sursa": "https://www.ifad.org/documents/48415603/49535722/Moldova+TRTP+-+Start+up+report+-+March+2021.pdf/cc1b317a-ae4f-914f-ebcb-3719e4e8d8cf?t=1726607580910",
    "citat": "Goal: reduction in poverty and outmigration from rural areas through the enhancement of smallholder resilience … Development Objective: to enable the rural poor (especially youth, women and smallholders) to increase their productive capacity, resilience to economic, environmental and climate-related risks and access to markets. … Entry into force: 13/01/2021 … Current Completion: 30/03/2027",
    "nota": "Raportul IFAD «Talent Retention for Rural Transformation (TRTP) – Project Start-up Workshop report» (martie 2021; text original în engleză). Rândul din registru («IFAD VIII», 18 939 000 EUR) nu numește proiectul: legătura se bazează pe cronologie și sumă — fișa proiectului (https://www.ifad.org/en/w/projects/2000002242) dă aprobarea IFAD la 06.05.2020 și o finanțare IFAD de US$ 20,75 mil., iar raportul dă semnarea acordului la 1 iulie 2020 (registrul are 26.06.2020). Datele sunt «Entry into force» (13.01.2021) și «Current Completion» (30.03.2027); închiderea financiară e prevăzută la 30.09.2027."
+  },
+  {
+   "acte": [
+    "DP690/2026",
+    "LP137/2026",
+    "HG311/2026",
+    "HG276/2026",
+    "HG215/2026"
+   ],
+   "inceput": "2026-07-30",
+   "sfarsit": "2028-12-29",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00975&resourceId=RS00905&top=1&filter=loan_number%20%3D%20%27IBRD99780%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27",
+   "citat": "\"agreement_signing_date\": \"05-Jun-2026\" … \"closed_date_most_recent\": \"29-Dec-2028\" … \"effective_date_most_recent\": \"30-Jul-2026\" … \"loan_number\": \"IBRD99780\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IBRD99780: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (05.06.2026) și suma 218.200.000 EUR."
+  },
+  {
+   "acte": [
+    "DP1576/2024",
+    "LP215/2024",
+    "HG527/2024",
+    "HG453/2024",
+    "HG345/2024"
+   ],
+   "inceput": "2024-09-11",
+   "sfarsit": "2026-06-30",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00975&resourceId=RS00905&top=1&filter=loan_number%20%3D%20%27IBRD96940%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27",
+   "citat": "\"agreement_signing_date\": \"11-Jul-2024\" … \"closed_date_most_recent\": \"30-Jun-2026\" … \"effective_date_most_recent\": \"11-Sep-2024\" … \"loan_number\": \"IBRD96940\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IBRD96940: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (11.07.2024) și suma 37.300.000 EUR."
+  },
+  {
+   "acte": [
+    "DP1002/2023",
+    "LP184/2023",
+    "HG384/2023",
+    "HG334/2023",
+    "HG202/2023"
+   ],
+   "inceput": "2023-07-19",
+   "sfarsit": "2024-05-24",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00975&resourceId=RS00905&top=1&filter=loan_number%20%3D%20%27IBRD95240%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27",
+   "citat": "\"agreement_signing_date\": \"09-Jun-2023\" … \"closed_date_most_recent\": \"24-May-2024\" … \"effective_date_most_recent\": \"19-Jul-2023\" … \"loan_number\": \"IBRD95240\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IBRD95240: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (09.06.2023) și suma 92.100.000 EUR."
+  },
+  {
+   "acte": [
+    "DP864/2023",
+    "LP55/2023",
+    "HG63/2023",
+    "DP726/2022",
+    "DP1572/2020",
+    "LP68/2020",
+    "HG288/2020",
+    "DP1542/2020",
+    "DP1541/2020"
+   ],
+   "sfarsit": "2024-03-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA66320%27",
+   "citat": "\"agreement_signing_date\": \"28-Apr-2020\" … \"closed_date_most_recent\": \"31-Mar-2024\" … \"credit_number\": \"IDA66320\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA66320: final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (28.04.2020) și suma 52.900.000 EUR."
+  },
+  {
+   "acte": [
+    "DP865/2023",
+    "LP56/2023",
+    "HG64/2023",
+    "DP727/2022",
+    "DP198/2021",
+    "LP139/2021",
+    "HG178/2021",
+    "DP118/2021",
+    "DP43/2021"
+   ],
+   "inceput": "2022-02-04",
+   "sfarsit": "2024-09-30",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA68730%27",
+   "citat": "\"agreement_signing_date\": \"09-Aug-2021\" … \"closed_date_most_recent\": \"30-Sep-2024\" … \"effective_date_most_recent\": \"04-Feb-2022\" … \"credit_number\": \"IDA68730\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA68730: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (09.08.2021) și suma 24.800.000 EUR."
+  },
+  {
+   "acte": [
+    "DP543/2022",
+    "LP197/2022",
+    "HG459/2022",
+    "DP516/2022",
+    "DP461/2022"
+   ],
+   "inceput": "2022-08-10",
+   "sfarsit": "2023-05-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA71600%27",
+   "citat": "\"agreement_signing_date\": \"04-Jul-2022\" … \"closed_date_most_recent\": \"31-May-2023\" … \"effective_date_most_recent\": \"10-Aug-2022\" … \"credit_number\": \"IDA71600\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA71600: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (04.07.2022) și suma 101.300.000 EUR. Registrul scrie BIRD, Banca Mondială îl are ca IDA: legat după sumă."
+  },
+  {
+   "acte": [
+    "DP542/2022",
+    "LP198/2022",
+    "HG460/2022",
+    "DP515/2022",
+    "DP462/2022"
+   ],
+   "inceput": "2022-08-10",
+   "sfarsit": "2023-05-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00975&resourceId=RS00905&top=1&filter=loan_number%20%3D%20%27IBRD94120%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27",
+   "citat": "\"agreement_signing_date\": \"04-Jul-2022\" … \"closed_date_most_recent\": \"31-May-2023\" … \"effective_date_most_recent\": \"10-Aug-2022\" … \"loan_number\": \"IBRD94120\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IBRD94120: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (04.07.2022) și suma 40.800.000 EUR. Registrul scrie AID, Banca Mondială îl are ca BIRD: legat după sumă."
+  },
+  {
+   "acte": [
+    "DP1852/2020",
+    "LP193/2020",
+    "HG799/2020",
+    "DP1741/2020",
+    "DP1569/2020"
+   ],
+   "inceput": "2021-03-29",
+   "sfarsit": "2026-08-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00975&resourceId=RS00905&top=1&filter=loan_number%20%3D%20%27IBRD91340%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27",
+   "citat": "\"agreement_signing_date\": \"30-Sep-2020\" … \"closed_date_most_recent\": \"31-Aug-2026\" … \"effective_date_most_recent\": \"29-Mar-2021\" … \"loan_number\": \"IBRD91340\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IBRD91340: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (30.09.2020) și suma 92.000.000 EUR."
+  },
+  {
+   "acte": [
+    "DP776/2018",
+    "LP127/2018",
+    "HG655/2018",
+    "DPRM744/2018",
+    "DPRM724/2018",
+    "HG439/2018"
+   ],
+   "inceput": "2018-07-20",
+   "sfarsit": "2019-07-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA62740%27",
+   "citat": "\"agreement_signing_date\": \"11-Jul-2018\" … \"closed_date_most_recent\": \"31-Jul-2019\" … \"effective_date_most_recent\": \"20-Jul-2018\" … \"credit_number\": \"IDA62740\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA62740: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (11.07.2018) și suma 24.900.000 EUR."
+  },
+  {
+   "acte": [
+    "DPRM1116/2014",
+    "LP69/2014",
+    "HG264/2014",
+    "DPRM1077/2014"
+   ],
+   "inceput": "2014-04-29",
+   "sfarsit": "2014-10-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA54390%27",
+   "citat": "\"agreement_signing_date\": \"03-Apr-2014\" … \"closed_date_most_recent\": \"31-Oct-2014\" … \"effective_date_most_recent\": \"29-Apr-2014\" … \"credit_number\": \"IDA54390\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA54390: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (03.04.2014) și suma 13.700.000 DST."
+  },
+  {
+   "acte": [
+    "DPRM1117/2014",
+    "LP70/2014",
+    "HG263/2014",
+    "DPRM1076/2014",
+    "HG85/2014"
+   ],
+   "inceput": "2014-04-29",
+   "sfarsit": "2014-10-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00975&resourceId=RS00905&top=1&filter=loan_number%20%3D%20%27IBRD83660%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27",
+   "citat": "\"agreement_signing_date\": \"03-Apr-2014\" … \"closed_date_most_recent\": \"31-Oct-2014\" … \"effective_date_most_recent\": \"29-Apr-2014\" … \"loan_number\": \"IBRD83660\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IBRD83660: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (03.04.2014) și suma 9.000.000 USD."
+  },
+  {
+   "acte": [
+    "DPRM719/2013",
+    "LP165/2013",
+    "HG412/2013",
+    "DPRM508/2013"
+   ],
+   "inceput": "2013-07-30",
+   "sfarsit": "2014-09-01",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA52190%27",
+   "citat": "\"agreement_signing_date\": \"29-May-2013\" … \"closed_date_most_recent\": \"01-Sep-2014\" … \"effective_date_most_recent\": \"30-Jul-2013\" … \"credit_number\": \"IDA52190\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA52190: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (29.05.2013) și suma 6.500.000 DST."
+  },
+  {
+   "acte": [
+    "DP403/2012",
+    "LP272/2012",
+    "HG832/2012",
+    "HG684/2012"
+   ],
+   "inceput": "2012-12-14",
+   "sfarsit": "2013-06-30",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA51770%27",
+   "citat": "\"agreement_signing_date\": \"07-Nov-2012\" … \"closed_date_most_recent\": \"30-Jun-2013\" … \"effective_date_most_recent\": \"14-Dec-2012\" … \"credit_number\": \"IDA51770\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA51770: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (07.11.2012) și suma 30.000.000 USD."
+  },
+  {
+   "acte": [
+    "DP254/2012",
+    "LP172/2012",
+    "HG307/2012"
+   ],
+   "inceput": "2012-09-11",
+   "sfarsit": "2013-11-30",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA50800%27",
+   "citat": "\"agreement_signing_date\": \"20-Apr-2012\" … \"closed_date_most_recent\": \"30-Nov-2013\" … \"effective_date_most_recent\": \"11-Sep-2012\" … \"credit_number\": \"IDA50800\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA50800: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (20.04.2012) și suma 700.000 DST."
+  },
+  {
+   "acte": [
+    "DP262/2011",
+    "LP174/2011",
+    "HG488/2011",
+    "HG279/2011"
+   ],
+   "inceput": "2011-10-26",
+   "sfarsit": "2017-12-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA50010%27",
+   "citat": "\"agreement_signing_date\": \"01-Jul-2011\" … \"closed_date_most_recent\": \"31-Dec-2017\" … \"effective_date_most_recent\": \"26-Oct-2011\" … \"credit_number\": \"IDA50010\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA50010: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (01.07.2011) și suma 22.900.000 DST."
+  },
+  {
+   "acte": [
+    "DP573/2010",
+    "LP225/2010",
+    "HG813/2010",
+    "HG713/2010",
+    "HG329/2010"
+   ],
+   "inceput": "2010-11-16",
+   "sfarsit": "2010-12-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA47620%27",
+   "citat": "\"agreement_signing_date\": \"12-Aug-2010\" … \"closed_date_most_recent\": \"31-Dec-2010\" … \"effective_date_most_recent\": \"16-Nov-2010\" … \"credit_number\": \"IDA47620\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA47620: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (12.08.2010) și suma 16.600.000 DST."
+  },
+  {
+   "acte": [
+    "DP242/2010",
+    "LP58/2010",
+    "HG193/2010",
+    "HG849/2009"
+   ],
+   "inceput": "2010-05-19",
+   "sfarsit": "2013-03-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA46820%27",
+   "citat": "\"agreement_signing_date\": \"22-Feb-2010\" … \"closed_date_most_recent\": \"31-Mar-2013\" … \"effective_date_most_recent\": \"19-May-2010\" … \"credit_number\": \"IDA46820\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA46820: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (22.02.2010) și suma 12.500.000 DST."
+  },
+  {
+   "acte": [
+    "DPRM6/2009",
+    "LP18/2009",
+    "HG467/2009",
+    "HG230/2009"
+   ],
+   "inceput": "2009-10-08",
+   "sfarsit": "2013-06-30",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA45630%27",
+   "citat": "\"agreement_signing_date\": \"11-Jun-2009\" … \"closed_date_most_recent\": \"30-Jun-2013\" … \"effective_date_most_recent\": \"08-Oct-2009\" … \"credit_number\": \"IDA45630\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA45630: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (11.06.2009) și suma 6.800.000 DST."
+  },
+  {
+   "acte": [
+    "DPRM2251/2009",
+    "LP21/2009",
+    "HG364/2009",
+    "HG119/2009"
+   ],
+   "inceput": "2009-08-28",
+   "sfarsit": "2012-09-30",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA45550%27",
+   "citat": "\"agreement_signing_date\": \"04-May-2009\" … \"closed_date_most_recent\": \"30-Sep-2012\" … \"effective_date_most_recent\": \"28-Aug-2009\" … \"credit_number\": \"IDA45550\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA45550: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (04.05.2009) și suma 3.400.000 DST."
+  },
+  {
+   "acte": [
+    "DPRM2252/2009",
+    "LP22/2009",
+    "HG365/2009",
+    "HG1300/2008"
+   ],
+   "inceput": "2009-09-04",
+   "sfarsit": "2011-12-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA45410%27",
+   "citat": "\"agreement_signing_date\": \"16-Mar-2009\" … \"closed_date_most_recent\": \"31-Dec-2011\" … \"effective_date_most_recent\": \"04-Sep-2009\" … \"credit_number\": \"IDA45410\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA45410: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (16.03.2009) și suma 6.700.000 DST."
+  },
+  {
+   "acte": [
+    "DPRM1778/2008",
+    "LP167/2008",
+    "HG737/2008"
+   ],
+   "inceput": "2008-12-19",
+   "sfarsit": "2013-12-30",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA44140%27",
+   "citat": "\"agreement_signing_date\": \"02-Jun-2008\" … \"closed_date_most_recent\": \"30-Dec-2013\" … \"effective_date_most_recent\": \"19-Dec-2008\" … \"credit_number\": \"IDA44140\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA44140: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (02.06.2008) și suma 8.600.000 DST."
+  },
+  {
+   "acte": [
+    "DPRM1268/2007",
+    "LP193/2007",
+    "HG803/2007",
+    "HG466/2007"
+   ],
+   "inceput": "2007-10-30",
+   "sfarsit": "2011-06-30",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA42830%27",
+   "citat": "\"agreement_signing_date\": \"03-May-2007\" … \"closed_date_most_recent\": \"30-Jun-2011\" … \"effective_date_most_recent\": \"30-Oct-2007\" … \"credit_number\": \"IDA42830\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA42830: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (03.05.2007) și suma 10.800.000 DST."
+  },
+  {
+   "acte": [
+    "DPRM1023/2007",
+    "LP32/2007",
+    "HG84/2007"
+   ],
+   "inceput": "2007-03-20",
+   "sfarsit": "2007-10-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA42360%27",
+   "citat": "\"agreement_signing_date\": \"22-Dec-2006\" … \"closed_date_most_recent\": \"31-Oct-2007\" … \"effective_date_most_recent\": \"20-Mar-2007\" … \"credit_number\": \"IDA42360\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA42360: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (22.12.2006) și suma 6.800.000 DST."
+  },
+  {
+   "acte": [
+    "DPRM337/2005",
+    "LP293/2005",
+    "HG1064/2005"
+   ],
+   "inceput": "2006-01-03",
+   "sfarsit": "2013-12-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA40820%27",
+   "citat": "\"agreement_signing_date\": \"07-Jul-2005\" … \"closed_date_most_recent\": \"31-Dec-2013\" … \"effective_date_most_recent\": \"03-Jan-2006\" … \"credit_number\": \"IDA40820\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA40820: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (07.07.2005) și suma 5.700.000 DST."
+  },
+  {
+   "acte": [
+    "DPRM677/2006",
+    "LP190/2006",
+    "HG623/2006"
+   ],
+   "inceput": "2006-08-07",
+   "sfarsit": "2012-10-31",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA41550%27",
+   "citat": "\"agreement_signing_date\": \"05-Apr-2006\" … \"closed_date_most_recent\": \"31-Oct-2012\" … \"effective_date_most_recent\": \"07-Aug-2006\" … \"credit_number\": \"IDA41550\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA41550: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (05.04.2006) și suma 3.600.000 DST."
+  },
+  {
+   "acte": [
+    "DPRM422/2006",
+    "LP378/2005",
+    "HG1370/2005"
+   ],
+   "inceput": "2006-02-10",
+   "sfarsit": "2013-06-30",
+   "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA41190%27",
+   "citat": "\"agreement_signing_date\": \"14-Nov-2005\" … \"closed_date_most_recent\": \"30-Jun-2013\" … \"effective_date_most_recent\": \"10-Feb-2006\" … \"credit_number\": \"IDA41190\"",
+   "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA41190: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (14.11.2005) și suma 3.350.000 DST."
   }
  ]
 }
