@@ -440,6 +440,22 @@ intrarea în vigoare din 31.07.2025). Rândul BERD „CET-Nord” al registrului
 Un utilizator poate corecta oricând aceste înregistrări din pagină (creionul din tabel); `teste_debursari.js` verifică fișierul: fiecare
 înregistrare are rând, notele au cel mult 200 de caractere, totalul MF se potrivește, iar nicio dată nu se scrie peste una oficială.
 
+**Datele din Banca Mondială (Finances One, situația la 30.09.2026).** Seturile publice „IBRD Statement of Loans and Guarantees –
+Historical Data” (`DS00975`) și „IDA Statement of Credits, Grants and Guarantees – Historical Data” (`DS00976`) de pe
+financesone.worldbank.org dau, pentru fiecare credit al Moldovei: data semnării, **data intrării în vigoare** (*Effective Date*),
+**data închiderii** (*Closed Date*, ultima înregistrată: poate fi prelungită), suma inițială, suma anulată și suma **debursată
+cumulat**, toate în dolari (debursările la cursul zilei plății). Un credit s-a legat de un rând al registrului numai când data semnării
+coincide cu `semnat` și suma BM / suma din registru se încadrează în cursul monedei acordului (EUR 1,0–1,4; DST 1,3–1,7; USD ≈ 1);
+la rândurile cu două instrumente în aceeași zi s-a ales după sumă (dp461 și dp462/2022 au etichetele BIRD/AID inversate în registru
+față de BM: s-au legat după sumă, registrul nu s-a schimbat). Ce s-a scris:
+
+* **`date/proiecte_manual.json`**: 26 de intrări noi, doar unde câmpul (început sau final) nu avea nicio sursă; `sursa` e adresa API-ului
+  cu filtrul pe numărul creditului (o singură înregistrare), `citat` e fragmentul exact din ea (semnarea, data, numărul). Nu s-a atins nicio
+  dată care avea deja sursă.
+* **`date/debursari.json`**: 35 de debursări cumulate la 30.09.2026, în USD (total 1.229.113.440,64 USD), doar la rândurile fără nicio
+  debursare din scrisoarea MF. La două rânduri cu două instrumente în aceeași zi (hg623/2006, hg1370/2005) s-au scris doar datele.
+* **Nu s-au schimbat** sumele proiectelor din registru și datele deja existente; diferențele (12 câmpuri, mai ales termene prelungite
+  de BM după aprobare) sunt în foaia „Diferențe de date” din `banca_mondiala_potriviri.xlsx`, cu tot ce n-a putut fi legat.
 
 **Codul de acces și „baza de date".** Site-ul e static (GitHub Pages): n-are server care să primească
 date. Singurul loc în care o pagină poate scrie fără un serviciu în plus e chiar repository-ul, prin

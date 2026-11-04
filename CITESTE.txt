@@ -1,3 +1,7 @@
-Aceste fișiere sunt versiunea cu aspectul VECHI (cel din arhiva acorduri-main_10) plus datele din PDF.
-Pune-le în depozit peste cele existente (aceleași nume și aceleași foldere), apoi șterge folderul fonturi/
-(nu mai e folosit; nu strică dacă rămâne). Nu atinge nimic altceva, iar fișierele de date zilnice rămân cum sunt.
+Date din Banca Mondială (Finances One, situația la 30.09.2026). Trei fișiere, doar date și text; designul nu e atins.
+Pune-le în repository la aceleași căi:
+  date/proiecte_manual.json  (26 intrări noi: început / final, cu adresa și citatul înregistrării oficiale)
+  date/debursari.json        (35 debursări cumulate, în USD, adăugate după cele 31 din scrisoarea MF)
+  README.md                  (secțiunea „Datele din Banca Mondială”)
+ATENȚIE: date/debursari.json înlocuiește fișierul din site. La 04.11.2026 fișierul live era identic cu cel de la care am pornit
+(31 debursări, actualizat 2026-11-03T06:05). Dacă între timp ai introdus debursări din pagină, nu-l înlocui: spune-mi și le îmbin.
