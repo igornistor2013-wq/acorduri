@@ -2823,6 +2823,234 @@
    "sursa": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=1&filter=country_code%20%3D%20%27MD%27%20AND%20end_of_period%20%3D%20%2730-Sep-2026%27%20AND%20credit_number%20%3D%20%27IDA41190%27",
    "citat": "\"agreement_signing_date\": \"14-Nov-2005\" … \"closed_date_most_recent\": \"30-Jun-2013\" … \"effective_date_most_recent\": \"10-Feb-2006\" … \"credit_number\": \"IDA41190\"",
    "nota": "Banca Mondială, Finances One, situația la 30.09.2026, IDA41190: început = data intrării în vigoare (Effective Date); final = data închiderii (Closed Date), ultima din dataset: poate fi prelungită. Legat de rând după data semnării (14.11.2005) și suma 3.350.000 DST."
+  },
+  {
+   "acte": [
+    "HG399/2025",
+    "HG751/2022"
+   ],
+   "inceput": "2022-05-20",
+   "sfarsit": "2028-11-09",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2022-ACT-60606",
+   "citat": "<activity-date iso-date=\"2022-05-20\" type=\"2\"> <narrative xml:lang=\"EN\">Actual Start: 2022-05-20</narrative> </activity-date> … <activity-date iso-date=\"2028-11-09\" type=\"3\"> <narrative xml:lang=\"EN\">Planned End: 2028-11-09</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2022-ACT-60606: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 27.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "HG398/2025",
+    "HG750/2022"
+   ],
+   "inceput": "2022-05-20",
+   "sfarsit": "2028-11-09",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2022-ACT-60722",
+   "citat": "<activity-date iso-date=\"2022-05-20\" type=\"2\"> <narrative xml:lang=\"EN\">Actual Start: 2022-05-20</narrative> </activity-date> … <activity-date iso-date=\"2028-11-09\" type=\"3\"> <narrative xml:lang=\"EN\">Planned End: 2028-11-09</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2022-ACT-60722: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 25.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "HG136/2024",
+    "HG110/2024"
+   ],
+   "inceput": "2023-12-15",
+   "sfarsit": "2032-02-28",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2023-ACT-61828",
+   "citat": "<activity-date iso-date=\"2023-12-15\" type=\"2\"> <narrative xml:lang=\"EN\">Actual Start: 2023-12-15</narrative> </activity-date> … <activity-date iso-date=\"2032-02-28\" type=\"3\"> <narrative xml:lang=\"EN\">Planned End: 2032-02-28</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2023-ACT-61828: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 31.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "HG749/2022",
+    "HG717/2020"
+   ],
+   "inceput": "2020-10-22",
+   "sfarsit": "2028-10-21",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2020-ACT-D-42585-00",
+   "citat": "<activity-date iso-date=\"2020-10-22\" type=\"2\"> <narrative xml:lang=\"EN\">Actual Start: 2020-10-22</narrative> </activity-date> … <activity-date iso-date=\"2028-10-21\" type=\"3\"> <narrative xml:lang=\"EN\">Planned End: 2028-10-21</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2020-ACT-D-42585-00: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 9.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "DP34/2021"
+   ],
+   "inceput": "2021-02-19",
+   "sfarsit": "2025-02-18",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2020-ACT-D-42924-00",
+   "citat": "<activity-date iso-date=\"2021-02-19\" type=\"2\"> <narrative xml:lang=\"EN\">Actual Start: 2021-02-19</narrative> </activity-date> … <activity-date iso-date=\"2025-02-18\" type=\"3\"> <narrative xml:lang=\"EN\">Planned End: 2025-02-18</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2020-ACT-D-42924-00: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 15.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "DP974/2023",
+    "LP154/2023",
+    "HG353/2023",
+    "DP914/2023"
+   ],
+   "inceput": "2022-12-19",
+   "sfarsit": "2028-06-25",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2022-ACT-61535",
+   "citat": "<activity-date iso-date=\"2022-12-19\" type=\"2\"> <narrative xml:lang=\"EN\">Actual Start: 2022-12-19</narrative> </activity-date> … <activity-date iso-date=\"2028-06-25\" type=\"3\"> <narrative xml:lang=\"EN\">Planned End: 2028-06-25</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2022-ACT-61535: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 40.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "HG724/2023",
+    "HG488/2022",
+    "HG432/2021"
+   ],
+   "inceput": "2021-12-15",
+   "sfarsit": "2022-12-15",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2021-PCC-430625",
+   "citat": "<activity-date iso-date=\"2021-12-15\" type=\"2\"> <narrative xml:lang=\"EN\">Actual Start: 2021-12-15</narrative> </activity-date> … <activity-date iso-date=\"2022-12-15\" type=\"4\"> <narrative xml:lang=\"EN\">Actual End: 2022-12-15</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2021-PCC-430625: început = data reală de început; final = data reală de încheiere. Legat de rând după finanțator, titlu și suma 60.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "HG983/2023",
+    "HG351/2019"
+   ],
+   "inceput": "2019-07-24",
+   "sfarsit": "2028-01-24",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2018-ACT-D-41244-00",
+   "citat": "<activity-date iso-date=\"2019-07-24\" type=\"2\"> <narrative xml:lang=\"EN\">Actual Start: 2019-07-24</narrative> </activity-date> … <activity-date iso-date=\"2028-01-24\" type=\"3\"> <narrative xml:lang=\"EN\">Planned End: 2028-01-24</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2018-ACT-D-41244-00: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 8.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "HG352/2019"
+   ],
+   "inceput": "2019-07-24",
+   "sfarsit": "2027-07-24",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2018-ACT-D-41300-00",
+   "citat": "<activity-date iso-date=\"2019-07-24\" type=\"2\"> <narrative xml:lang=\"EN\">Actual Start: 2019-07-24</narrative> </activity-date> … <activity-date iso-date=\"2027-07-24\" type=\"3\"> <narrative xml:lang=\"EN\">Planned End: 2027-07-24</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2018-ACT-D-41300-00: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 23.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "HG799/2025",
+    "HG806/2024",
+    "HG786/2024"
+   ],
+   "sfarsit": "2027-08-29",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2021-ACT-62645",
+   "citat": "<activity-date iso-date=\"2027-08-29\" type=\"3\"> <narrative xml:lang=\"EN\">Planned End: 2027-08-29</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2021-ACT-62645: final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 25.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "HG178/2025",
+    "HG90/2025"
+   ],
+   "sfarsit": "2028-12-31",
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2021-ACT-62648",
+   "citat": "<activity-date iso-date=\"2028-12-31\" type=\"3\"> <narrative xml:lang=\"EN\">Planned End: 2028-12-31</narrative> </activity-date>",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2021-ACT-62648: final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 64.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "HG1108/2010"
+   ],
+   "inceput": "2010-12-15",
+   "sfarsit": "2017-09-28",
+   "sursa": "https://d-portal.org/q.xml?aid=DE-1-200966440",
+   "citat": "<activity-date iso-date=\"2010-12-15\" type=\"2\"></activity-date> … <activity-date iso-date=\"2017-09-28\" type=\"4\"></activity-date>",
+   "nota": "Registrul IATI, publicat de KfW / BMZ (Germania) (prin d-portal), activitatea DE-1-200966440: început = data reală de început; final = data reală de încheiere. Legat de rând după finanțator, titlu și suma 5.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "OME27/2025"
+   ],
+   "inceput": "2025-03-25",
+   "sfarsit": "2031-06-30",
+   "sursa": "https://d-portal.org/q.xml?aid=DE-1-202268019",
+   "citat": "<activity-date iso-date=\"2025-03-25\" type=\"2\"></activity-date> … <activity-date iso-date=\"2031-06-30\" type=\"3\"></activity-date>",
+   "nota": "Registrul IATI, publicat de KfW / BMZ (Germania) (prin d-portal), activitatea DE-1-202268019: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 38.700.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "OMDED116/2025"
+   ],
+   "inceput": "2025-06-30",
+   "sfarsit": "2029-05-31",
+   "sursa": "https://d-portal.org/q.xml?aid=DE-1-202468510",
+   "citat": "<activity-date iso-date=\"2025-06-30\" type=\"2\"></activity-date> … <activity-date iso-date=\"2029-05-31\" type=\"3\"></activity-date>",
+   "nota": "Registrul IATI, publicat de KfW / BMZ (Germania) (prin d-portal), activitatea DE-1-202468510: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 20.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "OMMPS235/2024"
+   ],
+   "inceput": "2024-01-01",
+   "sfarsit": "2027-12-31",
+   "sursa": "https://d-portal.org/q.xml?aid=DE-1-202321248",
+   "citat": "<activity-date iso-date=\"2024-01-01\" type=\"2\"></activity-date> … <activity-date iso-date=\"2027-12-31\" type=\"3\"></activity-date>",
+   "nota": "Registrul IATI, publicat de GIZ / BMZ (Germania) (prin d-portal), activitatea DE-1-202321248: început = data reală de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 3.800.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "DP701/2022",
+    "LP307/2022",
+    "HG748/2022",
+    "HG713/2022",
+    "HG462/2022"
+   ],
+   "inceput": "2022-12-15",
+   "sfarsit": "2022-12-15",
+   "sursa": "https://d-portal.org/q.xml?aid=FR-3-CMD100601",
+   "citat": "<activity-date iso-date=\"2022-12-15\" type=\"2\"></activity-date> … <activity-date iso-date=\"2022-12-15\" type=\"4\"></activity-date>",
+   "nota": "Registrul IATI, publicat de AFD (Franța) (prin d-portal), activitatea FR-3-CMD100601: început = data reală de început; final = data reală de încheiere. Legat de rând după finanțator, titlu și suma 60.000.000 EUR (identică)."
+  },
+  {
+   "acte": [
+    "DP1055/2023",
+    "DP1054/2023",
+    "LP235/2023",
+    "LP236/2023",
+    "HG483/2023",
+    "HG484/2023",
+    "HG409/2023",
+    "HG276/2023",
+    "HG277/2023"
+   ],
+   "sfarsit": "2023-08-31",
+   "sursa": "https://d-portal.org/q.xml?aid=XM-DAC-701-8-202210509",
+   "citat": "<activity-date iso-date=\"2023-08-31\" type=\"3\"></activity-date>",
+   "nota": "Registrul IATI, publicat de JICA (Japonia) (prin d-portal), activitatea XM-DAC-701-8-202210509: final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 13.500.000.000 JPY (identică)."
+  },
+  {
+   "acte": [
+    "HG87/2026",
+    "DP552/2026",
+    "LP11/2026",
+    "HG15/2026",
+    "HG744/2025"
+   ],
+   "inceput": "2026-03-24",
+   "sfarsit": "2027-03-23",
+   "sursa": "https://d-portal.org/q.xml?aid=XM-DAC-701-8-202413313",
+   "citat": "<activity-date iso-date=\"2026-03-24\" type=\"1\"></activity-date> … <activity-date iso-date=\"2027-03-23\" type=\"3\"></activity-date>",
+   "nota": "Registrul IATI, publicat de JICA (Japonia) (prin d-portal), activitatea XM-DAC-701-8-202413313: început = data planificată de început; final = data planificată de încheiere. Legat de rând după finanțator, titlu și suma 192.000.000 JPY (identică)."
+  },
+  {
+   "acte": [
+    "HG163/2006"
+   ],
+   "inceput": "2006-07",
+   "sursa": "https://www.ifad.org/evaluation/public_html/eksyst/doc/prj/region/pn/moldova/Moldova_RBDP.pdf",
+   "citat": "RBDP became effective in July 2006",
+   "nota": "Document IFAD (evaluare IOE), alin. 18: intrarea în vigoare iulie 2006 (luna din document); finalizat în decembrie 2010, prevăzut inițial septembrie 2011. Legat după denumire (RBDP) și finanțator."
+  },
+  {
+   "acte": [
+    "HG413/2011",
+    "LP108/2011",
+    "HG317/2011",
+    "HG84/2011",
+    "HG883/2010"
+   ],
+   "inceput": "2011-07-04",
+   "sursa": "https://uneval.org/sites/default/files/member_publications/moldova_1562_ppe.pdf",
+   "citat": "effectiveness: 4 July 2011",
+   "nota": "Evaluare IFAD (PPE), nota de subsol 8: intrarea în vigoare 4 iulie 2011; finalizare 30 septembrie 2016. Legat după denumire (RFSADP) și finanțator."
   }
  ]
 }
