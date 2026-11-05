@@ -457,6 +457,51 @@ față de BM: s-au legat după sumă, registrul nu s-a schimbat). Ce s-a scris:
 * **Nu s-au schimbat** sumele proiectelor din registru și datele deja existente; diferențele (12 câmpuri, mai ales termene prelungite
   de BM după aprobare) sunt în foaia „Diferențe de date” din `banca_mondiala_potriviri.xlsx`, cu tot ce n-a putut fi legat.
 
+**Date din registrul IATI și din documente FIDA.** IATI e registrul în care finanțatorii își publică singuri activitățile (data de început
+și de final, angajamentul, plățile); `d-portal.org` îl afișează, iar `q.xml?aid=…` dă activitatea exact cum a publicat-o finanțatorul.
+S-au legat de rânduri 18 activități: UE (11, DG NEAR), KfW și GIZ (4), AFD (1) și JICA (2), numai când finanțatorul, titlul și suma
+(în moneda acordului) coincid. Alte 2 date (FIDA, programele RBDP și RFSADP) vin din documente FIDA/IOE.
+
+* **`date/proiecte_manual.json`**: 20 de intrări noi, doar unde câmpul nu avea sursă. `sursa` e adresa activității, `citat` elementele
+  `activity-date` exacte; `nota` spune dacă data e reală („Actual”) sau planificată („Planned”). La UE, începutul e data reală a acțiunii,
+  finalul e sfârșitul planificat al perioadei de implementare. La `hg786/2024` și `hg90/2025` (activități „în pregătire”, cu două date
+  de început care nu se potrivesc) s-a scris doar finalul; la JICA `hg277/2023` (creditul de politici) doar finalul, fiindcă începutul
+  planificat (01.01.2023) e înainte de semnare.
+* **`date/debursari.json`**: 3 debursări cumulate, doar la acorduri plătite integral (UE `hg432/2021`, 60 mil. EUR; KfW `hg1108/2010`,
+  5 mil. EUR; AFD `hg462/2022`, 60 mil. EUR). La activitățile încă în plată nu s-a scris nimic: IATI nu spune la ce dată e totalul.
+* **Ce nu spune IATI**: BERD și BEI publică doar data aprobării/semnării (nu perioada proiectului) și nicio plată, iar la nivelul deciziilor
+  UE „plătit” e 0 (plățile sunt la nivelul contractelor), deci nu s-au folosit. Legăturile doar după sumă (sume rotunde: 5, 25, 40, 60 mil.)
+  nu s-au scris; lista lor e în `surse_oficiale_potriviri.xlsx`.
+
+**Credite mai vechi ale Băncii Mondiale, asistența macrofinanciară a UE și Compactul MCC.** A treia rundă de surse oficiale a extins legarea
+cu Finances One la creditele din 1994–2017, a adăugat pagina DG ECFIN a Comisiei Europene (operațiunile MFA ale Moldovei, cu fiecare tranșă)
+și cifra finală a Compactului MCC. La actele din 1995–2004, HG apare adesea la 2–5 săptămâni după semnarea BM, așa că potrivirea ține cont de
+denumire, de sumă (la DST, 1,2–1,75 față de moneda actului; suma a două instrumente semnate în aceeași zi) și de fereastra de date a actelor.
+
+* **`date/proiecte_manual.json`**: 38 de intrări noi, doar unde câmpul nu avea sursă. 35 vin din Finances One (început = *Effective Date*,
+  final = *Closed Date*; `sursa` e API-ul filtrat pe numărul creditului, `citat` are semnarea, datele și numărul). La rândurile cu două
+  instrumente ale aceluiași proiect (BIRD + AID, credit + grant) finalul e cel mai târziu. 3 vin de pe pagina ECFIN: finalul MFA 2017–2020
+  (iulie 2020, sfârșitul perioadei de disponibilitate; `hg763/2017` și `hg226/2017`) și al MFA COVID-19 (08.10.2021; `hg501/2020`).
+* **`date/debursari.json`**: 37 de debursări noi. 30 sunt cumulate BM la 30.09.2026 (529.413.952,19 USD; la rândurile cu două instrumente,
+  suma lor). 6 sunt tranșe MFA, pe tipul acordului: `hg763/2017` (împrumut) 2 × 20 mil. EUR și `hg226/2017` (grant) 2 × 10 mil. EUR, plătite
+  la 10.10.2019 și 10.07.2020 (datele aprobării plății de către Comisie; ECFIN spune doar „octombrie 2019” și „iulie 2020”), `hg501/2020`
+  (MFA COVID-19) 2 × 50 mil. EUR, la 25.11.2020 și 08.10.2021. Una e a Compactului MCC (`hg677/2009`): 259.371.697 USD cheltuiți din
+  262 mil. („Grant Expended”, pagina MCC în copia arhivată din 14.02.2017), datată la încheierea Compactului (01.09.2015), fiindcă cifra n-are
+  dată proprie; datele Compactului erau deja în fișier.
+* **MFA 2022–2024 nu s-a scris.** Decizia (UE) 2022/563 (295 mil. EUR, 5 tranșe între 01.08.2022 și 17.12.2024, încheiată) nu are rând propriu:
+  actele ei sunt adunate în rândurile `hg226/2017`, `hg501/2020` și `dp1663/2020` (același titlu). Intrările manuale de mai sus listează numai
+  actele din 2017 și 2020, deci rămân corecte dacă rândurile se despart. Rândul `dp1663/2020` (memorandumuri) nu s-a completat.
+* **Ce nu s-a scris, în rest**: data semnării memorandumului MFA 2017 (ECFIN spune 24.11.2017, un comunicat al Comisiei din 10.10.2019 spune
+  „octombrie 2017”) și începutul MFA COVID-19 (sursa dă doar memorandumul, 29.09.2020; „semnat” din registru, 22.06.2022, e al altui acord);
+  la BM, rândurile cu instrumente ambigue sau cu sumă care nu se potrivește (`hg712/2010`: 2 mil. USD în registru, 20 mil. USD la BM, deci
+  fără debursare), granturile din fonduri fiduciare (nu sunt în seturile IBRD și IDA) și creditele anulate înainte de intrarea în vigoare.
+  Paginile de proiect BEI și CEB dau doar aprobarea, starea și (BEI) semnările, fără perioadă și fără plăți; la fel BERD (IATI).
+* **Debursările din AMP nu s-au scris**: față de cele ale BM diferă mult (la `dprm1762/2015` AMP are 0, BM 70 mil. USD; la `dp793/2018`
+  0,2 mil. EUR față de 23,6 mil. USD); comparația e în foaia „Debursări AMP vs BM” din `surse_oficiale_potriviri_3.xlsx`.
+
+Cu acestea, rămân fără început 288 de rânduri (de la 321), fără final 280 (de la 316) și fără debursare 363 (de la 397), din 466 de rânduri
+listate; cele mai multe sunt UE (programe sectoriale, fără plăți publicate pe acord), BERD, BEI, CEB și donatorii bilaterali mici.
+
 **Codul de acces și „baza de date".** Site-ul e static (GitHub Pages): n-are server care să primească
 date. Singurul loc în care o pagină poate scrie fără un serviciu în plus e chiar repository-ul, prin
 API-ul „Contents" al GitHub. „Baza de date" e deci fișierul `date/debursari.json`; pagina îl citește ca pe

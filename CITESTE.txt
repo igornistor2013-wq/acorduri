@@ -1,7 +1,7 @@
-Date din Banca Mondială (Finances One, situația la 30.09.2026). Trei fișiere, doar date și text; designul nu e atins.
+Runda 3 de surse oficiale: credite mai vechi ale Băncii Mondiale (Finances One), asistența macrofinanciară a UE (DG ECFIN) și Compactul MCC. Trei fișiere, doar date și text; designul nu e atins.
 Pune-le în repository la aceleași căi:
-  date/proiecte_manual.json  (26 intrări noi: început / final, cu adresa și citatul înregistrării oficiale)
-  date/debursari.json        (35 debursări cumulate, în USD, adăugate după cele 31 din scrisoarea MF)
-  README.md                  (secțiunea „Datele din Banca Mondială”)
-ATENȚIE: date/debursari.json înlocuiește fișierul din site. La 04.11.2026 fișierul live era identic cu cel de la care am pornit
-(31 debursări, actualizat 2026-11-03T06:05). Dacă între timp ai introdus debursări din pagină, nu-l înlocui: spune-mi și le îmbin.
+  date/proiecte_manual.json  (38 de intrări noi față de site: 35 Banca Mondială + 3 MFA, fiecare cu adresă și citat)
+  date/debursari.json        (37 de debursări noi: 30 Banca Mondială, 6 tranșe MFA, 1 Compactul MCC, adăugate după cele 69 de pe site)
+  README.md                  (secțiunea nouă „Credite mai vechi ale Băncii Mondiale, asistența macrofinanciară a UE și Compactul MCC”; conține și secțiunea IATI, care lipsea din README-ul de pe site)
+ATENȚIE: date/debursari.json înlocuiește fișierul din site. La 05.11.2026 fișierul live avea 69 de debursări (actualizat 2026-11-04T14:43:47Z) și era identic cu baza acestui pachet.
+Dacă între timp ai introdus debursări din pagină, nu-l înlocui: spune-mi și le îmbin.
