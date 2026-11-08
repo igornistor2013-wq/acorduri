@@ -149,8 +149,10 @@
   .dsum{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);display:flex;gap:4px 14px;flex-wrap:wrap}
   .dsum b{color:var(--navy-deep)}
   .head-btns{display:flex;gap:8px;flex-wrap:wrap}
-  .tbl-scroll{overflow-x:auto}
-  table.deb-tbl{border-collapse:collapse;width:100%;table-layout:fixed;min-width:1040px}
+  /* position:relative — textul ascuns pentru cititoare de ecran (.vh, poziționat absolut) din capul tabelului rămâne în panou; altfel ieșea în dreapta lui și lărgea toată pagina */
+  .tbl-scroll{overflow-x:auto;position:relative}
+  /* lățimea minimă 880 px: tabelul încape în panou pe ecrane de laptop (la 1280 px panoul are ~900 px); sub ea, tabelul se derulează în panou, nu pagina */
+  table.deb-tbl{border-collapse:collapse;width:100%;table-layout:fixed;min-width:880px}
   .deb-tbl > thead > tr > th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;text-align:left;padding:11px 12px;border-bottom:1px solid var(--line-strong);background:#fbfcfe;line-height:1.3;vertical-align:bottom;overflow-wrap:anywhere}
   .deb-tbl > thead > tr > th.num,.deb-tbl > tbody > tr > td.num{text-align:right}
   .deb-tbl > tbody > tr > td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -161,6 +163,13 @@
   .deb-tbl > thead > tr > th:nth-child(5){width:17%}
   .deb-tbl > thead > tr > th:nth-child(6){width:17%}
   .deb-tbl > thead > tr > th:nth-child(7){width:6%}
+  /* ecrane de laptop (până la 1360 px): coloanele se reîmpart (suma proiectului și butonul de detalii primesc loc), iar coloana donatorilor se îngustează de la 300 la 280 px */
+  @media (max-width:1360px){
+    .deb-tbl > thead > tr > th:nth-child(1){width:22%}
+    .deb-tbl > thead > tr > th:nth-child(5){width:19%}
+    .deb-tbl > thead > tr > th:nth-child(7){width:7%}
+  }
+  @media (min-width:1101px) and (max-width:1360px){.cols{grid-template-columns:280px minmax(0,1fr)}}
   .th-sub{display:block;text-transform:none;letter-spacing:0;font-weight:500;font-size:10px;margin-top:1px}
   tr.ac{cursor:pointer}
   tr.ac:hover{background:#fafbfd}

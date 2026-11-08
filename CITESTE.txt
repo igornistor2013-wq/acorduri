@@ -1,11 +1,11 @@
-Runda 5 de surse oficiale („mai caută”): descrieri din Banca Mondială (API-ul proiectelor), din registrul IATI (KfW/GIZ, DEZA/SDC, UE/DG NEAR) și din fișa Ambasadei Japoniei; angajamente și plăți KfW. Șase fișiere, doar date și text; designul nu e atins.
+Pagina „Debursări pe acorduri”: lățimea. Trei fișiere; designul rămâne cel vechi, se schimbă doar cât de lat iese tabelul.
+Defectul (cu toți donatorii bifați, pe un laptop de 1280 px): pagina devenea mai lată decât fereastra (cu circa 70 px), iar la derulare tabelul se vedea tăiat în stânga. Două cauze:
+  1. textul ascuns pentru cititoare de ecran din antetul „Detalii” (câte unul la fiecare donator) ieșea în dreapta panoului și lărgea toată pagina;
+  2. tabelul avea lățimea minimă de 1040 px, iar panoul are circa 900 px pe un laptop de 1280 px, deci tabelul se derula și el.
 Pune-le în repository la aceleași căi:
-  date/proiecte_manual.json  (71 de intrări noi față de site: 70 cu descriere — Banca Mondială 41, DEZA/SDC 10, UE 7, Japonia 7, KfW/GIZ 5 — și 4 cu date de început/final; fiecare cu adresă și citat)
-  date/sume_manual.json      (2 angajamente noi, KfW/BMZ: HG778/2022 — 40 mil. EUR și HG1074/2017 — 10 mil. EUR)
-  date/debursari.json        (3 debursări noi, adăugate după cele 115 de pe site: hg778/2022, hg1074/2017 și ome27/2025 — toate KfW)
-  date/acorduri_legare.json  (registrul refăcut cu legatura_acorduri.py; singura schimbare: sumele celor două rânduri de mai sus)
-  legis_acorduri.html        (pagina refăcută cu legis_pagina.py)
-  README.md                  (secțiunea nouă „Descrieri din Banca Mondială, din registrul IATI și din fișa Ambasadei Japoniei; angajamente și plăți KfW”; conține și secțiunea rundei 4, pe care README-ul de pe site încă nu o are)
-ATENȚIE: date/debursari.json înlocuiește fișierul din site. La 08.11.2026 fișierul live avea 115 debursări (actualizat 2026-11-06T10:05:40Z) și era identic cu baza acestui pachet. Dacă între timp ai introdus debursări din pagină, nu-l înlocui: spune-mi și le îmbin. La fel pentru date/proiecte_manual.json (276 de intrări pe site) și date/sume_manual.json (183 de chei).
-La fel pentru date/acorduri_legare.json și legis_acorduri.html: dacă după 06.11.2026 au apărut acte noi (commit „Verificare zilnică” cu schimbări), nu le înlocui — workflow-ul „Legături acord ↔ proiect AMP” pornește singur după urcarea lui date/sume_manual.json și reface registrul (rezultatul e același, doar data din „actualizat” se schimbă).
-Raportul cu citatele și motivele (surse_oficiale_potriviri_5.xlsx) nu face parte din repository.
+  debursari.html      (numai CSS, patru schimbări: `.tbl-scroll` primește `position:relative`; lățimea minimă a tabelului scade de la 1040 la 880 px; sub 1360 px coloanele se reîmpart; între 1101 și 1360 px coloana cu donatorii are 280 px în loc de 300)
+  teste_debursari.py  (secțiunea nouă 18: cu toți donatorii bifați, de la 1920 la 390 px, pagina nu se lărgește; de la 1250 px tabelele încap în panou, nimic nu iese din celule și niciun cuvânt din antet nu se rupe; în română și în engleză. Pe codul vechi pică 14 verificări)
+  README.md           (două propoziții: lățimea tabelului și noul test)
+Rezultat: la 1920, 1536, 1366, 1280 și 1250 px tabelul încape întreg în panou. Pe ferestre mai înguste (între 1101 și 1229 px, apoi între 821 și 929 px) tabelul se derulează numai în panoul lui; pagina nu se mai lărgește la nicio lățime (măsurat de la 1920 la 390 px).
+Fișierele de mai sus nu sunt scrise de verificările automate (acestea scriu doar în date/, legis_acorduri.html, rss.xml și sitemap.xml), deci le poți înlocui direct. Baza pachetului: commit-ul 9139903 din 08.11.2026.
+După urcare, GitHub Pages poate ține câteva minute vechea pagină; apoi Ctrl+F5 și „Bifează cei afișați”.

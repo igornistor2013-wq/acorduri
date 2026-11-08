@@ -333,8 +333,9 @@ proiectului) nu are coloană: apare doar când deschizi proiectul, sus în detal
 din dreapta deschide detaliile: descrierea, debursările, datele despre proiect (cu sursa și citatul), proiectul AMP
 legat, actele. Se poate căuta (denumire, obiective, act, partener), filtra (tip de
 finanțare, cu sau fără debursări) și sorta. Donatorii bifați și filtrele rămân în adresa paginii
-(`#d=BERD|BEI&tip=…`), deci o selecție se trimite ca link. Pe telefon tabelul devine fișe; pagina are și
-varianta în engleză.
+(`#d=BERD|BEI&tip=…`), deci o selecție se trimite ca link. Pe laptop și pe desktop (ferestre de 1250 px sau mai
+late) fiecare tabel încape întreg în panoul lui, chiar cu toți donatorii bifați; pe un ecran mai îngust tabelul se
+derulează în panoul lui, iar pagina nu se lărgește. Pe telefon tabelul devine fișe; pagina are și varianta în engleză.
 
 **Rânduri omise, ca un proiect să nu apară de două ori.** Cinci rânduri ale registrului nu apar în liste:
 sunt rânduri-umbrelă, adică negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu
@@ -678,8 +679,8 @@ de o socoteală independentă, coloanele (inclusiv obiectivele și cele două da
 engleză), formularul „Date despre proiect" (introducere, editare, ștergere, coada nesalvată, mesajele commit),
 panourile „AMP", „Rânduri omise" și „Date fără acord găsit", câmpurile blocate, deblocarea, debursările (adăugare,
 editare, ștergere, verificarea fișierului scris), coada după reîncărcare, PIN-ul, debursări existente și orfane,
-cele trei fișiere Excel (deschise cu openpyxl; datele întregi sunt date adevărate), engleza, telefonul, starea
-din adresă, tastatura, lipsa erorilor JavaScript și a cererilor spre alte adrese decât pagina, `api.github.com`
+cele trei fișiere Excel (deschise cu openpyxl; datele întregi sunt date adevărate), engleza, telefonul, lățimea
+paginii cu toți donatorii bifați (de la 1920 la 390 px), starea din adresă, tastatura, lipsa erorilor JavaScript și a cererilor spre alte adrese decât pagina, `api.github.com`
 și `amp.vivi.md`. Cu `--doar 13,14` rulează doar secțiunile numerotate.
 
 **Limite.** Debursările sunt cele introduse de oameni și nu sunt verificate față de AMP sau o altă sursă;

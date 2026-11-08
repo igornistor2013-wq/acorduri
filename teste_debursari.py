@@ -1683,6 +1683,52 @@ try:
             pg.wait_for_function('window.DebursariUI.stare().coada === 0', timeout=15000)
             egal('după deblocare, coada se salvează singură', [x.get('suma') for x in fals.proiecte()], [777000])
             ctx.close()
+
+        # ---------------------------------------------------------------- 18. lățimea paginii
+        if rulez(18):
+            print('\n18. Lățimea paginii: cu toți donatorii bifați pagina nu se lărgește, iar de la ~1250 px tabelele încap în panou')
+            fals = GitHubFals(intrari=[])
+            ctx = context(b, viewport=(1280, 800))
+            pg = pagina(ctx, fals, manual='real')
+            pg.click('[data-act="toti-afisati"]')
+            sel = pg.evaluate('window.DebursariUI.stare().sel')
+            pg.wait_for_function('n => document.querySelectorAll("section.panel[data-d]").length === n', arg=len(sel), timeout=60000)
+            egal('toți donatorii din listă sunt bifați, fiecare cu tabelul lui', [len(sel), pg.locator('section.panel[data-d] table.deb-tbl').count()], [pg.locator('.don input').count()] * 2)
+            # cât iese pagina în lățime și cât iese tabelul din panoul lui (derulare orizontală)
+            js_lat = '''() => { const de = document.documentElement, sc = [...document.querySelectorAll("section.panel .tbl-scroll")];
+                return [de.scrollWidth - de.clientWidth, Math.max(0, ...sc.map(s => s.scrollWidth - s.clientWidth))]; }'''
+            # conținut care iese din celula lui (în rândurile principale ale tabelelor)
+            js_cel = '''() => { const r = [];
+                document.querySelectorAll("section.panel table.deb-tbl > tbody > tr.ac").forEach(tr => [...tr.children].forEach((td, i) => {
+                    const lim = td.getBoundingClientRect().right - parseFloat(getComputedStyle(td).paddingRight) + 1;
+                    td.querySelectorAll("*").forEach(el => { const q = el.getBoundingClientRect(); if (q.width && q.right > lim) r.push([i + 1, (el.textContent || "").trim().slice(0, 20), Math.round(q.right - lim)]); });
+                })); return r; }'''
+            # cuvinte din antet rupte la mijloc: regula paginii lasă cuvintele să se rupă, ca textul să nu iasă din celulă; aici regula se scoate, ca să se vadă un cuvânt care nu încape
+            js_antet = '''() => { const st = document.createElement("style"); st.textContent = "section.panel table.deb-tbl > thead th{overflow-wrap:normal !important}"; document.head.appendChild(st);
+                const r = [...document.querySelectorAll("section.panel table.deb-tbl > thead th")].slice(0, 7).filter(t => t.scrollWidth > t.clientWidth + 1).map(t => t.textContent.trim().slice(0, 18));
+                st.remove(); return r; }'''
+
+            def masoara(lat, tabel_incape):
+                pg.set_viewport_size({'width': lat, 'height': 800})
+                pg.wait_for_timeout(250)
+                pag, tab = pg.evaluate(js_lat)
+                verifica('%d px: pagina nu se lărgește (nicio derulare orizontală a paginii)' % lat, pag <= 0, pag)
+                if tabel_incape:
+                    verifica('%d px: tabelele încap în panou (fără derulare în panou)' % lat, tab <= 1, tab)
+                    peste = pg.evaluate(js_cel)
+                    verifica('%d px: nimic nu iese din celula lui' % lat, peste == [], peste[:4])
+                    rupte = pg.evaluate(js_antet)
+                    verifica('%d px: niciun cuvânt din antet nu e rupt la mijloc' % lat, rupte == [], rupte)
+
+            for lat in (1920, 1536, 1366, 1280, 1250):                      # laptop și desktop: tabelul încape întreg în panou
+                masoara(lat, True)
+            for lat in (1101, 1100, 1000, 920, 800, 390):                   # ecran mai îngust: tabelul se poate derula în panoul lui, dar pagina nu se lărgește
+                masoara(lat, False)
+            pg.evaluate('Traducere.seteaza("en")')
+            pg.wait_for_timeout(400)
+            for lat in (1280, 1250):                                        # și în engleză (antetele au alte cuvinte)
+                masoara(lat, True)
+            ctx.close()
         b.close()
 except Exception as e:                                           # o eroare a testului însuși trebuie să se vadă
     import traceback
