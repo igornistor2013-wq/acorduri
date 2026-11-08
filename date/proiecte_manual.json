@@ -3776,6 +3776,970 @@
    "sursa": "https://ondrl.gov.md/wp-content/uploads/2023/03/9NS_2KR_2012_Ro.pdf",
    "citat": "Chişinău, 17 Aprilie 2012 … Una sută treizeci milioane Yeni japonezi (¥130,000,000)",
    "nota": "Textul schimbului de note (2KR, extinderea proiectului pentru fermieri neprivilegiați), publicat pe ondrl.gov.md: nota japoneză și răspunsul au aceeași dată, 17.04.2012; suma (130.000.000 JPY) coincide cu rândul. Termenul de valabilitate a grantului (30.04.2013) nu s-a scris ca final: e o limită juridică, nu data finalizării (la alte 5 granturi 2KR diferă cu 3–6 luni de finalizarea reală)."
+  },
+  {
+   "acte": [
+    "DP1875/2020"
+   ],
+   "obiective": {
+    "ro": "Prevenirea, depistarea și combaterea amenințării pe care pandemia de COVID-19 o reprezintă pentru Republica Moldova.",
+    "en": "The objectives of the Project are to prevent, detect and respond to the threat posed by the COVID-19 pandemic in Republic of Moldova."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P174761",
+   "citat": "prevent, detect and respond to the threat posed by the COVID-19 pandemic",
+   "nota": "Banca Mondială, fișa proiectului P174761 „Moldova Pandemic Emergency Financing for COVID-19” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P174761). Legat de rând după denumirea („Răspuns de Urgență la COVID-19”) și suma: grantul de 3.480.000 USD din fișă corespunde celor 2.960.000 EUR ale rândului (curs de circa 1,18). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM1983/2016",
+    "LP16/2016",
+    "HG116/2016",
+    "DPRM1798/2015"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea calității, a transparenței și a utilizării statisticilor din educație, pentru ca reformele în curs din educație să fie mai bine fundamentate.",
+    "en": "The Project Development Objective (PDO) is to strengthen the quality, openness and use of education statistics to better inform the ongoing education reforms in Moldova."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P154541",
+   "citat": "strengthen the quality, openness and use of education statistics",
+   "nota": "Banca Mondială, fișa proiectului P154541 „Strengthening capacity - EMIS” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P154541). Legat de rând după denumirea („Fortificarea capacităților Sistemului Informațional de Management în Educație (SIME)” = „Strengthening capacity - EMIS”) și data semnării din registru (03.11.2015); închiderea din fișă, 31.07.2017, se potrivește cu perioada unui grant mic. Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HP880/1996",
+    "DPRM345/1995"
+   ],
+   "obiective": {
+    "ro": "Obiectivul principal: sprijinirea și accelerarea programului de reforme al guvernului în sectorul întreprinderilor și în cel financiar, cu accent pe măsurile care întăresc legăturile dintre băncile comerciale și întreprinderi. Proiectul va: 1) accelera apariția și creșterea întreprinderilor mici și mijlocii; …",
+    "en": "The principal objective of the First Private Sector Development Project is to support and help accelerate the government reform program in the enterprise and financial sectors, focusing especially on measures enhancing the links between commercial banks and enterprises. In particular, the project will: 1) accelerate the emergence and growth of small and medium scale enterprises (SMEs); …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P008561",
+   "citat": "support and help accelerate the government reform program in the enterprise and financial sectors",
+   "nota": "Banca Mondială, fișa proiectului P008561 „First Private Sector Development Project” (API-ul public al proiectelor, câmpul project_abstract; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P008561). Legat de rând după creditul IBRD39770 (semnat 17.04.1996) și creditul IBRD39771 (semnat 17.04.1996), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG1030/2016"
+   ],
+   "obiective": {
+    "ro": "Consolidarea capacității Guvernului Republicii Moldova de a elabora politici bazate pe dovezi în domeniul competențelor și al ocupării, prin sprijinirea unei colectări și analize mai bune a datelor despre competențele forței de muncă și nevoile pieței muncii.",
+    "en": "To strengthen the Government of Moldova’s capacity for evidence-based policymaking in the area of skills and employment through supporting enhanced collection and analysis of data on workforce skills and labor market needs"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P154573",
+   "citat": "capacity for evidence-based policymaking in the area of skills and employment",
+   "nota": "Banca Mondială, fișa proiectului P154573 „Moldova Skills Data Capacity Building” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P154573). Legat de rând după denumirea („Dezvoltarea capacităților statistice pe baza datelor ce țin de abilități” = „Moldova Skills Data Capacity Building”); singurul proiect al Băncii Mondiale cu acest obiect în Moldova. Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM337/2005",
+    "LP293/2005",
+    "HG1064/2005"
+   ],
+   "obiective": {
+    "ro": "Gestionarea eficace și transparentă a finanțelor publice, ca factor care sprijină programele de reducere a sărăciei și creșterea economică.",
+    "en": "Achieving effective and transparent management of public finances as an enabler of poverty reducing programs and economic growth"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P082916",
+   "citat": "effective and transparent management of public finances",
+   "nota": "Banca Mondială, fișa proiectului P082916 „Public Financial Management Technical Assistance Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P082916). Legat de rând după creditul IDA40820 (semnat 07.07.2005, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HCC26/2008",
+    "DPRM65/2001",
+    "HP160/2001",
+    "LP161/2001",
+    "HG1108/2000"
+   ],
+   "obiective": {
+    "ro": "Proiectul Fondului de Investiții în Sănătate urmărește să îmbunătățească starea de sănătate a populației Moldovei și să crească calitatea și eficiența sectorului public de sănătate, prin îmbunătățirea accesului la servicii esențiale pentru cei săraci; sprijină și lucrări strategice pentru controlul epidemiilor de tuberculoză și HIV/SIDA.",
+    "en": "The Health Investment Fund (HIF) Project aims to improve the health status of the Moldovan population, and to increase the quality and efficiency of the public health sector, by improving access to essential services for the poor. The project also includes support to strategic work, aiming at controlling the TB and HIV/AIDS epidemics."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P051174",
+   "citat": "improve the health status of the Moldovan population",
+   "nota": "Banca Mondială, fișa proiectului P051174 „Health Investment Fund Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P051174). Legat de rând după creditul IDA34080 (semnat 06.10.2000), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM2251/2009",
+    "LP21/2009",
+    "HG364/2009",
+    "HG119/2009"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Strategiei de creștere economică și reducere a sărăciei (EGPRSP) a Moldovei și împuternicirea comunităților sărace și a grupurilor vulnerabile ale populației să-și gestioneze nevoile prioritare de dezvoltare.",
+    "en": "The project development objectives are to support Moldova's Economic Growth and Poverty Reduction Strategy Paper (EGPRSP) and to empower poor communities and vulnerable population groups to manage their priority development needs."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P114838",
+   "citat": "empower poor communities and vulnerable population groups to manage their priority development needs",
+   "nota": "Banca Mondială, fișa proiectului P114838 „Second Social Investment Fund Project -Additional Financing” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P114838). Legat de rând după creditul IDA45550 (semnat 04.05.2009, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM2252/2009",
+    "LP22/2009",
+    "HG365/2009",
+    "HG1300/2008"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea siguranței și fiabilității sistemului de transport al energiei electrice și a furnizării angro, pentru ca sistemul energetic să funcționeze comercial fără obstacole; îmbunătățirea disponibilității, calității și eficienței încălzirii în clădiri publice prioritare alese.",
+    "en": "Improve the security and reliability of the electricity transmission system and wholesale electricity supply and, therefore, facilitate unimpeded commercial operation of the power system. Improve the availability, quality, and efficiency of heating in selected priority public buildings."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P113569",
+   "citat": "security and reliability of the electricity transmission system",
+   "nota": "Banca Mondială, fișa proiectului P113569 „ADDITIONAL FINANCING FOR ENERGY II PROJECT” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P113569). Legat de rând după creditul IDA45410 (semnat 16.03.2009, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM422/2006",
+    "LP378/2005",
+    "HG1370/2005"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Moldovei în creșterea competitivității întreprinderilor prin îmbunătățirea mediului de afaceri, un acces mai bun la finanțare și servicii adecvate de standardizare, testare și îmbunătățire a calității.",
+    "en": "The Project will assist Moldova in enhancing competitiveness of enterprises through improvements in the business environment, enhancing access to finance, and making adequate standards, testing, and quality improvement services available to enterprises."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P089124",
+   "citat": "enhancing competitiveness of enterprises through improvements in the business environment",
+   "nota": "Banca Mondială, fișa proiectului P089124 „Competitiveness Enhancement Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P089124). Legat de rând după creditul IDA41190 (semnat 14.11.2005, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM1617/2003",
+    "LP567/2003",
+    "HG1506/2003"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea siguranței și fiabilității sistemului de transport al energiei electrice și a furnizării angro, pentru ca sistemul energetic să funcționeze comercial fără obstacole; îmbunătățirea disponibilității, calității și eficienței încălzirii în clădiri publice prioritare alese.",
+    "en": "Improve the security and reliability of the electricity transmission system and wholesale electricity supply and, therefore, facilitate unimpeded commercial operation of the power system. Improve the availability, quality, and efficiency of heating in selected priority public buildings."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P040558",
+   "citat": "security and reliability of the electricity transmission system",
+   "nota": "Banca Mondială, fișa proiectului P040558 „Energy 2 Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P040558). Legat de rând după creditul IDA38330 (semnat 04.12.2003), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM6/2009",
+    "LP18/2009",
+    "HG467/2009",
+    "HG230/2009"
+   ],
+   "obiective": {
+    "ro": "Programul urmărește să sprijine pe termen lung redresarea și creșterea agriculturii, pentru ca sectoarele agricol și rural ale Moldovei să-și joace pe deplin rolul în creșterea viitoare a veniturilor și reducerea sărăciei. Proiectul continuă stimularea creșterii de după privatizare în aceste sectoare, prin îmbunătățirea accesului fermierilor și întreprinzătorilor rurali la statut juridic de proprietar, know-how, cunoștințe și servicii financiare …",
+    "en": "The Program objective is to provide long-term support to accelerate agricultural recovery and growth so that Moldova's agricultural and rural sectors can play their full role in providing the underpinnings for future income growth and poverty reduction. … the project will strive to continue foster the post-privatization growth in the agricultural and rural sectors of Moldova by improving access of farmers and rural entrepreneurs to legal ownership status, know-how, knowledge and financial services …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P090673",
+   "citat": "accelerate agricultural recovery and growth",
+   "nota": "Banca Mondială, fișa proiectului P090673 „Rural Investment & Services Project (APL #2)” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P090673). Legat de rând după creditul IDA45630 (semnat 11.06.2009, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DP262/2011",
+    "LP174/2011",
+    "HG488/2011",
+    "HG279/2011"
+   ],
+   "obiective": {
+    "ro": "Creșterea eficienței și echității sistemului de protecție socială din Moldova, printr-o extindere și o consolidare sustenabile fiscal ale programului „Ajutor social”.",
+    "en": "The development objective of the proposed project is to improve the efficiency and equity of Moldova's safety net through a fiscally sustainable expansion and strengthening of the Ajutor Social Program."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P120913",
+   "citat": "improve the efficiency and equity of Moldova's safety net",
+   "nota": "Banca Mondială, fișa proiectului P120913 „Strengthening the Effectiveness of the Social Safety Net Results-Based Financing Specific Investment Loan” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P120913). Legat de rând după creditul IDA50010 (semnat 01.07.2011, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG206/2001",
+    "HP974/1996",
+    "HG306/1996"
+   ],
+   "obiective": {
+    "ro": "Obiectivele primului proiect agricol: 1) modernizarea și creșterea eficacității programelor-cheie de cercetare agricolă pentru culturile și produsele prioritare de export; 2) consolidarea instituțiilor din domeniile prioritare: sistemul de cunoștințe agricole, funcțiile de reglementare a calității produselor și managementul în sectorul agroprocesator privatizat; …",
+    "en": "The objectives of the First Agriculture Project are to: 1) upgrade and improve the effectiveness of key agricultural research programs on priority export crops and products; 2) strengthen institutions in priority areas: the agricultural knowledge system; product quality regulatory functions; and management in the post-privatized agro-processing sector; …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P008556",
+   "citat": "upgrade and improve the effectiveness of key agricultural research programs",
+   "nota": "Banca Mondială, fișa proiectului P008556 „FIRST AGRICULTURE PROJECT” (API-ul public al proiectelor, câmpul project_abstract; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P008556). Legat de rând după creditul IBRD40110 (semnat 03.07.1996), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DP254/2012",
+    "LP172/2012",
+    "HG307/2012"
+   ],
+   "obiective": {
+    "ro": "Creșterea calității educației în mediul rural din Moldova: proiectul sprijină beneficiarul să îmbunătățească calitatea educației în localitățile rurale.",
+    "en": "The main objective of the project would be to increase quality of education in the rural areas of Moldova. The objective of the Project is to assist the Recipient in improving the quality of education in the rural areas in Moldova."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P129552",
+   "citat": "increase quality of education in the rural areas of Moldova",
+   "nota": "Banca Mondială, fișa proiectului P129552 „Quality Education in the Rural Areas of Moldova AF” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P129552). Legat de rând după creditul IDA50800 (semnat 20.04.2012, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DP573/2010",
+    "LP225/2010",
+    "HG813/2010",
+    "HG713/2010",
+    "HG329/2010"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea unei reorientări fundamentale, planificate, a politicii economice a Moldovei, cu finanțare bugetară necesară pentru a atenua ajustarea fiscală provocată de criza globală.",
+    "en": "The objective is to reinforce a planned fundamental redirection of economic policy making in Moldova whilst providing much-needed budget financing to smooth fiscal correction in response to the global crisis."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P112625",
+   "citat": "providing much-needed budget financing to smooth fiscal correction",
+   "nota": "Banca Mondială, fișa proiectului P112625 „Economic Recovery Development Policy Oeration” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P112625). Legat de rând după creditul IDA47620 (semnat 12.08.2010, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM620/2006",
+    "LP157/2006",
+    "HG540/2006",
+    "HG378/2006"
+   ],
+   "obiective": {
+    "ro": "Programul urmărește să sprijine pe termen lung redresarea și creșterea agriculturii, pentru ca sectoarele agricol și rural ale Moldovei să-și joace pe deplin rolul în creșterea viitoare a veniturilor și reducerea sărăciei. Proiectul continuă stimularea creșterii de după privatizare în aceste sectoare, prin îmbunătățirea accesului fermierilor și întreprinzătorilor rurali la statut juridic de proprietar, know-how, cunoștințe și servicii financiare …",
+    "en": "The Program objective is to provide long-term support to accelerate agricultural recovery and growth so that Moldova's agricultural and rural sectors can play their full role in providing the underpinnings for future income growth and poverty reduction. … the project will strive to continue foster the post-privatization growth in the agricultural and rural sectors of Moldova by improving access of farmers and rural entrepreneurs to legal ownership status, know-how, knowledge and financial services …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P090673",
+   "citat": "accelerate agricultural recovery and growth",
+   "nota": "Banca Mondială, fișa proiectului P090673 „Rural Investment & Services Project (APL #2)” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P090673). Legat de rând după creditul IDA41570 (semnat 13.04.2006, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DP220/2010",
+    "LP27/2010",
+    "HG39/2010",
+    "HG424/2009"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Moldovei în creșterea competitivității întreprinderilor prin îmbunătățirea mediului de afaceri, un acces mai bun la finanțare și servicii adecvate de standardizare, testare și îmbunătățire a calității.",
+    "en": "The Project will assist Moldova in enhancing competitiveness of enterprises through improvements in the business environment, enhancing access to finance, and making adequate standards, testing, and quality improvement services available to enterprises."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P116187",
+   "citat": "enhancing competitiveness of enterprises through improvements in the business environment",
+   "nota": "Banca Mondială, fișa proiectului P116187 „Additional Financing for Competitiveness Enhancement Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P116187). Legat de rând după creditul IDA46550 (semnat 17.11.2009), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG455/2004"
+   ],
+   "obiective": {
+    "ro": "Scopul principal al creditului pentru inovare în învățare este să stabilească, prin testare-pilot, dacă tinerii (14–30 de ani) din gospodării rurale și periurbane sărace sau vulnerabile din localitățile participante vor adopta practici economice și sociale pozitive și vor reduce comportamentele riscante, ca răspuns la un pachet integrat și incluziv de servicii și oportunități pentru tineri.",
+    "en": "The main purpose of the Learning Innovation Credit (LIC) is to determine (through pilot testing) whether targeted youth (14-30) from poor/vulnerable rural and pen-urban households in participating local areas will adopt positive economic/social practices and reduce risky behaviors in response to an integrated and inclusive package of youth-oriented services and opportunities."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P082878",
+   "citat": "determine (through pilot testing) whether targeted youth (14-30)",
+   "nota": "Banca Mondială, fișa proiectului P082878 „Youth Inclusion Learning & Innovation Credit” (API-ul public al proiectelor, câmpul project_abstract; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P082878). Legat de rând după denumirea („Proiectul de includere a tineretului” = „Youth Inclusion Learning & Innovation Credit”). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM1268/2007",
+    "LP193/2007",
+    "HG803/2007",
+    "HG466/2007"
+   ],
+   "obiective": {
+    "ro": "Reducerea costurilor de transport rutier pentru utilizatorii drumurilor din Moldova, prin îmbunătățirea stării și calității rețelei rutiere și a modului în care este administrată.",
+    "en": "Reduce road transport costs for road users in Moldova, by improving the condition and quality of its road network and the way it is managed."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P100929",
+   "citat": "Reduce road transport costs for road users in Moldova",
+   "nota": "Banca Mondială, fișa proiectului P100929 „Road Sector Program Support Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P100929). Legat de rând după creditul IDA42830 (semnat 03.05.2007, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG512/1999"
+   ],
+   "obiective": {
+    "ro": "Dezvoltarea capacității necesare pentru a pune în aplicare reforma pensiilor și sprijinirea construirii unui sistem de protecție socială eficient și durabil în Moldova.",
+    "en": "The objectives of the Social Protection Management Project are to develop the capacity required to implement the pension reform and to support the development of an efficient and sustainable social protection system in Moldova."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P051173",
+   "citat": "develop the capacity required to implement the pension reform",
+   "nota": "Banca Mondială, fișa proiectului P051173 „Social Protection Project” (API-ul public al proiectelor, câmpul project_abstract; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P051173). Legat de rând după creditul IDA32610 (semnat 06.07.1999), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM677/2006",
+    "LP190/2006",
+    "HG623/2006"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea beneficiarului în îmbunătățirea calității educației în mediul rural din Moldova.",
+    "en": "The objective of the Project is to assist the Recipient in improving the quality of education in the rural areas in Moldova."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P090340",
+   "citat": "improving the quality of education in the rural areas in Moldova",
+   "nota": "Banca Mondială, fișa proiectului P090340 „Quality Education in the Rural Areas of Moldova” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P090340). Legat de rând după creditul IDA41550 (semnat 05.04.2006, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM1772/2008",
+    "LP150/2008",
+    "HG716/2008",
+    "HG651/2008"
+   ],
+   "obiective": {
+    "ro": "Al doilea credit pentru sprijinirea reducerii sărăciei (PRSC2) din Republica Moldova urmărește să consolideze și să aprofundeze reformele sprijinite de primul credit (PRSC1) … pentru a accelera creșterea economică comună și a îmbunătăți guvernarea, prin eficientizarea programelor de cheltuieli și a administrației publice …",
+    "en": "The Second Poverty Reduction Support Credit (PRSC2) for the Republic of Moldova is intended to bolster and deepen the reform efforts supported by the first PRSC (PRSC1). … to accelerate shared economic growth and improve governance by addressing the efficiency of its expenditure programs and public administration …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P103941",
+   "citat": "bolster and deepen the reform efforts supported by the first PRSC",
+   "nota": "Banca Mondială, fișa proiectului P103941 „Second Poverty Reduction Support Credit” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P103941). Legat de rând după creditul IDA44130 (semnat 02.06.2008), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM1777/2008",
+    "LP166/2008",
+    "HG736/2008"
+   ],
+   "obiective": {
+    "ro": "Programul urmărește să sprijine pe termen lung redresarea și creșterea agriculturii, pentru ca sectoarele agricol și rural ale Moldovei să-și joace pe deplin rolul în creșterea viitoare a veniturilor și reducerea sărăciei. Proiectul continuă stimularea creșterii de după privatizare în aceste sectoare, prin îmbunătățirea accesului fermierilor și întreprinzătorilor rurali la statut juridic de proprietar, know-how, cunoștințe și servicii financiare …",
+    "en": "The Program objective is to provide long-term support to accelerate agricultural recovery and growth so that Moldova's agricultural and rural sectors can play their full role in providing the underpinnings for future income growth and poverty reduction. … the project will strive to continue foster the post-privatization growth in the agricultural and rural sectors of Moldova by improving access of farmers and rural entrepreneurs to legal ownership status, know-how, knowledge and financial services …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P090673",
+   "citat": "accelerate agricultural recovery and growth",
+   "nota": "Banca Mondială, fișa proiectului P090673 „Rural Investment & Services Project (APL #2)” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P090673). Legat de rând după creditul IDA44160 (semnat 02.06.2008), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM1778/2008",
+    "LP167/2008",
+    "HG737/2008"
+   ],
+   "obiective": {
+    "ro": "Obiectivul revizuit al proiectului: creșterea accesului, a calității și a eficienței operaționale a serviciilor de alimentare cu apă și de canalizare …",
+    "en": "The revised objective of the Project is to increase access, quality, and operational efficiency of water and sewerage services …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P107612",
+   "citat": "increase access, quality, and operational efficiency of water and sewerage services",
+   "nota": "Banca Mondială, fișa proiectului P107612 „NATIONAL WATER SUPPLY & SANITATION PROGRAM” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P107612). Legat de rând după creditul IDA44140 (semnat 02.06.2008, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM1411/2003",
+    "LP311/2003",
+    "HG747/2003"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea calității, fiabilității, eficienței și sustenabilității serviciilor de alimentare cu apă și canalizare în municipalitățile și zonele rurale participante; scopul este și ca operatorii de apă să treacă spre recuperarea costurilor.",
+    "en": "To improve the quality, reliability, efficiency and sustainability of the water supply and sanitation services in the participating municipalities and rural areas. The aim is also to ensure that the water utilities move towards cost recovery."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P074469",
+   "citat": "improve the quality, reliability, efficiency and sustainability of the water supply and sanitation services",
+   "nota": "Banca Mondială, fișa proiectului P074469 „Pilot Water Supply & Sanitation Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P074469). Legat de rând după creditul IDA37630 (semnat 09.06.2003), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG735/2004",
+    "DPRM1378/2003",
+    "LP301/2003",
+    "HG750/2003"
+   ],
+   "obiective": {
+    "ro": "Două obiective de dezvoltare: (i) reducerea costurilor netarifare ale comerțului și transportului; (ii) creșterea veniturilor și a conformării și reducerea contrabandei și a corupției la punctele de trecere a frontierei.",
+    "en": "The Project would seek two development objectives: (i) to reduce non-tariff costs to trade and transport; and (ii) to increase revenue and compliance, and reduce smuggling and corruption at border crossings."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P073626",
+   "citat": "reduce non-tariff costs to trade and transport",
+   "nota": "Banca Mondială, fișa proiectului P073626 „Trade & Transport Facilitation in Southeast Europe Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P073626). Legat de rând după creditul IDA37830 (semnat 13.06.2003), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DP58/2012",
+    "LP79/2012",
+    "HG98/2012",
+    "HG955/2011",
+    "HG788/2011",
+    "DPRM1269/2007",
+    "LP194/2007",
+    "HG802/2007",
+    "HG772/2007"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea programului Guvernului de a mări accesul la servicii de sănătate de calitate și eficiente, pentru a reduce mortalitatea prematură și invaliditatea populației, și de a îmbunătăți direcționarea transferurilor și serviciilor sociale către cei săraci, în concordanță cu cadrul de cheltuieli pe termen mediu 2007–2009.",
+    "en": "The overall project objective is to promote the Government's program to increase access to quality and efficient health services with the aim of decreasing premature mortality and disability for the local population and improve the targeting of social transfers and services to the poor in line with the MTEF for 2007-2009."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P095250",
+   "citat": "increase access to quality and efficient health services",
+   "nota": "Banca Mondială, fișa proiectului P095250 „Health Services & Social Assistance” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P095250). Legat de rând după creditul IDA43200 (semnat 03.07.2007, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM1943/2004",
+    "LP285/2004",
+    "HG789/2004"
+   ],
+   "obiective": {
+    "ro": "Sprijinirea Strategiei de creștere economică și reducere a sărăciei (EGPRSP) a Moldovei și împuternicirea comunităților sărace și a grupurilor vulnerabile de a-și gestiona nevoile prioritare de dezvoltare.",
+    "en": "The project development objectives are to support Moldova's Economic Growth and Poverty Reduction Strategy Paper (EGPRSP) and to empower poor communities and vulnerable population groups to manage their priority development needs."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P079314",
+   "citat": "empower poor communities and vulnerable population groups to manage their priority development needs",
+   "nota": "Banca Mondială, fișa proiectului P079314 „Social Investment Fund 2 Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P079314). Legat de rând după creditul IDA39310 (semnat 18.06.2004), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM719/2006",
+    "LP277/2006",
+    "HG819/2006"
+   ],
+   "obiective": {
+    "ro": "Reducerea la minimum a amenințării pe care gripa aviară înalt patogenă (HPAI) și alte boli infecțioase care provin de la animale o reprezintă pentru oameni.",
+    "en": "The overall objective of the Project is to minimize the threat posed to humans by Highly Pathogenic Avian Influenza (HPAI) and other infectious diseases that originate in animals."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P099841",
+   "citat": "minimize the threat posed to humans by Highly Pathogenic Avian Influenza",
+   "nota": "Banca Mondială, fișa proiectului P099841 „Avian Influenza Control & Human Pandemic Preparedness & Response Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P099841). Legat de rând după creditul IDA41880 (semnat 16.06.2006, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM1023/2007",
+    "LP32/2007",
+    "HG84/2007"
+   ],
+   "obiective": {
+    "ro": "Primul dintr-o serie de trei credite anuale pentru sprijinirea reducerii sărăciei (PRSC I) sprijină … eforturile de reformă din strategia EGPRSP și din Planul de acțiuni UE–Moldova. Creditul urmărește să sporească … capacitatea de a accelera creșterea economică și de a îmbunătăți eficiența programelor sociale și a administrației publice …",
+    "en": "PRSC I, the first in a set of three annual PRSCs, support the … reform efforts as articulated in their PRSP (or EGPRSP as it is known in Moldova) and the EU-Moldova Action Plan. The credit aims to enhance the … ability to accelerating economic growth and improve the efficiency of its social programs and public administration …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P099166",
+   "citat": "improve the efficiency of its social programs and public administration",
+   "nota": "Banca Mondială, fișa proiectului P099166 „Poverty Reduction Support Credit (PRSC)” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P099166). Legat de rând după creditul IDA42360 (semnat 22.12.2006, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM747/2002",
+    "LP1175/2002",
+    "HP1174/2002",
+    "HG846/2002"
+   ],
+   "obiective": {
+    "ro": "Al treilea credit pentru ajustări structurale sprijină reforme în două direcții, pentru o creștere susținută pe termen mediu: (i) reducerea sărăciei, prin monitorizarea și evaluarea mai bună a măsurilor de reducere a sărăciei, îmbunătățirea sistemului de educație și a eficienței serviciilor de sănătate și consolidarea protecției sociale; (ii) îmbunătățirea mediului de afaceri, prin restricții bugetare stricte și o gestiune fiduciară mai bună, …",
+    "en": "The third Structural Adjustment Credit supports reforms within two broad agendas to help ensure sustained growth in Moldova over the medium term: (i) reforms to reduce poverty through improving monitoring and evaluation of poverty reduction measures, improvement of the education system and the efficiency of health care delivery, and strengthening social protection; and (ii) reforms to improve the business environment through implementation of hard budget constraints and improvement of fiduciary management, …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P065163",
+   "citat": "supports reforms within two broad agendas to help ensure sustained growth in Moldova",
+   "nota": "Banca Mondială, fișa proiectului P065163 „Structural Adjustment Credit 3” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P065163). Legat de rând după creditul IDA36670 (semnat 26.06.2002), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DP242/2010",
+    "LP58/2010",
+    "HG193/2010",
+    "HG849/2009"
+   ],
+   "obiective": {
+    "ro": "Contribuție la ocuparea forței de muncă și la veniturile salariale din comunitățile rurale sărace selectate, în timpul actualei contracții economice și al redresării.",
+    "en": "To contribute to employment and wage incomes in selected poor rural communities during the current economic contraction and during the recovery."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P117301",
+   "citat": "employment and wage incomes in selected poor rural communities",
+   "nota": "Banca Mondială, fișa proiectului P117301 „Second Social Investment Fund Project -Second Additional Financing” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P117301). Legat de rând după creditul IDA46820 (semnat 22.02.2010, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM1944/2004",
+    "LP286/2004",
+    "HP272/2004",
+    "HG727/2004",
+    "DPRM809/2002",
+    "LP1274/2002",
+    "HP1273/2002",
+    "HG909/2002"
+   ],
+   "obiective": {
+    "ro": "Programul urmărește să sprijine pe termen lung redresarea și creșterea agriculturii, pentru ca sectorul agricol al Moldovei să-și joace pe deplin rolul în creșterea viitoare a veniturilor și reducerea sărăciei. Proiectul urmărește să stimuleze creșterea de după privatizare, îmbunătățind accesul noilor fermieri privați și al întreprinderilor rurale la ceea ce le trebuie ca să reușească: statut juridic de proprietar, cunoștințe, know-how și finanțare.",
+    "en": "The program objective is to provide long-term support to accelerate agricultural recovery and growth so that Moldova's agricultural sector can play its full role in providing the underpinnings for future income growth and poverty reduction. Within this broader objective, the project objective is to foster post-privatization growth in the agricultural sector by improving the access of new private farmers and rural businesses to what they need to succeed - legal ownership status, knowledge, know-how, and finance."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P060434",
+   "citat": "accelerate agricultural recovery and growth",
+   "nota": "Banca Mondială, fișa proiectului P060434 „Rural Investment & Services Project (APL #1)” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P060434). Legat de rând după creditul IDA36680 (semnat 26.06.2002), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG91/2006"
+   ],
+   "obiective": {
+    "ro": "Protejarea mediului și a sănătății oamenilor prin gestionarea și eliminarea în siguranță a stocurilor de pesticide contaminate cu poluanți organici persistenți (POP) și de PCB. Obiectivul global: gestionarea durabilă a stocurilor de POP și consolidarea cadrului de reglementare și instituțional pentru controlul pe termen lung al POP și al altor substanțe toxice, în conformitate cu Convenția de la Stockholm și cu celelalte convenții și protocoale ratificate de Moldova.",
+    "en": "The development objective is to protect the environment and human health by safely managing and disposing of stockpiles of POPs contaminated pesticides and PCBs. The global project objective is sustainable POPs stockpiles management and strengthening of the regulatory and institutional arrangements for long term control of POPs and other toxic substances in line with the requirements of the Stockholm Convention and other related conventions and protocols ratified by Moldova."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P090037",
+   "citat": "safely managing and disposing of stockpiles of POPs contaminated pesticides and PCBs",
+   "nota": "Banca Mondială, fișa proiectului P090037 „Persistent Organic Pollutants (POPs) Stockpiles Management & Destruction GEF Project” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P090037). Legat de rând după denumirea („Managementul și distrugerea stocurilor de poluanți organici persistenți” = „POPs Stockpiles Management & Destruction GEF Project”); grantul GEF al Băncii Mondiale pentru Moldova. Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG947/1999"
+   ],
+   "obiective": {
+    "ro": "Obiectivul principal: sprijinirea și accelerarea programului de reforme al guvernului în sectorul întreprinderilor și în cel financiar, cu accent pe măsurile care întăresc legăturile dintre băncile comerciale și întreprinderi. Proiectul va: 1) accelera apariția și creșterea întreprinderilor mici și mijlocii; …",
+    "en": "The principal objective of the First Private Sector Development Project is to support and help accelerate the government reform program in the enterprise and financial sectors, focusing especially on measures enhancing the links between commercial banks and enterprises. In particular, the project will: 1) accelerate the emergence and growth of small and medium scale enterprises (SMEs); …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P008561",
+   "citat": "support and help accelerate the government reform program in the enterprise and financial sectors",
+   "nota": "Banca Mondială, fișa proiectului P008561 „First Private Sector Development Project” (API-ul public al proiectelor, câmpul project_abstract; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P008561). Legat de rând după creditul IBRD39770 (semnat 17.04.1996, ca în registru) și creditul IBRD39771 (semnat 17.04.1996, ca în registru), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG956/2007"
+   ],
+   "obiective": {
+    "ro": "Obiectivele principale ale proiectului: (i) îmbunătățirea calității serviciilor de canalizare din Soroca; (ii) reducerea evacuării de poluanți, inclusiv de nutrienți, din sursele municipale ale Sorocii care ajung în Nistru și, mai departe, în Marea Neagră; …",
+    "en": "The key development objectives of the project are: (i) improve the quality of sanitation services in Soroca; (ii) reduce the discharge of pollutants, including nutrients, from Soroca municipal sources that flow into the Nistru River and, subsequently, into the Black Sea; …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P074139",
+   "citat": "improve the quality of sanitation services in Soroca",
+   "nota": "Banca Mondială, fișa proiectului P074139 „ENVIRONMENTAL INFRASTRUCTURE PROJECT” (API-ul public al proiectelor, câmpul pdo; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P074139). Legat de rând după denumirea („Infrastructura mediului” = „Environmental Infrastructure Project”); acordul de grant cu BIRD privește singurul proiect al Băncii Mondiale cu acest nume în Moldova (Soroca). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HP1480/1998"
+   ],
+   "obiective": {
+    "ro": "Proiectul sprijină prima fază a reformelor din sectorul educației din Moldova, axate pe învățământul general obligatoriu. Obiectivul-cheie: modernizarea și îmbunătățirea calității învățământului primar și gimnazial.",
+    "en": "The General Education Project aims at supporting the first phase of Moldova's education sector reforms, focusing on mandatory general education. The project's key objective is to modernize and improve the quality of primary and lower secondary education."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P008558",
+   "citat": "modernize and improve the quality of primary and lower secondary education",
+   "nota": "Banca Mondială, fișa proiectului P008558 „General Education” (API-ul public al proiectelor, câmpul project_abstract; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P008558). Legat de rând după creditul IDA30030 (semnat 17.11.1997), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HP1506/1998"
+   ],
+   "obiective": {
+    "ro": "Dezvoltarea și testarea unui sistem bancar rural cooperatist, care să ofere eficient servicii financiare fermierilor privați mici și întreprinzătorilor rurali.",
+    "en": "The objective of the Rural Finance Project is to develop and test a cooperative rural banking system that would efficiently provide financial services to small private farmers and rural entrepreneurs."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P035781",
+   "citat": "develop and test a cooperative rural banking system",
+   "nota": "Banca Mondială, fișa proiectului P035781 „RURAL FINANCE PROJECT” (API-ul public al proiectelor, câmpul project_abstract; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P035781). Legat de rând după creditul IDA30310 (semnat 28.01.1998), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HP1533/1998"
+   ],
+   "obiective": {
+    "ro": "Obiectivul principal: sprijinirea guvernului în eforturile de a spori capacitatea managerială a întreprinderilor privatizate recent și, astfel, productivitatea și competitivitatea lor.",
+    "en": "The Second Private Sector Development Project's principal objective is to assist the Government in its efforts to increase the managerial capacity of recently privatized enterprises and thus, improve their productivity and competitiveness."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P035811",
+   "citat": "increase the managerial capacity of recently privatized enterprises",
+   "nota": "Banca Mondială, fișa proiectului P035811 „Private Sector Development Project (02)” (API-ul public al proiectelor, câmpul project_abstract; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P035811). Legat de rând după creditul IDA29620 (semnat 03.09.1997), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DPRM290/2005",
+    "LP240/2005",
+    "HG1025/2005",
+    "HP204/1998"
+   ],
+   "obiective": {
+    "ro": "Crearea unui program de înregistrare a bunurilor imobile care să ofere: (a) proprietarilor — siguranța drepturilor de proprietate; (b) băncilor comerciale — încrederea necesară pentru a acorda credite garantate cu imobile; (c) pieței imobiliare — informațiile despre proprietate și amplasare de care are nevoie ca să funcționeze eficient; (d) instituțiilor publice — informații de bază pentru urbanism și gestionarea terenurilor; …",
+    "en": "The First Cadastre Project's objective is to develop a real estate registration program which will provide: (a) property owners with security of ownership rights; (b) commercial banks with the confidence necessary to give secured credit against real estate; (c) the real estate market with information on ownership and location of property as needed for the market to function effectively; (d) government agencies and institutions with basic information for urban planning and land management; …"
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P035771",
+   "citat": "to develop a real estate registration program which will provide",
+   "nota": "Banca Mondială, fișa proiectului P035771 „First Cadastre Project” (API-ul public al proiectelor, câmpul project_abstract; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P035771). Legat de rând după creditul IDA30610 (semnat 08.06.1998; data din registru, 07.07.2005, e a altui act al rândului), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei (cu „…” unde s-a omis o propoziție); cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HP550/1999",
+    "HP418/1999"
+   ],
+   "obiective": {
+    "ro": "Fondul de Investiții Sociale pentru Moldova urmărește: a) să împuternicească comunitățile rurale prin consolidarea capacităților lor de a lua decizii, de a se organiza și de a gestiona; b) să îmbunătățească calitatea serviciilor sociale și economice de bază pentru populația rurală din Moldova, în special pentru cei săraci.",
+    "en": "The Social Investment Fund for Moldova aims to a) help empower rural communities by strengthening their capacities to make decisions, organize, and manage; and b) improve the quality of basic social and economic services for rural populations in Moldova, particularly the poor."
+   },
+   "sursa": "https://search.worldbank.org/api/v2/projects?format=json&fl=id,project_name,pdo,project_abstract&qterm=P044840",
+   "citat": "help empower rural communities by strengthening their capacities to make decisions",
+   "nota": "Banca Mondială, fișa proiectului P044840 „Social Investment Fund” (API-ul public al proiectelor, câmpul project_abstract; pagina proiectului: https://projects.worldbank.org/en/projects-operations/project-detail/P044840). Legat de rând după creditul IDA31700 (semnat 17.03.1999), denumire și instrument (legarea cu Finances One e cea din runda 3). Textul englez e al fișei; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG1150/2002"
+   ],
+   "obiective": {
+    "ro": "Asistență pentru creșterea producției alimentare (2KR): livrarea a 32 de combine Sampo.",
+    "en": "Assistance for Increase of Food Production (2KR: Second Kennedy Round): 32 Sampo combine harvesters."
+   },
+   "sursa": "https://www.ua.emb-japan.go.jp/eng/bi_md/factsheet/assistance_e.pdf",
+   "citat": "32 Sampo combine harvesters",
+   "nota": "Fișa Ambasadei Japoniei în Moldova despre asistența japoneză (text original în engleză): linia grantului legat de rând (schimb de note septembrie 2002, 300 mil. JPY; legarea e cea de la datele și suma rândului, din runda 4). Fișa nu enunță un obiectiv: descrierea e programul și bunurile livrate, în formularea fișei. Textul românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG1299/2002"
+   ],
+   "obiective": {
+    "ro": "Grant cultural: furnizarea de echipament audio pentru Palatul Național al Republicii Moldova.",
+    "en": "The Supply of Audio Equipment to the Moldovan National Palace."
+   },
+   "sursa": "https://www.ua.emb-japan.go.jp/eng/bi_md/factsheet/assistance_e.pdf",
+   "citat": "The Supply of Audio Equipment to the Moldovan National Palace",
+   "nota": "Fișa Ambasadei Japoniei în Moldova despre asistența japoneză (text original în engleză): linia grantului legat de rând (schimb de note octombrie 2002, 41,4 mil. JPY; legarea e cea de la datele și suma rândului, din runda 4). Fișa nu enunță un obiectiv: descrierea e programul și bunurile livrate, în formularea fișei. Textul românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG229/2006"
+   ],
+   "obiective": {
+    "ro": "Asistență pentru creșterea producției alimentare (2KR): livrarea a 100 de tractoare Belarus.",
+    "en": "Assistance for Increase of Food Production (2KR: Second Kennedy Round): 100 Belarus tractors."
+   },
+   "sursa": "https://www.ua.emb-japan.go.jp/eng/bi_md/factsheet/assistance_e.pdf",
+   "citat": "100 Belarus tractors",
+   "nota": "Fișa Ambasadei Japoniei în Moldova despre asistența japoneză (text original în engleză): linia grantului legat de rând (schimb de note martie 2006, 220 mil. JPY; legarea e cea de la datele și suma rândului, din runda 4). Fișa nu enunță un obiectiv: descrierea e programul și bunurile livrate, în formularea fișei. Textul românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG233/2008"
+   ],
+   "obiective": {
+    "ro": "Asistență pentru creșterea producției alimentare (2KR): livrarea a 71 de tractoare Belarus.",
+    "en": "Assistance for Increase of Food Production (2KR: Second Kennedy Round): 71 Belarus tractors."
+   },
+   "sursa": "https://www.ua.emb-japan.go.jp/eng/bi_md/factsheet/assistance_e.pdf",
+   "citat": "71 Belarus tractors",
+   "nota": "Fișa Ambasadei Japoniei în Moldova despre asistența japoneză (text original în engleză): linia grantului legat de rând (schimb de note martie 2008, 200 mil. JPY; legarea e cea de la datele și suma rândului, din runda 4). Fișa nu enunță un obiectiv: descrierea e programul și bunurile livrate, în formularea fișei. Textul românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG28/2007"
+   ],
+   "obiective": {
+    "ro": "Asistență pentru creșterea producției alimentare (2KR): livrarea a 51 de tractoare Belarus și a 7 combine Deutz.",
+    "en": "Assistance for Increase of Food Production (2KR: Second Kennedy Round): 51 Belarus tractors and 7 Deutz combine harvesters."
+   },
+   "sursa": "https://www.ua.emb-japan.go.jp/eng/bi_md/factsheet/assistance_e.pdf",
+   "citat": "51 Belarus tractors and 7 Deutz combine harvesters",
+   "nota": "Fișa Ambasadei Japoniei în Moldova despre asistența japoneză (text original în engleză): linia grantului legat de rând (schimb de note ianuarie 2007, 230 mil. JPY; legarea e cea de la datele și suma rândului, din runda 4). Fișa nu enunță un obiectiv: descrierea e programul și bunurile livrate, în formularea fișei. Textul românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG406/2009"
+   ],
+   "obiective": {
+    "ro": "Asistență pentru creșterea producției alimentare (2KR): livrarea a 73 de tractoare Belarus.",
+    "en": "Assistance for Increase of Food Production (2KR: Second Kennedy Round): 73 Belarus tractors."
+   },
+   "sursa": "https://www.ua.emb-japan.go.jp/eng/bi_md/factsheet/assistance_e.pdf",
+   "citat": "73 Belarus tractors",
+   "nota": "Fișa Ambasadei Japoniei în Moldova despre asistența japoneză (text original în engleză): linia grantului legat de rând (schimb de note octombrie 2009, 160 mil. JPY; legarea e cea de la datele și suma rândului, din runda 4). Fișa nu enunță un obiectiv: descrierea e programul și bunurile livrate, în formularea fișei. Textul românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG88/2006"
+   ],
+   "obiective": {
+    "ro": "Grant cultural: îmbunătățirea echipamentului audio-vizual și expozițional al Muzeului Național de Artă al Moldovei.",
+    "en": "The Improvement of Audio-Visual and Exhibition Equipment of the National Art Museum of Moldova."
+   },
+   "sursa": "https://www.ua.emb-japan.go.jp/eng/bi_md/factsheet/assistance_e.pdf",
+   "citat": "The Improvement of Audio-Visual and Exhibition Equipment of the National Art Museum of Moldova",
+   "nota": "Fișa Ambasadei Japoniei în Moldova despre asistența japoneză (text original în engleză): linia grantului legat de rând (schimb de note ianuarie 2006, 16,3 mil. JPY; legarea e cea de la datele și suma rândului, din runda 4). Fișa nu enunță un obiectiv: descrierea e programul și bunurile livrate, în formularea fișei. Textul românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DP34/2021"
+   ],
+   "obiective": {
+    "ro": "Obiectivul general al acțiunii este atenuarea impactului crizei COVID-19 în Republica Moldova.",
+    "en": "The overall objective of this action is to mitigate the impact of the COVID-19 crisis in the Republic of Moldova."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2020-ACT-D-42924-00",
+   "citat": "The overall objective of this action is to mitigate the impact of the COVID-19 crisis in the Republic of Moldova.",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2020-ACT-D-42924-00 «COVID-19 Resilience Contract for the Republic of Moldova», câmpul description. Legată de rând cu aceleași criterii ca datele rândului (finanțator, titlu și suma). Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG990/2020",
+    "HG387/2018",
+    "HG1257/2016"
+   ],
+   "obiective": {
+    "ro": "Obiectivul general al programului identificat, un Contract de reformă sectorială (SRC) – Sprijin pentru reforma Poliției din Republica Moldova, este asigurarea statului de drept, a ordinii publice și a securității și protecția drepturilor omului prin dezvoltarea unei forțe de poliție accesibile, responsabile, eficiente, reprezentative, transparente și profesioniste.",
+    "en": "The overall objective of the identified programme for a Sector Reform Contract (SRC) Support to reform of the Police in the Republic of Moldova is to ensure the rule of law, enhancement of public order and security and protection of human rights through the development of an accessible, accountable, efficient, representative, transparent and professional police force."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2015-ACT-D-38144-00",
+   "citat": "The overall objective of the identified programme for a Sector Reform Contract (SRC) Support to reform of the Police in the Republic of Moldova is to ensure the rule of law, enhancement of public order and security and protection of human rights through the development of an accessible, accountable, efficient, representative, transparent and professional police force.",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2015-ACT-D-38144-00 «Support to Police Reform», câmpul description. Legată de rând cu aceleași criterii ca datele rândului (finanțator, titlu și suma). Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG469/2025",
+    "HG376/2019",
+    "HG356/2019",
+    "HG512/2017",
+    "HG1363/2016"
+   ],
+   "obiective": {
+    "ro": "Obiectivul general al acțiunii este creșterea capacităților Guvernului Republicii Moldova și ale altor instituții naționale-cheie de a implementa Agenda de asociere UE–Republica Moldova.",
+    "en": "The overall objective of this action is to increase the capacities of the Government of the Republic of Moldova and other key national institutions in implementing the EU-Republic of Moldova Association Agenda."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2016-ACT-D-39553-00",
+   "citat": "The overall objective of this action is to increase the capacities of the Government of the Republic of Moldova and other key national institutions in implementing the EU-Republic of Moldova Association Agenda.",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2016-ACT-D-39553-00 «Technical Cooperation Facility 2016», câmpul description. Legată de rând cu aceleași criterii ca datele rândului (finanțator, titlu și suma). Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG352/2019"
+   ],
+   "obiective": {
+    "ro": "Obiectivul general este stimularea creșterii și dezvoltării economice inteligente, durabile și favorabile incluziunii în microregiunile-pilot din Republica Moldova.",
+    "en": "The overall objective is to stimulate smart, sustainable and inclusive economic growth and development in pilot micro- regions in the Republic of Moldova"
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2018-ACT-D-41300-00",
+   "citat": "The overall objective is to stimulate smart, sustainable and inclusive economic growth and development in pilot micro- regions in the Republic of Moldova",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2018-ACT-D-41300-00 «Inclusive economic empowerment of micro-regions of the Republic of Moldova», câmpul description. Legată de rând cu aceleași criterii ca datele rândului (finanțator, titlu și suma). Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG724/2023",
+    "HG488/2022",
+    "HG432/2021"
+   ],
+   "obiective": {
+    "ro": "Obiectivul general al acțiunii este atenuarea impactului socio-economic al creșterii prețurilor la gaze, consolidarea capacității Guvernului de a presta servicii de bază populației și sprijinirea redresării economice pe termen lung, a securității energetice și a tranziției verzi a Republicii Moldova.",
+    "en": "The overall objective of this action is to mitigate the socio-economic impact of the rising gas prices, strengthen the Governments capacity to deliver basic services to its population, and support the long-term economic recovery, energy security and green transition of the Republic of Moldova."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2021-PCC-430625",
+   "citat": "The overall objective of this action is to mitigate the socio-economic impact of the rising gas prices, strengthen the Governments capacity to deliver basic services to its population, and support the long-term economic recovery, energy security and green transition of the Republic of Moldova.",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2021-PCC-430625 «State and Resilience Building Contract for the Republic of Moldova», câmpul description. Legată de rând cu aceleași criterii ca datele rândului (finanțator, titlu și suma). Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "DP1125/2023",
+    "LP273/2023",
+    "HG669/2023",
+    "HG565/2023",
+    "HG692/2020",
+    "HG513/2017"
+   ],
+   "obiective": {
+    "ro": "Obiectivul acțiunii este îmbunătățirea și crearea sinergiei între agricultură și dezvoltarea rurală, mediu (inclusiv eficiența energetică) și dezvoltarea regională, pentru a îmbunătăți calitatea vieții rurale în vederea dezvoltării durabile a Republicii Moldova.",
+    "en": "The objective of the action is to improve and achieve synergy between agriculture and rural development, environment (including energy efficiency), and regional development so as to improve the quality of rural life for sustainable development of the Republic of Moldova."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2016-ACT-D-39554-00",
+   "citat": "The objective of the action is to improve and achieve synergy between agriculture and rural development, environment (including energy efficiency), and regional development so as to improve the quality of rural life for sustainable development of the Republic of Moldova.",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2016-ACT-D-39554-00 «Development of Rural areas in the Republic of Moldova», câmpul description. Legată de rând cu aceleași criterii ca datele rândului (finanțator, titlu și suma). Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG749/2022",
+    "HG717/2020"
+   ],
+   "obiective": {
+    "ro": "Acțiunea va sprijini Republica Moldova în răspunsul sistemului de sănătate la criza COVID și în implementarea unor reforme legate de Acordul de asociere/DCFTA UE–Moldova și de Agenda de asociere.",
+    "en": "This action will support the Republic of Moldova in the health response to the COVID-crisis and in the implementation of some reforms linked to the EU-Moldova Association Agreement/DCFTA and Association Agenda."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=XI-IATI-EC_NEAR-2020-ACT-D-42585-00",
+   "citat": "This action will support the Republic of Moldova in the health response to the COVID-crisis and in the implementation of some reforms linked to the EU-Moldova Association Agreement/DCFTA and Association Agenda.",
+   "nota": "Registrul IATI, publicat de Comisia Europeană (DG NEAR) (prin d-portal), activitatea XI-IATI-EC_NEAR-2020-ACT-D-42585-00 «EU4Moldova: Facility to support the health response to the COVID-crisis and Association Agreement related Reforms», câmpul description. Legată de rând cu aceleași criterii ca datele rândului (finanțator, titlu și suma). Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG138/2020"
+   ],
+   "obiective": {
+    "ro": "Proiectul va sprijini autoritățile naționale moldovenești în promovarea reformei guvernării locale, iar autoritățile locale în conceperea și aplicarea unor practici de guvernare locală mai incluzive și mai transparente și în furnizarea mai eficientă a diverselor servicii publice.",
+    "en": "This project will support the Moldovan national authorities in advancing the local governance reform, and the local authorities in designing and implementing more inclusive and transparent local governance practices and a more efficient delivery of various public services."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=CH-4-2025-2018011451",
+   "citat": "This project will support the Moldovan national authorities in advancing the local governance reform, and the local authorities in designing and implementing more inclusive and transparent local governance practices and a more efficient delivery of various public services.",
+   "nota": "Registrul IATI, publicat de DEZA/SDC (Elveția) (prin d-portal), activitatea CH-4-2025-2018011451 «Moldova: Ma Implic - Project on civic engagement in local governance» (perioada în IATI: 01.11.2023–31.10.2027), câmpul description. Legat de rând după finanțator și titlu: e proiectul «Mă implic»; descrierea e aceeași la creditele 2018011451 și 2018011661 și fișa nu deosebește fazele (rândul vizează prima fază, 2020). IATI împarte proiectele elvețiene pe credite și pe ani, cu perioade și sume parțiale care nu corespund unui singur acord, de aceea s-a scris doar descrierea. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG243/2020"
+   ],
+   "obiective": {
+    "ro": "Prin creșterea competitivității întreprinderilor private locale și prin îmbunătățirea intermedierii pe piața muncii și a dezvoltării competențelor, proiectul contribuie la sporirea ocupării și a veniturilor femeilor și bărbaților, în special ale persoanelor din grupuri excluse.",
+    "en": "By increasing competitiveness of local private enterprises and enhancing labour market intermediation and skills development, this project contributes to improved employment and income-generation for women and men, benefiting in particular people from excluded groups."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=CH-4-2018009092",
+   "citat": "By increasing competitiveness of local private enterprises and enhancing labour market intermediation and skills development, this project contributes to improved employment and income-generation for women and men, benefiting in particular people from excluded groups.",
+   "nota": "Registrul IATI, publicat de DEZA/SDC (Elveția) (prin d-portal), activitatea CH-4-2018009092 «Creating Job OpportuniUes through lmproved Market Systems (IMS)» (titlul exact din IATI, cu erori de transcriere), câmpul description. Legat de rând după finanțator și titlu: titlul din IATI e traducerea exactă a denumirii din registru (hotărârea din 10.04.2020). IATI împarte proiectele elvețiene pe credite și pe ani, cu perioade și sume parțiale care nu corespund unui singur acord, de aceea s-a scris doar descrierea. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG27/2024"
+   ],
+   "obiective": {
+    "ro": "Proiectul urmărește să sprijine reziliența și dezvoltarea economică a Moldovei printr-o abordare de dezvoltare a sistemelor de piață, o modalitate flexibilă și agilă care consolidează capacitatea partenerilor cu impact sistemic în sectoarele-cheie. Facilitând un acces mai bun la piață, tehnologii, finanțare și competențe și un mediu de afaceri mai favorabil pentru companii, proiectul va contribui la crearea de locuri de muncă mai bune și de venituri suplimentare pentru beneficiarii săi.",
+    "en": "The project intends to foster the economic resilience and development in Moldova by adopting a market system development approach, a flexible and agile modality that strengthens the capacity of partners with systemic footprint in key sectors. By facilitating a better access to market, technologies, funding, skills and a more conducive business environment for companies, the project will contribute to create better jobs and additional income for its beneficiaries."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=CH-4-2025-2018011209",
+   "citat": "The project intends to foster the economic resilience and development in Moldova by adopting a market system development approach, a flexible and agile modality that strengthens the capacity of partners with systemic footprint in key sectors. … By facilitating a better access to market, technologies, funding, skills and a more conducive business environment for companies, the project will contribute to create better jobs and additional income for its beneficiaries.",
+   "nota": "Registrul IATI, publicat de DEZA/SDC (Elveția) (prin d-portal), activitatea CH-4-2025-2018011209 «Opportunities through Technologies and Innovation in Moldova (OPTIM) - Phase 2» (perioada în IATI: 01.01.2023–31.12.2026), câmpul description. Legat de rând după finanțator și titlu: hotărârea din 10.01.2024 vizează faza 2 (OPTIM), care acoperă această perioadă. IATI împarte proiectele elvețiene pe credite și pe ani, cu perioade și sume parțiale care nu corespund unui singur acord, de aceea s-a scris doar descrierea. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG127/2019",
+    "HG284/2015"
+   ],
+   "obiective": {
+    "ro": "În Moldova, tinerii se confruntă cu diverse probleme de sănătate, care nu sunt abordate în prezent în mod adecvat de serviciile de sănătate. … Proiectul se concentrează pe îmbunătățirea calității și a caracterului cuprinzător al serviciilor, precum și pe sprijinul comunității pentru ca tinerii să adopte un stil de viață mai sănătos și să ceară asistență de la serviciile de sănătate.",
+    "en": "In Moldova, young people face various health challenges which are currently not adequately addressed by health services. … The project is focused on improving the quality and enhancing the comprehensiveness of the services, as well as on the community support for young people to adopt a healthier lifestyle and seek assistance from health services."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=CH-4-2011004963",
+   "citat": "In Moldova, young people face various health challenges which are currently not adequately addressed by health services. … The project is focused on improving the quality and enhancing the comprehensiveness of the services, as well as on the community support for young people to adopt a healthier lifestyle and seek assistance from health services.",
+   "nota": "Registrul IATI, publicat de DEZA/SDC (Elveția) (prin d-portal), activitatea CH-4-2011004963 «Youth Friendly Health Services in Moldova» (perioada în IATI: 01.11.2014–31.10.2018), câmpul description. Legat de rând după finanțator și titlu: hotărârea din 25.05.2015 cade în această fază a proiectului «Generație Sănătoasă / Servicii de sănătate prietenoase tinerilor». IATI împarte proiectele elvețiene pe credite și pe ani, cu perioade și sume parțiale care nu corespund unui singur acord, de aceea s-a scris doar descrierea. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG611/2020",
+    "HG277/2019",
+    "HG490/2016"
+   ],
+   "obiective": {
+    "ro": "Guvernanța deficitară este principalul blocaj al sectorului apei din Moldova: pune în pericol sustenabilitatea pe termen lung a investițiilor trecute și frânează noile investiții pentru extinderea accesului la apă potabilă pentru toți. Prin acest proiect, DEZA va îmbunătăți coordonarea și gestionarea sectorului, precum și performanța instituțiilor-cheie din sector, lucrând direct cu instituțiile naționale la dezvoltarea capacităților sectoriale, la gestionarea integrată a resurselor de apă și la un sistem informațional complet al apei.",
+    "en": "Poor governance is the key bottleneck in the Moldovan water sector, which jeopardizes long-term sustainability of past investments, and hinders new Investments to extend access to drinking water for all. With this project, SDC will improve the steering and management of the sector as well as the performance of key sector institutions, through working directly with the national institutions on sector capacity development, integrated water resource management, and a comprehensive water information system."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=CH-4-2014005224",
+   "citat": "Poor governance is the key bottleneck in the Moldovan water sector, which jeopardizes long-term sustainability of past investments, and hinders new Investments to extend access to drinking water for all. … With this project, SDC will improve the steering and management of the sector as well as the performance of key sector institutions, through working directly with the national institutions on sector capacity development, integrated water resource management, and a comprehensive water information system.",
+   "nota": "Registrul IATI, publicat de DEZA/SDC (Elveția) (prin d-portal), activitatea CH-4-2014005224 «Strengthening the Institutional Framework in the Water and Sanitation Sector in Moldova» (perioada în IATI: 01.03.2014–31.08.2020), câmpul description. Legat de rând după finanțator și titlu: titlul din IATI e traducerea exactă a denumirii din registru (hotărârea din 22.04.2016 cade în această fază). IATI împarte proiectele elvețiene pe credite și pe ani, cu perioade și sume parțiale care nu corespund unui singur acord, de aceea s-a scris doar descrierea. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG60/2019",
+    "HG537/2017",
+    "HG493/2016"
+   ],
+   "obiective": {
+    "ro": "Moldova suportă costuri sociale mari din cauza emigrării masive. Beneficiile potențiale ale migrației rămân insuficient exploatate. … Elveția sprijină Moldova în crearea unui mediu favorabil valorificării capitalului uman și financiar al migranților pentru dezvoltarea țării lor de origine.",
+    "en": "Moldova pays great social costs as a result of high outward migration. The potential benefits of migration remain underexploited. … Switzerland supports Moldova in creating a favorable environment for leveraging migrants' human and financial capital for the development of their home country."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=CH-4-2014005201",
+   "citat": "Moldova pays great social costs as a result of high outward migration. … Switzerland supports Moldova in creating a favorable environment for leveraging migrants",
+   "nota": "Registrul IATI, publicat de DEZA/SDC (Elveția) (prin d-portal), activitatea CH-4-2014005201 «Moldova - Making the Most of Migration» (perioada în IATI: 15.01.2014–31.12.2018), câmpul description. Legat de rând după finanțator și titlu: hotărârea din 22.04.2016 cade în această fază a proiectului «Valorificarea potențialului migrației» (Making the Most of Migration). IATI împarte proiectele elvețiene pe credite și pe ani, cu perioade și sume parțiale care nu corespund unui singur acord, de aceea s-a scris doar descrierea. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG574/2025"
+   ],
+   "obiective": {
+    "ro": "Elveția va sprijini instituțiile anticorupție din Moldova să-și consolideze capacitatea de a recupera și gestiona bunurile furate, asigurând aplicarea eficientă a legislației.",
+    "en": "Switzerland will assist Moldovan anti-corruption institutions to enhance their capability to recover and manage stolen assets, ensuring effective application of the legislation."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=CH-4-2025-2024006094",
+   "citat": "Switzerland will assist Moldovan anti-corruption institutions to enhance their capability to recover and manage stolen assets, ensuring effective application of the legislation.",
+   "nota": "Registrul IATI, publicat de DEZA/SDC (Elveția) (prin d-portal), activitatea CH-4-2025-2024006094 «Supporting Moldova in confiscating and recovering stolen assets (CRESTA)» (perioada în IATI: 01.10.2024–14.06.2029), câmpul description. Legat de rând după finanțator și titlu: titlul din IATI e traducerea exactă a denumirii din registru. IATI împarte proiectele elvețiene pe credite și pe ani, cu perioade și sume parțiale care nu corespund unui singur acord, de aceea s-a scris doar descrierea. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG802/2024",
+    "HG603/2019"
+   ],
+   "obiective": {
+    "ro": "Prin acest proiect, Elveția va sprijini eforturile guvernului moldovean de a asigura accesul tuturor la servicii de sănătate și de a proteja populația împotriva cheltuielilor de sănătate care sărăcesc. Aceasta se va realiza prin servicii mai accesibile, ca preț și ca acces, pentru cei mai săraci și mai vulnerabili.",
+    "en": "Through this project, Switzerland will support the Moldovan government's efforts to ensure access to healthcare services for all and to protect the population against impoverishing health expenditures. This will be achieved through making services more affordable and more accessible for the poorest and the most vulnerable."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=CH-4-2017005417",
+   "citat": "Through this project, Switzerland will support the Moldovan government … This will be achieved through making services more affordable and more accessible for the poorest and the most vulnerable.",
+   "nota": "Registrul IATI, publicat de DEZA/SDC (Elveția) (prin d-portal), activitatea CH-4-2017005417 «Progressing towards Universal Health Coverage in Moldova» (perioada în IATI: 01.11.2017–30.04.2023), câmpul description. Legat de rând după finanțator și titlu: hotărârea din 04.12.2019 cade în această fază a proiectului. IATI împarte proiectele elvețiene pe credite și pe ani, cu perioade și sume parțiale care nu corespund unui singur acord, de aceea s-a scris doar descrierea. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG176/2023",
+    "HG1067/2018",
+    "HG838/2014"
+   ],
+   "obiective": {
+    "ro": "Tulburările de sănătate mintală reprezintă o povară mare a bolii în Moldova. … Prin acest proiect, Elveția sprijină eforturile Republicii Moldova de îmbunătățire a bunăstării utilizatorilor serviciilor de sănătate mintală, prin acces la servicii funcționale de îngrijire primară de sănătate mintală la nivel comunitar.",
+    "en": "Mental health disorders represent a high burden of disease in Moldova. … With this project, Switzerland is supporting the efforts of the Republic of Moldova towards the improvement of the well-being of mental health service users through access to functional community level Primary Mental Health Care Services."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=CH-4-2013006122",
+   "citat": "Mental health disorders represent a high burden of disease in Moldova. … With this project, Switzerland is supporting the efforts of the Republic of Moldova towards the improvement of the well-being of mental health service users through access to functional community level Primary Mental Health Care Services.",
+   "nota": "Registrul IATI, publicat de DEZA/SDC (Elveția) (prin d-portal), activitatea CH-4-2013006122 «Support to the Reform of Mental Health Services in Moldova» (perioada în IATI: 15.05.2013–31.07.2018), câmpul description. Legat de rând după finanțator și titlu: hotărârea din 08.10.2014 cade în prima fază a proiectului (MENSANA). IATI împarte proiectele elvețiene pe credite și pe ani, cu perioade și sume parțiale care nu corespund unui singur acord, de aceea s-a scris doar descrierea. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "OMMPS183/2024"
+   ],
+   "obiective": {
+    "ro": "În acord cu prioritățile guvernelor Moldovei și Elveției, proiectul urmărește să împuternicească femeile din punct de vedere social și economic, inclusiv refugiatele din Ucraina, să le sporească participarea la luarea deciziilor și pe piața muncii, să le promoveze activitățile antreprenoriale și, în final, să contribuie la o societate și o economie echitabile, egale, incluzive și reziliente în Moldova.",
+    "en": "In line with the priorities of the Governments of Moldova and Switzerland, the project aims to socially and economically empower women, including refugee women from Ukraine, increase their participation in decision-making and the workforce, promote their entrepreneurial activities, and finally contribute to a just, equal, inclusive and resilient society and economy in Moldova."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=CH-4-2025-2024000184",
+   "citat": "the project aims to socially and economically empower women, including refugee women from Ukraine, increase their participation in decision-making and the workforce, promote their entrepreneurial activities",
+   "nota": "Registrul IATI, publicat de DEZA/SDC (Elveția) (prin d-portal), activitatea CH-4-2025-2024000184 «Single-phase project: Enhancing Peace and Economic Prosperity through Women's Leadership and Inclusion (Women for Peace & Prosperity)» (perioada în IATI: 01.07.2024–30.06.2028), câmpul description. Legat de rând după finanțator și titlu: titlul din IATI e traducerea exactă a denumirii din registru. IATI împarte proiectele elvețiene pe credite și pe ani, cu perioade și sume parțiale care nu corespund unui singur acord, de aceea s-a scris doar descrierea. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG1074/2017"
+   ],
+   "obiective": {
+    "ro": "Scopul modulului de cooperare financiară este îmbunătățirea evacuării apelor uzate pentru populația orașului Cahul, în privința accesului și a siguranței evacuării, precum și consolidarea protecției mediului și a păstrării resurselor. Pentru o funcționare durabilă, capacitățile tehnice și economice ale întreprinderii municipale Apă-Canal Cahul (ACC) vor fi sprijinite printr-o măsură de însoțire.",
+    "en": "Aim of the FC-module is the improvement of wastewater disposal of Cahuls population in terms of access and disposal safety as well as strengthening of environmental protection and resource preservation. To ensure a sustainable operation, the technical and economical capacities of the municipal utility Apa Canal Cahul (ACC) will be underpinned by a supporting measure."
+   },
+   "inceput": "2018-08-01",
+   "sfarsit": "2027-06-30",
+   "sursa": "https://d-portal.org/q.xml?aid=DE-1-201668904",
+   "citat": "Aim of the FC-module is the improvement of wastewater disposal of Cahuls population in terms of access and disposal safety as well as strengthening of environmental protection and resource preservation. … To ensure a sustainable operation, the technical and economical capacities of the municipal utility Apa Canal Cahul (ACC) will be underpinned by a supporting measure. … <activity-date iso-date=\"2018-08-01\" type=\"2\"></activity-date> … <activity-date iso-date=\"2027-06-30\" type=\"3\"></activity-date>",
+   "nota": "Registrul IATI, publicat de KfW / BMZ (Germania) (prin d-portal), activitatea DE-1-201668904 «Initiative Sanitation»: obiective = câmpul description; început = data reală de început (tip 2); final = data planificată de încheiere (tip 3). Legat de rând după finanțator și titlu: HG1074/2017 (13.12.2017) aprobă înțelegerea prin schimb de note pentru «colaborarea financiară pentru anul 2016 (proiectul „Iniţiativa sanitaţie”)»; activitatea IATI are numărul de proiect BMZ 201668904 și angajamentul din 01.08.2018. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG319/2016"
+   ],
+   "obiective": {
+    "ro": "Serviciile comunale din infrastructura locală sunt furnizate mai eficient și mai durabil în zonele rurale.",
+    "en": "Communal services from the local infrastructure are provided more efficiently and sustainably in rural areas."
+   },
+   "sfarsit": "2019-01-30",
+   "sursa": "https://d-portal.org/q.xml?aid=DE-1-200821678",
+   "citat": "Communal services from the local infrastructure are provided more efficiently and sustainably in rural areas. … <activity-date iso-date=\"2019-01-30\" type=\"4\"></activity-date>",
+   "nota": "Registrul IATI, publicat de GIZ / BMZ (Germania) (prin d-portal), activitatea DE-1-200821678 «Modernisation of Municipal Services»: obiective = câmpul description; final = data reală de încheiere (tip 4). Începutul real (01.01.2010) nu s-a scris: e înainte de hotărârea din 22.03.2016. HG319/2016 aprobă înțelegerea pentru cooperarea tehnică ce vizează proiectul «Modernizarea serviciilor comunale»; legătura se bazează pe denumire și pe perioadă (finalul planificat, 31.12.2015, a fost prelungit până la 30.01.2019). Activitatea are mai mulți cofinanțatori (DEZA, UE, România, Suedia). Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG778/2022"
+   ],
+   "obiective": {
+    "ro": "Obiectivul modulului „Promovarea securității energetice a gospodăriilor vulnerabile din Republica Moldova” este, prin urmare, consolidarea capacității guvernului moldovean de a oferi sprijin adecvat și protecție socială populațiilor vulnerabile. Volumul proiectului, de 40 mil. EUR, urmărește în mod special accesibilitatea prețului la energie.",
+    "en": "The objective of the module Promoting Energy Security of Vulnerable Households in the Republic of Moldova therefore is to strengthen the Moldovan governments ability to provide adequate support and social protection to vulnerable populations. The project volume of EUR 40 million is specifically aimed to ensure the affordability of energy supply."
+   },
+   "inceput": "2022-11-18",
+   "sfarsit": "2023-03-31",
+   "sursa": "https://d-portal.org/q.xml?aid=DE-1-202268050",
+   "citat": "The objective of the module Promoting Energy Security of Vulnerable Households in the Republic of Moldova therefore is to strengthen the Moldovan governments ability to provide adequate support and social protection to vulnerable populations. … The project volume of EUR 40 million is specifically aimed to ensure the affordability of energy supply. … <activity-date iso-date=\"2022-11-18\" type=\"2\"></activity-date> … <activity-date iso-date=\"2023-03-31\" type=\"4\"></activity-date>",
+   "nota": "Registrul IATI, publicat de KfW / BMZ (Germania) (prin d-portal), activitatea DE-1-202268050 «Sector Budget Funding Promotion of Energy Security of Vulnerable Groups in the Republic of Moldova»: obiective = câmpul description; început = data reală de început (tip 2); final = data reală de încheiere (tip 4, activitate încheiată). Legat de rând după finanțator și titlu: HG778/2022 (09.11.2022) aprobă înțelegerea pentru colaborarea financiară «Promovarea securității energetice a grupurilor vulnerabile din Republica Moldova», iar angajamentul KfW (18.11.2022) vine la nouă zile după hotărâre. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "OMDED116/2025"
+   ],
+   "obiective": {
+    "ro": "Proiectul urmărește extinderea ofertei de finanțare la prețuri accesibile pentru întreprinderile mici și mijlocii (IMM) din Republica Moldova.",
+    "en": "The project aims to expand the supply of affordable finance for SMEs in the Republic of Moldova."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=DE-1-202468510",
+   "citat": "The project aims to expand the supply of affordable finance for SMEs in the Republic of Moldova.",
+   "nota": "Registrul IATI, publicat de KfW / BMZ (Germania) (prin d-portal), activitatea DE-1-202468510 «SME Development Facility of Moldova - Phase II» (câmpul description). Legat de rând după finanțator, titlu și suma 20.000.000 EUR, ca la datele rândului. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "OME27/2025"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea eficienței energetice a unor clădiri publice selectate din sănătate (spitale regionale) și educație (universități și școli profesionale).",
+    "en": "The aim of the project is to improve the energy efficiency of selected public buildings in the areas of health (regional hospitals) and education (universities and vocational schools)."
+   },
+   "sursa": "https://d-portal.org/q.xml?aid=DE-1-202268019",
+   "citat": "The aim of the project is to improve the energy efficiency of selected public buildings in the areas of health (regional hospitals) and education (universities and vocational schools).",
+   "nota": "Registrul IATI, publicat de KfW / BMZ (Germania) (prin d-portal), activitatea DE-1-202268019 «Climate-friendly Energy Generation and Energy Efficiency» (câmpul description). Descrierea numește grantul de cooperare financiară de 38,7 mil. EUR și Unitatea de implementare MEPIU, ca în rând (OME27/2025); legătura cu rândul e cea a datelor lui. Textul englez e al IATI; cel românesc e traducerea."
+  },
+  {
+   "acte": [
+    "HG132/2026"
+   ],
+   "sfarsit": "2029-01-31",
+   "sursa": "https://d-portal.org/q.xml?aid=DE-1-202520278",
+   "citat": "<activity-date iso-date=\"2029-01-31\" type=\"3\"></activity-date>",
+   "nota": "Registrul IATI, publicat de BMZ (Germania) (prin d-portal), activitatea DE-1-202520278 «Strengthening quality infrastructure for EU accession and competitiveness» (implementator: Physikalisch-Technische Bundesanstalt): final = data planificată de încheiere (tip 3). Începutul real (01.02.2026) nu s-a scris: e înainte de hotărârea din 25.03.2026. Descrierea din IATI repetă doar titlul, deci nu s-a scris nicio descriere. Legat de rând după finanțator și titlu (traducere exactă)."
   }
  ]
 }

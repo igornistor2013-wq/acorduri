@@ -1059,5 +1059,19 @@
   "extern": true,
   "u": "https://gov.md/ro/comunicate-de-presa/fermierii-vor-avea-acces-la-tehnica-agricola-moderna-si-sisteme-de-irigare-cu",
   "nota": "Comunicatul Guvernului din 15.10.2026: «Noua etapă prevede o finanțare de până la aproximativ 55 de milioane de dolari», cu sprijinul JICA. Plafon estimativ, la începutul negocierilor; la fel în comunicatul MAIA."
+ },
+ "HG1074/2017": {
+  "v": 10000000,
+  "val": "EUR",
+  "extern": true,
+  "u": "https://d-portal.org/q.xml?aid=DE-1-201668904",
+  "nota": "KfW/BMZ (IATI, DE-1-201668904, «Initiative Sanitation»): angajament (tip 2) de 10.000.000 EUR la 01.08.2018; HG1074/2017 aprobă înțelegerea pentru proiectul «Iniţiativa sanitaţie»."
+ },
+ "HG778/2022": {
+  "v": 40000000,
+  "val": "EUR",
+  "extern": true,
+  "u": "https://d-portal.org/q.xml?aid=DE-1-202268050",
+  "nota": "KfW/BMZ (IATI, DE-1-202268050): angajament de 40.000.000 EUR la 18.11.2022; descrierea: «The project volume of EUR 40 million». Plătit integral la 28.11.2022."
  }
 }
