@@ -387,11 +387,10 @@ tabelului („obiective N/M · început N/M · finalizare N/M", cu cifrele de la
 Un utilizator poate corecta oricând un câmp din pagină; `date/proiecte_manual.json` e pentru ce se poate
 dovedi cu un document oficial.
 
-La data acestei versiuni, `date/proiecte_manual.json` are obiective pentru 170 din cele 460 de rânduri listate
-(Banca Mondială 62, BERD 34, BEI 20, CEB 10, Japonia/JICA 10, FIDA 9 — toate —, AFD 7, Germania 7 — KfW și GIZ —,
-Uniunea Europeană 6, Elveția 4, SUA/MCC 1), fiecare cu adresa documentului oficial și citatul exact. Restul (China,
-SUA/USAID, cea mai mare parte din Japonia și Germania, majoritatea acordurilor Elveției, ale UE și ale Băncii Mondiale
-mai vechi) rămân „neintroduse", până se găsește o sursă; se pot completa direct din pagină, cu codul de acces, sau în
+La data acestei versiuni (runda a cincea de surse oficiale), `date/proiecte_manual.json` are obiective pentru 240 din cele 466 de rânduri listate
+(Banca Mondială 103, BERD 34, BEI 20, Japonia/JICA 17, Elveția 14, Uniunea Europeană 13, Germania — KfW, GIZ și acorduri guvernamentale — 12,
+CEB 10, FIDA 9, AFD 7, SUA/MCC 1), fiecare cu adresa documentului oficial și citatul exact. Restul (China, SUA/USAID, granturile japoneze pentru IMM,
+schimburile de note germane fără proiect numit, majoritatea acordurilor UE și o parte din ale Băncii Mondiale) rămân „neintroduse", până se găsește o sursă; se pot completa direct din pagină, cu codul de acces, sau în
 fișier, cu o intrare nouă (sursă + citat). Datele de început și de finalizare vin deocamdată din AMP (la proiectele legate sigur) și din 60 de intrări oficiale
 (Banca Mondială 35 — din rapoartele de implementare ISR, de finalizare ICR și din acordurile de finanțare: data intrării
 în vigoare ca început, data de închidere ca final —, FIDA 8, JICA/Japonia 5, GIZ/Germania 4, AFD 4, Elveția/SDC 3 și
@@ -501,6 +500,100 @@ denumire, de sumă (la DST, 1,2–1,75 față de moneda actului; suma a două in
 
 Cu acestea, rămân fără început 288 de rânduri (de la 321), fără final 280 (de la 316) și fără debursare 363 (de la 397), din 466 de rânduri
 listate; cele mai multe sunt UE (programe sectoriale, fără plăți publicate pe acord), BERD, BEI, CEB și donatorii bilaterali mici.
+
+**Registrul IATI (a doua trecere), granturile japoneze și evaluările JICA.** A patra rundă de surse oficiale a refăcut potrivirea pe sume
+exacte, în moneda originală, între rândurile fără date și activitățile din registrul IATI (prin d-portal), a citit pagina fiecărei activități
+potrivite (`q.xml?aid=…`, cu datele exacte) și a adăugat două surse pentru Japonia: fișa Ambasadei Japoniei din decembrie 2010 și evaluările
+ex-post JICA. Un rând se leagă de o activitate doar când coincid finanțatorul, titlul și suma (în moneda originală), iar data angajamentului sau
+a semnării se potrivește cu cea a rândului; sumele rotunde care se potrivesc fără titlu și dată nu se iau.
+
+* **`date/proiecte_manual.json`**: 22 de intrări noi (21 cu început, 15 cu final), cu toate actele rândului în `acte`.
+  * *Registrul IATI (8).* UE 3: `hg1257/2016` (reforma poliției, 14.12.2016 – 13.12.2023), `hg513/2017` (zone rurale, 21.07.2017 – 21.12.2026),
+    `hg1363/2016` (Facilitatea pentru cooperare tehnică 2016, 21.07.2017 – 21.07.2027); începutul e „Actual Start” (coincide cu semnarea), finalul
+    „Planned End”. AFD 3: `hg996/2023` (CMD100901, 30.09.2024 – 17.12.2025, final real), `hg537/2023` (CMD101001, 12.12.2023 – 28.02.2024, final
+    planificat), `hg471/2025` (CMD101601, 17.12.2025 – 17.12.2025, plată unică). JICA: `hg103/2021` (echipamente de prevenire a incendiilor,
+    26.11.2021 – 30.11.2024 planificat). DEZA/SDC: `hg574/2025` (CRESTA), doar finalul planificat, 14.06.2029. Citatul e rândul `<activity-date …>`
+    din XML-ul activității, iar nota spune ce fel de dată e (reală sau planificată) și cum s-a legat rândul.
+  * *Fișa Ambasadei Japoniei, decembrie 2010 (11).* La granturile 2KR (`hg1150/2002`, `hg229/2006`, `hg28/2007`, `hg233/2008`, `hg406/2009`) și la cele
+    culturale (`hg1299/2002`, `hg88/2006`) începutul e luna schimbului de note („E/N signed in …”), iar finalul luna finalizării („Completed in …”). La
+    cele patru granturi fără proiect pentru IMM (`hg246/2005`, `hg230/2006`, `hg2501/2007`, `hg232/2008`) fișa dă doar luna E/N, deci doar începutul.
+    Rândurile se leagă după suma identică în yeni, luna E/N (față de data HG) și tipul grantului.
+  * *Evaluări JICA și text de schimb de note (3).* `hg234/2011` (început 11.05.2011 = data E/N; finalul era deja în fișier) și `hg1211/2007` (început
+    noiembrie 2007; finalul era deja în fișier), din evaluările ex-post; `hg103/2012` (început 17.04.2012, data notei din textul publicat pe ondrl.gov.md).
+* **`date/debursari.json`**: 9 debursări noi, la 8 rânduri. AFD (5): `hg996/2023` 2 × 20 mil. EUR (31.12.2024 și 31.12.2025, adică întreg împrumutul de
+  40 mil.), `hg537/2023` 40 mil. EUR (31.12.2023), `hg525/2024` 25 mil. EUR (31.12.2024), `hg471/2025` 25 mil. EUR (31.12.2025); AFD raportează plățile la
+  31 decembrie, deci datele sunt de închidere de an, nu ale plăților. DEZA/SDC (1): `hg574/2025`, 250.000 CHF la 31.12.2025 din 1,88 mil. CHF angajați.
+  JICA (3), sume finale din evaluările ex-post, datate la finalizare: `hg234/2011` 394 mil. JPY („Actual Grant Amount”, din 417; 02.10.2013), `hg156/2013`
+  1.025 mil. JPY („Actual Grant Amount”, din 1.154; 31.01.2016, ziua lipsește) și `hg952/2012` 5.698 mil. JPY („Disbursed Amount”, credit, din 5.926;
+  31.05.2018, sfârșitul perioadei efective).
+* **Ce nu s-a scris, în rest**:
+  * *Termenele din schimburile de note 2KR* (31.03.2003, 31.03.2006, 31.03.2007, 31.03.2008, 31.10.2010, 30.04.2013): sunt perioada în care grantul poate fi
+    eliberat, nu finalizarea; la cinci granturi diferă cu 3–6 luni de luna finalizării din fișa Ambasadei, care a fost scrisă ca final.
+  * *`hg1211/2007`*: evaluarea JICA dă finalizarea în decembrie 2008, fișa Ambasadei în martie 2009; a rămas decembrie 2008 (din rând). „Contract Amount” (483 mil. JPY)
+    e valoarea contractelor, nu o plată, deci nu s-a scris ca debursare.
+  * *`hg525/2024`*: are deja 2023–2028 (perioada programului de șase ani, din comunicatul AFD); IATI dă 04.12.2024 pentru această tranșă. S-a adăugat doar debursarea.
+    Cele trei împrumuturi AFD pentru reforma energetică (`hg537/2023`, `hg525/2024`, `hg471/2025`; IATI le numește pe ultimele două „faza 2” și „faza 3”) au acum date de natură diferită: de verificat dacă se aliniază.
+  * *iDRIP (`hg85/2026`, `hg252/2026`)*: rămân datele de pe pagina AFD; IATI are o activitate de irigații cu alte date și cu începutul înainte de semnare.
+  * *`hg574/2025`*: începutul din IATI (01.10.2024) nu s-a scris, fiindcă rândul n-are dată de semnare, iar HG e din 03.09.2025. Celelalte rânduri elvețiene nu
+    s-au legat: registrul SDC are 685 de activități pentru Moldova, fragmentate pe credite și ani, cu angajamente care nu coincid cu sumele din registru.
+  * *Acordurile USAID pentru obiectivele de dezvoltare din 2016* (`hg938/2016`, `hg1062/2016`, `hg185/2022`, `hg186/2022`, `hg206/2021`): textele din 2021–2022 dau
+    termenul de realizare 31.12.2025, dar până în 2024 s-au inițiat 18 amendamente și termenul actual nu s-a putut verifica.
+  * *Angajamentele AFD dublate* (80 mil. EUR la `hg996/2023`, 50 mil. la `hg525/2024`, față de împrumuturi de 40 și 25 mil.) nu s-au folosit; plățile din IATI însumează
+    exact împrumuturile. Perioadele de execuție din deciziile anuale de finanțare ale UE sunt calculate, nu citabile; fișele BEI și BERD, rapoartele de datorie externă ale MF și
+    termenele de tragere din rapoartele Curții de Conturi nu dau perioada proiectului sau plăți pe acord.
+* Detaliile (citate, adrese, motivele) sunt în `surse_oficiale_potriviri_4.xlsx`, livrat odată cu aceste fișiere (nu e în repository).
+
+Cu acestea, rămân fără început 267 de rânduri (de la 288), fără final 265 (de la 280) și fără debursare 355 (de la 363), din 466 de rânduri
+listate; cele mai multe sunt UE (acorduri de finanțare fără plăți publicate pe acord), BERD, BEI, CEB, Elveția (activități fragmentate) și donatorii bilaterali mici.
+
+**Descrieri din Banca Mondială, din registrul IATI și din fișa Ambasadei Japoniei; angajamente și plăți KfW.** A cincea rundă a căutat ce mai lipsea
+pe cele cinci câmpuri (descriere, început, final, angajament, debursare) în surse oficiale citite altfel sau încă nefolosite: API-ul public al proiectelor
+Băncii Mondiale (`search.worldbank.org/api/v2/projects`, câmpul `pdo` — obiectivul de dezvoltare — sau, la proiectele vechi, `project_abstract`), registrul IATI
+prin d-portal (activitățile KfW/GIZ publicate de BMZ, DEZA/SDC și UE/DG NEAR, câmpul `description`, plus datele și tranzacțiile KfW) și fișa Ambasadei Japoniei.
+Rândurile s-au legat ca înainte: după finanțator, titlu (sau numărul creditului din Finances One) și, unde rândul are, după sumă și dată. Textul englez al fiecărei
+descrieri e cel al sursei (cu „…” unde s-a omis o propoziție), cel românesc e traducerea, iar `citat` e un fragment exact din sursă, verificat pe înregistrarea originală.
+
+* **`date/proiecte_manual.json`**: 71 de intrări noi (347 în total): 70 cu descriere și 4 cu date (trei dintre ele au și descriere; `hg132/2026` doar final).
+  * *Banca Mondială (41 de descrieri).* La rândurile cu număr de credit, legătura e cea din runda a treia (Finances One: credit, instrument, data semnării); la celelalte,
+    denumirea proiectului, unică în API. Un proiect cu mai multe rânduri (RISP II: `hg230/2009`, `hg736/2008`, `hg378/2006`) dă aceeași descriere fiecărui rând.
+    `nota` dă numărul proiectului (`P…`) și motivul legării. La patru proiecte (cele două credite PRSC, fondul de investiții în sănătate și programul de apă și canalizare) fișa are semne stricate
+     (de pildă „Government#s”, „inselected”, „,,services”): textul englez s-a oprit sau s-a întrerupt cu „…” înaintea lor, ca să rămână exact cel al sursei.
+  * *KfW/GIZ prin IATI (6 intrări).* Descrieri la `omded116/2025` (IMM, faza II), `ome27/2025` (eficiență energetică în clădiri publice), `hg778/2022` (securitate
+    energetică), `hg1074/2017` (Inițiativa sanitație, Cahul) și `hg319/2016` (modernizarea serviciilor comunale, GIZ). Date: `hg778/2022` 18.11.2022 – 31.03.2023
+    (ambele reale, activitate încheiată), `hg1074/2017` 01.08.2018 (real) – 30.06.2027 (planificat), `hg319/2016` doar finalul real, 30.01.2019, și `hg132/2026` doar finalul
+    planificat, 31.01.2029; începuturile din 2010, respectiv 01.02.2026, sunt înainte de hotărâri (22.03.2016 și 25.03.2026), deci nu s-au scris. Hotărârile
+    HG778/2022 și HG1074/2017 numesc proiectul ca activitatea IATI (a doua, „colaborarea financiară pentru anul 2016 (proiectul «Iniţiativa sanitaţie»)”), iar angajamentul KfW pentru
+    prima vine la nouă zile după hotărâre.
+  * *DEZA/SDC prin IATI (10 descrieri)*: `hg284/2015`, `hg493/2016`, `hg838/2014`, `hg603/2019`, `hg138/2020`, `hg27/2024`, `ommps183/2024`, `hg574/2025`, `hg243/2020`, `hg490/2016`.
+    La proiectele cu mai multe faze s-a luat descrierea fazei în care cade hotărârea (nota dă perioada). Numai descrierea: perioadele și sumele din IATI sunt pe credite și pe ani.
+  * *UE, DG NEAR prin IATI (7 descrieri)*: `hg1363/2016`, `hg513/2017`, `hg1257/2016`, `hg352/2019`, `dp34/2021`, `hg717/2020`, `hg432/2021` — aceleași activități de la care veneau deja datele rândurilor.
+  * *Fișa Ambasadei Japoniei (7 descrieri)*: cinci granturi 2KR (`hg1150/2002`, `hg229/2006`, `hg28/2007`, `hg233/2008`, `hg406/2009`) și două culturale (`hg1299/2002`, `hg88/2006`).
+    Fișa nu enunță obiective: descrierea e programul și bunurile livrate, în formularea ei („32 Sampo combine harvesters”).
+* **`date/sume_manual.json`**: 2 angajamente noi, cu `extern` și adresa activității IATI: `HG778/2022` (40 mil. EUR; descrierea IATI spune „The project volume of EUR 40 million”) și
+  `HG1074/2017` (10 mil. EUR, angajament din 01.08.2018). Amândouă sunt granturi (IATI: tip de finanțare 110). `date/acorduri_legare.json` și `legis_acorduri.html` s-au refăcut cu
+  `legatura_acorduri.py` și `legis_pagina.py`: 339 de acorduri cu sumă (de la 337), singurele schimbări fiind cele două rânduri.
+* **`date/debursari.json`**: 3 plăți noi, toate KfW (BMZ): `hg778/2022` 40 mil. EUR (28.11.2022, activitate încheiată), `hg1074/2017` 9.488.074,47 EUR din 10 mil. (18.06.2026) și `ome27/2025`
+  405.576 EUR din 38,7 mil. (09.04.2026). BMZ publică o singură tranzacție „Disbursement” pe activitate: valoarea e cumulată, iar data e a tranzacției din IATI, nu neapărat a ultimei plăți
+  (nota fiecărei intrări o spune). La `omded116/2025` IATI arată 0 plătit, deci nu s-a scris nimic.
+* **Ce nu s-a scris**:
+  * *Schimburile de note germane fără proiect numit* (`hg299/2020`, `hg607/2019`, `hg640/2020`, `hg266/2022`) și `hg112/2024`, a cărei hotărâre acoperă patru proiecte (IMM, IMM măsuri adiționale,
+    Programul deschis de dezvoltare urbană și măsurile lui adiționale) pe un rând care poartă numele ultimului: nicio descriere, dată sau sumă.
+  * *GIZ*: angajamentele din IATI (de pildă 35,35 mil. EUR la „Strong Businesses and Communities”) nu coincid cu sumele din registru, deci nu s-au scris sume sau plăți; `hg316/2023` (Cahul II) n-are în IATI o activitate cu acest titlu.
+  * *DEZA*: `hg21/2022` (CREATIVO) nu are descriere în IATI; la nicio activitate elvețiană nu s-au scris perioade, sume sau plăți (fragmentate pe credite și ani).
+  * *UE*: `hg351/2019` și `hg353/2019` (acțiuni din aceeași zi, legătură neclară) nu s-au atins; IATI dă la UE plăți doar la nivelul contractelor.
+  * *Banca Mondială*: 23 de rânduri BIRD/AID rămân fără descriere (operațiuni de politici și credite de ajustare structurală, granturi mici din fonduri fiduciare, câteva acte din 2026 și altele pe care nu s-a putut lega sigur
+     un proiect cu text în API). La `hp204/1998` (First Cadastre Project)
+    registrul are data semnării 07.07.2005, iar Finances One 08.06.1998: descrierea s-a scris după denumirea proiectului (P035771), diferența rămâne de verificat.
+  * *Japonia*: cele patru granturi fără proiect pentru IMM (`hg246/2005`, `hg230/2006`, `hg2501/2007`, `hg232/2008`): fișa nu spune ce au finanțat.
+  * *BERD*: registrul IATI al BERD are 63 de activități pentru Moldova, din 2016 încoace. Cele zece rânduri BERD rămase fără descriere sunt: șase mai vechi sau fără proiect de sine stătător în IATI (Termocom,
+     creditul din 1996, terminalul petrolier Giurgulești, Apă-Canal Chișinău și cele două rânduri ale aeroportului, `hp119/1998` și `hg1450/2008`), hotărârea de împuternicire `hg41/2011` și trei rânduri „CET-Nord”
+     (`hg690/2014`, `dprm1952/2016`, `dp1044/2018`); pentru acestea IATI are doar faza a II-a („GrCF2 W1-Balti District Heating Phase 2”, 24.12.2021), iar rândurile grupează actele ambelor faze, deci nu s-a scris nimic.
+* Detaliile (citate, adrese, motivele) sunt în `surse_oficiale_potriviri_5.xlsx`, livrat odată cu aceste fișiere (nu e în repository).
+
+Cu acestea, rămân fără descriere 226 de rânduri (de la 296), fără sumă 132 (de la 134) și fără debursare 352 (de la 355), din 466 de rânduri listate; dintre cele fără descriere,
+cele mai multe sunt UE (64), Banca Mondială (23), Japonia (12), BERD (10), China (10), SUA (9) și donatorii bilaterali mici. Datele s-au scris la patru rânduri, deci fără început
+scad cu 2 și fără final cu 4 (niciunul din cele patru nu avea date în AMP): cu raportul AMP din 08.11.2026, pagina publicată număra 252 de rânduri fără început și 250 fără final,
+adică 250 și 246 după aceste date. La început și la final cifrele depind de raportul AMP, care se schimbă, deci pot diferi de cele din rundele de mai sus.
 
 **Codul de acces și „baza de date".** Site-ul e static (GitHub Pages): n-are server care să primească
 date. Singurul loc în care o pagină poate scrie fără un serviciu în plus e chiar repository-ul, prin

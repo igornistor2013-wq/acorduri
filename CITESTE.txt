@@ -1,7 +1,11 @@
-Runda 3 de surse oficiale: credite mai vechi ale Băncii Mondiale (Finances One), asistența macrofinanciară a UE (DG ECFIN) și Compactul MCC. Trei fișiere, doar date și text; designul nu e atins.
+Runda 5 de surse oficiale („mai caută”): descrieri din Banca Mondială (API-ul proiectelor), din registrul IATI (KfW/GIZ, DEZA/SDC, UE/DG NEAR) și din fișa Ambasadei Japoniei; angajamente și plăți KfW. Șase fișiere, doar date și text; designul nu e atins.
 Pune-le în repository la aceleași căi:
-  date/proiecte_manual.json  (38 de intrări noi față de site: 35 Banca Mondială + 3 MFA, fiecare cu adresă și citat)
-  date/debursari.json        (37 de debursări noi: 30 Banca Mondială, 6 tranșe MFA, 1 Compactul MCC, adăugate după cele 69 de pe site)
-  README.md                  (secțiunea nouă „Credite mai vechi ale Băncii Mondiale, asistența macrofinanciară a UE și Compactul MCC”; conține și secțiunea IATI, care lipsea din README-ul de pe site)
-ATENȚIE: date/debursari.json înlocuiește fișierul din site. La 05.11.2026 fișierul live avea 69 de debursări (actualizat 2026-11-04T14:43:47Z) și era identic cu baza acestui pachet.
-Dacă între timp ai introdus debursări din pagină, nu-l înlocui: spune-mi și le îmbin.
+  date/proiecte_manual.json  (71 de intrări noi față de site: 70 cu descriere — Banca Mondială 41, DEZA/SDC 10, UE 7, Japonia 7, KfW/GIZ 5 — și 4 cu date de început/final; fiecare cu adresă și citat)
+  date/sume_manual.json      (2 angajamente noi, KfW/BMZ: HG778/2022 — 40 mil. EUR și HG1074/2017 — 10 mil. EUR)
+  date/debursari.json        (3 debursări noi, adăugate după cele 115 de pe site: hg778/2022, hg1074/2017 și ome27/2025 — toate KfW)
+  date/acorduri_legare.json  (registrul refăcut cu legatura_acorduri.py; singura schimbare: sumele celor două rânduri de mai sus)
+  legis_acorduri.html        (pagina refăcută cu legis_pagina.py)
+  README.md                  (secțiunea nouă „Descrieri din Banca Mondială, din registrul IATI și din fișa Ambasadei Japoniei; angajamente și plăți KfW”; conține și secțiunea rundei 4, pe care README-ul de pe site încă nu o are)
+ATENȚIE: date/debursari.json înlocuiește fișierul din site. La 08.11.2026 fișierul live avea 115 debursări (actualizat 2026-11-06T10:05:40Z) și era identic cu baza acestui pachet. Dacă între timp ai introdus debursări din pagină, nu-l înlocui: spune-mi și le îmbin. La fel pentru date/proiecte_manual.json (276 de intrări pe site) și date/sume_manual.json (183 de chei).
+La fel pentru date/acorduri_legare.json și legis_acorduri.html: dacă după 06.11.2026 au apărut acte noi (commit „Verificare zilnică” cu schimbări), nu le înlocui — workflow-ul „Legături acord ↔ proiect AMP” pornește singur după urcarea lui date/sume_manual.json și reface registrul (rezultatul e același, doar data din „actualizat” se schimbă).
+Raportul cu citatele și motivele (surse_oficiale_potriviri_5.xlsx) nu face parte din repository.
