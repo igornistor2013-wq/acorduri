@@ -1,5 +1,5 @@
 {
-"actualizat": "2026-10-28 14:29",
+"actualizat": "2026-11-09 17:47",
 "istoric_complet": true,
 "puncte": {
 "1/MDED/2026": {
@@ -10,6 +10,38 @@
 "sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-14-ianuarie-2026-ora-1000",
 "sume": [],
 "titlu": "Hotărâre pentru aprobarea Acordului de grant dintre Instituția Publică Organizația pentru Dezvoltarea Antreprenoriatului și Agenția de Cooperare Internațională a Germaniei (GIZ) pentru implementarea Proiectului „Întreprinderi și comune puternice pentru Moldova”, semnat la Chișinău la 30 decembrie 2025"
+},
+"1003/MAIA/2026": {
+"categorie": "Împrumut",
+"data": "2026-11-12",
+"partener": "JICA",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-11/NU-1003-MAIA-2026.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-12-noiembrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la aprobarea semnării Acordului de împrumut dintre Guvernul Republicii Moldova și Agenția Japoneză pentru Cooperare Internațională pentru realizarea Proiectului „Modernizarea tehnicii și echipamentelor agricole (etapa a II-a)”"
+},
+"1005/MMPS/2026": {
+"categorie": "Asistență tehnică",
+"data": "2026-11-12",
+"modificare": true,
+"partener": "Cehia",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-11/NU-1005-MMPS-2026_0.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-12-noiembrie-2026-ora-1000",
+"sume": [
+{
+"f": "…itele contribuțiilor în natură asumate de MMPS. Totodată, se va corela Tabelul 4 din anexa nr. 3 (cca 92 400 de pagini; 115 038 MDL) cu poziția 4.2.1 din anexa nr. 4 (92 160 de pagini; 114 73…",
+"s": 2,
+"v": 115038,
+"val": "MDL"
+},
+{
+"f": "…orela Tabelul 4 din anexa nr. 3 (cca 92 400 de pagini; 115 038 MDL) cu poziția 4.2.1 din anexa nr. 4 (92 160 de pagini; 114 739,20 MDL). Se acceptă. Valorile din Tabelul 4 al anexei nr. 3 (aprox…",
+"s": 2,
+"v": 114739.2,
+"val": "MDL"
+}
+],
+"titlu": "Hotărâre cu privire la aprobarea semnării Amendamentului nr. 2 la Memorandumul de înțelegere dintre Ministerul Muncii și Protecției Sociale al Republicii Moldova, Ministerul Muncii și Aspectelor Sociale al Republicii Cehe și Agenția Cehă pentru Dezvoltare privind implementarea Proiectului „Sprijin pentru implementarea reformei RESTART în Republica Moldova” în cadrul cooperării pentru dezvoltare dintre Republica Cehă și Republica Moldova, semnat la 15 octombrie 2025"
 },
 "1039/MC/MAE/2025": {
 "categorie": "Asistență tehnică",
@@ -1569,6 +1601,15 @@
 "sume": [],
 "titlu": "Hotărâre cu privire la inițierea negocierilor asupra proiectului Acordului de împrumut dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare în vederea implementării proiectului „Mecanismul de Eficiență Energetică Revolving din Moldova (MEERM)” și acordarea împuternicirilor delegației pentru negocierea acestuia"
 },
+"719/MEn/MAE/2026": {
+"categorie": "Asistență financiară",
+"data": "2026-11-12",
+"partener": "China",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-11/NU-719-MEn-MAE-2026.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-12-noiembrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Acordului, întocmit prin schimb de scrisori, dintre Guvernul Republicii Moldova și Guvernul Republicii Populare Chineze privind studiul de fezabilitate al Proiectului „Dezvoltarea socioeconomică a raioanelor Republicii Moldova prin utilizarea surselor de energie regenerabilă și a sistemelor de stocare a energiei”"
+},
 "736/MAIA/2026": {
 "categorie": "Împrumut",
 "data": "2026-07-29",
@@ -1832,6 +1873,10 @@
 "sedinta-guvernului-din-12-noiembrie-2025-ora-1000": {
 "acorduri": 0,
 "data": "2025-11-12"
+},
+"sedinta-guvernului-din-12-noiembrie-2026-ora-1000": {
+"acorduri": 3,
+"data": "2026-11-12"
 },
 "sedinta-guvernului-din-13-mai-2026-ora-1000": {
 "acorduri": 2,
