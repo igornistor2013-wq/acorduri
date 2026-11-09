@@ -195,7 +195,7 @@ care legis.md îl primește.
 | `legatura_acorduri.py` | Scrie `date/acorduri_legare.json`: deschide pagina registrului într-un browser fără ecran și îi cere lista acordurilor așa cum le vede ea (grupate, denumite, cu suma aleasă și trecută în euro). Are nevoie de Playwright |
 | `date/acorduri_legare.json` | Acordurile din registru, gata grupate, un acord pe linie. Citit de pagina „De la lege la bani". Se rescrie doar când se schimbă ceva |
 | `date/legaturi_amp.json` | Legăturile acord ↔ proiect AMP confirmate de oameni (vezi mai jos). Se completează de mână sau din pagină |
-| `debursari.html` | Pagina „Debursări pe acorduri”: structura și stilurile. Scripturile ei sunt `debursari.js` și `debursari-ui.js` (vezi „Debursări pe acorduri”), încărcate cu `?v=AAAA-LL-ZZ`: **la fiecare modificare a unuia dintre ele schimbă data din `debursari.html`**, altfel browserul poate păstra o variantă veche (de pildă se vedea doar butonul „Debursare”, fără creioanele de editare). Un test verifică prezența lui `?v=` |
+| `debursari.html` | Pagina „Debursări pe acorduri”: structura și stilurile. Scripturile ei sunt `debursari.js` și `debursari-ui.js` (vezi „Debursări pe acorduri”), încărcate cu `?v=AAAA-LL-ZZ`: **la fiecare modificare a unuia dintre ele schimbă data din `debursari.html`** (dacă data de azi e deja pusă, adaugă o literă: `?v=2026-11-09b`), altfel browserul poate păstra o variantă veche (de pildă se vedea doar butonul „Debursare”, fără creioanele de editare). Un test verifică prezența lui `?v=` |
 | `debursari.js` | Logica paginii, fără DOM, ca s-o poată testa Node: donatorii și proiectele lor, rândurile omise, obiectivele și datele proiectelor (sursele și ordinea lor), totalurile (aceleași reguli ca în registru), proiectele cu grant și împrumut unite într-un singur rând (`grupeazaProiecte`, `sumeComponente`, `ordoneazaUnitati`), operațiile asupra fișierului de date și salvarea lui prin API-ul GitHub („Depozit”), păstrarea codului cu PIN („Seif”) și specificațiile celor trei fișiere Excel |
 | `debursari-ui.js` | Interfața paginii: alegerea donatorilor, tabelul, fereastra cu codul, formularele de debursare și de date despre proiect, panourile „AMP”, „Rânduri omise” și „Date fără acord găsit”, butoanele Excel, engleza și varianta pentru telefon. Nu ține codul nicăieri în afara memoriei paginii |
 | `amp-date.js` | Datele de început și de finalizare din AMP pentru acordurile din „Debursări pe acorduri”: citește raportul AMP live (nr. 661, prin proxy-ul amp.vivi.md) și, când nu răspunde, arhiva `arhiva.js`; leagă un acord de un proiect AMP doar când denumirea, finanțatorul și suma coincid („sigur”) sau când un om a confirmat legătura în `date/legaturi_amp.json`; o legătură doar „probabilă” rămâne indiciu, nu dă date în tabel. Funcții pure, ca să le poată testa Node |
@@ -343,8 +343,10 @@ cu denumirea comună o singură dată și, la „Suma proiectului", cât e grant
 **totalul** în euro; sub denumire scrie tipurile și numărul de acorduri („grant + împrumut · 2 acorduri"). Un clic pe
 rând (sau pe butonul din dreapta) deschide **acordurile componente**, ca rânduri obișnuite, numite după tip și an
 („Grant, 2023", „Împrumut, 2022"), cu datele, debursările, detaliile și editarea lor: creioanele și butonul „Debursare"
-sunt la componente, nu la rândul proiectului. Rândul proiectului arată debursările însumate ale componentelor, cu
-procentul din totalul proiectului, iar datele de început și de finalizare sunt cele din acorduri (începutul cel mai
+sunt la componente, nu la rândul proiectului. Detaliile unei componente încep cu linia **„Componentele proiectului”**:
+toate componentele (cea curentă marcată), ca împrumutul să se vadă și când detaliile unui grant, care sunt înalte, îl
+împing sub ele; un clic pe alta închide detaliile de acum, o deschide pe ea și derulează la ea. Rândul proiectului arată
+debursările însumate ale componentelor, cu procentul din totalul proiectului, iar datele de început și de finalizare sunt cele din acorduri (începutul cel mai
 timpuriu, finalizarea cea mai târzie, cu mențiunea „din acorduri"). Se unesc numai rândurile cu aceeași denumire
 (fără diacritice și punctuație) **la același donator**, când între ele sunt și grant, și împrumut: două acorduri de
 același tip sau de donatori diferiți nu se unesc, iar un filtru care ascunde una dintre componente (de pildă tipul

@@ -269,8 +269,8 @@ for fisier in re.findall(r'<script[^>]+src="([^"?]+)', html):
 verifica('debursari.html: titlul începe cu „Debursări pe acorduri —” (pentru traducerea titlului)', '<title>Debursări pe acorduri — ' in html)
 # fără „?v=” browserul poate păstra ore în șir un debursari-ui.js vechi lângă o pagină nouă (se vedea doar butonul „Debursare”, fără creioane)
 for fisier in ('debursari.js', 'debursari-ui.js'):
-    verifica('debursari.html: „%s” se încarcă cu versiune (?v=AAAA-LL-ZZ), ca să nu rămână o variantă veche în cache' % fisier,
-             re.search(r'<script src="%s\?v=\d{4}-\d{2}-\d{2}"></script>' % re.escape(fisier), html) is not None)
+    verifica('debursari.html: „%s” se încarcă cu versiune (?v=AAAA-LL-ZZ, cu o literă la urmă dacă se schimbă de mai multe ori în aceeași zi), ca să nu rămână o variantă veche în cache' % fisier,
+             re.search(r'<script src="%s\?v=\d{4}-\d{2}-\d{2}[a-z]?"></script>' % re.escape(fisier), html) is not None)
 # regula de securitate: o cheie GitHub nu se scrie în niciun fișier din repository (oricine o vede poate scrie în el); se caută în toate fișierele text
 _cheie = re.compile(r'github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{30,}')
 _gasite = []
@@ -1823,7 +1823,7 @@ try:
             rg = pg.locator(P + ' tr.ac.sub[data-k="BERD|%s"]' % grant['id'])
             rg.locator('.exp').click()
             pg.wait_for_selector(P + ' tr.det[data-k="BERD|%s"]' % grant['id'])
-            egal('detaliile grantului se deschid sub componenta lui', pg.evaluate('document.querySelector("' + PJ + ' tr.ac.sub[data-k=\'BERD|' + grant['id'] + '\']").nextElementSibling.className'), 'det')
+            egal('detaliile grantului se deschid sub componenta lui', pg.evaluate('document.querySelector("' + PJ + ' tr.ac.sub[data-k=\'BERD|' + grant['id'] + '\']").nextElementSibling.className'), 'det sub')
             h.locator('.exp').click()
             pg.wait_for_selector(P + ' tr.ac.sub', state='detached')
             egal('închis din nou: nici componentele, nici detaliile lor nu mai sunt în tabel', [pg.locator(P + ' tr.ac.sub').count(), pg.locator(P + ' tr.det').count(), pg.locator(P + ' tr.pg').count()], [0, 0, 1])
@@ -1897,6 +1897,75 @@ try:
             verifica('telefon: pagina nu se lărgește (fără derulare orizontală)', lat <= 0, lat)
             verifica('telefon: sumele pe componente se văd întregi în cartonaș', all(fmt_bani_ro(a['suma']['v']) in txt(h.locator('td').nth(4)) for a in (grant, imprumut)) and
                      pg.evaluate('(() => { const c = document.querySelector("' + PJ + ' tr.pg td:nth-child(5)").getBoundingClientRect(), r = document.querySelector("' + PJ + ' tr.pg").getBoundingClientRect(); return c.right <= r.right + 1; })()'))
+            ctx.close()
+
+            # proiectul cu două granturi și un împrumut (BIRD, „Operațiunea de politici de dezvoltare 2”): detaliile unei componente sunt înalte și împing împrumutul sub ele,
+            # în afara ferestrei; linia „Componentele proiectului” din detalii îl arată, iar un clic pe el duce la el
+            print('   · linia „Componentele proiectului”, în detaliile unei componente')
+            ctx = context(b, viewport=(1080, 800))
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BIRD&q=politici%20de%20dezvoltare%202')
+            PB, PJB = 'section.panel[data-d="BIRD"]', "section.panel[data-d='BIRD']"
+            cheie_dpo = cheie_nume('Moldova, măsuri în situație de urgență, reziliență și competitivitate. Operațiunea de politici de dezvoltare 2')
+            dpo = proiecte_unite(acorduri_donator('BIRD'))[cheie_dpo]
+            egal('în registru, proiectul are două granturi și un împrumut', sorted(x['categorie'] for x in dpo), ['Grant', 'Grant', 'Împrumut'])
+            id_imp = [x['id'] for x in dpo if x['categorie'] == 'Împrumut'][0]
+            pg.locator(PB + ' tr.pg[data-gr="BIRD|%s"] .exp' % cheie_dpo).click()
+            pg.wait_for_selector(PB + ' tr.ac.sub')
+            comp = pg.locator(PB + ' tr.ac.sub')
+            nume_comp = comp.locator('.pname').all_inner_texts()
+            egal('proiectul deschis: trei componente, în ordinea grant, grant, împrumut', [comp.count(), comp.locator('.tag').all_inner_texts()], [3, ['Grant', 'Grant', 'Împrumut']])
+            comp.first.locator('.exp').click()
+            pg.wait_for_selector(PB + ' tr.det')
+            strip = pg.locator(PB + ' tr.det .det-comp')
+            egal('detaliile primului grant: linia „Componentele proiectului” are toate cele trei componente, cu numele din rândurile lor', [strip.locator('.dc-l').text_content(), strip.locator('.dc').all_inner_texts()], ['Componentele proiectului', nume_comp])
+            egal('componenta curentă (primul grant) e marcată, celelalte două sunt butoane', [strip.locator('.dc.cur').all_inner_texts(), strip.locator('.dc.cur').get_attribute('aria-current'), strip.locator('button.dc').count()], [[nume_comp[0]], 'true', 2])
+            box = strip.locator('button.dc').last.bounding_box()
+            verifica('împrumutul se vede în linie, pe ecran, fără derulare', box is not None and 0 <= box['y'] and box['y'] + box['height'] <= 800, box)
+            verifica('(cauza) rândul împrumutului e sub detaliile grantului, în afara ferestrei', pg.locator(PB + ' tr.ac.sub[data-k="BIRD|%s"]' % id_imp).bounding_box()['y'] > 800)
+            strip.locator('button.dc').last.click()
+            pg.wait_for_selector(PB + ' tr.det[data-k="BIRD|%s"]' % id_imp)
+            egal('un clic pe „Împrumut”: se deschid detaliile împrumutului, cele ale grantului se închid', pg.locator(PB + ' tr.det').evaluate_all('l => l.map(r => r.getAttribute("data-k"))'), ['BIRD|' + id_imp])
+            pg.wait_for_function('s => { const t = document.querySelector(s).getBoundingClientRect().top; return t >= 0 && t < 300; }', arg=PJB + " tr.ac.sub[data-k='BIRD|" + id_imp + "']", timeout=10000)
+            verifica('pagina a derulat la rândul împrumutului (sub bara de acces), iar rândul e deschis', pg.locator(PB + ' tr.ac.sub[data-k="BIRD|%s"]' % id_imp).get_attribute('class').find('deschis') >= 0)
+            egal('focusul e pe butonul rândului împrumutului', pg.evaluate('(() => { const a = document.activeElement; return [a.classList.contains("exp"), a.closest("tr").getAttribute("data-k")]; })()'), [True, 'BIRD|' + id_imp])
+            egal('în detaliile împrumutului, componenta curentă e împrumutul, iar celelalte două sunt butoane', [pg.locator(PB + ' tr.det .det-comp .dc.cur').all_inner_texts(), pg.locator(PB + ' tr.det .det-comp button.dc').all_inner_texts()], [[nume_comp[2]], nume_comp[:2]])
+            # tastatură: Enter pe butonul celui de-al doilea grant
+            pg.locator(PB + ' tr.det .det-comp button.dc').nth(1).focus()
+            pg.keyboard.press('Enter')
+            pg.wait_for_selector(PB + ' tr.det[data-k="BIRD|%s"]' % [x['id'] for x in dpo if x['categorie'] == 'Grant'][1])
+            egal('Enter pe butonul unei componente deschide detaliile ei și le închide pe celelalte', [pg.locator(PB + ' tr.det').count(), pg.locator(PB + ' tr.det .det-comp .dc.cur').all_inner_texts()], [1, [nume_comp[1]]])
+            # proiectul închis și redeschis: linia nu rămâne decât în detaliile deschise
+            pg.locator(PB + ' tr.pg[data-gr="BIRD|%s"] .exp' % cheie_dpo).click()
+            pg.wait_for_selector(PB + ' tr.ac.sub', state='detached')
+            egal('proiectul închis: nici componentele, nici linia nu mai sunt în tabel', [pg.locator(PB + ' tr.ac.sub').count(), pg.locator(PB + ' .det-comp').count()], [0, 0])
+            # un rând obișnuit (nu componentă) nu are linia
+            rand_simplu = pg.locator(PB + ' tr.ac:not(.sub)').first
+            rand_simplu.locator('.exp').click()
+            pg.wait_for_selector(PB + ' tr.det')
+            egal('detaliile unui rând obișnuit nu au linia „Componentele proiectului”', pg.locator(PB + ' .det-comp').count(), 0)
+            rand_simplu.locator('.exp').click()
+            # engleză
+            pg.locator(PB + ' tr.pg[data-gr="BIRD|%s"] .exp' % cheie_dpo).click()
+            pg.wait_for_selector(PB + ' tr.ac.sub')
+            pg.locator(PB + ' tr.ac.sub').first.locator('.exp').click()
+            pg.wait_for_selector(PB + ' tr.det .det-comp')
+            pg.evaluate('Traducere.seteaza("en")')
+            pg.wait_for_timeout(500)
+            stripe = pg.locator(PB + ' tr.det .det-comp').first               # detaliile deschise mai înainte (al doilea grant) au rămas deschise
+            egal('în engleză: „Components of the project” și numele componentelor (Grant, Grant, Loan)', [stripe.locator('.dc-l').text_content(), [x.split(',')[0] for x in stripe.locator('.dc').all_inner_texts()]], ['Components of the project', ['Grant', 'Grant', 'Loan']])
+            pg.evaluate('Traducere.seteaza("ro")')
+            pg.wait_for_timeout(300)
+            ctx.close()
+            # telefon: pastilele se așază pe rânduri, în cartonașul detaliilor; pagina nu se lărgește
+            ctx = context(b, viewport=(390, 800))
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BIRD&q=politici%20de%20dezvoltare%202')
+            pg.locator(PB + ' tr.pg[data-gr="BIRD|%s"] .exp' % cheie_dpo).click()
+            pg.wait_for_selector(PB + ' tr.ac.sub')
+            pg.locator(PB + ' tr.ac.sub').first.locator('.exp').click()
+            pg.wait_for_selector(PB + ' tr.det .det-comp')
+            lat = pg.evaluate('document.documentElement.scrollWidth - document.documentElement.clientWidth')
+            verifica('telefon: cu linia deschisă pagina nu se lărgește', lat <= 0, lat)
+            verifica('telefon: pastilele componentelor încap în cartonașul detaliilor', pg.evaluate('(() => { const td = document.querySelector("' + PJB + ' tr.det > td").getBoundingClientRect(); return [...document.querySelectorAll("' + PJB + ' tr.det .dc")].every(b => { const r = b.getBoundingClientRect(); return r.left >= td.left - 1 && r.right <= td.right + 1; }); })()'))
             ctx.close()
 
             # după deblocare: componentele se editează ca orice rând; rândul proiectului se reface cu sumele noi

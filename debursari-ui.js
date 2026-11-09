@@ -860,9 +860,20 @@ function formularProiect(a, k, sterge) {
     '<div class="full hint">' + esc(L('Ce scrii aici are prioritate față de sursele oficiale și AMP și se păstrează în baza de date; poți șterge oricând ce ai introdus, iar datele din surse rămân.',
                                        'What you write here takes precedence over the official sources and AMP and is kept in the database; you can delete it at any time, and the source data stays.')) + '</div></form>';
 }
+/* În detaliile unei componente a unui proiect cu grant și împrumut: toate componentele proiectului, cea curentă marcată. Detaliile unei componente sunt înalte și
+   împing celelalte componente (de pildă împrumutul) mult sub ele; așa se vede, chiar în detalii, că proiectul le are, iar un clic pe alta închide detaliile de
+   acum, o deschide pe ea și derulează la ea. */
+function htmlComponente(a, k, sub) {
+  var d = k.slice(0, k.indexOf('|')), et = L('Componentele proiectului', 'Components of the project');
+  return '<div class="det-comp" role="group" aria-label="' + esc(et) + '"><span class="dc-l">' + esc(et) + '</span>' + sub.membri.map(function (m) {
+    var nume = D.etichetaComponenta(m, sub.membri, S.en);
+    return m.id === a.id ? '<span class="dc cur" aria-current="true">' + esc(nume) + '</span>'
+      : '<button type="button" class="dc" data-act="spre-componenta" data-spre="' + esc(d + '|' + m.id) + '" data-fk="' + esc(k + '|dc_' + m.id) + '">' + esc(nume) + '</button>';
+  }).join('') + '</div>';
+}
 function htmlDetalii(d, a, g, k) {
-  var intrari = S.peAcord.get(a.id) || [];
-  return '<tr class="det" data-k="' + esc(k) + '"><td colspan="7"><div class="det-grid' + (cod ? '' : ' solo') + '">' + htmlDescriere(a, infoDe(a)) + '<div>' + htmlIntrari(a, intrari, g) + '</div>' + (cod ? '<div>' + htmlForm(a, k) + '</div>' : '') +
+  var intrari = S.peAcord.get(a.id) || [], sub = S.subDe.get(k) || null;
+  return '<tr class="det' + (sub ? ' sub' : '') + '" data-k="' + esc(k) + '"><td colspan="7">' + (sub ? htmlComponente(a, k, sub) : '') + '<div class="det-grid' + (cod ? '' : ' solo') + '">' + htmlDescriere(a, infoDe(a)) + '<div>' + htmlIntrari(a, intrari, g) + '</div>' + (cod ? '<div>' + htmlForm(a, k) + '</div>' : '') +
     htmlProiect(a, k) + htmlInfo(a) + '</div></td></tr>';
 }
 
@@ -1129,6 +1140,25 @@ function comutaRand(k) {
 function comutaGrup(gk) {
   if (S.gdeschise.has(gk)) S.gdeschise.delete(gk); else S.gdeschise.add(gk);
   refaGrup(gk);
+}
+/* De la detaliile unei componente la altă componentă a aceluiași proiect (linia „Componentele proiectului”): detaliile de acum se închid, ale celeilalte se deschid,
+   focusul trece pe butonul ei, iar pagina derulează la rândul ei, sub bara de acces lipită sus. */
+function spreComponenta(dela, spre) {
+  var sub = S.subDe.get(spre);
+  if (!sub || !S.gdeschise.has(sub.gk)) return;
+  S.deschise.delete(dela); S.deschise.add(spre);
+  refaGrup(sub.gk);
+  var tr = RAD.querySelector('tr.ac[data-k="' + qs(spre) + '"]');
+  if (!tr) return;
+  var btn = tr.querySelector('.exp');
+  if (btn) { try { btn.focus({ preventScroll: true }); } catch (e) { btn.focus(); } }
+  var bara = $('#sAcces'), sus = (bara ? bara.getBoundingClientRect().height : 0) + 12;
+  var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({ top: Math.max(0, tr.getBoundingClientRect().top + window.pageYOffset - sus), behavior: calm ? 'auto' : 'smooth' });
+  tr.classList.add('semnal');
+  setTimeout(function () { tr.classList.remove('semnal'); }, 1800);
+  var a = S.baza.peId.get(spre.slice(spre.indexOf('|') + 1));
+  if (a) live(L('Detaliile componentei: ', 'Details of the component: ') + D.etichetaComponenta(a, sub.membri, S.en));
 }
 function deschideRand(k) {
   if (!S.deschise.has(k)) { S.deschise.add(k); refaRand(k); }
@@ -1563,6 +1593,7 @@ function actiune(act, b) {
     case 'scoate': comutaDonator(b.getAttribute('data-d'), false); break;
     case 'comuta': if (k) comutaRand(k); break;
     case 'grup-comuta': if (tr && tr.getAttribute('data-gr')) comutaGrup(tr.getAttribute('data-gr')); break;
+    case 'spre-componenta': if (k) spreComponenta(k, b.getAttribute('data-spre')); break;
     case 'adauga': if (k) { deschideRand(k); focuseazaFormular(k); } break;
     case 'rand-ed': if (k) pornesteRand(k, b.getAttribute('data-f')); break;
     case 'rand-salveaza': if (k) salveazaRand(k); break;
