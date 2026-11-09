@@ -452,6 +452,85 @@ function numeAfisat(a, en) {
   return d ? a.nume + ' (' + d + ')' : a.nume;
 }
 
+/* Proiecte cu componentă de grant și componentă de împrumut. Grantul și împrumutul aceluiași proiect au acte proprii, deci în registru sunt acorduri deosebite,
+   cu aceeași denumire (de pildă „Securitatea furnizării gazelor naturale”: împrumutul din 2022 și grantul din 2023). În tabel se arată ca un singur proiect:
+   denumirea comună o dată, tipurile și sumele separate; acordurile componente rămân rânduri de sine stătătoare (cu datele, debursările și editarea lor) și se
+   deschid sub rândul proiectului. Se unesc doar rândurile cu aceeași denumire din aceeași listă (deci la același donator) între care sunt și grant, și împrumut;
+   rândurile cu aceeași denumire și același tip (tranșe, ani diferiți) rămân separate, cu mențiunea de deosebire de mai sus. */
+const ORDINE_COMPONENTE = ORDINE_TIP;                   // grant, împrumut, asistență tehnică, asistență financiară
+function rangTip(c) { const i = ORDINE_COMPONENTE.indexOf(c); return i < 0 ? ORDINE_COMPONENTE.length : i; }
+/* Denumirea comună: dintre denumirile acordurilor (care pot diferi prin majuscule sau diacritice), cea cu cele mai puține majuscule după prima literă
+   („Securitatea furnizării gazelor naturale”, nu „… Gazelor Naturale”); la egalitate, cea care începe cu majusculă, apoi cea cu mai multe diacritice. */
+function numeComun(membri) {
+  let ales = '', min = Infinity;
+  membri.forEach(function (a) {
+    const s = String(a.nume);
+    const scor = (s.slice(1).match(/[A-ZĂÂÎȘȚŞŢ]/g) || []).length * 1000 + (/^[a-zăâîșțşţ]/.test(s) ? 100 : 0) - (s.match(/[^\u0000-\u007f]/g) || []).length;
+    if (scor < min) { min = scor; ales = s; }
+  });
+  return ales;
+}
+/* Lista (filtrată și ordonată) → ce se afișează, în ordinea ei: { cheie, nume, membri, grup }. Un proiect cu grant și împrumut ia locul primului său
+   acord din listă; componentele lui merg după tip (grant, împrumut, asistență tehnică), apoi în ordinea listei. */
+function grupeazaProiecte(lista) {
+  const fam = new Map();
+  (lista || []).forEach(function (a) { const k = cheieNume(a.nume); (fam.get(k) || fam.set(k, []).get(k)).push(a); });
+  const mixte = new Map();
+  fam.forEach(function (m, k) {
+    if (m.length > 1 && m.some(function (a) { return a.categorie === 'Grant'; }) && m.some(function (a) { return a.categorie === 'Împrumut'; })) mixte.set(k, m);
+  });
+  const out = [], puse = new Set();
+  (lista || []).forEach(function (a) {
+    const k = cheieNume(a.nume), m = mixte.get(k);
+    if (!m) { out.push({ cheie: k, nume: a.nume, membri: [a], grup: false }); return; }
+    if (puse.has(k)) return;
+    puse.add(k);
+    const membri = m.map(function (x, i) { return [x, i]; }).sort(function (x, y) { return rangTip(x[0].categorie) - rangTip(y[0].categorie) || x[1] - y[1]; })
+      .map(function (x) { return x[0]; });
+    out.push({ cheie: k, nume: numeComun(membri), membri: membri, grup: true });
+  });
+  return out;
+}
+/* Cum se numește o componentă sub denumirea comună: tipul și anul („Grant, 2023”), iar dacă două componente seamănă, și suma, apoi codul actului. */
+function etichetaComponenta(a, membri, en) {
+  let nivel = 1;
+  while (nivel < 3 && membri.some(function (b) { return b !== a && partiDeosebire(b, nivel, false) === partiDeosebire(a, nivel, false); })) nivel++;
+  const t = partiDeosebire(a, nivel, en);
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+/* Sumele unui proiect cu componente, pe tipuri, în valuta fiecărui acord (cu echivalentul în euro), și totalul în euro al acordurilor numărate în total
+   (aceleași care intră în totalurile paginii). `aprox`: totalul include sume convertite din altă valută. `nenumarate`: acorduri cu sumă care nu intră în total. */
+function sumeComponente(membri) {
+  const tipuri = [], pe = new Map();
+  let eurTotal = null, aprox = false, nenumarate = 0, faraSuma = 0;
+  membri.forEach(function (a) {
+    let t = pe.get(a.categorie);
+    if (!t) { t = { categorie: a.categorie, n: 0, faraSuma: 0, faraEur: 0, valute: [], eur: null }; pe.set(a.categorie, t); tipuri.push(t); }
+    t.n++;
+    if (!a.suma) { t.faraSuma++; faraSuma++; return; }
+    let v = null;
+    t.valute.forEach(function (x) { if (x.val === a.suma.val) v = x; });
+    if (!v) { v = { val: a.suma.val, v: 0 }; t.valute.push(v); }
+    v.v = Math.round((v.v + a.suma.v) * 100) / 100;
+    if (a.eur != null) t.eur = (t.eur || 0) + a.eur; else t.faraEur++;
+    if (a.eurTotal != null) { eurTotal = (eurTotal || 0) + a.eurTotal; if (a.suma.val !== 'EUR') aprox = true; } else nenumarate++;
+  });
+  tipuri.forEach(function (t) { if (t.faraEur) t.eur = null; });           // echivalentul în euro, doar când se știe pentru toate sumele tipului
+  tipuri.sort(function (x, y) { return rangTip(x.categorie) - rangTip(y.categorie); });
+  return { tipuri: tipuri, eurTotal: eurTotal, aprox: aprox, nenumarate: nenumarate, faraSuma: faraSuma };
+}
+/* Datele proiectului cu componente: cea mai timpurie dată de început și cea mai târzie dată de finalizare dintre acorduri (`info`: acord → infoProiect).
+   Sunt date ca la fiecare acord, în „2026-03-15”, „2026-03” sau „2026”; un acord fără dată nu intră în calcul. */
+function dateGrup(membri, info) {
+  let i = null, s = null;
+  membri.forEach(function (a) {
+    const x = info(a) || {};
+    if (x.inceput && esteDataPartiala(x.inceput.v) && (i === null || x.inceput.v < i)) i = x.inceput.v;
+    if (x.sfarsit && esteDataPartiala(x.sfarsit.v) && (s === null || x.sfarsit.v > s)) s = x.sfarsit.v;
+  });
+  return { inceput: i, sfarsit: s };
+}
+
 /* Ce se știe despre un rând: obiectivele proiectului și datele de început și de finalizare. Fiecare câmp se ia din prima sursă care îl are:
      1. ce a introdus un utilizator în pagină (date/debursari.json, `ctx.db`: Map id rând → înregistrare),
      2. surse oficiale, scrise de mână, cu adresa documentului și citatul exact (date/proiecte_manual.json, `ctx.manual`: Map id rând → intrări),
@@ -704,6 +783,46 @@ function ordoneaza(lista, sort, peAcord, cursuri) {
     data: function (a, b) { return (ordRo(b.semnat) || ordRo(b.primul)).localeCompare(ordRo(a.semnat) || ordRo(a.primul)); }
   }[sort] || function () { return 0; };
   return lista.slice().sort(function (a, b) { return dupa(a, b) || a.nume.localeCompare(b.nume, 'ro'); });
+}
+/* Aceeași ordine, pentru ce se afișează (vezi grupeazaProiecte): un proiect cu componente se așază după totalul lui (suma în euro, debursările,
+   procentul, cea mai recentă semnare), nu după primul lui acord. Unitățile cu un singur acord au exact cheile din ordoneaza, deci rămân între ele
+   în aceeași ordine; fără niciun proiect cu componente, lista se întoarce așa cum e. */
+function ordoneazaUnitati(unitati, sort, peAcord, cursuri) {
+  if (!unitati.some(function (u) { return u.grup; })) return unitati;
+  const nulLa = function (x, y, desc) {
+    if (x == null && y == null) return 0;
+    if (x == null) return 1;
+    if (y == null) return -1;
+    return desc ? y - x : x - y;
+  };
+  const chei = new Map();
+  const cheia = function (u) {
+    let c = chei.get(u);
+    if (c) return c;
+    const m = u.membri;
+    if (m.length === 1) {
+      const g = agregaAcord(m[0], peAcord.get(m[0].id) || [], cursuri);
+      c = { eur: m[0].eur, deb: g.eur, pct: g.pct, data: ordRo(m[0].semnat) || ordRo(m[0].primul) };
+    } else {
+      const s = sumeComponente(m), r = rezumat(m, peAcord, cursuri);
+      let eur = s.eurTotal, data = '';
+      if (eur == null) m.forEach(function (a) { if (a.eur != null) eur = (eur || 0) + a.eur; });
+      m.forEach(function (a) { const x = ordRo(a.semnat) || ordRo(a.primul); if (x > data) data = x; });
+      c = { eur: eur, deb: r.debEur, pct: r.pct, data: data };
+    }
+    chei.set(u, c);
+    return c;
+  };
+  const dupa = {
+    suma: function (a, b) { return nulLa(a.eur, b.eur, true); },
+    deb: function (a, b) { return b.deb - a.deb; },
+    pct: function (a, b) { return nulLa(a.pct, b.pct, true); },
+    nume: function (a, b) { return a.u.nume.localeCompare(b.u.nume, 'ro'); },
+    data: function (a, b) { return b.data.localeCompare(a.data); }
+  }[sort] || function () { return 0; };
+  return unitati.map(function (u, i) { return Object.assign({ u: u, i: i }, cheia(u)); })
+    .sort(function (a, b) { return dupa(a, b) || a.u.nume.localeCompare(b.u.nume, 'ro') || a.i - b.i; })
+    .map(function (x) { return x.u; });
 }
 /* Donatorii pentru lista cu căsuțe: după număr de proiecte, după sumă, după debursări sau alfabetic. */
 function ordoneazaDonatori(donatori, sort, peAcord, cursuri, en) {
@@ -1151,6 +1270,7 @@ return {
   deduCursuri: deduCursuri, pregateste: pregateste, descriere: descriere,
   MAX_OBIECTIVE: MAX_OBIECTIVE, SURSE_PROIECT: SURSE_PROIECT,
   normalizeazaManual: normalizeazaManual, gasesteAcord: gasesteAcord, numeAfisat: numeAfisat,
+  grupeazaProiecte: grupeazaProiecte, ordoneazaUnitati: ordoneazaUnitati, etichetaComponenta: etichetaComponenta, sumeComponente: sumeComponente, dateGrup: dateGrup,
   dataPartiala: dataPartiala, esteDataPartiala: esteDataPartiala, fmtDataPartiala: fmtDataPartiala, parseDataPartiala: parseDataPartiala, inceputDupaSfarsit: inceputDupaSfarsit,
   infoProiect: infoProiect, etichetaSursaProiect: etichetaSursaProiect, textSursaProiect: textSursaProiect, legaturaSursaProiect: legaturaSursaProiect,
   valideazaProiect: valideazaProiect, proiectDin: proiectDin, proiectDbValid: proiectDbValid, legaProiecte: legaProiecte,

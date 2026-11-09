@@ -350,6 +350,93 @@ const PN = D.pregateste({ cursuri: CURSURI, acorduri: [ac('q1', 'Școli', 'UE', 
 egal('donatorii unui rând: finanțatorul acordului (parteneriAcord), nu toți partenerii din grup; registrul rămâne la îndemână', [PN.acorduri[0].donatori, PN.acorduri[0].parteneriText, PN.acorduri[0].parteneriRegistru], [['BEI'], 'BEI', 'UE / BEI']);
 egal('fără parteneriAcord (fișier mai vechi): partenerii din registru', D.pregateste({ cursuri: CURSURI, acorduri: [ac('q2', 'Școli', 'UE / BEI', null)] }).acorduri[0].donatori, ['UE', 'BEI']);
 
+console.log('\nProiecte cu grant și împrumut: un singur rând, sumele pe componente');
+const JSON_GR = {
+  cursuri: CURSURI,
+  acorduri: [
+    ac('g1', 'Securitatea Energetică a Moldovei', 'BEI', S(100e6, 'EUR'), { categorie: 'Împrumut', semnat: '01.02.2022' }),
+    ac('g2', 'Securitatea energetică a Moldovei', 'BEI', S(20e6, 'EUR'), { categorie: 'Grant', semnat: '03.04.2023' }),
+    ac('g3', 'Securitatea energetică a Moldovei', 'BEI', S(5e6, 'EUR'), { categorie: 'Asistență tehnică', semnat: '05.06.2023' }),
+    ac('h1', 'Drumuri', 'BEI', S(1e6, 'EUR'), { categorie: 'Grant', semnat: '01.01.2020' }),
+    ac('h2', 'Drumuri', 'BEI', S(2e6, 'EUR'), { categorie: 'Grant', semnat: '01.01.2021' }),
+    ac('k1', 'Apă', 'BERD', S(30e6, 'EUR'), { categorie: 'Împrumut', semnat: '01.03.2019' }),
+    ac('k2', 'Apă', 'BERD', S(2e6, 'USD'), { categorie: 'Grant', semnat: '01.03.2020' }),
+    ac('m1', 'Școli', 'BERD', S(10e6, 'EUR'), { categorie: 'Împrumut' }),
+    ac('m2', 'Școli', 'UE', S(1e6, 'EUR'), { categorie: 'Grant' }),
+    ac('n1', 'Spital', 'BEI', null, { categorie: 'Grant', semnat: '01.01.2015' }),
+    ac('n2', 'Spital', 'BEI', S(8e6, 'EUR'), { categorie: 'Împrumut', semnat: '01.01.2016' }),
+    ac('p1', 'Calea ferată', 'BEI', S(7e6, 'EUR'), { categorie: 'Împrumut', faraTotal: true, inTotal: 'fara_total', semnat: '01.01.2018' }),
+    ac('p2', 'Calea ferată', 'BEI', S(1e6, 'EUR'), { categorie: 'Grant', semnat: '01.01.2019' }),
+    ac('q1', 'Termoficare', 'BEI / BERD', S(5e6, 'EUR'), { categorie: 'Împrumut', semnat: '01.01.2021' }),
+    ac('q2', 'Termoficare', 'BEI', S(1e6, 'EUR'), { categorie: 'Grant', semnat: '01.01.2021' }),
+    ac('r1', 'Proiect solitar', 'BEI', S(3e6, 'EUR'), { categorie: 'Împrumut', semnat: '01.01.2017' })
+  ]
+};
+const BG = D.pregateste(JSON_GR), donG = c => BG.donatori.filter(d => d.cheie === c)[0];
+const lBEI = donG('BEI').acorduri, uBEI = D.grupeazaProiecte(lBEI);
+egal('BEI: proiectele cu grant și împrumut în aceeași listă se unesc (securitate, spital, cale ferată, termoficare); restul rămân rânduri de sine stătătoare',
+     uBEI.map(u => u.nume + (u.grup ? ' [' + u.membri.map(a => a.id).join(',') + ']' : '')),
+     ['Securitatea energetică a Moldovei [g2,g1,g3]', 'Drumuri', 'Drumuri', 'Spital [n1,n2]', 'Calea ferată [p2,p1]', 'Termoficare [q2,q1]', 'Proiect solitar']);
+egal('un proiect unit ia locul primului lui acord din listă; ordinea celorlalte nu se schimbă', uBEI.map(u => u.membri[0].id).filter((x, i) => !uBEI[i].grup), ['h1', 'h2', 'r1']);
+egal('componentele merg după tip: grant, împrumut, asistență tehnică (apoi ordinea listei)', uBEI[0].membri.map(a => a.categorie), ['Grant', 'Împrumut', 'Asistență tehnică']);
+egal('două granturi cu aceeași denumire, fără împrumut, nu se unesc (rămân rânduri deosebite, cu mențiunea „grant, 2020” / „grant, 2021”)', [uBEI.filter(u => u.nume === 'Drumuri').map(u => u.grup), BG.peId.get('h1').deosebire.ro, BG.peId.get('h2').deosebire.ro], [[false, false], 'grant, 2020', 'grant, 2021']);
+egal('același proiect la donatori diferiți nu se unește: BERD are împrumutul „Școli”, UE grantul', [D.grupeazaProiecte(donG('BERD').acorduri).filter(u => u.nume === 'Școli').map(u => u.grup), D.grupeazaProiecte(donG('UE').acorduri).map(u => u.grup)], [[false], [false]]);
+egal('un acord cofinanțat apare în lista fiecărui donator: la BEI se unește cu grantul, la BERD rămâne singur',
+     [uBEI.filter(u => u.nume === 'Termoficare')[0].membri.map(a => a.id), D.grupeazaProiecte(donG('BERD').acorduri).filter(u => u.nume === 'Termoficare').map(u => [u.grup, u.membri.map(a => a.id)])[0]], [['q2', 'q1'], [false, ['q1']]]);
+egal('lista goală sau fără proiecte cu componente: nicio unitate unită', [D.grupeazaProiecte([]), D.grupeazaProiecte(null), D.grupeazaProiecte(donG('UE').acorduri).some(u => u.grup)], [[], [], false]);
+egal('fiecare acord din listă e într-o singură unitate', [uBEI.reduce((s, u) => s + u.membri.length, 0), new Set([].concat(...uBEI.map(u => u.membri.map(a => a.id)))).size, lBEI.length], [lBEI.length, lBEI.length, lBEI.length]);
+egal('denumirea comună: cea cu mai puține majuscule după prima literă (nu „Securitatea Energetică…”)', [uBEI[0].nume, uBEI[0].membri.map(a => a.nume)], ['Securitatea energetică a Moldovei', ['Securitatea energetică a Moldovei', 'Securitatea Energetică a Moldovei', 'Securitatea energetică a Moldovei']]);
+egal('denumirea comună: la același număr de majuscule, cea cu diacritice', D.grupeazaProiecte([
+  Object.assign({}, BG.peId.get('g1'), { id: 'x1', nume: 'Securitatea energetica a Moldovei', categorie: 'Grant' }),
+  Object.assign({}, BG.peId.get('g1'), { id: 'x2', nume: 'Securitatea energetică a Moldovei' })])[0].nume, 'Securitatea energetică a Moldovei');
+const sG = D.sumeComponente(uBEI[0].membri);
+egal('sume pe componente: grant, împrumut, asistență tehnică, în valuta acordurilor', sG.tipuri.map(t => [t.categorie, t.n, t.valute.map(v => v.v + ' ' + v.val).join(' + ')]),
+     [['Grant', 1, '20000000 EUR'], ['Împrumut', 1, '100000000 EUR'], ['Asistență tehnică', 1, '5000000 EUR']]);
+egal('totalul în euro: suma acordurilor numărate; exact (fără aproximare) când totul e în euro', [sG.eurTotal, sG.aprox, sG.nenumarate, sG.faraSuma], [125000000, false, 0, 0]);
+const sK = D.sumeComponente(D.grupeazaProiecte(donG('BERD').acorduri).filter(u => u.nume === 'Apă')[0].membri);
+egal('valute diferite pe componente: fiecare în valuta ei, cu echivalentul în euro; totalul e aproximativ', [sK.tipuri.map(t => t.valute[0].val), sK.tipuri.map(t => Math.round(t.eur)), Math.round(sK.eurTotal), sK.aprox],
+     [['USD', 'EUR'], [Math.round(2e6 / CURSURI.USD), 30000000], Math.round(30e6 + 2e6 / CURSURI.USD), true]);
+const sN = D.sumeComponente(uBEI.filter(u => u.nume === 'Spital')[0].membri);
+egal('un acord fără sumă: componenta lui rămâne fără sumă (nu zero), iar totalul îl numără pe celălalt', [sN.tipuri.map(t => [t.categorie, t.faraSuma, t.valute.length]), sN.faraSuma, sN.eurTotal], [[['Grant', 1, 0], ['Împrumut', 0, 1]], 1, 8000000]);
+const sP = D.sumeComponente(uBEI.filter(u => u.nume === 'Calea ferată')[0].membri);
+egal('un acord care nu se adună în total (fara_total): suma lui se vede pe componentă, dar nu intră în total', [sP.tipuri.map(t => t.valute[0].v), sP.eurTotal, sP.nenumarate], [[1000000, 7000000], 1000000, 1]);
+egal('două acorduri de același tip, în aceeași valută: se adună într-o singură linie, cu numărul lor', (function () {
+  const m = [BG.peId.get('h1'), BG.peId.get('h2'), BG.peId.get('g1')], s = D.sumeComponente(m);
+  return s.tipuri.map(t => [t.categorie, t.n, t.valute[0].v]);
+})(), [['Grant', 2, 3000000], ['Împrumut', 1, 100000000]]);
+egal('etichetele componentelor: tip și an; dacă seamănă, și suma; în engleză', [uBEI[0].membri.map(a => D.etichetaComponenta(a, uBEI[0].membri, false)), uBEI[0].membri.map(a => D.etichetaComponenta(a, uBEI[0].membri, true))],
+     [['Grant, 2023', 'Împrumut, 2022', 'Asistență tehnică, 2023'], ['Grant, 2023', 'Loan, 2022', 'Technical assistance, 2023']]);
+(function () {
+  const m = ['t1', 't2', 't3'].map((id, i) => Object.assign({}, BG.peId.get('g2'), { id: id, categorie: i < 2 ? 'Grant' : 'Împrumut', semnat: '01.01.2024', suma: S((i + 1) * 1e6, 'EUR'), coduri: ['HG' + (i + 1) + '/2024'] }));
+  const m2 = [m[0], Object.assign({}, m[0], { id: 't4', coduri: ['HG9/2024'] }), m[2]];
+  egal('etichete: la tip și an egale (două granturi din 2024), se adaugă suma', [D.etichetaComponenta(m[0], m, false), D.etichetaComponenta(m[1], m, false), D.etichetaComponenta(m[2], m, false)], ['Grant, 2024, 1 mil. EUR', 'Grant, 2024, 2 mil. EUR', 'Împrumut, 2024']);
+  egal('etichete: la tip, an și sumă egale, se adaugă codul actului', [D.etichetaComponenta(m2[0], m2, false), D.etichetaComponenta(m2[1], m2, false), D.etichetaComponenta(m2[2], m2, false)], ['Grant, 2024, 1 mil. EUR, HG1/2024', 'Grant, 2024, 1 mil. EUR, HG9/2024', 'Împrumut, 2024']);
+})();
+(function () {
+  const info = a => ({ g1: { inceput: { v: '2022-03' }, sfarsit: { v: '2026' } }, g2: { inceput: { v: '2023-05-10' }, sfarsit: { v: '2027-12-31' } }, g3: { inceput: null, sfarsit: { v: 'nu e dată' } } }[a.id]);
+  egal('datele proiectului: cea mai timpurie dată de început și cea mai târzie dată de finalizare dintre acorduri; valorile invalide nu intră', D.dateGrup(uBEI[0].membri, info), { inceput: '2022-03', sfarsit: '2027-12-31' });
+  egal('fără nicio dată → nul', D.dateGrup(uBEI[0].membri, () => ({ inceput: null, sfarsit: null })), { inceput: null, sfarsit: null });
+})();
+// ordonarea: proiectul cu componente se așază după totalul lui, nu după primul lui acord
+(function () {
+  const peAcG = new Map(), cG = BG.cursuri;
+  const lista = D.ordoneaza(lBEI, 'suma', peAcG, cG);
+  const dupaAcord = D.grupeazaProiecte(lista);
+  const dupaTotal = D.ordoneazaUnitati(dupaAcord, 'suma', peAcG, cG);
+  egal('după sumă: proiectele se așază după totalul lor în euro (125, 8, 6, 3, 2 mil.; calea ferată 1 mil., fiindcă împrumutul ei nu se adună în total), nu după primul lor acord',
+       [dupaTotal.length, dupaTotal.map(u => u.nume)], [dupaAcord.length, ['Securitatea energetică a Moldovei', 'Spital', 'Termoficare', 'Proiect solitar', 'Drumuri', 'Calea ferată', 'Drumuri']]);
+  egal('unitățile cu un singur acord își păstrează ordinea relativă din ordoneaza', dupaTotal.filter(u => !u.grup).map(u => u.membri[0].id), dupaAcord.filter(u => !u.grup).map(u => u.membri[0].id));
+  egal('fără proiecte cu componente, lista se întoarce neschimbată (aceeași listă)', (function () { const u = D.grupeazaProiecte(donG('UE').acorduri); return D.ordoneazaUnitati(u, 'suma', peAcG, cG) === u; })(), true);
+  egal('după denumire, grupul stă după denumirea comună', D.ordoneazaUnitati(dupaAcord, 'nume', peAcG, cG).map(u => u.nume), ['Calea ferată', 'Drumuri', 'Drumuri', 'Proiect solitar', 'Securitatea energetică a Moldovei', 'Spital', 'Termoficare']);
+  // debursări: grupul se așază după debursările lui însumate
+  const intrari = [D.intrareDin(BG.peId.get('p1'), { data: '2025-01-10', suma: 6e6, val: 'EUR', nota: '' }), D.intrareDin(BG.peId.get('p2'), { data: '2025-02-10', suma: 1e6, val: 'EUR', nota: '' }),
+                   D.intrareDin(BG.peId.get('r1'), { data: '2025-03-10', suma: 5e6, val: 'EUR', nota: '' })];
+  const legat = D.lega(intrari, BG).peAcord;
+  egal('după debursări: calea ferată (6 + 1 mil.) înaintea proiectului solitar (5 mil.)', D.ordoneazaUnitati(D.grupeazaProiecte(D.ordoneaza(lBEI, 'deb', legat, cG)), 'deb', legat, cG).slice(0, 2).map(u => u.nume), ['Calea ferată', 'Proiect solitar']);
+  const rez = D.rezumat(uBEI.filter(u => u.nume === 'Calea ferată')[0].membri, legat, cG);
+  egal('rezumatul proiectului unit: debursările tuturor acordurilor lui (2 debursări, 7 mil. EUR); procentul se ia doar la acordurile numărate în total (grantul: 1 mil. din 1 mil.)', [rez.nIntrari, Math.round(rez.debEur), rez.n, rez.pct], [2, 7000000, 2, 1]);
+})();
+
 console.log('\nFiltre, ordonare, adresă');
 const peAc = L.peAcord;
 const F = (f) => B.acorduri.filter(a => D.potriveste(a, Object.assign({ peAcord: peAc }, f))).map(a => a.id);
@@ -659,6 +746,40 @@ egal('BERD: un rând pe acord în foaia „Proiecte”', xr.foi[0].randuri.lengt
 const xt = D.excelPeDonatori(Object.assign(ctx(false), { peAcord: peRand }), R.donatori, []);
 verificaSpec('toți donatorii reali', xt);
 verifica('un fișier cu toți donatorii (' + R.donatori.length + ' foi + rezumat + debursări) se scrie', Buffer.from(await (await X.construieste(xt)).arrayBuffer()).slice(0, 2).toString() === 'PK');
+
+console.log('\nProiecte cu grant și împrumut: pe datele reale');
+(function () {
+  const nulPeAcord = new Map(), ordineTip = cat => cat.every((c, i) => i === 0 || D.ORDINE_TIP.indexOf(cat[i - 1]) <= D.ORDINE_TIP.indexOf(c));
+  let nGrupuri = 0, nAcorduri = 0;
+  const rele = [];
+  R.donatori.forEach(d => {
+    ['suma', 'deb', 'pct', 'nume', 'data'].forEach(sort => {
+      const lista = D.ordoneaza(d.acorduri, sort, nulPeAcord, R.cursuri), unit = D.ordoneazaUnitati(D.grupeazaProiecte(lista), sort, nulPeAcord, R.cursuri);
+      if (unit.reduce((s, u) => s + u.membri.length, 0) !== lista.length || new Set([].concat(...unit.map(u => u.membri.map(a => a.id)))).size !== lista.length) rele.push(d.cheie + '/' + sort + ': acorduri pierdute sau duplicate');
+      if (unit.filter(u => !u.grup).map(u => u.membri[0].id).join() !== D.grupeazaProiecte(lista).filter(u => !u.grup).map(u => u.membri[0].id).join()) rele.push(d.cheie + '/' + sort + ': rândurile simple și-au schimbat ordinea');
+    });
+    D.grupeazaProiecte(d.acorduri).filter(u => u.grup).forEach(u => {
+      nGrupuri++; nAcorduri += u.membri.length;
+      const cat = u.membri.map(a => a.categorie), s = D.sumeComponente(u.membri), et = u.membri.map(a => D.etichetaComponenta(a, u.membri, false));
+      if (u.membri.length < 2 || cat.indexOf('Grant') < 0 || cat.indexOf('Împrumut') < 0) rele.push(d.cheie + ' ' + u.nume + ': nu are și grant, și împrumut');
+      if (new Set(et).size !== et.length) rele.push(d.cheie + ' ' + u.nume + ': etichete la fel ' + et.join(' | '));
+      if (Math.abs((s.eurTotal || 0) - u.membri.reduce((t, a) => t + (a.eurTotal || 0), 0)) > 0.01) rele.push(d.cheie + ' ' + u.nume + ': totalul nu e suma acordurilor numărate');
+      if (u.membri.some(a => a.donatori.indexOf(d.cheie) < 0)) rele.push(d.cheie + ' ' + u.nume + ': un acord nu e al acestui donator');
+      if (new Set(u.membri.map(a => D.fold(a.nume).replace(/[^a-z0-9]+/g, ' ').trim())).size !== 1) rele.push(d.cheie + ' ' + u.nume + ': denumiri diferite');
+      if (!ordineTip(cat)) rele.push(d.cheie + ' ' + u.nume + ': componentele nu merg în ordinea grant, împrumut, …');
+      if (!u.membri.some(a => a.nume === u.nume)) rele.push(d.cheie + ' ' + u.nume + ': denumirea comună nu e a niciunui acord');
+    });
+  });
+  egal('orice listă de donator, în orice ordine, se împarte în unități fără să se piardă sau să se dubleze vreun acord; rândurile simple rămân în ordinea lor; fiecare proiect unit are grant și împrumut, aceeași denumire, etichete distincte și totalul = suma acordurilor numărate', rele, []);
+  verifica('există proiecte cu grant și împrumut în registru (' + nGrupuri + ' proiecte, ' + nAcorduri + ' acorduri)', nGrupuri >= 5 && nAcorduri >= 2 * nGrupuri, [nGrupuri, nAcorduri]);
+  const berd = R.donatori.filter(d => d.cheie === 'BERD')[0], gaze = D.grupeazaProiecte(berd.acorduri).filter(u => u.grup && /gazelor naturale/i.test(u.nume))[0];
+  verifica('„Securitatea furnizării gazelor naturale” (BERD): o singură denumire; grant 34.026.156 EUR + împrumut 465.000.000 EUR = 499.026.156 EUR',
+           !!gaze && gaze.nume === 'Securitatea furnizării gazelor naturale' && D.sumeComponente(gaze.membri).tipuri.map(t => t.categorie + ' ' + t.valute[0].v).join(' + ') === 'Grant 34026156 + Împrumut 465000000' &&
+           Math.round(D.sumeComponente(gaze.membri).eurTotal) === 499026156, gaze && gaze.nume);
+  // numărătorile rămân pe acorduri: unirea în tabel nu schimbă totalurile
+  const toate = D.rezumat(R.acorduri, nulPeAcord, R.cursuri);
+  verifica('totalurile (rezumatul) se calculează pe acorduri: aceleași cu sau fără unire în proiecte', toate.n === R.acorduri.length && Math.abs(toate.sumaEur - totalR.sumaEur) < 1e-6, [toate.n, R.acorduri.length]);
+})();
 
 
 // fișierul date/debursari.json din repository (completat și din scrisoarea Ministerului Finanțelor, situația la 30.09.2026)

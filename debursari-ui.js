@@ -36,6 +36,8 @@ var S = {
   amp: { faza: 'neinceput', peAcord: new Map(), stare: null, eroare: '', promisiune: null },           // datele de început și de finalizare din AMP
   sel: [], q: '', tip: '', deb: '', sort: 'suma', dq: '', dsort: 'n',
   deschise: new Set(), f: {}, fe: {}, ed: null, conf: null, pf: {}, pfe: {}, confP: null,
+  gdeschise: new Set(),                        // proiectele cu grant și împrumut deschise în tabel: „donator|denumire” → se văd acordurile componente
+  subDe: new Map(), unit: new Map(),           // refăcute la fiecare randare: rând (donator|id acord) → proiectul din care face parte; „donator|denumire” → proiectul (acordurile lui)
   re: new Map(),                               // rândurile aflate în editare în tabel: id acord → { f: câmpurile de acum, f0: cele de la deschidere, fe: erorile }
   dlg: { mod: 'cod', eroare: '', ocupat: false, tine: false }
 };
@@ -577,16 +579,19 @@ function htmlBaraRand(a, k) {
                                  'Date: 15.03.2026, 03.2026 or 2026. What you write here takes precedence over the official sources and AMP; empty a field to go back to the value from the sources or, for the amount, the one in the register.')) + '</div>' +
     '</div></td></tr>';
 }
+/* Rândul unui acord. Când acordul face parte dintr-un proiect cu grant și împrumut (S.subDe, vezi htmlGrup), rândul stă sub proiect și poartă, în loc de
+   denumirea comună, doar ce îl deosebește de celelalte componente: tipul și anul („Grant, 2023”). Restul rămâne la fel: date, sumă, debursări, detalii, editare. */
 function htmlRand(d, a) {
-  var g = ag(a), k = d.cheie + '|' + a.id, deschis = S.deschise.has(k), info = infoDe(a), nume = D.numeAfisat(a, S.en);
+  var g = ag(a), k = d.cheie + '|' + a.id, deschis = S.deschise.has(k), info = infoDe(a), nume = D.numeAfisat(a, S.en), sub = S.subDe.get(k) || null;
   var cof = a.donatori.filter(function (x) { return x !== d.cheie; });
   var meta = [];
   if (a.stadiu) meta.push('<span class="stg ' + a.stadiu + '">' + esc(D.etichetaStadiu(a.stadiu, S.en)) + '</span>');
   if (a.semnat) meta.push(esc(L('semnat ', 'signed ') + a.semnat));
   if (cof.length) meta.push('<span class="cof">' + esc(L('cofinanțat cu ', 'co-financed with ') + cof.join(', ')) + '</span>');
   var ed = inEditare(a);
-  return '<tr class="ac' + (deschis ? ' deschis' : '') + (ed ? ' edit' : '') + '" data-k="' + esc(k) + '">' +
-    '<td data-l="' + esc(L('Proiectul', 'Project')) + '"><div class="pname">' + esc(nume) + '</div><div class="pmeta">' + meta.join(' · ') + '</div></td>' +
+  var celNume = sub ? '<div class="pname" title="' + esc(a.numeComplet || a.nume) + '">' + esc(D.etichetaComponenta(a, sub.membri, S.en)) + '</div>' : '<div class="pname">' + esc(nume) + '</div>';
+  return '<tr class="ac' + (sub ? ' sub' : '') + (deschis ? ' deschis' : '') + (ed ? ' edit' : '') + '" data-k="' + esc(k) + '">' +
+    '<td data-l="' + esc(sub ? L('Componenta', 'Component') : L('Proiectul', 'Project')) + '">' + celNume + '<div class="pmeta">' + meta.join(sub ? ' ' : ' · ') + '</div></td>' +
     '<td class="dcol" data-l="' + esc(L('Data efectivă de începere', 'Actual start date')) + '">' + htmlData(info, 'inceput', a, k, nume) + '</td>' +
     '<td class="dcol" data-l="' + esc(L('Data finalizării', 'Completion date')) + '">' + htmlData(info, 'sfarsit', a, k, nume) + '</td>' +
     '<td data-l="' + esc(L('Tip de finanțare', 'Type of financing')) + '"><span class="tag ' + (CLASA_TIP[a.categorie] || 't-alt') + '">' + esc(D.etichetaTip(a.categorie, S.en) || '—') + '</span></td>' +
@@ -595,6 +600,69 @@ function htmlRand(d, a) {
     '<td class="act"><button type="button" class="exp" data-act="comuta" aria-expanded="' + (deschis ? 'true' : 'false') + '" aria-label="' +
       esc((deschis ? L('Închide detaliile: ', 'Close details: ') : L('Deschide detaliile: ', 'Open details: ')) + nume) + '">' + IC.chev + '</button></td></tr>' +
     (ed ? htmlBaraRand(a, k) : '') + (deschis ? htmlDetalii(d, a, g, k) : '');
+}
+
+/* ------------------------------------------------------------------ proiecte cu grant și împrumut
+   Un proiect finanțat și cu grant, și cu împrumut are în registru câte un acord pentru fiecare (cu acte proprii), dar aceeași denumire. În tabel apare
+   ca un singur rând: denumirea comună, tipurile, sumele pe componente (grant, împrumut) și totalul. Un clic îl deschide și arată acordurile componente,
+   rânduri obișnuite (cu datele, debursările, detaliile și editarea lor), sub el. Numărătorile și Excel-ul rămân pe acorduri. */
+function dataGrup(v, camp) {
+  if (!v) return '<span class="nil" title="' + esc(L('Nu s-a găsit o sursă pentru această dată la niciun acord', 'No source was found for this date at any agreement')) + '" aria-label="' + esc(L('necunoscută', 'unknown')) + '">—</span>';
+  var ce = camp === 'inceput'
+    ? L('Cea mai timpurie dată de început dintre acorduri; sursa fiecărei date se vede la acordul respectiv', 'The earliest start date among the agreements; the source of each date is shown at its agreement')
+    : L('Cea mai târzie dată de finalizare dintre acorduri; sursa fiecărei date se vede la acordul respectiv', 'The latest completion date among the agreements; the source of each date is shown at its agreement');
+  return '<div class="dt"><time datetime="' + esc(v) + '">' + esc(D.fmtDataPartiala(v)) + '</time></div><div class="psrc"><span class="src" title="' + esc(ce) + '">' + esc(L('din acorduri', 'from agreements')) + '</span></div>';
+}
+/* suma unei componente (toate acordurile ei de același tip), în valuta acordurilor, cu echivalentul în euro */
+function htmlSumaTip(t) {
+  var h = '<div class="sp-t"><span class="tag mic ' + (CLASA_TIP[t.categorie] || 't-alt') + '">' + esc(D.etichetaTip(t.categorie, S.en) || '—') + (t.n > 1 ? ' ×' + t.n : '') + '</span>';
+  if (!t.valute.length) return h + '<span class="nil">—</span><div class="amt-sub nuadun">' + esc(L('suma nu e cunoscută', 'amount not known')) + '</div></div>';
+  t.valute.forEach(function (v) { h += '<div class="amt">' + esc(fb(v.v)) + ' <span class="cur">' + esc(v.val) + '</span></div>'; });
+  if (t.eur != null && (t.valute.length > 1 || t.valute[0].val !== 'EUR')) h += '<div class="amt-sub">≈ ' + esc(fm(t.eur, 0)) + ' EUR</div>';
+  if (t.faraSuma) h += '<div class="amt-sub nuadun">' + esc(L('+ ' + t.faraSuma + ' fără sumă cunoscută', '+ ' + t.faraSuma + ' without a known amount')) + '</div>';
+  return h + '</div>';
+}
+/* totalul în euro al acordurilor numărate în total (aceleași care intră în totalurile paginii) */
+function htmlTotalGrup(sc) {
+  var h = '<div class="sp-tot"><span class="sp-l">' + esc(L('Total', 'Total')) + '</span>';
+  h += sc.eurTotal == null ? '<span class="nil">—</span>' : '<div class="amt">' + (sc.aprox ? '≈ ' : '') + esc(fm(sc.eurTotal, 0)) + ' <span class="cur">EUR</span></div>';
+  if (sc.faraSuma) h += '<div class="amt-sub nuadun">' + esc(sc.faraSuma === 1 ? L('un acord fără sumă cunoscută', 'one agreement without a known amount') : L(sc.faraSuma + ' acorduri fără sumă cunoscută', sc.faraSuma + ' agreements without a known amount')) + '</div>';
+  if (sc.nenumarate) h += '<div class="amt-sub nuadun">' + esc(sc.nenumarate === 1 ? L('un acord nu intră în total', 'one agreement is not in the total') : L(sc.nenumarate + ' acorduri nu intră în total', sc.nenumarate + ' agreements are not in the total')) + '</div>';
+  return h + '</div>';
+}
+/* debursările tuturor acordurilor proiectului (ca la un rând obișnuit); de adăugat se adaugă la acordul potrivit, după ce proiectul se deschide */
+function htmlDebGrup(r) {
+  if (S.debEroare || !r.nIntrari) return '<span class="nil">—</span>';
+  var h = '<div class="amt">' + esc(fm(r.debEur, 0)) + ' <span class="cur">EUR</span></div>';
+  if (r.pct != null) {
+    h += '<div class="bar' + (r.pct > 1 ? ' peste' : '') + '"><i style="width:' + Math.min(100, r.pct * 100).toFixed(1) + '%"></i></div>' +
+         '<div class="pct"><b>' + esc(fmPct(r.pct * 100)) + '%</b> ' + esc(L('din suma proiectului', 'of the project amount')) + '</div>';
+  }
+  return h + '<div class="amt-sub">' + r.nIntrari + ' ' + (r.nIntrari === 1 ? L('debursare', 'disbursement') : L('debursări', 'disbursements')) + (r.ultima ? ' · ' + esc(L('ultima ', 'last ')) + esc(D.dataRo(r.ultima)) : '') + '</div>';
+}
+function htmlAntet(d, u) {
+  var gk = d.cheie + '|' + u.cheie, deschis = S.gdeschise.has(gk), sc = D.sumeComponente(u.membri), dt = D.dateGrup(u.membri, infoDe);
+  var r = D.rezumat(u.membri, S.peAcord, S.baza.cursuri), cof = [];
+  u.membri.forEach(function (a) { a.donatori.forEach(function (x) { if (x !== d.cheie && cof.indexOf(x) < 0) cof.push(x); }); });
+  var meta = ['<span class="grp-t">' + esc(sc.tipuri.map(function (t) { return (D.etichetaTip(t.categorie, S.en) || '').toLowerCase(); }).filter(Boolean).join(' + ')) + '</span>',
+              esc(u.membri.length + ' ' + L('acorduri', 'agreements'))];
+  if (cof.length) meta.push('<span class="cof">' + esc(L('cofinanțat cu ', 'co-financed with ') + cof.join(', ')) + '</span>');
+  var tags = sc.tipuri.map(function (t) { return '<span class="tag ' + (CLASA_TIP[t.categorie] || 't-alt') + '">' + esc(D.etichetaTip(t.categorie, S.en) || '—') + '</span>'; }).join('');
+  return '<tr class="pg' + (deschis ? ' deschis' : '') + '" data-gr="' + esc(gk) + '">' +
+    '<td data-l="' + esc(L('Proiectul', 'Project')) + '"><div class="pname">' + esc(u.nume) + '</div><div class="pmeta">' + meta.join(' · ') + '</div></td>' +
+    '<td class="dcol" data-l="' + esc(L('Data efectivă de începere', 'Actual start date')) + '">' + dataGrup(dt.inceput, 'inceput') + '</td>' +
+    '<td class="dcol" data-l="' + esc(L('Data finalizării', 'Completion date')) + '">' + dataGrup(dt.sfarsit, 'sfarsit') + '</td>' +
+    '<td data-l="' + esc(L('Tip de finanțare', 'Type of financing')) + '"><div class="tags">' + tags + '</div></td>' +
+    '<td class="num" data-l="' + esc(L('Suma proiectului, pe componente', 'Project amount, by component')) + '"><div class="split">' + sc.tipuri.map(htmlSumaTip).join('') + htmlTotalGrup(sc) + '</div></td>' +
+    '<td class="num" data-l="' + esc(L('Suma debursărilor', 'Disbursed amount')) + '">' + htmlDebGrup(r) + '</td>' +
+    '<td class="act"><button type="button" class="exp" data-act="grup-comuta" data-fk="' + esc(gk + '|gexp') + '" aria-expanded="' + (deschis ? 'true' : 'false') + '" aria-label="' +
+      esc((deschis ? L('Închide acordurile proiectului: ', 'Close the agreements of the project: ') : L('Deschide acordurile proiectului: ', 'Open the agreements of the project: ')) + u.nume) + '">' + IC.chev + '</button></td></tr>';
+}
+function htmlGrup(d, u) {
+  var gk = d.cheie + '|' + u.cheie;
+  S.unit.set(gk, u);
+  u.membri.forEach(function (a) { S.subDe.set(d.cheie + '|' + a.id, { gk: gk, membri: u.membri }); });
+  return htmlAntet(d, u) + (S.gdeschise.has(gk) ? u.membri.map(function (a) { return htmlRand(d, a); }).join('') : '');
 }
 
 /* rândul deschis: debursările introduse, formularul de adăugare și datele despre acord */
@@ -808,8 +876,12 @@ function acoperire(lista) {
 }
 function htmlPanou(d) {
   var lista = filtrate(d.acorduri), r = D.rezumat(lista, S.peAcord, S.baza.cursuri), nume = D.numeDonator(d.cheie, S.en);
-  var total = d.acorduri.length;
-  var dsum = '<div class="dsum"><span><b>' + lista.length + '</b> ' + (lista.length === total ? L('proiecte', 'projects') : L('proiecte din ', 'projects of ') + total) + '</span>' +
+  // un proiect cu grant și împrumut (două sau mai multe acorduri) e un singur rând în tabel și se numără o dată; acordurile se spun între paranteze
+  var unitati = D.ordoneazaUnitati(D.grupeazaProiecte(lista), S.sort, S.peAcord, S.baza.cursuri);
+  var filtrata = lista.length !== d.acorduri.length;
+  var total = filtrata ? D.grupeazaProiecte(d.acorduri).length : unitati.length;
+  var dsum = '<div class="dsum"><span><b>' + unitati.length + '</b> ' + (filtrata ? L('proiecte din ', 'projects of ') + total : L('proiecte', 'projects')) +
+    (unitati.length !== lista.length ? ' <span class="dsum-ac">(' + lista.length + ' ' + L('acorduri', 'agreements') + ')</span>' : '') + '</span>' +
     '<span>' + esc(L('suma ', 'amount ')) + '<b>' + esc(fEur(r.sumaEur)) + '</b></span>' +
     (S.debEroare ? '' : '<span>' + esc(L('debursat ', 'disbursed ')) + '<b>' + esc(fEur(r.debEur)) + '</b>' + (r.pct != null ? ' (' + esc(fmPct(r.pct * 100)) + '%)' : '') + '</span>') +
     acoperire(lista) + '</div>';
@@ -821,7 +893,7 @@ function htmlPanou(d) {
     corp = '<div class="tbl-scroll"><table class="deb-tbl"><thead><tr><th>' + esc(L('Proiectul', 'Project')) + '</th><th>' + esc(L('Data efectivă de începere', 'Actual start date')) + '</th><th>' + esc(L('Data finalizării', 'Completion date')) +
       '</th><th>' + esc(L('Tip de finanțare', 'Type of financing')) +
       '</th><th class="num">' + esc(L('Suma proiectului', 'Project amount')) + '</th><th class="num">' + esc(L('Suma debursărilor', 'Disbursed amount')) + '</th><th><span class="vh">' + esc(L('Detalii', 'Details')) + '</span></th></tr></thead><tbody>' +
-      lista.map(function (a) { return htmlRand(d, a); }).join('') + '</tbody></table></div>';
+      unitati.map(function (u) { return u.grup ? htmlGrup(d, u) : htmlRand(d, u.membri[0]); }).join('') + '</tbody></table></div>';
   }
   return '<section class="panel" data-d="' + esc(d.cheie) + '" aria-label="' + esc(d.cheie) + '"><div class="panel-head"><div><h2>' + esc(d.cheie) + (nume !== d.cheie ? ' <small>' + esc(nume) + '</small>' : '') + '</h2>' + dsum + '</div>' +
     '<div class="head-btns"><button type="button" class="btn" data-act="excel-donator" data-d="' + esc(d.cheie) + '"' + (lista.length ? '' : ' disabled') + '>' + IC.xl + 'Excel · ' + esc(D.taie(d.cheie, 24)) + '</button>' +
@@ -843,6 +915,7 @@ function randeazaRez() {
     return;
   }
   pastreazaFocus(function () {
+    S.subDe = new Map(); S.unit = new Map();                  // se refac odată cu tabelele (htmlGrup)
     el.innerHTML = S.sel.length ? donatoriAlesi().map(htmlPanou).join('') : htmlGol();
   });
   legaLinkuriAmp();
@@ -991,6 +1064,35 @@ function refaRand(k) {
     while (tmp.firstChild) tr.parentNode.insertBefore(tmp.firstChild, tr);
     tr.parentNode.removeChild(tr);
   });
+  var sub = S.subDe.get(k);
+  if (sub) refaAntet(sub.gk);                    // suma sau debursările acordului s-au putut schimba: se reface și rândul proiectului
+  legaLinkuriAmp();
+}
+/* proiectul cu grant și împrumut al cărui rând se reface: „donator|denumire” → donatorul și acordurile lui */
+function donatorDeGrup(gk) {
+  var c = gk.slice(0, gk.indexOf('|'));
+  return S.baza.donatori.filter(function (x) { return x.cheie === c; })[0] || null;
+}
+function refaAntet(gk) {
+  var h = RAD.querySelector('tr.pg[data-gr="' + qs(gk) + '"]'), u = S.unit.get(gk), d = donatorDeGrup(gk);
+  if (!h || !u || !d) return;
+  pastreazaFocus(function () {
+    var tmp = document.createElement('tbody');
+    tmp.innerHTML = htmlAntet(d, u);
+    h.parentNode.replaceChild(tmp.firstChild, h);
+  });
+}
+function refaGrup(gk) {
+  var h = RAD.querySelector('tr.pg[data-gr="' + qs(gk) + '"]'), u = S.unit.get(gk), d = donatorDeGrup(gk);
+  if (!h || !u || !d) { randeazaRez(); return; }
+  pastreazaFocus(function () {
+    var urm = h.nextElementSibling;
+    while (urm && (urm.classList.contains('sub') || urm.classList.contains('det') || urm.classList.contains('re'))) { var de_sters = urm; urm = urm.nextElementSibling; de_sters.parentNode.removeChild(de_sters); }
+    var tmp = document.createElement('tbody');
+    tmp.innerHTML = htmlGrup(d, u);
+    while (tmp.firstChild) h.parentNode.insertBefore(tmp.firstChild, h);
+    h.parentNode.removeChild(h);
+  });
   legaLinkuriAmp();
 }
 
@@ -1023,6 +1125,10 @@ function dupaFiltre() { scrieHash(); randeazaRez(); }
 function comutaRand(k) {
   if (S.deschise.has(k)) S.deschise.delete(k); else S.deschise.add(k);
   refaRand(k);
+}
+function comutaGrup(gk) {
+  if (S.gdeschise.has(gk)) S.gdeschise.delete(gk); else S.gdeschise.add(gk);
+  refaGrup(gk);
 }
 function deschideRand(k) {
   if (!S.deschise.has(k)) { S.deschise.add(k); refaRand(k); }
@@ -1429,6 +1535,12 @@ RAD.addEventListener('click', function (ev) {
   if (tr && RAD.contains(tr) && !ev.target.closest('a,button,input,select,textarea,label')) {
     if (window.getSelection && String(window.getSelection())) return;      // omul selectează text, nu deschide rândul
     comutaRand(tr.getAttribute('data-k'));
+    return;
+  }
+  var pg = ev.target.closest('tr.pg');
+  if (pg && RAD.contains(pg) && !ev.target.closest('a,button,input,select,textarea,label')) {
+    if (window.getSelection && String(window.getSelection())) return;
+    comutaGrup(pg.getAttribute('data-gr'));
   }
 });
 function actiune(act, b) {
@@ -1450,6 +1562,7 @@ function actiune(act, b) {
     case 'alege': comutaDonator(b.getAttribute('data-d'), true); break;
     case 'scoate': comutaDonator(b.getAttribute('data-d'), false); break;
     case 'comuta': if (k) comutaRand(k); break;
+    case 'grup-comuta': if (tr && tr.getAttribute('data-gr')) comutaGrup(tr.getAttribute('data-gr')); break;
     case 'adauga': if (k) { deschideRand(k); focuseazaFormular(k); } break;
     case 'rand-ed': if (k) pornesteRand(k, b.getAttribute('data-f')); break;
     case 'rand-salveaza': if (k) salveazaRand(k); break;

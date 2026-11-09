@@ -196,14 +196,14 @@ care legis.md îl primește.
 | `date/acorduri_legare.json` | Acordurile din registru, gata grupate, un acord pe linie. Citit de pagina „De la lege la bani". Se rescrie doar când se schimbă ceva |
 | `date/legaturi_amp.json` | Legăturile acord ↔ proiect AMP confirmate de oameni (vezi mai jos). Se completează de mână sau din pagină |
 | `debursari.html` | Pagina „Debursări pe acorduri”: structura și stilurile. Scripturile ei sunt `debursari.js` și `debursari-ui.js` (vezi „Debursări pe acorduri”), încărcate cu `?v=AAAA-LL-ZZ`: **la fiecare modificare a unuia dintre ele schimbă data din `debursari.html`**, altfel browserul poate păstra o variantă veche (de pildă se vedea doar butonul „Debursare”, fără creioanele de editare). Un test verifică prezența lui `?v=` |
-| `debursari.js` | Logica paginii, fără DOM, ca s-o poată testa Node: donatorii și proiectele lor, rândurile omise, obiectivele și datele proiectelor (sursele și ordinea lor), totalurile (aceleași reguli ca în registru), operațiile asupra fișierului de date și salvarea lui prin API-ul GitHub („Depozit”), păstrarea codului cu PIN („Seif”) și specificațiile celor trei fișiere Excel |
+| `debursari.js` | Logica paginii, fără DOM, ca s-o poată testa Node: donatorii și proiectele lor, rândurile omise, obiectivele și datele proiectelor (sursele și ordinea lor), totalurile (aceleași reguli ca în registru), proiectele cu grant și împrumut unite într-un singur rând (`grupeazaProiecte`, `sumeComponente`, `ordoneazaUnitati`), operațiile asupra fișierului de date și salvarea lui prin API-ul GitHub („Depozit”), păstrarea codului cu PIN („Seif”) și specificațiile celor trei fișiere Excel |
 | `debursari-ui.js` | Interfața paginii: alegerea donatorilor, tabelul, fereastra cu codul, formularele de debursare și de date despre proiect, panourile „AMP”, „Rânduri omise” și „Date fără acord găsit”, butoanele Excel, engleza și varianta pentru telefon. Nu ține codul nicăieri în afara memoriei paginii |
 | `amp-date.js` | Datele de început și de finalizare din AMP pentru acordurile din „Debursări pe acorduri”: citește raportul AMP live (nr. 661, prin proxy-ul amp.vivi.md) și, când nu răspunde, arhiva `arhiva.js`; leagă un acord de un proiect AMP doar când denumirea, finanțatorul și suma coincid („sigur”) sau când un om a confirmat legătura în `date/legaturi_amp.json`; o legătură doar „probabilă” rămâne indiciu, nu dă date în tabel. Funcții pure, ca să le poată testa Node |
 | `teste_amp_date.js` | Testele lui `amp-date.js`: formatele datelor, regulile de potrivire (sigur, probabil, ambiguu, prea vechi), legăturile confirmate sau respinse, raportul live față de arhivă, oprirea după 20 de secunde și o verificare pe arhiva AMP + registrul real. Rulare: `node teste_amp_date.js` |
 | `date/proiecte_manual.json` | Date despre proiecte, scrise de mână și cu sursă. „omise”: rândurile-umbrelă ale registrului, care nu apar în lista de proiecte (cu motivul). „proiecte”: obiectivele proiectului și, când sursa le dă, data de început și de finalizare; fiecare intrare are adresa documentului oficial și citatul exact — fără ele nu se citește. Vezi „Debursări pe acorduri” |
 | `date/debursari.json` | „Baza de date” a paginii: debursările introduse de mână, o înregistrare pe linie, și — la cheia `proiecte`, scrisă doar când nu e goală — datele despre proiecte introduse în pagină (obiective, început, finalizare). Fișier public; îl scrie doar pagina, prin API-ul GitHub, cu codul de acces. Fiecare salvare e un commit. La 3 noiembrie 2026 conține și datele din scrisoarea Ministerului Finanțelor (situația la 30.09.2026): 31 de debursări cumulate și datele de început/finalizare la 34 de rânduri, fiecare cu nota care citează scrisoarea (vezi „Datele din scrisoarea Ministerului Finanțelor”) |
 | `teste_debursari.js` | Testele logicii (obiective și date cu sursele lor, rânduri omise, totaluri, operații, conflicte de scriere, PIN, specificațiile Excel). Rulare: `node teste_debursari.js` |
-| `teste_debursari.py` | Verifică fișierele paginii (inclusiv `date/proiecte_manual.json`) și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”, inclusiv deblocarea unică și editarea în tabel); `--doar 13,14` rulează doar secțiunile numerotate (de la 13 în sus; 1–12 rulează doar fără `--doar`) |
+| `teste_debursari.py` | Verifică fișierele paginii (inclusiv `date/proiecte_manual.json`) și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”, inclusiv deblocarea unică, editarea în tabel și proiectele cu grant și împrumut unite într-un rând, secțiunea 19); `--doar 13,14` rulează doar secțiunile numerotate (de la 13 în sus; 1–12 rulează doar fără `--doar`) |
 | `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi. Le scrie `legis_watch.py`; apar în repository după prima rulare reușită a lui `legis_local.bat` |
 | `CNAME` | Domeniul propriu |
 
@@ -336,6 +336,24 @@ finanțare, cu sau fără debursări) și sorta. Donatorii bifați și filtrele 
 (`#d=BERD|BEI&tip=…`), deci o selecție se trimite ca link. Pe laptop și pe desktop (ferestre de 1250 px sau mai
 late) fiecare tabel încape întreg în panoul lui, chiar cu toți donatorii bifați; pe un ecran mai îngust tabelul se
 derulează în panoul lui, iar pagina nu se lărgește. Pe telefon tabelul devine fișe; pagina are și varianta în engleză.
+
+**Proiecte cu grant și împrumut: un singur rând, cu sumele pe componente.** Registrul are separat grantul și
+împrumutul aceluiași proiect (două acorduri, aceeași denumire, ani diferiți). Pagina le arată ca **un singur rând**,
+cu denumirea comună o singură dată și, la „Suma proiectului", cât e grant, cât e împrumut (fiecare în valuta lui) și
+**totalul** în euro; sub denumire scrie tipurile și numărul de acorduri („grant + împrumut · 2 acorduri"). Un clic pe
+rând (sau pe butonul din dreapta) deschide **acordurile componente**, ca rânduri obișnuite, numite după tip și an
+(„Grant, 2023", „Împrumut, 2022"), cu datele, debursările, detaliile și editarea lor: creioanele și butonul „Debursare"
+sunt la componente, nu la rândul proiectului. Rândul proiectului arată debursările însumate ale componentelor, cu
+procentul din totalul proiectului, iar datele de început și de finalizare sunt cele din acorduri (începutul cel mai
+timpuriu, finalizarea cea mai târzie, cu mențiunea „din acorduri"). Se unesc numai rândurile cu aceeași denumire
+(fără diacritice și punctuație) **la același donator**, când între ele sunt și grant, și împrumut: două acorduri de
+același tip sau de donatori diferiți nu se unesc, iar un filtru care ascunde una dintre componente (de pildă tipul
+„Împrumut") desface proiectul în rânduri obișnuite, cu mențiunea „(împrumut, 2022)" ca înainte. Proiectele se sortează
+după totalul lor. **Numărătorile și Excel-ul rămân pe acorduri**: indicatorii și sumele din antet nu se schimbă, antetul
+donatorului spune „N proiecte (M acorduri)", iar Excel-ul are tot câte un rând pe acord, cu denumirile deosebite. Un
+singur act care cuprinde și grant, și împrumut (de pildă acordul cu FIDA, `hg969/2008`) rămâne un singur rând, cu tipul
+dat de registru, fiindcă registrul nu are sumele separate. Regulile sunt în `grupeazaProiecte` și `sumeComponente` din
+`debursari.js`, cu teste în `teste_debursari.js` și în secțiunea 19 din `teste_debursari.py`.
 
 **Rânduri omise, ca un proiect să nu apară de două ori.** Cinci rânduri ale registrului nu apar în liste:
 sunt rânduri-umbrelă, adică negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu

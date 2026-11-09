@@ -21,7 +21,7 @@ Ce se verifică, pe scurt:
   · engleză, telefon (fără derulare orizontală), adresa cu selecția, tastatură, cereri doar către pagină, api.github.com și proxy-ul AMP.
 Are nevoie de Node.js, de openpyxl și (pentru --browser) de Playwright.
 """
-import base64, datetime, functools, hashlib, json, os, re, subprocess, sys, tempfile, threading
+import base64, datetime, functools, hashlib, json, os, re, subprocess, sys, tempfile, threading, unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -76,6 +76,32 @@ def donatori_acord(a):
 
 def acorduri_donator(d):
     return [a for a in RANDURI if d in donatori_acord(a)]
+
+
+def cheie_nume(s):
+    s = ''.join(c for c in unicodedata.normalize('NFD', s or '') if not unicodedata.combining(c)).lower()
+    return re.sub(r'[^a-z0-9]+', ' ', s).strip()
+
+
+def proiecte_unite(lista):
+    """Proiectele cu componentă de grant și de împrumut dintr-o listă de acorduri (a unui donator): rândurile cu aceeași denumire între care sunt și grant,
+    și împrumut. Pagina le arată ca un singur rând, cu sumele pe componente; acordurile lor se văd când proiectul se deschide. {cheia denumirii: [acorduri]}"""
+    fam = {}
+    for a in lista:
+        fam.setdefault(cheie_nume(curata_nume(a.get('scurt') or a['nume'])), []).append(a)
+    return {k: m for k, m in fam.items() if len(m) > 1 and any(x['categorie'] == 'Grant' for x in m) and any(x['categorie'] == 'Împrumut' for x in m)}
+
+
+def in_proiecte_unite(lista):
+    return {x['id'] for m in proiecte_unite(lista).values() for x in m}
+
+
+def cheie_proiect_unit(donator, id_):
+    """Cheia proiectului unit (la acest donator) din care face parte acordul, sau None."""
+    for k, m in proiecte_unite(acorduri_donator(donator)).items():
+        if any(x['id'] == id_ for x in m):
+            return k
+    return None
 
 
 def eur(a):
@@ -433,7 +459,18 @@ def deblocat(pg):
 
 
 def rand_acord(pg, donator, id_):
-    return pg.locator('section.panel[data-d="%s"] tr.ac[data-k="%s"]' % (donator, donator + '|' + id_))
+    r = pg.locator('section.panel[data-d="%s"] tr.ac[data-k="%s"]' % (donator, donator + '|' + id_))
+    if r.count() == 0:                       # acordul face parte dintr-un proiect cu grant și împrumut, închis: se deschide proiectul (rândul lui apare dedesubt)
+        cheie = cheie_proiect_unit(donator, id_)
+        h = pg.locator('section.panel[data-d="%s"] tr.pg[data-gr="%s"]' % (donator, donator + '|' + cheie)) if cheie else None
+        if h is not None and h.count() and 'deschis' not in (h.get_attribute('class') or ''):
+            h.locator('.exp').click()
+    return r
+
+
+def nume_rand(r):
+    """Denumirea cu mențiunea de deosebire, cum o scrie și Excel-ul (din eticheta butonului de detalii): rândul poate fi o componentă a unui proiect unit, care arată doar „Grant, 2023”."""
+    return r.locator('.exp').get_attribute('aria-label').split(': ', 1)[1]
 
 
 def deschide_rand(pg, donator, a):
@@ -563,14 +600,16 @@ try:
                  ['PROIECTUL', 'DATA EFECTIVĂ DE ÎNCEPERE', 'DATA FINALIZĂRII', 'TIP DE FINANȚARE', 'SUMA PROIECTULUI', 'SUMA DEBURSĂRILOR'])
             verifica('în tabel nu mai există coloana „Descriere succintă”, nici text de descriere în rânduri', len(antete) == 7 and 'DESCRIERE' not in ' '.join(antete).upper() and pg.locator('section.panel[data-d="BERD"] tr.ac .pdesc').count() == 0, antete)
             egal('șapte celule pe rând (șase coloane + butonul de detalii)', pg.locator('section.panel[data-d="BERD"] tr.ac').first.locator('td').count(), 7)
-            egal('un rând pe acord pentru BERD (%d)' % len(BERD), pg.locator('section.panel[data-d="BERD"] tr.ac').count(), len(BERD))
+            U_BERD, IN_BERD = proiecte_unite(BERD), in_proiecte_unite(BERD)
+            egal('tabelul BERD: un rând pe acord, în afară de proiectele cu grant și împrumut, care sunt un singur rând fiecare (%d rânduri simple + %d proiecte unite, cu %d acorduri; acordurile lor apar când proiectul se deschide)' % (len(BERD) - len(IN_BERD), len(U_BERD), len(IN_BERD)),
+                 [pg.locator('section.panel[data-d="BERD"] tr.ac').count(), pg.locator('section.panel[data-d="BERD"] tr.pg').count()], [len(BERD) - len(IN_BERD), len(U_BERD)])
             sus = pg.locator('.kpi .val').all_inner_texts()
             egal('indicatorul „Proiecte” = rândurile lui BERD', sus[0], str(len(BERD)))
             asteptat_suma = rotunjit(suma_numarata(BERD))
             verifica('„Suma proiectelor” din indicator = calculul independent (%s EUR)' % fmt_ro(asteptat_suma, 0),
                      fmt_ro(asteptat_suma, 0) in pg.locator('.kpi .sub').all_inner_texts()[1], pg.locator('.kpi .sub').all_inner_texts())
             # primul rând, comparat cu datele
-            lista_sumă = sorted(BERD, key=lambda a: -(eur(a) if eur(a) is not None else -1))
+            lista_sumă = sorted([a for a in BERD if a['id'] not in IN_BERD], key=lambda a: -(eur(a) if eur(a) is not None else -1))       # rândurile simple; proiectele unite au rând propriu (secțiunea 19)
             prim = lista_sumă[0]
             r0 = pg.locator('section.panel[data-d="BERD"] tr.ac').first
             _nume0 = curata_nume(prim.get('scurt') or prim['nume'])
@@ -610,7 +649,7 @@ try:
             verifica('căutare fără rezultat: mesaj și buton „Șterge filtrele”', pg.locator('section.panel[data-d="BERD"] [data-act="sterge-filtre"]').count() == 1)
             pg.click('[data-act="sterge-filtre"]')
             pg.wait_for_timeout(250)
-            egal('după „Șterge filtrele” se întorc toate rândurile', pg.locator('section.panel[data-d="BERD"] tr.ac').count(), len(BERD))
+            egal('după „Șterge filtrele” se întorc toate rândurile (simple și proiecte unite)', [pg.locator('section.panel[data-d="BERD"] tr.ac').count(), pg.locator('section.panel[data-d="BERD"] tr.pg').count()], [len(BERD) - len(IN_BERD), len(U_BERD)])
             ctx.close()
 
             # ---------------------------------------------------------------- 2. câmpuri blocate, cod greșit
@@ -873,7 +912,9 @@ try:
             egal('filtrul „Doar cu debursări”: două rânduri', pg.locator('section.panel[data-d="BERD"] tr.ac').count(), 2)
             pg.select_option('#fdeb', 'fara')
             pg.wait_for_timeout(250)
-            egal('filtrul „Doar fără debursări”: restul', pg.locator('section.panel[data-d="BERD"] tr.ac').count(), len(BERD) - 2)
+            _fara = [a for a in BERD if a['id'] not in {x['id'] for x in pe}]
+            egal('filtrul „Doar fără debursări”: restul (rânduri simple + proiecte unite, cu grant și împrumut)', [pg.locator('section.panel[data-d="BERD"] tr.ac').count(), pg.locator('section.panel[data-d="BERD"] tr.pg').count()],
+                 [len(_fara) - len(in_proiecte_unite(_fara)), len(proiecte_unite(_fara))])
             pg.select_option('#fdeb', '')
             # orfana se poate șterge doar cu cod
             verifica('fără cod, orfana nu are buton de ștergere', pg.locator('#sOrfane [data-act="del"]').count() == 0)
@@ -1098,14 +1139,14 @@ try:
                     antet, rand_antet = [c.value for c in r], r[0].row
                     break
             iP, iD, iI, iF, iS = (antet.index(x) for x in ('Proiectul', 'Descriere succintă (obiectivele proiectului)', 'Data efectivă de începere', 'Data finalizării', 'Sursa obiectivelor și a datelor'))
-            nume_A = rA.locator('.pname').inner_text()
+            nume_A = nume_rand(rA)
             ra = [r for r in ws.iter_rows(min_row=rand_antet + 1) if r[iP].value == nume_A]
             verifica('Excel: rândul proiectului cu surse oficiale există o dată', len(ra) == 1, [r[iP].value for r in ws.iter_rows(min_row=rand_antet + 1, max_row=rand_antet + 4)])
             ra = ra[0]
             egal('Excel: obiectivele; data întreagă e dată adevărată (se sortează), cea doar cu luna și anul rămâne text', [ra[iD].value, ra[iI].value, ra[iF].value], [OBI_A['ro'], datetime.datetime(2019, 5, 14), '12.2027'])
             verifica('Excel: data întreagă are format de dată (zz.ll.aaaa)', ra[iI].number_format.lower().replace('/', '.') in ('dd.mm.yyyy', 'dd\\.mm\\.yyyy'), ra[iI].number_format)
             egal('Excel: sursa spune „sursă oficială”, cu hyperlink spre document', [ra[iS].value, ra[iS].hyperlink.target if ra[iS].hyperlink else None], ['sursă oficială', SURSA_A])
-            nume_C = rC.locator('.pname').inner_text()
+            nume_C = nume_rand(rC)
             rc_x = [r for r in ws.iter_rows(min_row=rand_antet + 1) if r[iP].value == nume_C][0]
             verifica('Excel: proiectul fără surse are celulele goale (nu „—” și nu text inventat)', [rc_x[iD].value, rc_x[iI].value, rc_x[iF].value, rc_x[iS].value] == [None, None, None, None] or
                      [rc_x[iD].value, rc_x[iI].value, rc_x[iF].value, rc_x[iS].value] == ['', '', '', ''], [rc_x[iD].value, rc_x[iI].value, rc_x[iF].value, rc_x[iS].value])
@@ -1364,7 +1405,8 @@ try:
                     antet, rand_antet = [c.value for c in rr], rr[0].row
                     break
             iP, iI, iF, iS = (antet.index(x) for x in ('Proiectul', 'Data efectivă de începere', 'Data finalizării', 'Sursa obiectivelor și a datelor'))
-            rx = [x for x in ws.iter_rows(min_row=rand_antet + 1) if x[iP].value == r.locator('.pname').inner_text()][0]
+            _nume_rand = nume_rand(r)
+            rx = [x for x in ws.iter_rows(min_row=rand_antet + 1) if x[iP].value == _nume_rand][0]
             egal('Excel: datele din AMP (date adevărate) și sursa „AMP”', [rx[iI].value, rx[iF].value, rx[iS].value], [datetime.datetime(2024, 3, 12), datetime.datetime(2027, 12, 31), 'AMP'])
             note = ' '.join(toate_foile(cale))
             verifica('Excel: nota spune ce s-a citit din AMP (raportul live și arhiva)', 'raportul AMP live (1 proiecte)' in note and ('arhiva AMP (%d proiecte' % len(arh)) in note, note[-600:])
@@ -1420,12 +1462,15 @@ try:
             pg.click('[data-act="toti-afisati"]')
             sel = pg.evaluate('window.DebursariUI.stare().sel')
             pg.wait_for_function('n => document.querySelectorAll("section.panel[data-d]").length === n', arg=len(sel), timeout=60000)
+            n_grupuri = pg.locator('section.panel[data-d] tr.pg').count()
+            pg.evaluate('document.querySelectorAll("section.panel[data-d] tr.pg .exp").forEach(b => b.click())')           # proiectele cu grant și împrumut: se deschid, ca să se vadă și acordurile lor
+            pg.wait_for_function('n => document.querySelectorAll("section.panel[data-d] tr.pg.deschis").length === n', arg=n_grupuri, timeout=30000)
             ids_afisate = set(pg.evaluate('[...document.querySelectorAll("section.panel[data-d] tr.ac")].map(r => r.getAttribute("data-k").split("|").slice(1).join("|"))'))
             asteptate = {a['id'] for a in RANDURI if set(donatori_acord(a)) & set(sel)}
             egal('în pagină, cu toți donatorii bifați (%d): exact rândurile neomise (%d)' % (len(sel), len(asteptate)), sorted(ids_afisate), sorted(asteptate))
             verifica('în pagină: niciun rând omis nu apare în vreo listă', not (ids_afisate & OMISE_ID), sorted(ids_afisate & OMISE_ID))
             dubluri = pg.evaluate('''() => [...document.querySelectorAll("section.panel[data-d]")].map(p => {
-                const v = [...p.querySelectorAll("tr.ac .pname")].map(x => x.textContent.trim());
+                const v = [...p.querySelectorAll("tr.pg .pname, tr.ac:not(.sub) .pname")].map(x => x.textContent.trim());
                 const s = new Set(), d = [];
                 v.forEach(n => { if (s.has(n)) d.push(n); s.add(n); });
                 return [p.getAttribute("data-d"), d];
@@ -1560,7 +1605,7 @@ try:
                     antet, rand_antet = [c.value for c in rr], rr[0].row
                     break
             iP, iS, iV = antet.index('Proiectul'), antet.index('Suma proiectului'), antet.index('Suma proiectului') + 1
-            rx = [x for x in wsb.iter_rows(min_row=rand_antet + 1) if x[iP].value == rC.locator('.pname').inner_text()][0]
+            rx = [x for x in wsb.iter_rows(min_row=rand_antet + 1) if x[iP].value == nume_rand(rC)][0]
             egal('Excel: rândul cu suma corectată (suma, valuta)', [rx[iS].value, rx[iV].value], [12345678.9, 'USD'])
             note = ' '.join(toate_foile(cale))
             verifica('Excel: nota spune că suma a fost corectată și arată registru → corectată', 'suma a fost corectată de un utilizator' in note and (reg_txt + ' → 12.345.678,90 USD') in note, note[-600:])
@@ -1729,6 +1774,192 @@ try:
             for lat in (1280, 1250):                                        # și în engleză (antetele au alte cuvinte)
                 masoara(lat, True)
             ctx.close()
+
+        # ---------------------------------------------------------------- 19. proiecte cu grant și împrumut: un singur rând, sumele pe componente
+        if rulez(19):
+            print('\n19. Proiecte cu grant și împrumut: un singur rând, cu denumirea comună și sumele pe componente')
+            fals = GitHubFals(intrari=[])
+            ctx = context(b)
+            pg = pagina(ctx, fals, hash_='#d=BERD&q=gazelor%20naturale')
+            P = 'section.panel[data-d="BERD"]'
+            PJ = "section.panel[data-d='BERD']"                       # același selector, pentru codul JavaScript evaluat în pagină (ghilimele simple în interior)
+            U, IN_BERD = proiecte_unite(BERD), in_proiecte_unite(BERD)
+            gaze = U[cheie_nume('Securitatea furnizării gazelor naturale')]
+            grant = [x for x in gaze if x['categorie'] == 'Grant'][0]
+            imprumut = [x for x in gaze if x['categorie'] == 'Împrumut'][0]
+            total_unitati = len(BERD) - len(IN_BERD) + len(U)
+            txt = lambda loc: loc.inner_text().replace('\xa0', ' ')
+            h = pg.locator(P + ' tr.pg')
+            egal('un singur rând pentru grantul și împrumutul cu aceeași denumire (în loc de două rânduri deosebite prin mențiune)', [h.count(), pg.locator(P + ' tr.ac.sub').count()], [1, 0])
+            egal('denumirea comună, o singură dată, fără mențiunea „(grant, 2023)” / „(împrumut, 2022)”', h.locator('.pname').inner_text(), 'Securitatea furnizării gazelor naturale')
+            meta = txt(h.locator('.pmeta'))
+            verifica('sub denumire: tipurile componentelor și numărul de acorduri', 'grant + împrumut' in meta and '2 acorduri' in meta, meta)
+            egal('coloana „Tip de finanțare”: ambele tipuri', h.locator('td').nth(3).locator('.tag').all_inner_texts(), ['Grant', 'Împrumut'])
+            sume = txt(h.locator('td').nth(4))
+            pe_tip = re.findall(r'(Grant|Împrumut)\s+([\d.,]+)\s+([A-Z]{3})', sume)
+            egal('suma proiectului, separată pe componente: cât e grant și cât e împrumut, în valuta fiecăruia (calcul independent din registru)', pe_tip,
+                 [('Grant', fmt_bani_ro(grant['suma']['v']), grant['suma']['val']), ('Împrumut', fmt_bani_ro(imprumut['suma']['v']), imprumut['suma']['val'])])
+            total_gaze = fmt_ro(rotunjit(suma_numarata(gaze)), 0)
+            verifica('totalul proiectului = grant + împrumut, în euro (%s)' % total_gaze, re.search(r'TOTAL\s+(≈ )?' + re.escape(total_gaze) + r' EUR', sume, re.I) is not None, sume)
+            verifica('rândul proiectului nu are creioane de editare, nici butonul „Debursare” (ele sunt la fiecare componentă)', h.locator('.edt').count() == 0 and h.locator('[data-act="adauga"]').count() == 0)
+            egal('proiectul e închis: butonul spune „Deschide acordurile proiectului”, iar acordurile componente nu sunt în tabel',
+                 [h.locator('.exp').get_attribute('aria-expanded'), h.locator('.exp').get_attribute('aria-label').startswith('Deschide acordurile proiectului: '), pg.locator(P + ' tr.ac[data-k="BERD|%s"]' % grant['id']).count()], ['false', True, 0])
+            dsum = txt(pg.locator(P + ' .dsum'))
+            m = re.search(r'(\d+) proiecte din (\d+) \((\d+) acorduri\)', dsum)
+            n_simple = pg.locator(P + ' tr.ac:not(.sub)').count()
+            egal('antetul donatorului numără proiectele (un proiect unit = unul) și spune între paranteze câte acorduri sunt', [int(x) for x in m.groups()] if m else dsum, [1 + n_simple, total_unitati, len(gaze) + n_simple])
+            # deschidere / închidere
+            h.locator('.exp').click()
+            pg.wait_for_selector(P + ' tr.ac.sub')
+            sub = pg.locator(P + ' tr.ac.sub')
+            egal('deschis: cele două acorduri componente apar sub proiect, întâi grantul, apoi împrumutul', [sub.count(), sub.evaluate_all('l => l.map(r => r.getAttribute("data-k"))')], [2, ['BERD|' + grant['id'], 'BERD|' + imprumut['id']]])
+            egal('componentele se numesc după tip și an (denumirea comună e deasupra)', sub.locator('.pname').all_inner_texts(), ['Grant, ' + grant['semnat'][-4:], 'Împrumut, ' + imprumut['semnat'][-4:]])
+            egal('fiecare componentă își are tipul și suma ei, ca un rând obișnuit', [[fmt_bani_ro(a['suma']['v']) in txt(sub.nth(i).locator('td').nth(4)), sub.nth(i).locator('.tag').inner_text()] for i, a in enumerate((grant, imprumut))],
+                 [[True, 'Grant'], [True, 'Împrumut']])
+            egal('deschis: aria-expanded, iar rândul proiectului rămâne deasupra componentelor', [h.locator('.exp').get_attribute('aria-expanded'), pg.evaluate('document.querySelector("' + PJ + ' tr.pg").nextElementSibling.getAttribute("data-k")')], ['true', 'BERD|' + grant['id']])
+            verifica('numărătorile rămân pe acorduri: indicatorul „Proiecte” = acordurile lui BERD, suma din antet = calculul independent', pg.locator('.kpi .val').first.inner_text() == str(len(BERD)) and
+                     ('suma ' + fmt_ro(rotunjit(suma_numarata([a for a in BERD])), 0)) not in dsum, (pg.locator('.kpi .val').first.inner_text(), dsum))
+            # detaliile unei componente, apoi închiderea și redeschiderea proiectului
+            rg = pg.locator(P + ' tr.ac.sub[data-k="BERD|%s"]' % grant['id'])
+            rg.locator('.exp').click()
+            pg.wait_for_selector(P + ' tr.det[data-k="BERD|%s"]' % grant['id'])
+            egal('detaliile grantului se deschid sub componenta lui', pg.evaluate('document.querySelector("' + PJ + ' tr.ac.sub[data-k=\'BERD|' + grant['id'] + '\']").nextElementSibling.className'), 'det')
+            h.locator('.exp').click()
+            pg.wait_for_selector(P + ' tr.ac.sub', state='detached')
+            egal('închis din nou: nici componentele, nici detaliile lor nu mai sunt în tabel', [pg.locator(P + ' tr.ac.sub').count(), pg.locator(P + ' tr.det').count(), pg.locator(P + ' tr.pg').count()], [0, 0, 1])
+            h.locator('.exp').click()
+            pg.wait_for_selector(P + ' tr.det[data-k="BERD|%s"]' % grant['id'])
+            egal('redeschis: detaliile deschise înainte rămân deschise', [pg.locator(P + ' tr.ac.sub').count(), pg.locator(P + ' tr.det').count()], [2, 1])
+            rg.locator('.exp').click()
+            pg.wait_for_selector(P + ' tr.det', state='detached')
+            # clic pe rând (nu doar pe buton) și tastatură
+            h.locator('td').first.click()
+            pg.wait_for_selector(P + ' tr.ac.sub', state='detached')
+            egal('un clic pe rândul proiectului îl închide (ca la un rând obișnuit)', [pg.locator(P + ' tr.ac.sub').count(), h.locator('.exp').get_attribute('aria-expanded')], [0, 'false'])
+            h.locator('.exp').focus()
+            pg.keyboard.press('Enter')
+            pg.wait_for_selector(P + ' tr.ac.sub')
+            verifica('Enter pe butonul proiectului îl deschide, iar focusul rămâne pe buton', h.locator('.exp').get_attribute('aria-expanded') == 'true' and pg.evaluate('document.activeElement.classList.contains("exp") && document.activeElement.closest("tr").classList.contains("pg")'))
+            # filtre: fără celălalt tip, proiectul nu se mai unește; cu toate tipurile revine
+            pg.select_option('#ftip', 'Împrumut')
+            pg.wait_for_timeout(250)
+            egal('filtrul „Împrumut”: nu mai există proiect unit; împrumutul e rând obișnuit, cu mențiunea de deosebire', [pg.locator(P + ' tr.pg').count(), [x for x in pg.locator(P + ' tr.ac:not(.sub) .pname').all_inner_texts() if 'împrumut, ' + imprumut['semnat'][-4:] in x]],
+                 [0, [curata_nume(imprumut.get('scurt') or imprumut['nume']) + ' (împrumut, ' + imprumut['semnat'][-4:] + ')']])
+            pg.select_option('#ftip', '')
+            pg.wait_for_selector(P + ' tr.pg')
+            egal('fără filtru, proiectul unit revine și rămâne deschis', [pg.locator(P + ' tr.pg').count(), pg.locator(P + ' tr.ac.sub').count()], [1, 2])
+            # ordine: proiectul unit se așază după totalul lui; fără căutare, tabelul întreg
+            pg.fill('#q', '')
+            pg.wait_for_function('n => document.querySelectorAll("section.panel[data-d=\'BERD\'] tr.pg").length === n', arg=len(U), timeout=15000)
+            by_id = {a['id']: a for a in ACORDURI}
+            by_cheie = {k: m for k, m in U.items()}
+            def total_unit(chei):
+                if chei.startswith('BERD|') and chei[5:] in by_id:
+                    return eur(by_id[chei[5:]])
+                m = by_cheie[chei[5:]]
+                tot = suma_numarata(m)
+                return tot if any(x.get('inTotal') == 'numarat' and eur(x) is not None for x in m) else (sum(eur(x) for x in m if eur(x) is not None) or None)
+            chei_ordine = pg.evaluate('[...document.querySelectorAll("' + PJ + ' tbody > tr.pg, ' + PJ + ' tbody > tr.ac:not(.sub)")].map(r => r.getAttribute("data-gr") || r.getAttribute("data-k"))')
+            totaluri = [total_unit(c) for c in chei_ordine]
+            cu = [x for x in totaluri if x is not None]
+            verifica('ordinea implicită (după sumă): proiectele, unite sau nu, sunt în ordinea descrescătoare a sumei sau a totalului lor; fără sumă, la coadă', cu == sorted(cu, reverse=True) and totaluri[:len(cu)] == cu, totaluri[:8])
+            egal('proiectul cu totalul cel mai mare e primul rând (grant + împrumut)', chei_ordine[0], 'BERD|' + cheie_nume('Securitatea furnizării gazelor naturale'))
+            egal('fără căutare: câte un rând pentru fiecare proiect (%d) și numărul de acorduri între paranteze' % total_unitati,
+                 [len(chei_ordine), re.search(r'(\d+) proiecte \((\d+) acorduri\)', txt(pg.locator(P + ' .dsum'))).groups()], [total_unitati, (str(total_unitati), str(len(BERD)))])
+            # engleză
+            pg.evaluate('Traducere.seteaza("en")')
+            pg.wait_for_timeout(500)
+            h = pg.locator(P + ' tr.pg').first
+            hu = pg.locator(P + ' tr.pg').filter(has_text='Securitatea furnizării gazelor naturale')
+            sume_en = txt(hu.locator('td').nth(4))
+            verifica('în engleză: tipurile (Grant, Loan), „2 agreements”, „Total”, sume cu virgulă la mii', 'grant + loan' in txt(hu.locator('.pmeta')) and '2 agreements' in txt(hu.locator('.pmeta')) and hu.locator('td').nth(3).locator('.tag').all_inner_texts() == ['Grant', 'Loan'] and
+                     re.search(r'Grant\s+' + re.escape(fmt_en(grant['suma']['v'])) + r' EUR', sume_en) is not None and re.search(r'Loan\s+' + re.escape(fmt_en(imprumut['suma']['v'])) + r' EUR', sume_en) is not None and 'total' in sume_en.lower(), sume_en)
+            egal('în engleză: componentele se numesc „Grant, 2023” și „Loan, 2022”; butonul: „Close the agreements of the project”',
+                 [pg.locator(P + ' tr.ac.sub .pname').all_inner_texts()[:2], hu.locator('.exp').get_attribute('aria-label').startswith('Close the agreements of the project: ')],
+                 [['Grant, ' + grant['semnat'][-4:], 'Loan, ' + imprumut['semnat'][-4:]], True])
+            egal('în engleză: antetul donatorului spune „projects” și „agreements”', re.search(r'(\d+) projects \((\d+) agreements\)', txt(pg.locator(P + ' .dsum'))) is not None, True)
+            pg.evaluate('Traducere.seteaza("ro")')
+            pg.wait_for_timeout(300)
+            ctx.close()
+
+            # telefon: cartonaș pentru proiect, cartonașe mai înguste pentru componente; pagina nu se lărgește
+            print('   · telefon')
+            ctx = context(b, viewport=(390, 800))
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BERD&q=gazelor%20naturale')
+            h = pg.locator(P + ' tr.pg')
+            verifica('telefon: rândul proiectului e un cartonaș (grilă), cu eticheta fiecărei celule, iar antetul tabelului e ascuns', pg.evaluate('getComputedStyle(document.querySelector("' + PJ + ' tr.pg")).display') == 'grid' and
+                     h.locator('td[data-l]').count() == 6 and pg.evaluate('getComputedStyle(document.querySelector("' + PJ + ' thead")).display') == 'none')
+            h.locator('.exp').click()
+            pg.wait_for_selector(P + ' tr.ac.sub')
+            marg = pg.evaluate('[document.querySelector("' + PJ + ' tr.pg").getBoundingClientRect().left, document.querySelector("' + PJ + ' tr.ac.sub").getBoundingClientRect().left]')
+            verifica('telefon: componentele sunt cartonașe trase spre dreapta față de proiect (cu cel puțin 10 px)', marg[1] - marg[0] >= 10, marg)
+            lat = pg.evaluate('document.documentElement.scrollWidth - document.documentElement.clientWidth')
+            verifica('telefon: pagina nu se lărgește (fără derulare orizontală)', lat <= 0, lat)
+            verifica('telefon: sumele pe componente se văd întregi în cartonaș', all(fmt_bani_ro(a['suma']['v']) in txt(h.locator('td').nth(4)) for a in (grant, imprumut)) and
+                     pg.evaluate('(() => { const c = document.querySelector("' + PJ + ' tr.pg td:nth-child(5)").getBoundingClientRect(), r = document.querySelector("' + PJ + ' tr.pg").getBoundingClientRect(); return c.right <= r.right + 1; })()'))
+            ctx.close()
+
+            # după deblocare: componentele se editează ca orice rând; rândul proiectului se reface cu sumele noi
+            print('   · editare și debursare la o componentă')
+            fals = GitHubFals(intrari=[])
+            ctx = context(b)
+            pg = pagina(ctx, fals, hash_='#d=BERD&q=gazelor%20naturale')
+            debloca(pg)
+            verifica('deblocat', deblocat(pg))
+            h = pg.locator(P + ' tr.pg')
+            h.locator('.exp').click()
+            pg.wait_for_selector(P + ' tr.ac.sub')
+            verifica('după deblocare: creioanele și butonul „Debursare” sunt la componente (3 + 1 pe fiecare), nu la rândul proiectului', pg.locator(P + ' tr.ac.sub .edt').count() == 6 and pg.locator(P + ' tr.ac.sub [data-act="adauga"]').count() == 2 and
+                     h.locator('.edt').count() == 0 and h.locator('[data-act="adauga"]').count() == 0)
+            rg = pg.locator(P + ' tr.ac.sub[data-k="BERD|%s"]' % grant['id'])
+            rg.locator('.edt[data-f="suma"]').click()
+            pg.wait_for_selector(P + ' tr.ac.edit')
+            rg.locator('[data-re=suma]').fill('40.000.000')
+            rg.locator('[data-re=suma]').press('Enter')
+            asteapta_salvat(pg, fals, 1)
+            h = pg.locator(P + ' tr.pg')
+            sume = txt(h.locator('td').nth(4))
+            nou_total = 40000000 + imprumut['suma']['v']
+            verifica('suma grantului corectată: rândul proiectului arată grantul de 40.000.000 EUR și totalul nou (%s EUR); proiectul rămâne deschis' % fmt_ro(nou_total, 0),
+                     re.search(r'Grant\s+40\.000\.000 EUR', sume) and re.search(r'TOTAL\s+' + re.escape(fmt_ro(nou_total, 0)) + r' EUR', sume, re.I) and pg.locator(P + ' tr.ac.sub').count() == 2, sume)
+            verifica('componenta corectată arată „corectată de utilizator” și suma din registru', 'corectată de utilizator' in txt(pg.locator(P + ' tr.ac.sub[data-k="BERD|%s"]' % grant['id']).locator('td').nth(4)))
+            # o debursare la împrumut: se vede și în rândul proiectului, ca procent din totalul proiectului
+            det = deschide_rand(pg, 'BERD', imprumut)
+            completeaza(det, suma='1.000.000', data='2026-10-01', val='EUR', nota='probă pentru proiectul unit')
+            det.locator('form.deb-form button[type=submit]').click()
+            asteapta_salvat(pg, fals, 2)
+            h = pg.locator(P + ' tr.pg')
+            deb = txt(h.locator('td').nth(5))
+            pct = 1000000 / nou_total * 100
+            verifica('debursarea unei componente apare în rândul proiectului: 1.000.000 EUR, 1 debursare, procentul din totalul proiectului', '1.000.000' in deb and '1 debursare' in deb and ('%s%%' % fmt_ro(round(pct, 1), 1)) in deb, deb)
+            egal('antetul donatorului: debursat 1.000.000 EUR', 'debursat 1.000.000 EUR' in txt(pg.locator(P + ' .dsum')), True)
+            # Excel: tot câte un rând pe acord (nu pe proiect unit), cu denumirile deosebite și suma fiecărui acord
+            def excel_berd(nume):
+                with pg.expect_download(timeout=60000) as d:
+                    pg.click(P + ' [data-act="excel-donator"]')
+                cale = DESC / nume
+                d.value.save_as(str(cale))
+                ws = openpyxl.load_workbook(cale)['BERD']
+                for rr in ws.iter_rows(min_row=1, max_row=12):
+                    if 'Proiectul' in [c.value for c in rr]:
+                        return ws, [c.value for c in rr], rr[0].row
+            nume_g = curata_nume(grant.get('scurt') or grant['nume']) + ' (grant, ' + grant['semnat'][-4:] + ')'
+            nume_i = curata_nume(imprumut.get('scurt') or imprumut['nume']) + ' (împrumut, ' + imprumut['semnat'][-4:] + ')'
+            ws, antet, ra = excel_berd('berd-proiect-unit-cautat.xlsx')                  # căutarea „gazelor naturale” e încă activă: se exportă doar proiectul unit
+            iP, iS, iD = antet.index('Proiectul'), antet.index('Suma proiectului'), antet.index('Debursat (echivalent EUR)')
+            rx = {r[iP].value: r for r in ws.iter_rows(min_row=ra + 1, max_row=ra + 2)}
+            egal('Excel (cu căutarea activă): proiectul unit are două rânduri, câte unul pe acord, cu denumirile deosebite', [randuri_date(ws, ra), sorted(rx)], [2, sorted([nume_g, nume_i])])
+            egal('Excel: suma fiecărui acord, în valuta lui (grantul, cu suma corectată)', [[rx[nume_g][iS].value, rx[nume_g][iS + 1].value], [rx[nume_i][iS].value, rx[nume_i][iS + 1].value]],
+                 [[40000000, 'EUR'], [imprumut['suma']['v'], imprumut['suma']['val']]])
+            verifica('Excel: debursarea (1.000.000 EUR) e la rândul împrumutului, nu la al grantului', abs((rx[nume_i][iD].value or 0) - 1000000) < 1 and not rx[nume_g][iD].value, [rx[nume_i][iD].value, rx[nume_g][iD].value])
+            pg.fill('#q', '')
+            pg.wait_for_function('n => document.querySelectorAll("section.panel[data-d=\'BERD\'] tr.pg").length === n', arg=len(U), timeout=15000)
+            ws, antet, ra = excel_berd('berd-proiecte-unite.xlsx')
+            egal('Excel (fără căutare): tot un rând pe acord (%d), nu pe proiect unit (%d)' % (len(BERD), total_unitati), randuri_date(ws, ra), len(BERD))
+            nume_xl = [r[iP].value for r in ws.iter_rows(min_row=ra + 1, max_row=ra + len(BERD))]
+            verifica('Excel: fiecare acord al unui proiect unit își păstrează rândul și mențiunea de deosebire (grant / împrumut, an)', nume_g in nume_xl and nume_i in nume_xl and len(set(nume_xl)) == len(nume_xl), nume_xl[:6])
+            ctx.close()
+
         b.close()
 except Exception as e:                                           # o eroare a testului însuși trebuie să se vadă
     import traceback

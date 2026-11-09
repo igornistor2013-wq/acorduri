@@ -271,6 +271,24 @@
   .edt svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
   .edt:hover,.edt:focus-visible{color:var(--navy);background:var(--blue-bg);border-color:var(--line-strong)}
   tr.ac.edit,tr.ac.edit:hover{background:#fffdf4}
+  /* proiect cu grant și împrumut: un singur rând (denumirea comună, sumele pe componente și totalul); acordurile componente se deschid sub el */
+  tr.pg{cursor:pointer}
+  tr.pg:hover{background:#fafbfd}
+  tr.pg.deschis{background:#f7f9fd}
+  tr.pg.deschis > td{border-bottom-color:transparent}
+  tr.pg > td:first-child{box-shadow:inset 3px 0 0 var(--navy)}
+  tr.ac.sub{background:#fcfdff}
+  tr.ac.sub:hover,tr.ac.sub.deschis{background:#f7f9fd}
+  tr.ac.sub.edit,tr.ac.sub.edit:hover{background:#fffdf4}
+  tr.ac.sub > td:first-child{padding-left:26px;box-shadow:inset 3px 0 0 var(--line-strong)}
+  tr.ac.sub .pname{font-size:12.5px;font-weight:600}
+  .grp-t{font-weight:600;color:#39405a}
+  .tags{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+  .tag.mic{font-size:9.5px;padding:1px 6px}
+  .split{display:flex;flex-direction:column;align-items:flex-end;gap:9px}
+  .sp-t{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:0}
+  .sp-tot{display:flex;flex-direction:column;align-items:flex-end;gap:2px;align-self:stretch;border-top:1px solid var(--line-strong);padding-top:7px}
+  .sp-l{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);font-weight:700}
   .re-in{width:100%;min-width:0;border:1px solid var(--line-strong);border-radius:5px;padding:5px 6px;font-size:12px;font-family:var(--mono);background:#fff;color:var(--ink);text-align:left}
   select.re-in{margin-top:5px}
   .re-in[aria-invalid="true"]{border-color:var(--red);background:#fffafa}
@@ -330,12 +348,19 @@
     table.deb-tbl{min-width:0;display:block}
     .deb-tbl > thead{display:none}
     .deb-tbl > tbody{display:block}
-    .deb-tbl > tbody > tr.ac{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;border:1px solid var(--line);border-radius:10px;margin:10px 12px 0;padding:10px 12px 12px;background:#fff}
+    .deb-tbl > tbody > tr.ac,.deb-tbl > tbody > tr.pg{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;border:1px solid var(--line);border-radius:10px;margin:10px 12px 0;padding:10px 12px 12px;background:#fff}
     .deb-tbl > tbody > tr.ac.deschis{border-color:var(--navy);border-bottom:none;border-bottom-left-radius:0;border-bottom-right-radius:0;padding-bottom:4px}
-    .deb-tbl > tbody > tr.ac > td{display:block;border:none;padding:4px 0;min-width:0;text-align:left !important}
-    .deb-tbl > tbody > tr.ac > td:nth-child(1),.deb-tbl > tbody > tr.ac > td:nth-child(6){grid-column:1 / -1}
-    .deb-tbl > tbody > tr.ac > td[data-l]::before{content:attr(data-l);display:block;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;margin-bottom:2px}
-    .deb-tbl > tbody > tr.ac > td.act{grid-column:1 / -1;text-align:right !important}
+    .deb-tbl > tbody > tr.ac > td,.deb-tbl > tbody > tr.pg > td{display:block;border:none;padding:4px 0;min-width:0;text-align:left !important}
+    .deb-tbl > tbody > tr.ac > td:nth-child(1),.deb-tbl > tbody > tr.ac > td:nth-child(6),.deb-tbl > tbody > tr.pg > td:nth-child(1),.deb-tbl > tbody > tr.pg > td:nth-child(6){grid-column:1 / -1}
+    .deb-tbl > tbody > tr.ac > td[data-l]::before,.deb-tbl > tbody > tr.pg > td[data-l]::before{content:attr(data-l);display:block;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);font-weight:700;margin-bottom:2px}
+    .deb-tbl > tbody > tr.ac > td.act,.deb-tbl > tbody > tr.pg > td.act{grid-column:1 / -1;text-align:right !important}
+    /* proiectul cu grant și împrumut: cartonaș cu bară în stânga; acordurile lui, cartonașe mai înguste sub el */
+    .deb-tbl > tbody > tr.pg{border-left:4px solid var(--navy)}
+    .deb-tbl > tbody > tr.pg.deschis{border-bottom-color:var(--line)}
+    .deb-tbl > tbody > tr.pg > td:first-child,.deb-tbl > tbody > tr.ac.sub > td:first-child{box-shadow:none;padding-left:0}
+    .deb-tbl > tbody > tr.ac.sub{margin-left:24px;border-left:4px solid var(--line-strong)}
+    .deb-tbl > tbody > tr.ac.sub.deschis{border-left-color:var(--navy)}
+    .split,.sp-t,.sp-tot{align-items:flex-start}
     .exp{width:auto;padding:0 12px}
     .deb-tbl > tbody > tr.ac.edit{border-color:var(--gold);border-bottom:none;border-bottom-left-radius:0;border-bottom-right-radius:0;padding-bottom:4px}
     .deb-tbl > tbody > tr.re{display:block;margin:0 12px}
@@ -403,9 +428,9 @@
 <dialog id="dlg" data-no-tr aria-labelledby="dlgTitlu"></dialog>
 
 <script src="traducere.js" defer></script>
-<script src="debursari.js?v=2026-10-28"></script>
+<script src="debursari.js?v=2026-11-09"></script>
 <script src="legatura-amp.js"></script>
 <script src="amp-date.js"></script>
-<script src="debursari-ui.js?v=2026-11-03"></script>
+<script src="debursari-ui.js?v=2026-11-09"></script>
 </body>
 </html>

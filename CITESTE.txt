@@ -1,11 +1,20 @@
-Pagina „Debursări pe acorduri”: lățimea. Trei fișiere; designul rămâne cel vechi, se schimbă doar cât de lat iese tabelul.
-Defectul (cu toți donatorii bifați, pe un laptop de 1280 px): pagina devenea mai lată decât fereastra (cu circa 70 px), iar la derulare tabelul se vedea tăiat în stânga. Două cauze:
-  1. textul ascuns pentru cititoare de ecran din antetul „Detalii” (câte unul la fiecare donator) ieșea în dreapta panoului și lărgea toată pagina;
-  2. tabelul avea lățimea minimă de 1040 px, iar panoul are circa 900 px pe un laptop de 1280 px, deci tabelul se derula și el.
+Pagina „Debursări pe acorduri”: proiectele cu componentă de grant și de împrumut apar într-un singur rând, cu denumirea comună și sumele separate pe componente. Șase fișiere; designul rămâne cel vechi, se schimbă doar rândurile acestor proiecte.
+Înainte: grantul și împrumutul aceluiași proiect erau două rânduri, cu aceeași denumire, deosebite doar printr-o mențiune („… (împrumut, 2022)”, „… (grant, 2023)”).
+Acum, la același donator:
+  1. un singur rând, cu denumirea comună o singură dată; sub ea scrie „grant + împrumut · 2 acorduri”;
+  2. la „Suma proiectului”: cât e grant, cât e împrumut (fiecare în valuta lui) și TOTALUL în euro; la „Tip de finanțare” apar ambele tipuri;
+  3. un clic pe rând (sau pe butonul din dreapta) deschide acordurile componente, ca rânduri obișnuite, numite „Grant, 2023” și „Împrumut, 2022”, cu datele, debursările, detaliile și editarea lor (creioanele și butonul „Debursare” sunt la componente);
+  4. rândul proiectului arată debursările însumate ale componentelor (cu procentul din totalul proiectului) și datele de început și de finalizare luate din acorduri; proiectele se sortează după totalul lor.
+Regula: se unesc numai rândurile cu aceeași denumire (fără diacritice și punctuație) la același donator, când între ele sunt și grant, și împrumut. În registrul de acum sunt 25 de astfel de proiecte (56 de acorduri); la BERD, 7 (18 acorduri), deci tabelul BERD are 33 de rânduri în loc de 44. Două acorduri de același tip, sau de donatori diferiți, nu se unesc; un filtru care ascunde una dintre componente (de pildă tipul „Împrumut”) desface proiectul în rânduri obișnuite, cu mențiunea veche.
+Ce NU se schimbă: indicatorii de sus, totalurile și procentele (se numără tot acordurile), Excel-ul (tot câte un rând pe acord, cu denumirile deosebite), debursările și corecturile de sumă din date/debursari.json (rămân pe acord). Antetul donatorului spune acum „33 proiecte (44 acorduri)”.
 Pune-le în repository la aceleași căi:
-  debursari.html      (numai CSS, patru schimbări: `.tbl-scroll` primește `position:relative`; lățimea minimă a tabelului scade de la 1040 la 880 px; sub 1360 px coloanele se reîmpart; între 1101 și 1360 px coloana cu donatorii are 280 px în loc de 300)
-  teste_debursari.py  (secțiunea nouă 18: cu toți donatorii bifați, de la 1920 la 390 px, pagina nu se lărgește; de la 1250 px tabelele încap în panou, nimic nu iese din celule și niciun cuvânt din antet nu se rupe; în română și în engleză. Pe codul vechi pică 14 verificări)
-  README.md           (două propoziții: lățimea tabelului și noul test)
-Rezultat: la 1920, 1536, 1366, 1280 și 1250 px tabelul încape întreg în panou. Pe ferestre mai înguste (între 1101 și 1229 px, apoi între 821 și 929 px) tabelul se derulează numai în panoul lui; pagina nu se mai lărgește la nicio lățime (măsurat de la 1920 la 390 px).
-Fișierele de mai sus nu sunt scrise de verificările automate (acestea scriu doar în date/, legis_acorduri.html, rss.xml și sitemap.xml), deci le poți înlocui direct. Baza pachetului: commit-ul 9139903 din 08.11.2026.
-După urcare, GitHub Pages poate ține câteva minute vechea pagină; apoi Ctrl+F5 și „Bifează cei afișați”.
+  debursari.js        (funcții noi, fără DOM: grupeazaProiecte, sumeComponente, ordoneazaUnitati, etichetaComponenta, dateGrup)
+  debursari-ui.js     (rândul proiectului unit, deschiderea și închiderea lui, componentele; rândul se reface după o editare sau o debursare la o componentă)
+  debursari.html      (CSS pentru rândul proiectului și pentru componente, pe desktop și pe telefon; data din `?v=` a celor două scripturi, schimbată în 2026-11-09 ca browserul să nu păstreze varianta veche)
+  teste_debursari.js  (două secțiuni noi, cu date inventate și cu datele reale: 342 de verificări)
+  teste_debursari.py  (secțiunea nouă 19: rândul unit, sumele pe componente, deschidere, filtre, ordine, engleză, telefon, editare și debursare la o componentă, Excel; testele vechi sunt adaptate, fiindcă presupuneau „un rând pe acord”)
+  README.md           (paragraful „Proiecte cu grant și împrumut: un singur rând, cu sumele pe componente” și trei rânduri din tabelul de fișiere)
+Rezultat: verificările din browser (toate cele 19 secțiuni), cele ale logicii și cele pentru AMP și legături trec; designul paginii e neschimbat în rest.
+Limită: un singur act care cuprinde și grant, și împrumut, fără sume separate în registru (de pildă FIDA hg969/2008, AID hg1116/2005, BIRD/AID dprm161/2017) rămâne un singur rând, cu tipul dat de registru; nu are de unde să iasă un grant și un împrumut cu sume separate.
+Fișierele de mai sus nu sunt scrise de verificările automate (acestea scriu doar în date/, legis_acorduri.html, rss.xml și sitemap.xml), deci le poți înlocui direct. Baza pachetului: commit-ul a589356 din 08.11.2026.
+După urcare, GitHub Pages poate ține câteva minute vechea pagină; apoi Ctrl+F5.
