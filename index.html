@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<meta name="description" content="Asistență externă pentru Republica Moldova — proiecte, donatori, sectoare, pe ani. Date din platforma AMP și din standardul internațional IATI."/>
 <title>Asistență Externă — Republica Moldova</title>
 <meta name="description" content="Cine finanțează Republica Moldova, cât și unde: donatori, proiecte, sume angajate și debursate, pe ani, sectoare și raioane — din platforma AMP și IATI.">
 <meta property="og:title" content="Asistență externă pentru Republica Moldova">
@@ -15,6 +14,16 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebSite",
+ "name": "Asistență externă pentru Republica Moldova",
+ "url": "https://nistor.vivi.md/",
+ "inLanguage": ["ro", "en"],
+ "description": "Cine finanțează Republica Moldova, cât și unde: donatori, proiecte, sume angajate și debursate, pe ani, sectoare și raioane — din platforma AMP și IATI."
+}
+</script>
 <link rel="alternate" type="application/rss+xml" title="Acorduri de asistență externă — acte noi" href="rss.xml">
 
 <style>
@@ -1225,6 +1234,14 @@
   .dif-t2 i{background:#eb6834}
   .dif-v{text-align:right;color:var(--ink-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
   .dif-v b{color:var(--navy-deep)}
+  /* ecran tactil: ținte de apăsat ceva mai mari; pe mouse nimic nu se schimbă */
+  @media (pointer:coarse){
+    .lang-switch button,button[data-lang],.unealta,#dataRetryBtn{min-height:34px}
+    .footer-link{display:inline-block;padding:7px 0}
+  }
+  .footer-link{font-size:12px;font-weight:700;color:var(--navy);text-decoration:none}
+  .footer-link:hover{color:var(--gold);text-decoration:underline}
+  .footer-link:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:3px}
 </style>
 </head>
 <body>
@@ -1441,6 +1458,7 @@
         <img src="amp-logo.png" width="160" height="90" alt="AMP - Aid Management Platform" loading="lazy"/>
         <span data-i18n="footerSource">Sursă: platforma AMP (Aid Management Platform) a Republicii Moldova — versiune veche și versiune nouă · sume în EUR</span>
       </div>
+      <a class="footer-link" href="debursari.html" data-i18n="footerDebursari">Debursări pe acorduri →</a>
       <span id="filterSummary"></span>
     </div>
     <div class="footer-owner">
@@ -1938,7 +1956,7 @@
     <div class="sdg-leg" id="sdgLegenda"></div>
     <div class="panel-head" id="sdgListaCap" style="border-top:1px solid var(--line);">
       <h2><svg class="ico" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span data-i18n="sdgListTitle">Proiectele fiecărui sector</span> <span id="sdgCount" class="badge"></span></h2>
-      <div class="btns"><button type="button" class="sdg-btn" id="sdgToate"></button> <button type="button" class="sdg-btn" id="sdgExcel"></button></div>
+      <div class="btns"><button type="button" class="sdg-btn" id="sdgToate">Deschide toate</button> <button type="button" class="sdg-btn" id="sdgExcel">📊 Excel (.xlsx)</button></div>
     </div>
     <div id="sdgLista"></div>
   </div>
@@ -3739,7 +3757,8 @@ const ETICHETE_CONTROALE = {
   iatiThreshold: ['Prag de potrivire', 'Match threshold'],
   iatiSearchInput: ['Caută proiect după denumire sau AMP ID', 'Search project by name or AMP ID'],
   dpDonorSearch: ['Caută donator', 'Search donor'],
-  dpSearchInput: ['Caută activitate după denumire, donator sau ID IATI', 'Search activity by name, donor or IATI ID']
+  dpSearchInput: ['Caută activitate după denumire, donator sau ID IATI', 'Search activity by name, donor or IATI ID'],
+  legJson: ['JSON cu confirmările în pregătire', 'JSON with the confirmations being prepared']
 };
 function etichetaControale(){
   const en = typeof currentLang !== 'undefined' && currentLang === 'en';
@@ -9640,6 +9659,7 @@ Object.assign(I18N.ro, {
   statusError: '<b>Datele live nu au putut fi încărcate.</b> Se afișează doar arhiva (1993–2022). Detalii: {err}.{ultima}',
   statusFaraSume: '<b>Raportul live nu are coloane de sume recunoscute.</b> Proiectele s-au preluat, dar angajamentele și debursările rămân cele din arhivă. Probabil platforma a redenumit coloanele de finanțare.',
   statusRetry: 'Reîncearcă',
+  footerDebursari: 'Debursări pe acorduri →',
   footerSource: 'Sursă: platforma AMP (Aid Management Platform) a Republicii Moldova — arhivă 1993–2022 + raport live 2008–2026 · sume în EUR',
   footerIatiSource: 'Sursă: standardul internațional IATI (International Aid Transparency Initiative), via d-portal · potriviri cu platforma AMP a Republicii Moldova'
 });
@@ -9661,6 +9681,7 @@ Object.assign(I18N.en, {
   statusError: '<b>Live data could not be loaded.</b> Showing the archive only (1993–2022). Details: {err}.{ultima}',
   statusFaraSume: '<b>The live report has no recognisable funding columns.</b> Projects were loaded, but commitments and disbursements remain those of the archive. The platform has probably renamed the funding columns.',
   statusRetry: 'Retry',
+  footerDebursari: 'Disbursements by agreement →',
   footerSource: 'Source: the Republic of Moldova AMP (Aid Management Platform) — 1993–2022 archive + live 2008–2026 report · amounts in EUR',
   footerIatiSource: 'Source: the international IATI standard (International Aid Transparency Initiative), via d-portal · matched against the Republic of Moldova AMP platform'
 });

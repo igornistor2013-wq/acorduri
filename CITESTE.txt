@@ -1,14 +1,22 @@
-Pagina „Debursări pe acorduri”: am scos textul explicativ. Trei fișiere.
+Pachetul iati16: punctele 4, 5, 6 și 7 din verificarea site-ului. (Fișierul acesta e doar nota pachetului: NU îl urca în repository.)
 
-Dispar:
-  - paragraful de sub titlu („Acordurile din registrul legis.md, repartizate pe donatori. Bifează un donator…”);
-  - blocul „De unde vin cifrele” cu cele cinci paragrafe (sursa, obiectivele, dublurile, debursările, procentul).
-Rămâne, într-un rând mic sub tabel, doar linkul „Descarcă o copie a debursărilor (JSON)” (și, când e cazul, „Uită codul păstrat pe acest dispozitiv”), pentru că fac ceva. Dacă vrei să plece și ele, spune-mi.
+URCĂ aceste 10 fișiere, la aceleași căi:
+  date/sume_manual.json       (4)  acordul HG758/2017 are suma ca 230 mii USD (echivalentul din raportul oficial), nu 4 mil. lei: BCE nu are curs pentru leu, iar acordul rămânea în afara totalului
+  date/acorduri_legare.json   (4)  același acord, acum cu 205.486 EUR și în total (331 în loc de 330 de acorduri cu sumă în total)
+  legis_acorduri.html         (4,5) regenerată din acorduri.html (aceleași schimbări de mai jos)
+  index.html                  (5,6) butoanele „Deschide toate”/„Excel” au text, câmpul JSON are etichetă, link „Debursări pe acorduri →” în subsol, o singură meta description, date structurate WebSite
+  acorduri.html               (5)   zone de apăsare mai mari pe ecran tactil (la mouse nu se schimbă nimic)
+  debursari.html              (5,6) la fel + date structurate Dataset
+  hg246.html, despre.html     (5)   zone de apăsare pe ecran tactil
+  404.html                    (6)   descriere și noindex
+  README.md                   (7)   descrierea
 
-Pune-le în repository la aceleași căi:
-  debursari.html    (paragraful scos; ?v= al scripturilor devine 2026-11-10f)
-  debursari-ui.js   (notele scoase, rămân cele două linkuri)
-  README.md         (descrierea)
-  CITESTE.txt       (acest text)
-Rezultat: verificările din browser (624), logica (374), AMP (54), legătura (53), legis și cursul trec.
-După urcare, GitHub Pages poate ține câteva minute vechea pagină; apoi Ctrl+F5.
+ȘTERGE din repository (în GitHub: deschizi fișierul → pictograma coș → Commit):
+  tema.css          o temă pe care nicio pagină nu o folosește
+  teste_tema.py     testul ei (pica și înainte, pentru că verifica o temă nefolosită)
+  CITESTE.txt       nota unui pachet vechi; e public pe site și nu-și are locul acolo
+
+Neschimbat, cu intenție: pagina „De la lege la bani” (index.html#legaturi). Nu mai e în meniu, dar e unealta cu care se pregătesc confirmările acord ↔ proiect AMP, deci n-am șters-o. Mutarea testelor într-un folder nu am făcut-o: ar însemna ștergerea a 10 fișiere de mână și rescrierea căilor din workflow-uri, pentru un câștig mic.
+
+După urcare pornește singur workflow-ul „Legături acord ↔ proiect AMP” (pentru că s-au schimbat fișiere din lista lui) și rescrie aceleași două fișiere generate, cu același rezultat. Apoi Ctrl+F5.
+Rezultat: verificările din browser (624), logica (374), AMP (54), legătura (53), legis, cursul, sectoarele, Excel și colectarea trec; regenerarea a dat doar schimbările de mai sus.

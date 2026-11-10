@@ -384,6 +384,14 @@ singur act care cuprinde și grant, și împrumut (de pildă acordul cu FIDA, `h
 dat de registru, fiindcă registrul nu are sumele separate. Regulile sunt în `grupeazaProiecte` și `sumeComponente` din
 `debursari.js`, cu teste în `teste_debursari.js` și în secțiunea 19 din `teste_debursari.py`.
 
+**Suma în lei a acordului HG758/2017.** BCE nu publică un curs al leului moldovenesc, deci o sumă în MDL rămânea fără echivalent în euro și acordul ieșea din total (`inTotal: fara_curs`). În `date/sume_manual.json` suma e acum echivalentul dat de același raport (anexa din Raportul privind asistența externă pe 2017–2018): 230 mii USD, în loc de 4 mil. lei; nota din fișier spune de ce. Restul fluxului (`legis_pagina.py`, `legatura_acorduri.py`) rămâne neschimbat.
+
+**Accesibilitate și atingere.** Butoanele „Deschide toate” și „Excel” din panoul de sectoare au text de pornire în HTML (JavaScript îl înlocuiește), iar câmpul `legJson` are etichetă în `ETICHETE_CONTROALE`. Pe ecran tactil (`@media (pointer:coarse)`) legăturile din subsol, comutatorul RO/EN, butoanele de analize și `.lnk` au o zonă de apăsare ceva mai mare; pe mouse nimic nu se schimbă. Pagina principală are în subsol un link către „Debursări pe acorduri” (`footerDebursari` în ambele dicționare).
+
+**Pentru motoarele de căutare.** `index.html` are o singură `meta description` (cea care se potrivește cu `og:description`) și date structurate `WebSite`; `debursari.html` are un `Dataset` (descărcările: `date/acorduri_legare.json` și `date/debursari.json`); `404.html` are descriere și `noindex`. `sitemap.xml` avea deja `lastmod` (îl scrie `date_deschise.py`).
+
+**Curățenie.** `tema.css` (o temă pe care nicio pagină nu o folosește) și testul ei, `teste_tema.py`, au fost scoase. Pagina „De la lege la bani” din `index.html#legaturi` rămâne: nu mai e în meniu, dar e unealta cu care se pregătesc confirmările acord ↔ proiect AMP (`legJson`, apoi `date/legaturi_amp.json`), așa că n-am șters-o. `CITESTE.txt` e doar nota pachetului și nu trebuie urcat în repository.
+
 **Fără text explicativ pe pagină.** Paragraful de sub titlu („Acordurile din registrul legis.md, repartizate pe donatori…”) și blocul „De unde vin cifrele” (cinci paragrafe despre sursă, obiective, dubluri, debursări și procent) au fost scoase din „Debursări pe acorduri”. Din bloc au rămas, într-un rând mic, butonul „Descarcă o copie a debursărilor (JSON)” și, când există un cod păstrat pe dispozitiv, „Uită codul păstrat pe acest dispozitiv”, fiindcă sunt funcționale. `randeazaNote()` din `debursari-ui.js` le randează; `#tSub` nu mai există.
 
 **Aspectul paginii (doar ecran).** Un bloc de CSS în `debursari.html`, în `@media screen`, chiar înainte de `@media print`, așază și

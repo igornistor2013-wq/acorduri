@@ -10,6 +10,24 @@
 <meta property="og:image" content="https://nistor.vivi.md/og.png">
 <meta property="og:url" content="https://nistor.vivi.md/debursari.html">
 <link rel="canonical" href="https://nistor.vivi.md/debursari.html">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "Dataset",
+ "name": "Debursări pe acorduri — Republica Moldova",
+ "description": "Acordurile de asistență externă din registrul legis.md, repartizate pe donatori, cu suma în euro, proiectele grupate pe componente (grant și împrumut) și debursările din anexele Ministerului Finanțelor.",
+ "url": "https://nistor.vivi.md/debursari.html",
+ "inLanguage": ["ro", "en"],
+ "isAccessibleForFree": true,
+ "spatialCoverage": {"@type": "Place", "name": "Republica Moldova"},
+ "keywords": ["asistență externă", "Republica Moldova", "debursări", "acorduri", "granturi", "împrumuturi"],
+ "creator": {"@type": "Person", "name": "Igor Nistor", "url": "https://github.com/igornistor2013-wq/acorduri"},
+ "distribution": [
+  {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://nistor.vivi.md/date/acorduri_legare.json"},
+  {"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://nistor.vivi.md/date/debursari.json"}
+ ]
+}
+</script>
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -363,6 +381,11 @@
   .footer-nav{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px}
   .footer-nav a{color:var(--navy);text-decoration:none;font-weight:600}
   .footer-nav a:hover{text-decoration:underline}
+  /* ecran tactil: ținte de apăsat ceva mai mari; pe mouse nimic nu se schimbă */
+  @media (pointer:coarse){
+    .footer-nav a{display:inline-block;padding:7px 0}
+    .lnk{padding:7px 2px}
+  }
   .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .eroare-mare{padding:34px 20px;text-align:center}
   .eroare-mare b{display:block;font-size:16px;color:var(--red);margin-bottom:6px}
