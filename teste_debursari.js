@@ -421,6 +421,29 @@ egal('un acord cofinanțat apare în lista fiecărui donator: la BEI se unește 
      [uBEI.filter(u => u.nume === 'Termoficare')[0].membri.map(a => a.id), D.grupeazaProiecte(donG('BERD').acorduri).filter(u => u.nume === 'Termoficare').map(u => [u.grup, u.membri.map(a => a.id)])[0]], [['q2', 'q1'], [false, ['q1']]]);
 egal('lista goală sau fără proiecte cu componente: nicio unitate unită', [D.grupeazaProiecte([]), D.grupeazaProiecte(null), D.grupeazaProiecte(donG('UE').acorduri).some(u => u.grup)], [[], [], false]);
 egal('fiecare acord din listă e într-o singură unitate', [uBEI.reduce((s, u) => s + u.membri.length, 0), new Set([].concat(...uBEI.map(u => u.membri.map(a => a.id)))).size, lBEI.length], [lBEI.length, lBEI.length, lBEI.length]);
+// proiecte unite de mână („unite” în date/proiecte_manual.json): acorduri cu denumiri diferite, care sunt componentele aceluiași proiect
+const MU = D.normalizeazaManual({ unite: [{ acte: ['A'], nume: 'x', motiv: 'm' }, { acte: ['A', 'B'], nume: '', motiv: 'm' }, { acte: ['A', 'B'], nume: 'Proiect', motiv: '' }, { acte: [' A ', 'B', ''], nume: '  Proiect   bun ', motiv: ' de ce ' }] });
+egal('fișierul manual, „unite”: se citesc doar intrările cu cel puțin două acte, denumire și motiv (curățate); celelalte dau erori', [MU.unite, MU.erori.length], [[{ acte: ['A', 'B'], nume: 'Proiect bun', motiv: 'de ce' }], 3]);
+egal('fișierul manual: fără „unite” → listă goală', [D.normalizeazaManual({}).unite, D.normalizeazaManual({ unite: 'x' }).unite], [[], []]);
+const JSON_UN = { actualizat: '2026-10-26 10:00', curs_data: '1 iulie 2026', cursuri: CURSURI, acorduri: [
+  ac('u21', 'Asistență nerambursabilă', 'Rusia', null, { categorie: 'Grant', primul: '28.10.2020' }),
+  ac('u22', 'Acord de împrumut de stat', 'Rusia', S(200000000, 'EUR'), { categorie: 'Împrumut', primul: '13.03.2020' }),
+  ac('u23', 'Acord de finanțare, credit de stat', 'Rusia', null, { categorie: 'Împrumut', primul: '21.07.2009' }),
+  ac('u24', 'Alt proiect', 'Rusia', S(1000000, 'EUR'), { categorie: 'Grant' }),
+  ac('u25', 'Împrumut BERD', 'BERD', S(3000000, 'EUR'), { categorie: 'Împrumut' })] };
+const MAN_UN = { unite: [{ acte: ['HG21/2020', 'HG22/2020', 'HG23/2020', 'HG25/2020'], nume: 'Asistența Rusiei', motiv: 'același proiect' }] };
+const BU = D.pregateste(JSON_UN, MAN_UN), lU = BU.donatori.filter(d => d.cheie === 'Rusia')[0].acorduri;
+const idUnit = u => u.nume + (u.grup ? ' [' + u.membri.map(a => a.id).join(',') + ']' : '');
+egal('unite: cele trei acorduri cu denumiri diferite devin un singur proiect (grant, apoi împrumuturile, în ordinea listei), cu denumirea din fișier',
+     D.grupeazaProiecte(lU, BU.peUnire).map(idUnit), ['Asistența Rusiei [u21,u22,u23]', 'Alt proiect']);
+egal('unite: fără fișierul de unire, denumirile diferite le țin separate (patru rânduri)', D.grupeazaProiecte(lU).map(idUnit), ['Asistență nerambursabilă', 'Acord de împrumut de stat', 'Acord de finanțare, credit de stat', 'Alt proiect']);
+egal('unite: se unesc numai în aceeași listă de donator (acordul BERD din intrare rămâne singur în lista lui)', D.grupeazaProiecte(BU.donatori.filter(d => d.cheie === 'BERD')[0].acorduri, BU.peUnire).map(idUnit), ['Împrumut BERD']);
+egal('unite: dacă un filtru lasă un singur acord din proiect, nu se mai unește', D.grupeazaProiecte(lU.filter(a => a.id !== 'u22' && a.id !== 'u23'), BU.peUnire).map(idUnit), ['Asistență nerambursabilă', 'Alt proiect']);
+egal('unite: două acorduri rămase (chiar de același tip) rămân unite', D.grupeazaProiecte(lU.filter(a => a.id === 'u22' || a.id === 'u23' || a.id === 'u24'), BU.peUnire).map(idUnit), ['Asistența Rusiei [u22,u23]', 'Alt proiect']);
+const sU = D.sumeComponente(D.grupeazaProiecte(lU, BU.peUnire)[0].membri);
+egal('unite: sumele pe componente (grantul fără sumă, două împrumuturi dintre care unul fără sumă), total în euro doar din ce are sumă', [sU.tipuri.map(t => [t.categorie, t.n, t.faraSuma, t.valute.map(v => v.v + ' ' + v.val).join('')]), sU.eurTotal, sU.faraSuma], [[['Grant', 1, 1, ''], ['Împrumut', 2, 1, '200000000 EUR']], 200000000, 2]);
+egal('unite: etichetele componentelor (tip și an) se deosebesc', D.grupeazaProiecte(lU, BU.peUnire)[0].membri.map(a => D.etichetaComponenta(a, D.grupeazaProiecte(lU, BU.peUnire)[0].membri, false)), ['Grant, 2020', 'Împrumut, 2020', 'Împrumut, 2009']);
+egal('unite: fiecare acord din listă e într-o singură unitate', [D.grupeazaProiecte(lU, BU.peUnire).reduce((n, u) => n + u.membri.length, 0), lU.length], [lU.length, lU.length]);
 egal('denumirea comună: cea cu mai puține majuscule după prima literă (nu „Securitatea Energetică…”)', [uBEI[0].nume, uBEI[0].membri.map(a => a.nume)], ['Securitatea energetică a Moldovei', ['Securitatea energetică a Moldovei', 'Securitatea Energetică a Moldovei', 'Securitatea energetică a Moldovei']]);
 egal('denumirea comună: la același număr de majuscule, cea cu diacritice', D.grupeazaProiecte([
   Object.assign({}, BG.peId.get('g1'), { id: 'x1', nume: 'Securitatea energetica a Moldovei', categorie: 'Grant' }),

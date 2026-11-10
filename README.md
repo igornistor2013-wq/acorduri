@@ -200,7 +200,7 @@ care legis.md îl primește.
 | `debursari-ui.js` | Interfața paginii: alegerea donatorilor, tabelul, fereastra cu codul, fereastra proiectului (`#fisa`, cu fișa lui), formularele de debursare și de date despre proiect, panourile „AMP”, „Rânduri omise” și „Date fără acord găsit”, butoanele Excel, engleza și varianta pentru telefon. Nu ține codul nicăieri în afara memoriei paginii |
 | `amp-date.js` | Datele de început și de finalizare din AMP pentru acordurile din „Debursări pe acorduri”: citește raportul AMP live (nr. 661, prin proxy-ul amp.vivi.md) și, când nu răspunde, arhiva `arhiva.js`; leagă un acord de un proiect AMP doar când denumirea, finanțatorul și suma coincid („sigur”) sau când un om a confirmat legătura în `date/legaturi_amp.json`; o legătură doar „probabilă” rămâne indiciu, nu dă date în tabel. Funcții pure, ca să le poată testa Node |
 | `teste_amp_date.js` | Testele lui `amp-date.js`: formatele datelor, regulile de potrivire (sigur, probabil, ambiguu, prea vechi), legăturile confirmate sau respinse, raportul live față de arhivă, oprirea după 20 de secunde și o verificare pe arhiva AMP + registrul real. Rulare: `node teste_amp_date.js` |
-| `date/proiecte_manual.json` | Date despre proiecte, scrise de mână și cu sursă. „omise”: rândurile-umbrelă ale registrului, care nu apar în lista de proiecte (cu motivul). „proiecte”: obiectivele proiectului și, când sursa le dă, data de început și de finalizare; fiecare intrare are adresa documentului oficial și citatul exact — fără ele nu se citește (citatul și nota rămân în fișier, ca dovadă; pagina nu le scrie, doar adresa documentului apare ca etichetă „sursă oficială”). Vezi „Debursări pe acorduri” |
+| `date/proiecte_manual.json` | Date despre proiecte, scrise de mână și cu sursă. „omise”: rândurile-umbrelă ale registrului, care nu apar în lista de proiecte (cu motivul). „unite”: acordurile cu denumiri diferite care sunt același proiect (actele, denumirea proiectului, motivul) și se arată ca un singur proiect cu componente. „proiecte”: obiectivele proiectului și, când sursa le dă, data de început și de finalizare; fiecare intrare are adresa documentului oficial și citatul exact — fără ele nu se citește (citatul și nota rămân în fișier, ca dovadă; pagina nu le scrie, doar adresa documentului apare ca etichetă „sursă oficială”). Vezi „Debursări pe acorduri” |
 | `date/debursari.json` | „Baza de date” a paginii: debursările introduse de mână, o înregistrare pe linie, și — la cheia `proiecte`, scrisă doar când nu e goală — datele despre proiecte introduse în pagină (obiective, început, finalizare). Fișier public; îl scrie doar pagina, prin API-ul GitHub, cu codul de acces. Fiecare salvare e un commit. La 3 noiembrie 2026 conține și datele din scrisoarea Ministerului Finanțelor (situația la 30.09.2026): 31 de debursări cumulate și datele de început/finalizare la 34 de rânduri, fiecare cu nota care citează scrisoarea (vezi „Datele din scrisoarea Ministerului Finanțelor”) |
 | `teste_debursari.js` | Testele logicii (obiective și date cu sursele lor, rânduri omise, totaluri, operații, conflicte de scriere, PIN, specificațiile Excel). Rulare: `node teste_debursari.js` |
 | `teste_debursari.py` | Verifică fișierele paginii (inclusiv `date/proiecte_manual.json`) și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”, inclusiv deblocarea unică, editarea în tabel și proiectele cu grant și împrumut unite într-un rând, secțiunea 19, proiectul deschis, încadrat, secțiunea 20, și fișa proiectului, secțiunea 21); `--doar 13,14` rulează doar secțiunile numerotate (de la 13 în sus; 1–12 rulează doar fără `--doar`) |
@@ -337,15 +337,14 @@ finanțare, cu sau fără debursări) și sorta. Donatorii bifați și filtrele 
 late) fiecare tabel încape întreg în panoul lui, chiar cu toți donatorii bifați; pe un ecran mai îngust tabelul se
 derulează în panoul lui, iar pagina nu se lărgește. Pe telefon tabelul devine fișe; pagina are și varianta în engleză.
 
-**Proiecte cu grant și împrumut: un singur rând, cu sumele pe componente.** Registrul are separat grantul și
+**Proiecte cu grant și împrumut: un singur rând, cu sumele pe componente.** (Acorduri cu denumiri diferite în registru, dar care sunt același proiect, se unesc de mână, vezi „unite” mai jos.) Registrul are separat grantul și
 împrumutul aceluiași proiect (două acorduri, aceeași denumire, ani diferiți). Pagina le arată ca **un singur rând**,
 cu denumirea comună o singură dată și, la „Suma proiectului", cât e grant, cât e împrumut (fiecare în valuta lui) și
 **totalul** în euro; sub denumire scrie tipurile și numărul de acorduri („grant + împrumut · 2 acorduri"). Un clic pe
 rând (sau pe butonul din dreapta) deschide **acordurile componente**, ca rânduri obișnuite, numite după tip și an
 („Grant, 2023", „Împrumut, 2022"), cu datele, debursările, detaliile și editarea lor: creioanele și butonul „Debursare"
-sunt la componente, nu la rândul proiectului. Detaliile unei componente încep cu linia **„Componentele proiectului”**:
-toate componentele (cea curentă marcată), ca împrumutul să se vadă și când detaliile unui grant, care sunt înalte, îl
-împing sub ele; un clic pe alta închide detaliile de acum, o deschide pe ea și derulează la ea. Rândul proiectului arată
+sunt la componente, nu la rândul proiectului. Fereastra unei componente are în antet linia **„Componentele proiectului”**:
+toate componentele (cea curentă marcată); un clic pe alta schimbă fereastra pe ea, fără s-o închidă. Rândul proiectului arată
 debursările însumate ale componentelor, cu procentul din totalul proiectului, iar datele de început și de finalizare sunt cele din acorduri (începutul cel mai
 timpuriu, finalizarea cea mai târzie, cu mențiunea „din acorduri"). Se unesc numai rândurile cu aceeași denumire
 (fără diacritice și punctuație) **la același donator**, când între ele sunt și grant, și împrumut: două acorduri de
@@ -356,6 +355,16 @@ donatorului spune „N proiecte (M acorduri)", iar Excel-ul are tot câte un râ
 singur act care cuprinde și grant, și împrumut (de pildă acordul cu FIDA, `hg969/2008`) rămâne un singur rând, cu tipul
 dat de registru, fiindcă registrul nu are sumele separate. Regulile sunt în `grupeazaProiecte` și `sumeComponente` din
 `debursari.js`, cu teste în `teste_debursari.js` și în secțiunea 19 din `teste_debursari.py`.
+
+**Acorduri cu denumiri diferite, dar același proiect: „unite” în `date/proiecte_manual.json`.** Regula de mai sus nu prinde
+acordurile al căror nume diferă în registru (de pildă cele trei ale Federației Ruse: grantul HG 793/2020, împrumutul HG 169/2020
+și creditul de stat HG 443/2009). Acestea se unesc de mână: o intrare în `unite` are `acte` (cel puțin două coduri de act, ca în
+„omise”), `nume` (denumirea sub care se arată proiectul) și `motiv`; fără una dintre ele intrarea se respinge, cu mesaj. Rândul
+unit se comportă ca proiectul cu grant și împrumut (sume pe componente, bloc încadrat, fereastră pe componentă), dar se unește și
+fără pereche grant + împrumut, și cu orice tipuri. Rămân valabile condițiile: același donator și cel puțin două acorduri rămase după
+filtre (un filtru care ascunde toate în afară de unul îl desface în rând obișnuit). Cheia grupului e `~` + denumirea normalizată, ca
+să nu se încurce cu un grup automat. Se scoate sau se schimbă ștergând/editând intrarea. Teste: `teste_debursari.js`, secțiunea 16
+(forma intrărilor) și secțiunea 23 (rândul Rusia în browser) din `teste_debursari.py`.
 
 **Proiectul cu grant și împrumut, desfăcut în tabel, e un bloc încadrat.** Un rând obișnuit nu se mai desface în tabel (detaliile
 lui sunt în fereastra proiectului, vezi mai jos), deci nu are cadru. Doar proiectul cu grant și împrumut se desface în tabel,
@@ -754,7 +763,7 @@ panourile „AMP", „Rânduri omise" și „Date fără acord găsit", câmpuri
 editare, ștergere, verificarea fișierului scris), coada după reîncărcare, PIN-ul, debursări existente și orfane,
 cele trei fișiere Excel (deschise cu openpyxl; datele întregi sunt date adevărate), engleza, telefonul, lățimea
 paginii cu toți donatorii bifați (de la 1920 la 390 px), starea din adresă, tastatura, lipsa erorilor JavaScript și a cererilor spre alte adrese decât pagina, `api.github.com`
-și `amp.vivi.md`, plus fereastra proiectului (secțiunea 22: deschidere, închidere, focus, derulare, componente, telefon). Cu `--doar 13,14` rulează doar secțiunile numerotate (secțiunile 1–12 rulează doar fără `--doar`).
+și `amp.vivi.md`, plus fereastra proiectului (secțiunea 22: deschidere, închidere, focus, derulare, componente, telefon) și proiectul unit de mână (secțiunea 23: Federația Rusă, un rând cu trei componente). Cu `--doar 13,14` rulează doar secțiunile numerotate (secțiunile 1–12 rulează doar fără `--doar`).
 
 **Limite.** Debursările sunt cele introduse de oameni și nu sunt verificate față de AMP sau o altă sursă;
 pagina nu le leagă de proiectele AMP („De la lege la bani" arată debursările din AMP). Obiectivele din

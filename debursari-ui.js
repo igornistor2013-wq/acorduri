@@ -947,9 +947,9 @@ function acoperire(lista) {
 function htmlPanou(d) {
   var lista = filtrate(d.acorduri), r = D.rezumat(lista, S.peAcord, S.baza.cursuri), nume = D.numeDonator(d.cheie, S.en);
   // un proiect cu grant și împrumut (două sau mai multe acorduri) e un singur rând în tabel și se numără o dată; acordurile se spun între paranteze
-  var unitati = D.ordoneazaUnitati(D.grupeazaProiecte(lista), S.sort, S.peAcord, S.baza.cursuri);
+  var unitati = D.ordoneazaUnitati(D.grupeazaProiecte(lista, S.baza.peUnire), S.sort, S.peAcord, S.baza.cursuri);
   var filtrata = lista.length !== d.acorduri.length;
-  var total = filtrata ? D.grupeazaProiecte(d.acorduri).length : unitati.length;
+  var total = filtrata ? D.grupeazaProiecte(d.acorduri, S.baza.peUnire).length : unitati.length;
   var dsum = '<div class="dsum"><span><b>' + unitati.length + '</b> ' + (filtrata ? L('proiecte din ', 'projects of ') + total : L('proiecte', 'projects')) +
     (unitati.length !== lista.length ? ' <span class="dsum-ac">(' + lista.length + ' ' + L('acorduri', 'agreements') + ')</span>' : '') + '</span>' +
     '<span>' + esc(L('suma ', 'amount ')) + '<b>' + esc(fEur(r.sumaEur)) + '</b></span>' +

@@ -1,18 +1,19 @@
-Pagina „Debursări pe acorduri”: detaliile unui proiect se deschid acum într-o fereastră separată, mai mică, deasupra paginii, nu mai în tabel, între proiectele vecine. Cinci fișiere; designul rămâne cel vechi (aceleași culori și fonturi), se schimbă doar locul unde se deschid detaliile.
-Raportat: când se deschidea un proiect, pagina cu detalii se încurca cu proiectele de alături; trebuia să se deosebească mai tare și să se deschidă într-o pagină separată, mai mică.
-Acum, butonul din dreapta rândului (și butonul „Debursare”, după deblocare) deschide o fereastră mică, centrată, pe fundal întunecat:
-  · pagina din spate se întunecă, nu se derulează și nu poate fi atinsă cât e deschisă fereastra; tabelul nu se mai desface, deci proiectele vecine rămân cum erau;
-  · sus, un antet care rămâne pe loc: tipul și situația acordului, denumirea proiectului, semnarea și cofinanțatorii, butonul „Închide”;
-  · dedesubt, aceeași fișă ca înainte (descrierea, datele esențiale, perioada, parcursul acordului, debursările și, după deblocare, formularele), care se derulează în fereastră;
-  · se închide cu „Închide”, cu Esc sau cu un clic pe fundalul întunecat; focusul se întoarce pe rândul de unde ai deschis; o schimbare a filtrelor din adresă o închide;
-  · la un proiect cu grant și împrumut, în antet apare linia „Componentele proiectului”: un clic pe o componentă schimbă fereastra pe ea, fără s-o închidă. Proiectul cu grant și împrumut se desface în continuare în tabel (cu componentele lui), în blocul albastru încadrat; doar detaliile s-au mutat în fereastră;
-  · pe telefon fereastra ocupă tot ecranul; rămâne lipită sus doar bara cu tipul și „Închide”, iar denumirea și fișa se derulează împreună.
+Pagina „Debursări pe acorduri”: (1) cele trei acorduri ale Federației Ruse sunt acum un singur proiect, cu componentele grant și împrumut; (2) detaliile unui proiect se deschid într-o fereastră separată, mai mică. Opt fișiere; designul rămâne cel vechi (aceleași culori și fonturi).
+
+Raportat acum: „acestea 3 proiecte este unu si acelasi doar componenta de grant si imprumut”. Cele trei rânduri (grantul HG 793/2020, împrumutul HG 169/2020 de 200 mil. EUR și creditul de stat HG 443/2009) au denumiri diferite în registru, deci regula automată nu le unea. Am adăugat în date/proiecte_manual.json lista „unite”: o intrare cu actele, denumirea proiectului și motivul. Rusia se arată acum ca un singur proiect, „Asistența financiară a Federației Ruse: grant și împrumuturi de stat”, cu etichetele Grant și Împrumut, iar componentele (Grant 2020, Împrumut 2020, Împrumut 2009) se desfac în tabel sau se deschid în fereastră. Numărătorile și Excel-ul rămân pe acorduri (3 acorduri, un proiect).
+  · Creditul din 2009 e cu 11 ani mai vechi decât actele din 2020; l-am pus în același proiect după cererea ta. Dacă nu e același proiect, scoți codul hg443/2009 din „acte”. Denumirea proiectului e aleasă de mine și se poate schimba în același fișier.
+  · Alte proiecte se unesc la fel: o intrare nouă în „unite”, cu cel puțin două acte ale aceluiași donator.
+
+Din pachetul anterior (iati9), cumulat: detaliile unui proiect se deschid într-o fereastră mică, centrată, pe fundal întunecat; se închide cu „Închide”, Esc sau un clic pe fundal, focusul se întoarce pe rând; la proiectul cu grant și împrumut, antetul are linia „Componentele proiectului”; pe telefon fereastra ocupă tot ecranul.
+
 Pune-le în repository la aceleași căi:
-  debursari.html      (fereastra proiectului: `<dialog id="fisa">` și stilurile ei; `?v=` al lui debursari.js și debursari-ui.js e acum 2026-11-10b, ca browserul să nu păstreze varianta veche)
-  debursari-ui.js     (deschiderea, închiderea și redesenarea ferestrei, pastilele componentelor; rândul nu se mai desface în tabel)
-  teste_debursari.py  (secțiunile 2, 3, 10, 11 și 13–21 adaptate la fereastră; secțiunea nouă 22: fereastra în sine)
-  README.md           (paragrafele despre fereastra proiectului și despre blocul încadrat al proiectului cu grant și împrumut)
-  CITESTE.txt         (acest text)
-Rezultat: verificările din browser (toate cele 22 de secțiuni, 620 de verificări), logica paginii (364), AMP (54), legătura (53) și legis trec. Fereastra a fost privită și la 1743, 1360, 1000 și 390 px, cu și fără cod, la un proiect obișnuit și la o componentă a unui proiect cu grant și împrumut.
-Fișierele de mai sus nu sunt scrise de verificările automate (acestea scriu doar în date/, legis_acorduri.html, rss.xml și sitemap.xml), deci le poți înlocui direct. Baza pachetului: commit-ul c51f10e din 10.11.2026, care conține pachetul anterior (fișa proiectului în cartonașe, deschisă în tabel).
+  debursari.html            (fereastra proiectului; `?v=` al lui debursari.js și debursari-ui.js e acum 2026-11-10c)
+  debursari.js              (citește „unite” și le grupează)
+  debursari-ui.js           (fereastra proiectului; transmite uniunile la grupare)
+  date/proiecte_manual.json (intrarea „unite” pentru Rusia; atenție la calea cu date/)
+  teste_debursari.js        (teste noi pentru uniuni)
+  teste_debursari.py        (secțiunile adaptate la fereastră; secțiunea 22: fereastra, 23: proiectul unit)
+  README.md                 (fereastra, blocul încadrat, „unite”)
+  CITESTE.txt               (acest text)
+Rezultatele verificărilor sunt în raportul din conversație. Fișierele de mai sus nu sunt scrise de verificările automate, deci le poți înlocui direct. Baza pachetului: commit-ul c51f10e din 10.11.2026.
 După urcare, GitHub Pages poate ține câteva minute vechea pagină; apoi Ctrl+F5.

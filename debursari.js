@@ -255,11 +255,12 @@ function parseDataPartiala(txt) {
 }
 
 /* ------------------------------------------------------------------ datele despre proiecte, scrise de mână (date/proiecte_manual.json) */
-/* Fișierul are două liste: „omise” (rânduri-umbrelă din registru, care nu apar în lista de proiecte) și „proiecte” (obiective, început,
-   finalizare, fiecare cu sursa și citatul exact). Aici se verifică ce s-a scris: o intrare fără sursă și citat nu se citește, ca să nu apară
-   în pagină nimic ce nu se poate verifica. Întoarce { omise, proiecte, erori } — erorile spun ce intrare s-a respins și de ce. */
+/* Fișierul are trei liste: „omise” (rânduri-umbrelă din registru, care nu apar în lista de proiecte), „unite” (acorduri cu denumiri diferite, care sunt
+   componentele aceluiași proiect și se arată ca un singur proiect) și „proiecte” (obiective, început, finalizare, fiecare cu sursa și citatul exact).
+   Aici se verifică ce s-a scris: o intrare fără sursă și citat nu se citește, ca să nu apară în pagină nimic ce nu se poate verifica.
+   Întoarce { omise, unite, proiecte, erori } — erorile spun ce intrare s-a respins și de ce. */
 function normalizeazaManual(j) {
-  const r = { omise: [], proiecte: [], erori: [] };
+  const r = { omise: [], unite: [], proiecte: [], erori: [] };
   const lista = function (x) { return Array.isArray(x) ? x : []; };
   const coduri = function (x) { return lista(x).filter(function (c) { return typeof c === 'string' && c.trim(); }).map(function (c) { return c.trim(); }); };
   const sir = function (x) { return String(x == null ? '' : x).replace(/\s+/g, ' ').trim(); };
@@ -267,6 +268,11 @@ function normalizeazaManual(j) {
     const acte = coduri(o && o.acte), motiv = sir(o && o.motiv);
     if (!acte.length || !motiv) { r.erori.push('omise[' + i + ']: lipsesc actele sau motivul'); return; }
     r.omise.push({ acte: acte, motiv: motiv, motivEn: sir(o.motiv_en), numaratLa: coduri(o.numarat_la) });
+  });
+  lista(j && j.unite).forEach(function (u, i) {
+    const acte = coduri(u && u.acte), nume = sir(u && u.nume), motiv = sir(u && u.motiv);
+    if (acte.length < 2 || !nume || !motiv) { r.erori.push('unite[' + i + ']: trebuie cel puțin două acte, denumirea proiectului și motivul'); return; }
+    r.unite.push({ acte: acte, nume: nume, motiv: motiv });
   });
   lista(j && j.proiecte).forEach(function (p, i) {
     const e = 'proiecte[' + i + ']';
@@ -388,8 +394,14 @@ function pregateste(json, manualBrut) {
     if (!a) { proiecteNegasite.push(p); return; }
     (proiecteManual.get(a.id) || proiecteManual.set(a.id, []).get(a.id)).push(p);
   });
+  // proiecte unite de mână: fiecare acord al unei intrări „unite” primește cheia și denumirea proiectului (la o a doua intrare pentru același acord, rămâne prima)
+  const peUnire = new Map();
+  manual.unite.forEach(function (u) {
+    const cheie = '~' + cheieNume(u.nume);
+    u.acte.forEach(function (c) { (peAct.get(c) || []).forEach(function (x) { if (!peUnire.has(x.id)) peUnire.set(x.id, { cheie: cheie, nume: u.nume, motiv: u.motiv }); }); });
+  });
   const donatori = Array.from(peDonator.keys()).map(function (k) { return { cheie: k, acorduri: peDonator.get(k) }; });
-  return { acorduri: acorduri, peId: peId, peAct: peAct, donatori: donatori, peDonator: peDonator, cursuri: cursuri,
+  return { acorduri: acorduri, peId: peId, peUnire: peUnire, peAct: peAct, donatori: donatori, peDonator: peDonator, cursuri: cursuri,
            omise: omise, proiecteManual: proiecteManual, proiecteNegasite: proiecteNegasite, eroriManual: manual.erori,
            cursData: json.curs_data || '', actualizat: json.actualizat || '' };
 }
@@ -472,22 +484,30 @@ function numeComun(membri) {
 }
 /* Lista (filtrată și ordonată) → ce se afișează, în ordinea ei: { cheie, nume, membri, grup }. Un proiect cu grant și împrumut ia locul primului său
    acord din listă; componentele lui merg după tip (grant, împrumut, asistență tehnică), apoi în ordinea listei. */
-function grupeazaProiecte(lista) {
-  const fam = new Map();
-  (lista || []).forEach(function (a) { const k = cheieNume(a.nume); (fam.get(k) || fam.set(k, []).get(k)).push(a); });
+function grupeazaProiecte(lista, uniri) {
+  /* `uniri` (baza.peUnire): acorduri unite de mână în același proiect, cu denumiri diferite (date/proiecte_manual.json, „unite”); ele se unesc dacă în listă
+     rămân cel puțin două dintre ele, oricare ar fi tipul lor. Celelalte se unesc după denumire, doar când sunt și grant, și împrumut. */
+  const fam = new Map(), man = new Map();
+  const unire = function (a) { return uniri && uniri.get ? uniri.get(a.id) : null; };
+  (lista || []).forEach(function (a) {
+    const u = unire(a);
+    if (u) { (man.get(u.cheie) || man.set(u.cheie, []).get(u.cheie)).push(a); return; }
+    const k = cheieNume(a.nume); (fam.get(k) || fam.set(k, []).get(k)).push(a);
+  });
   const mixte = new Map();
   fam.forEach(function (m, k) {
     if (m.length > 1 && m.some(function (a) { return a.categorie === 'Grant'; }) && m.some(function (a) { return a.categorie === 'Împrumut'; })) mixte.set(k, m);
   });
+  man.forEach(function (m, k) { if (m.length > 1) mixte.set(k, m); });
   const out = [], puse = new Set();
   (lista || []).forEach(function (a) {
-    const k = cheieNume(a.nume), m = mixte.get(k);
-    if (!m) { out.push({ cheie: k, nume: a.nume, membri: [a], grup: false }); return; }
+    const u = unire(a), k = u ? u.cheie : cheieNume(a.nume), m = mixte.get(k);
+    if (!m) { out.push({ cheie: cheieNume(a.nume), nume: a.nume, membri: [a], grup: false }); return; }
     if (puse.has(k)) return;
     puse.add(k);
     const membri = m.map(function (x, i) { return [x, i]; }).sort(function (x, y) { return rangTip(x[0].categorie) - rangTip(y[0].categorie) || x[1] - y[1]; })
       .map(function (x) { return x[0]; });
-    out.push({ cheie: k, nume: numeComun(membri), membri: membri, grup: true });
+    out.push({ cheie: k, nume: u ? u.nume : numeComun(membri), membri: membri, grup: true });
   });
   return out;
 }

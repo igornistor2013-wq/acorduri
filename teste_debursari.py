@@ -1666,6 +1666,11 @@ try:
             verifica('în date: actele la care e „numărată” suma unui rând omis se găsesc în rânduri care rămân în liste', all(c in pe_act for o in MANUAL_REAL['omise'] for c in o.get('numarat_la', [])),
                      [c for o in MANUAL_REAL['omise'] for c in o.get('numarat_la', []) if c not in pe_act])
             verifica('în date: fiecare rând omis are motiv în română și în engleză', all(o.get('motiv') and o.get('motiv_en') for o in MANUAL_REAL['omise']))
+            UNITE = MANUAL_REAL.get('unite', [])
+            rand_unite = [{i for c in u.get('acte', []) for i in pe_act.get(c, ())} for u in UNITE]
+            verifica('în date: fiecare intrare „unite” are cel puțin două acte, denumirea proiectului și motivul', all(len(u.get('acte', [])) >= 2 and u.get('nume') and u.get('motiv') for u in UNITE), UNITE)
+            verifica('în date: actele fiecărei intrări „unite” se găsesc în registru și dau cel puțin două rânduri deosebite', all(all(c in pe_act for c in u['acte']) and len(r) >= 2 for u, r in zip(UNITE, rand_unite)), [(u['acte'], r) for u, r in zip(UNITE, rand_unite)])
+            verifica('în date: niciun rând nu e în două intrări „unite”', sum(len(r) for r in rand_unite) == len(set().union(*rand_unite)) if rand_unite else True, rand_unite)
             fals = GitHubFals(intrari=[])
             ctx = context(b)
             pg = pagina(ctx, fals, manual='real', arhiva=False)
@@ -2866,6 +2871,60 @@ try:
             bx = pg.locator('#fisa').bounding_box()
             egal('820 px: ecran întreg', [round(bx['x']), round(bx['y']), round(bx['width']), round(bx['height'])], [0, 0, 820, 800])
             verifica('820 px: fără derulare orizontală', pg.evaluate('document.documentElement.scrollWidth <= window.innerWidth'))
+            ctx.close()
+
+        # ---------------------------------------------------------------- 23. proiecte unite de mână
+        if rulez(23):
+            print('\n23. Proiecte unite de mână (date/proiecte_manual.json, „unite”): acorduri cu denumiri diferite, un singur proiect cu componente')
+            U0 = MANUAL_REAL['unite'][0]
+            pe_act23 = {}
+            for a in RANDURI:
+                for x in a['acte']:
+                    pe_act23.setdefault(x['act'], set()).add(a['id'])
+            ids23 = sorted({i for c in U0['acte'] for i in pe_act23.get(c, ())})
+            membri23 = [BY_ID[i] for i in ids23]
+            don23 = donatori_acord(membri23[0])[0]
+            egal('date: intrarea „unite” are cel puțin trei acorduri, toate la același donator (%s), cu denumiri diferite și cu un grant și un împrumut' % don23,
+                 [len(ids23) >= 3, all(donatori_acord(a) == [don23] for a in membri23), len({fold_ro(a['nume']) for a in membri23}) == len(ids23), {a['categorie'] for a in membri23} >= {'Grant', 'Împrumut'}], [True, True, True, True])
+            P23 = 'section.panel[data-d="%s"]' % don23
+            fals = GitHubFals(intrari=[])
+            ctx = context_zi(b)
+            pg = pagina(ctx, fals, hash_='#d=' + don23, manual='real', arhiva=False)
+            h = pg.locator(P23 + ' tr.pg[data-gr="%s|~%s"]' % (don23, cheie_nume(U0['nume'])))
+            egal('în tabel, acordurile intrării sunt un singur rând de proiect (cu denumirea din fișier), nu rânduri separate', [h.count(), h.locator('.pname').inner_text().strip(), [pg.locator(P23 + ' tr.ac[data-k="%s|%s"]' % (don23, i)).count() for i in ids23]], [1, U0['nume'], [0] * len(ids23)])
+            meta = h.locator('.pmeta').inner_text().replace('\xa0', ' ')
+            verifica('sub denumire: „grant + împrumut” și numărul acordurilor', 'grant + împrumut' in meta and ('%d acorduri' % len(ids23)) in meta, meta)
+            egal('tipurile de finanțare din rând: Grant și Împrumut (o dată fiecare)', h.locator('td').nth(3).locator('.tag').all_inner_texts(), ['Grant', 'Împrumut'])
+            sume = h.locator('td').nth(4).inner_text().replace('\xa0', ' ')
+            n_imp = sum(1 for a in membri23 if a['categorie'] == 'Împrumut')
+            verifica('suma proiectului pe componente: împrumuturile numărate împreună („Împrumut ×%d”), cu suma cunoscută' % n_imp, ('×%d' % n_imp) in sume and any(fmt_bani_ro(a['suma']['v']) in sume for a in membri23 if a.get('suma')), sume)
+            dsum = pg.locator(P23 + ' .dsum').inner_text().replace('\xa0', ' ')
+            m = re.search(r'(\d+) proiecte \((\d+) acorduri\)', dsum)
+            n_don = len(acorduri_donator(don23))
+            verifica('antetul donatorului: unirea scade numărul de proiecte (%d acorduri → %d proiecte)' % (n_don, n_don - len(ids23) + 1), m is not None and int(m.group(2)) == n_don and int(m.group(1)) == n_don - len(ids23) + 1, dsum)
+            h.locator('.exp').click()
+            pg.wait_for_selector(P23 + ' tr.ac.sub')
+            sub = pg.locator(P23 + ' tr.ac.sub')
+            egal('desfăcut: toate acordurile apar ca componente, întâi grantul, apoi împrumuturile', [sorted(sub.evaluate_all('l => l.map(r => r.getAttribute("data-k").split("|")[1])')), sub.locator('.tag').all_inner_texts()],
+                 [ids23, ['Grant'] + ['Împrumut'] * n_imp])
+            sub.first.locator('.exp').click()
+            pg.wait_for_selector('#fisa[open] .det-comp')
+            egal('fereastra unei componente: titlul e denumirea proiectului, iar linia „Componentele proiectului” le are pe toate (una curentă, restul butoane)',
+                 [pg.locator('#fisa .fw-titlu').inner_text().strip(), pg.locator('#fisa .det-comp .dc').count(), pg.locator('#fisa .det-comp .dc.cur').count(), pg.locator('#fisa .det-comp button.dc').count()], [U0['nume'], len(ids23), 1, len(ids23) - 1])
+            etichete = pg.locator('#fisa .det-comp .dc').all_inner_texts()
+            verifica('componentele au etichete deosebite (tip și an)', len(set(etichete)) == len(etichete), etichete)
+            pg.locator('#fisa .det-comp button.dc').last.click()
+            pg.wait_for_function('DebursariUI.stare().fisa !== "%s|%s"' % (don23, sub.first.get_attribute('data-k').split('|')[1]))
+            egal('un clic pe ultima componentă schimbă fereastra pe ea (o singură fereastră)', [pg.locator('#fisa[open]').count(), pg.locator('#fisa .fw').count()], [1, 1])
+            pg.keyboard.press('Escape')
+            pg.wait_for_selector('#fisa[open]', state='detached')
+            # filtre: fără grant, rămân împrumuturile (tot unite); doar grantul → rând obișnuit
+            pg.select_option('#ftip', 'Împrumut')
+            pg.wait_for_timeout(250)
+            egal('filtrul „Împrumut”: cele %d împrumuturi rămân unite într-un proiect (fără grant)' % n_imp, [pg.locator(P23 + ' tr.pg').filter(has_text=U0['nume']).count(), pg.locator(P23 + ' tr.ac.sub').count()], [1, n_imp])
+            pg.select_option('#ftip', 'Grant')
+            pg.wait_for_timeout(250)
+            egal('filtrul „Grant”: un singur acord din proiect, deci nu se mai unește (rând obișnuit)', [pg.locator(P23 + ' tr.pg').filter(has_text=U0['nume']).count(), pg.locator(P23 + ' tr.ac[data-k="%s|%s"]' % (don23, [a['id'] for a in membri23 if a['categorie'] == 'Grant'][0])).count()], [0, 1])
             ctx.close()
 
         b.close()
