@@ -356,6 +356,13 @@ singur act care cuprinde și grant, și împrumut (de pildă acordul cu FIDA, `h
 dat de registru, fiindcă registrul nu are sumele separate. Regulile sunt în `grupeazaProiecte` și `sumeComponente` din
 `debursari.js`, cu teste în `teste_debursari.js` și în secțiunea 19 din `teste_debursari.py`.
 
+**Aspectul paginii (doar ecran).** Un bloc de CSS în `debursari.html`, în `@media screen`, chiar înainte de `@media print`, așază și
+ierarhizează pagina fără să schimbe culorile și fonturile: bara de filtre e un card (căutarea și cele trei filtre pe primul rând,
+butoanele „Excel · total” și „Excel · pe donatori” împreună, la dreapta, pe al doilea; pe telefon, câte unul pe rând); panoul unui
+donator are linie albastră deasupra, acronimul mare, iar indicatorii din antet (proiecte, sumă, debursat, obiective/început/finalizare)
+sunt cartonașe; tabelul are celule mai aerisite și un antet de coloane ușor colorat. Nu schimbă marcajul generat de
+`debursari-ui.js`, deci selectorii testelor rămân aceiași; la tipărire nu se aplică.
+
 **Acorduri cu denumiri diferite, dar același proiect: „unite” în `date/proiecte_manual.json`.** Regula de mai sus nu prinde
 acordurile al căror nume diferă în registru (de pildă cele trei ale Federației Ruse: grantul HG 793/2020, împrumutul HG 169/2020
 și creditul de stat HG 443/2009). Acestea se unesc de mână: o intrare în `unite` are `acte` (cel puțin două coduri de act, ca în
