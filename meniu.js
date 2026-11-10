@@ -165,10 +165,9 @@
         '<div class="mg-dd" id="acorduriSelector">' +
           '<button type="button" class="mg-b mg-acorduri" data-k="acorduri" id="acorduriNavBtn" aria-haspopup="true" aria-expanded="false">' + svg('acord') + lab('acorduri') + '' + svg('sag', 'mg-sag') + '</button>' +
           '<div class="mg-pop" id="acorduriSelectorMenu" role="menu">' +
+            '<a class="mg-opt" role="menuitem" data-k="debursari" id="acorduriOptDebursari" href="debursari.html">' + svg('monede') + '<span><b>' + t('deb') + '</b><small>' + t('debSub') + '</small></span></a>' +
             '<a class="mg-opt" role="menuitem" data-k="acorduri-legis" href="legis_acorduri.html">' + svg('carte') + '<span><b>' + t('legis') + '</b><small>' + t('legisSub') + noteRo + '</small></span></a>' +
             '<a class="mg-opt" role="menuitem" data-k="acorduri-mo" href="acorduri.html">' + svg('acord') + '<span><b>' + t('mo') + '</b><small>' + t('moSub') + noteRo + '</small></span></a>' +
-            '<a class="mg-opt" role="menuitem" data-k="legaturi" id="acorduriOptLegaturi" href="index.html#legaturi">' + svg('lant') + '<span><b>' + t('lege') + '</b><small>' + t('legeSub') + '</small></span></a>' +
-            '<a class="mg-opt" role="menuitem" data-k="debursari" id="acorduriOptDebursari" href="debursari.html">' + svg('monede') + '<span><b>' + t('deb') + '</b><small>' + t('debSub') + '</small></span></a>' +
           '</div>' +
         '</div>' +
         '<a class="mg-b mg-hg" data-k="hg246" id="hg246NavBtn" href="hg246.html">' + svg('hg') + lab('hg') + '</a>' +
@@ -317,7 +316,7 @@
       nav.querySelectorAll('.mg-limba button').forEach(function (b) { b.classList.toggle('active', b.dataset.lang === limba); });
       var o = nav.querySelectorAll('.mg-opt');
       var txt = [[t('iatiCheck'), t('iatiCheckSub')], [t('iatiDash'), t('iatiDashSub')],
-                 [t('legis'), t('legisSub') + t('doarRo')], [t('mo'), t('moSub') + t('doarRo')], [t('lege'), t('legeSub')], [t('deb'), t('debSub')]];
+                 [t('deb'), t('debSub')], [t('legis'), t('legisSub') + t('doarRo')], [t('mo'), t('moSub') + t('doarRo')]];      // în ordinea opțiunilor din meniu
       o.forEach(function (el, i) { el.querySelector('b').textContent = txt[i][0]; el.querySelector('small').textContent = txt[i][1]; });
     }
   };

@@ -1,21 +1,19 @@
-Cursul valutar se actualizează automat în fiecare dimineață. Cinci fișiere (trei sunt noi).
+Meniul „Acorduri”: „De la lege la bani” a fost scos, iar „Debursări pe acorduri” e acum prima opțiune. Cinci fișiere (plus testul meniului).
 
-Până acum cursurile BCE erau scrise de mână în acorduri.html („var PER_EUR”, cu data „1 iulie 2026”), deci rămâneau la data la care fuseseră puse; de aici „Cursuri BCE: 1 iulie 2026” din capul paginii „Debursări pe acorduri”.
+Meniul „Acorduri” (pe toate paginile) are acum trei opțiuni, în ordinea:
+  1. Debursări pe acorduri
+  2. Acorduri · legis.md
+  3. Acorduri · Monitorul Oficial
+„De la lege la bani” nu mai e în meniu și nici în linkurile de la sfârșitul paginii „Debursări pe acorduri”. Pagina însăși nu a fost ștearsă: dacă cineva are adresa index.html#legaturi, ea se deschide ca înainte.
 
-Acum un workflow nou, „Cursul valutar (BCE)”, rulează în fiecare zi la 05:20 UTC (07:20 iarna / 08:20 vara, ora Chișinăului; GitHub poate întârzia cu până la o oră-două) scriptul curs_bce.py:
-  · citește cursurile zilnice de referință ale BCE (eurofxref-daily.xml);
-  · le scrie în acorduri.html și legis_acorduri.html (tabelul PER_EUR și data cursului) și în date/acorduri_legare.json (cursurile și echivalentul în euro al sumelor), de unde le ia pagina „Debursări pe acorduri”;
-  · DST se calculează din coșul FMI la cursurile zilei (cu cursurile din 1 iulie 2026 dă exact valoarea de acum, 1 DST = 1,1905 EUR), ROL din RON, DEM și ECU rămân fixe;
-  · BCE publică doar în zilele lucrătoare, după-amiaza, deci dimineața e cursul zilei de ieri (luni, cel de vineri); sâmbăta, duminica și în sărbători scriptul nu găsește o dată mai nouă și nu schimbă nimic (fără commit);
-  · dacă BCE nu răspunde sau dă cursuri care nu par bune (lipsește o valută, un curs iese cu peste 30% din cel de până acum), nu scrie nimic, iar rularea apare ca eșuată în Actions: cursurile de până atunci rămân.
-Prima actualizare: mâine dimineață, sau acum: Actions → „Cursul valutar (BCE)” → Run workflow.
+În meniu era și un loc care refăcea etichetele după poziție la schimbarea limbii (RO/EN); l-am pus în noua ordine, ca la trecerea în engleză textele să rămână la opțiunea lor (am verificat: RO și EN, pe toate cele 7 pagini, la 1400 și la 390 px).
 
 Pune-le în repository la aceleași căi:
-  curs_bce.py                    (nou: scriptul)
-  teste_curs.py                  (nou: testele lui, fără rețea; rulate și de workflow înainte de scriere)
-  .github/workflows/curs.yml     (nou: programarea zilnică; folderul .github e ascuns, la urcare prin „Add file → Upload files” trage folderul întreg sau creează fișierul prin „Add file → Create new file”, cu numele .github/workflows/curs.yml, și lipește textul)
-  README.md                      (secțiunea „Cursul valutar” și rândurile din tabelul de fișiere)
-  CITESTE.txt                    (acest text)
-Primele două se pun lângă celelalte fișiere .py din rădăcină. Nu se schimbă nicio pagină și niciun fișier de date: cursurile se schimbă singure la prima rulare. Pachetul se adaugă peste iati12 (fereastra proiectului cu componente).
-
-Rezultat: testele noi (teste_curs.py) trec, inclusiv pe o copie a repository-ului pe care am aplicat o actualizare simulată (cursuri din 9 noiembrie 2026): atunci trec și testele paginii (logica 374, AMP 54, legătura 53, legis, fișierele paginii și secțiunile 13, 19, 20, 22, 23 din browser). Nu am putut citi BCE de aici (rețeaua mea nu ajunge la ecb.europa.eu), deci prima rulare reală e cea de pe GitHub; scriptul a fost încercat pe XML în formatul BCE.
+  meniu.js          (meniul: opțiunea scoasă, Debursări prima, etichetele după poziție)
+  debursari-ui.js   (linkul „De la lege la bani” scos din legăturile de la sfârșitul paginii)
+  debursari.html    (?v= al scripturilor devine 2026-11-10e, ca browserul să ia varianta nouă)
+  teste_tema.py     (testul meniului: trei opțiuni, în noua ordine)
+  README.md         (descrierea meniului)
+  CITESTE.txt       (acest text)
+Rezultat: verificările din browser (624), logica (374), AMP (54), legătura (53), legis și cursul trec. (teste_tema.py verifică stilul unei teme noi, pe care paginile nu o folosesc, deci unele verificări ale lui pică și fără această schimbare; am schimbat în el doar linia meniului.)
+După urcare, GitHub Pages poate ține câteva minute vechea pagină; apoi Ctrl+F5.

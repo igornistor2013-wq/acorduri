@@ -1094,7 +1094,7 @@ function randeazaNote() {
 }
 function randeazaNav() {
   $('#sNav').innerHTML = '<a href="index.html">' + esc(L('← Donatori și proiecte', '← Donors & projects')) + '</a><a href="legis_acorduri.html">' + esc(L('Acorduri · legis.md', 'Agreements · legis.md')) + '</a>' +
-    '<a href="acorduri.html">' + esc(L('Acorduri · Monitorul Oficial', 'Agreements · Official Gazette')) + '</a><a href="index.html#legaturi">' + esc(L('De la lege la bani', 'From law to money')) + '</a>' +
+    '<a href="acorduri.html">' + esc(L('Acorduri · Monitorul Oficial', 'Agreements · Official Gazette')) + '</a>' +
     '<a href="#">' + esc(L('↑ Începutul paginii', '↑ Top of the page')) + '</a><a href="despre.html">' + esc(L('Despre date', 'About the data')) + '</a>';
 }
 function randeazaTot() {

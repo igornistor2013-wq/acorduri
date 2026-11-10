@@ -147,7 +147,7 @@ with sync_playwright() as p:
     pg.click('#mgAcasa'); pg.wait_for_timeout(400)
     pg.click('#acorduriNavBtn'); pg.wait_for_timeout(300)
     opt = pg.evaluate("[...document.querySelectorAll('#acorduriSelectorMenu .mg-opt')].map(e => e.querySelector('b').innerText.trim())")
-    verifica('meniul „Acorduri” se deschide cu cele patru opțiuni', len(opt) == 4 and pg.evaluate("getComputedStyle(document.getElementById('acorduriSelectorMenu')).display") == 'block', opt)
+    verifica('meniul „Acorduri” se deschide cu trei opțiuni, „Debursări pe acorduri” prima; „De la lege la bani” nu mai e în meniu', opt == ['Debursări pe acorduri', 'Acorduri · legis.md', 'Acorduri · Monitorul Oficial'] and pg.evaluate("getComputedStyle(document.getElementById('acorduriSelectorMenu')).display") == 'block', opt)
     verifica('…și săgeata se rotește', pg.evaluate("getComputedStyle(document.querySelector('#acorduriNavBtn .mg-sag')).transform") != 'none')
     pg.keyboard.press('Escape'); pg.wait_for_timeout(200)
     verifica('Esc închide meniul derulant', pg.evaluate("getComputedStyle(document.getElementById('acorduriSelectorMenu')).display") == 'none')
