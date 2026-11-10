@@ -200,10 +200,10 @@ care legis.md îl primește.
 | `debursari-ui.js` | Interfața paginii: alegerea donatorilor, tabelul, fereastra cu codul, formularele de debursare și de date despre proiect, panourile „AMP”, „Rânduri omise” și „Date fără acord găsit”, butoanele Excel, engleza și varianta pentru telefon. Nu ține codul nicăieri în afara memoriei paginii |
 | `amp-date.js` | Datele de început și de finalizare din AMP pentru acordurile din „Debursări pe acorduri”: citește raportul AMP live (nr. 661, prin proxy-ul amp.vivi.md) și, când nu răspunde, arhiva `arhiva.js`; leagă un acord de un proiect AMP doar când denumirea, finanțatorul și suma coincid („sigur”) sau când un om a confirmat legătura în `date/legaturi_amp.json`; o legătură doar „probabilă” rămâne indiciu, nu dă date în tabel. Funcții pure, ca să le poată testa Node |
 | `teste_amp_date.js` | Testele lui `amp-date.js`: formatele datelor, regulile de potrivire (sigur, probabil, ambiguu, prea vechi), legăturile confirmate sau respinse, raportul live față de arhivă, oprirea după 20 de secunde și o verificare pe arhiva AMP + registrul real. Rulare: `node teste_amp_date.js` |
-| `date/proiecte_manual.json` | Date despre proiecte, scrise de mână și cu sursă. „omise”: rândurile-umbrelă ale registrului, care nu apar în lista de proiecte (cu motivul). „proiecte”: obiectivele proiectului și, când sursa le dă, data de început și de finalizare; fiecare intrare are adresa documentului oficial și citatul exact — fără ele nu se citește. Vezi „Debursări pe acorduri” |
+| `date/proiecte_manual.json` | Date despre proiecte, scrise de mână și cu sursă. „omise”: rândurile-umbrelă ale registrului, care nu apar în lista de proiecte (cu motivul). „proiecte”: obiectivele proiectului și, când sursa le dă, data de început și de finalizare; fiecare intrare are adresa documentului oficial și citatul exact — fără ele nu se citește (citatul și nota rămân în fișier, ca dovadă; pagina nu le scrie, doar adresa documentului apare ca etichetă „sursă oficială”). Vezi „Debursări pe acorduri” |
 | `date/debursari.json` | „Baza de date” a paginii: debursările introduse de mână, o înregistrare pe linie, și — la cheia `proiecte`, scrisă doar când nu e goală — datele despre proiecte introduse în pagină (obiective, început, finalizare). Fișier public; îl scrie doar pagina, prin API-ul GitHub, cu codul de acces. Fiecare salvare e un commit. La 3 noiembrie 2026 conține și datele din scrisoarea Ministerului Finanțelor (situația la 30.09.2026): 31 de debursări cumulate și datele de început/finalizare la 34 de rânduri, fiecare cu nota care citează scrisoarea (vezi „Datele din scrisoarea Ministerului Finanțelor”) |
 | `teste_debursari.js` | Testele logicii (obiective și date cu sursele lor, rânduri omise, totaluri, operații, conflicte de scriere, PIN, specificațiile Excel). Rulare: `node teste_debursari.js` |
-| `teste_debursari.py` | Verifică fișierele paginii (inclusiv `date/proiecte_manual.json`) și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”, inclusiv deblocarea unică, editarea în tabel și proiectele cu grant și împrumut unite într-un rând, secțiunea 19, și proiectul deschis, încadrat, secțiunea 20); `--doar 13,14` rulează doar secțiunile numerotate (de la 13 în sus; 1–12 rulează doar fără `--doar`) |
+| `teste_debursari.py` | Verifică fișierele paginii (inclusiv `date/proiecte_manual.json`) și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”, inclusiv deblocarea unică, editarea în tabel și proiectele cu grant și împrumut unite într-un rând, secțiunea 19, proiectul deschis, încadrat, secțiunea 20, și fișa proiectului, secțiunea 21); `--doar 13,14` rulează doar secțiunile numerotate (de la 13 în sus; 1–12 rulează doar fără `--doar`) |
 | `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi. Le scrie `legis_watch.py`; apar în repository după prima rulare reușită a lui `legis_local.bat` |
 | `CNAME` | Domeniul propriu |
 
@@ -329,9 +329,9 @@ al lui, dar în totaluri se numără o singură dată; fără partener în regis
 Bifezi unul sau mai mulți donatori și apare lista proiectelor lor, cu coloanele **Proiectul**,
 **Data efectivă de începere**, **Data finalizării**, **Tip de finanțare**, **Suma proiectului** (în valuta
 acordului și în euro) și **Suma debursărilor** (cu procentul debursat). **Descrierea succintă** (obiectivele
-proiectului) nu are coloană: apare doar când deschizi proiectul, sus în detalii, cu sursa și citatul ei. Butonul
-din dreapta deschide detaliile: descrierea, debursările, datele despre proiect (cu sursa și citatul), proiectul AMP
-legat, actele. Se poate căuta (denumire, obiective, act, partener), filtra (tip de
+proiectului) nu are coloană: apare doar când deschizi proiectul, în fișa lui, cu sursa ca etichetă mică. Butonul
+din dreapta deschide **fișa proiectului** (vezi mai jos): descrierea, datele esențiale, perioada, parcursul acordului,
+debursările și, după deblocare, formularele. Se poate căuta (denumire, obiective, act, partener), filtra (tip de
 finanțare, cu sau fără debursări) și sorta. Donatorii bifați și filtrele rămân în adresa paginii
 (`#d=BERD|BEI&tip=…`), deci o selecție se trimite ca link. Pe laptop și pe desktop (ferestre de 1250 px sau mai
 late) fiecare tabel încape întreg în panoul lui, chiar cu toți donatorii bifați; pe un ecran mai îngust tabelul se
@@ -366,6 +366,32 @@ devine cartonașe, proiectul deschis are bordură albastră și un loc deasupra,
 sfârșitul stilurilor tabelului din `debursari.html`; secțiunea 20 din `teste_debursari.py` le verifică, inclusiv pe ecran
 (pixelii barei), la 1360, 1000, 821/820 și 390 px, cu bara de editare după deblocare.
 
+**Fișa proiectului (ce se vede când deschizi un proiect).** Detaliile unui rând sunt o fișă ordonată, în cartonașe albe cu
+titlu mic, în această ordine: **Descrierea proiectului** (obiectivele, cu sursa ca etichetă mică „sursă oficială” /
+„AMP” / „introdus de utilizator”, iar la oficial, link spre document; când titlul întreg al acordului diferă de denumirea
+din tabel, apare dedesubt), **Date esențiale** (donatorul cu denumirea întreagă sub acronim, suma acordului cu valuta, echivalentul
+în euro și de unde vine suma, costul total al proiectului și alte sume din acte, când registrul le are, și dacă intră în totaluri),
+**Perioada de implementare** (data de început și de finalizare, fiecare cu sursa ei, **durata** și **situația** — „în
+desfășurare”, „termenul de finalizare a trecut” sau „urmează să înceapă” — calculate din cele două date, față de ziua de
+azi; „≈” când o dată e doar luna sau anul; fără durată și situație când o dată lipsește sau datele se contrazic; apoi proiectul
+AMP legat) și **Parcursul acordului** (actele din registru în ordinea datelor, fiecare cu etapa pe care o reprezintă — inițierea
+negocierilor, aprobarea semnării, proiectul de lege, ratificarea, promulgarea, punerea în aplicare — tipul și numărul actului,
+cu link spre el; un acord cu **nouă acte sau mai multe** arată primele trei și ultimele trei, iar restul se deschid cu
+butonul „Arată încă N acte”, care se închide cu „Restrânge lista actelor”; starea se păstrează când rândul se reface). Pe
+ecran lat cartonașele curg în două coloane echilibrate, de la 900 px în jos într-una (descriere, date, perioadă, parcurs); sub
+ele, pe toată lățimea, **debursările**, iar după deblocare, unul lângă altul, formularul de debursare și cel de „Date despre
+proiect”. **Citatul exact și nota din `date/proiecte_manual.json` nu se mai scriu în pagină**: rămân în fișier, ca dovadă pentru
+cine îl întreține; nota și gazda documentului se văd doar în indiciul (`title`) etichetei sursei. Fișa nu inventează nimic:
+tot ce arată vine din registru (actele, sumele, donatorii), din sursele de mai sus sau se calculează din datele de început și
+de finalizare; **textul descrierii vine doar din surse** (obiectivele), așa că un proiect fără obiective spune „Obiective
+neintroduse” până când cineva introduce obiectivele (formularul „Date despre proiect” sau o intrare nouă în `date/proiecte_manual.json`).
+Logica pură e în `debursari.js` (`parcursAcord`, `parcursAfisat`, `durataProiect`, `fmtDurata`, `stareProiect`), cu teste în
+`teste_debursari.js`; afișarea e în `debursari-ui.js` (`htmlDescriere`, `htmlInfo`, `htmlProiect`, `htmlParcurs`, `htmlDetalii`;
+starea parcursului desfășurat e `S.cale`), stilurile în `debursari.html` (`.fisa`, `.fs`, `.fapte`, `.cale`); secțiunea 21 din
+`teste_debursari.py` o verifică în browser: ordinea actelor, etapele, linkurile și legendele sunt calculate independent din
+registru, cu data înghețată (10.11.2026) pentru „în desfășurare / încheiat”, în română și engleză, la 1360, 1000, 901/900 și
+390 px, cu și fără cod, și cu fișierul adevărat de surse (niciun citat în pagină).
+
 **Rânduri omise, ca un proiect să nu apară de două ori.** Cinci rânduri ale registrului nu apar în liste:
 sunt rânduri-umbrelă, adică negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu
 aceleași sume (HG546/2026, HG799/2014, HG296/2013, HG704/2007, LP232/2023). Lista lor, cu motivul, e în
@@ -396,7 +422,7 @@ efectivă de începere" și „Data finalizării" sunt datele proiectului, cum l
 2. **O sursă oficială, scrisă de mână** în `date/proiecte_manual.json`, la „proiecte": `acte` (orice cod de act al
    rândului), `obiective` (`ro` și `en`), `inceput` și `sfarsit` (`AAAA-LL-ZZ`, `AAAA-LL` sau `AAAA`, după cât spune
    sursa), `sursa` (adresa documentului oficial), `citat` (fragmentul exact din document care susține ce s-a
-   scris) și, opțional, `nota`. O intrare fără sursă și citat nu se citește: pagina o semnalează în panoul „Date
+   scris; rămâne în fișier, ca dovadă, și nu se afișează în pagină) și, opțional, `nota` (se vede doar în indiciul etichetei sursei). O intrare fără sursă și citat nu se citește: pagina o semnalează în panoul „Date
    fără acord găsit", ca să nu apară în tabel nimic ce nu se poate verifica. Obiectivele se scriu în română
    (traducerea) și în engleză (cum le dă documentul); o dată se pune doar dacă sursa spune începutul sau
    sfârșitul proiectului (nu data aprobării sau a semnării), iar `nota` spune ce anume înseamnă data.

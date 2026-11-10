@@ -582,6 +582,88 @@ function descriere(a, en, info) {
   return o ? (en ? (o.en || o.ro) : o.ro) : '';
 }
 
+/* ------------------------------------------------------------------ fișa proiectului: parcursul acordului, durata și starea în timp
+   Doar ce se poate spune din datele pe care pagina le are deja (actele acordului din registru, datele de început și de finalizare): nimic nu se inventează. */
+/* Etapele pe care le lasă actele unui acord în registru, în ordinea lor firească (aceleași ca în „Etape parcurse” din registru): [cod, română, engleză]. */
+const ETAPE_ACT = [
+  ['neg', 'Inițierea negocierilor', 'Start of negotiations'],
+  ['sem', 'Aprobarea semnării', 'Approval of signing'],
+  ['plg', 'Proiectul de lege', 'Draft law'],
+  ['rat', 'Ratificare / aprobare', 'Ratification / approval'],
+  ['prm', 'Promulgare', 'Promulgation'],
+  ['vig', 'Punere în aplicare', 'Put into effect']
+];
+const TIPURI_ACT_EN = { 'Hotărâre': 'Decision', 'Decret': 'Decree', 'Lege': 'Law', 'Ordin': 'Order', 'Act': 'Act' };
+function rangEtapa(k) { for (let i = 0; i < ETAPE_ACT.length; i++) if (ETAPE_ACT[i][0] === k) return i; return -1; }
+function etichetaEtapa(k, en) { const i = rangEtapa(k); return i < 0 ? '' : ETAPE_ACT[i][en ? 2 : 1]; }
+function etichetaTipAct(t, en) { return en ? (TIPURI_ACT_EN[t] || t || '') : (t || ''); }
+/* Actele unui acord în ordinea datelor, cele mai vechi întâi, fiecare cu etapele pe care le reprezintă (o etapă necunoscută se ignoră). La aceeași dată,
+   ordinea firească a etapelor; registrul își scrie actele cu cele mai noi întâi, deci la egalitate mai departe contează ordinea inversă din registru. */
+function parcursAcord(acte) {
+  return (acte || []).map(function (x, i) {
+    const et = (x.etape || []).filter(function (e) { return rangEtapa(e) >= 0; }).sort(function (p, q) { return rangEtapa(p) - rangEtapa(q); });
+    return { act: x.act || '', tip: x.tip || '', data: x.data || '', ord: ordRo(x.data), url: x.url || '', etape: et, rang: et.length ? rangEtapa(et[0]) : ETAPE_ACT.length, i: i };
+  }).sort(function (p, q) {
+    if (p.ord !== q.ord) return !p.ord ? 1 : !q.ord ? -1 : (p.ord < q.ord ? -1 : 1);
+    return p.rang - q.rang || q.i - p.i;
+  });
+}
+/* Cum se numește un pas: etapele pe care le reprezintă („Inițierea negocierilor + Aprobarea semnării”); un act fără etapă recunoscută se numește după tipul lui. */
+function etichetaPas(p, en) {
+  return p.etape.length ? p.etape.map(function (e) { return etichetaEtapa(e, en); }).join(' + ') : etichetaTipAct(p.tip, en);
+}
+const PARCURS_PESTE = 8, PARCURS_CAPETE = 3;
+/* Parcursul de arătat: toate actele când sunt cel mult 8 sau când omul le-a cerut pe toate; altfel primele 3 și ultimele 3, cu numărul celor ascunse la mijloc. */
+function parcursAfisat(pasi, toate) {
+  const n = pasi.length;
+  if (toate || n <= PARCURS_PESTE) return { inainte: pasi, ascunse: 0, dupa: [], total: n };
+  return { inainte: pasi.slice(0, PARCURS_CAPETE), ascunse: n - 2 * PARCURS_CAPETE, dupa: pasi.slice(n - PARCURS_CAPETE), total: n };
+}
+/* Durata dintre două date (întregi sau parțiale): în luni când ambele spun cel puțin luna, altfel în ani; `aprox` când vreuna nu e dată întreagă.
+   Întoarce null când nu se poate (o dată lipsește sau începutul e după sfârșit). */
+function durataProiect(inceput, sfarsit) {
+  const x = dataPartiala(inceput), y = dataPartiala(sfarsit);
+  if (!x || !y || inceputDupaSfarsit(inceput, sfarsit)) return null;
+  if (!x.l || !y.l) return { luni: null, ani: y.a - x.a, aprox: true };
+  let luni = (y.a - x.a) * 12 + (y.l - x.l);
+  if (x.z && y.z && y.z < x.z) luni--;
+  return { luni: Math.max(0, luni), ani: null, aprox: !(x.z && y.z) };
+}
+/* „5 ani și 9 luni”, „1 an”, „sub o lună”, „≈ 3 ani” (când datele sunt doar luna sau anul). */
+function fmtDurata(d, en) {
+  if (!d) return '';
+  const an = function (n) { return en ? n + (n === 1 ? ' year' : ' years') : n + (n === 1 ? ' an' : (n >= 20 ? ' de ani' : ' ani')); };
+  const lu = function (n) { return en ? n + (n === 1 ? ' month' : ' months') : n + (n === 1 ? ' lună' : (n >= 20 ? ' de luni' : ' luni')); };
+  let t, sub = false;
+  if (d.luni == null) { sub = d.ani < 1; t = sub ? (en ? 'under a year' : 'sub un an') : an(d.ani); }
+  else {
+    const a = Math.floor(d.luni / 12), l = d.luni % 12;
+    sub = !a && !l;
+    t = sub ? (en ? 'under a month' : 'sub o lună') : [a ? an(a) : '', l ? lu(l) : ''].filter(Boolean).join(en ? ' and ' : ' și ');
+  }
+  return (d.aprox && !sub ? '≈ ' : '') + t;
+}
+/* Primul sau ultimul moment pe care îl poate însemna o dată parțială, ca AAAALLZZ: „2026” înseamnă de la 01.01.2026 până la 31.12.2026. */
+function limitaData(s, sus) {
+  const d = dataPartiala(s);
+  if (!d) return '';
+  const l = d.l || (sus ? 12 : 1), z = d.z || (sus ? new Date(Date.UTC(d.a, l, 0)).getUTCDate() : 1);
+  return String(d.a) + pad(l) + pad(z);
+}
+/* Unde se află proiectul în timp, după datele lui: 'incheiat' (termenul de finalizare a trecut), 'urmeaza' (nu a început), 'in-curs' (între cele două date)
+   sau '' când nu se poate spune sigur (o dată lipsește sau datele se contrazic). `acum`: AAAA-LL-ZZ (azi). La o dată parțială se ia limita favorabilă
+   („2026” ca finalizare înseamnă 31.12.2026), ca să nu se spună „încheiat” înainte de vreme. */
+function stareProiect(inceput, sfarsit, acum) {
+  const azi = String(acum || aziIso()).replace(/-/g, '');
+  if (inceput && sfarsit && inceputDupaSfarsit(inceput, sfarsit)) return '';
+  const i = limitaData(inceput, false), s = limitaData(sfarsit, true);
+  if (s && s < azi) return 'incheiat';
+  if (i && i > azi) return 'urmeaza';
+  return i && s ? 'in-curs' : '';
+}
+const STARI_PROIECT = { 'in-curs': ['în desfășurare', 'under way'], incheiat: ['termenul de finalizare a trecut', 'the completion date has passed'], urmeaza: ['urmează să înceapă', 'not started yet'] };
+function etichetaStare(k, en) { const x = STARI_PROIECT[k]; return x ? x[en ? 1 : 0] : ''; }
+
 /* ------------------------------------------------------------------ debursările */
 function idNou(pref) {
   return (pref || 'd') + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -1268,6 +1350,9 @@ return {
   dataRo: dataRo, esteDataIso: esteDataIso, aziIso: aziIso, dataOraRo: dataOraRo, ordRo: ordRo,
   donatoriiAcordului: donatoriiAcordului, curataNume: curataNume, stadiu: stadiu, etichetaStadiu: etichetaStadiu, etichetaTip: etichetaTip, numeDonator: numeDonator,
   deduCursuri: deduCursuri, pregateste: pregateste, descriere: descriere,
+  ETAPE_ACT: ETAPE_ACT, PARCURS_PESTE: PARCURS_PESTE, PARCURS_CAPETE: PARCURS_CAPETE,
+  etichetaEtapa: etichetaEtapa, etichetaTipAct: etichetaTipAct, parcursAcord: parcursAcord, etichetaPas: etichetaPas, parcursAfisat: parcursAfisat,
+  durataProiect: durataProiect, fmtDurata: fmtDurata, stareProiect: stareProiect, etichetaStare: etichetaStare,
   MAX_OBIECTIVE: MAX_OBIECTIVE, SURSE_PROIECT: SURSE_PROIECT,
   normalizeazaManual: normalizeazaManual, gasesteAcord: gasesteAcord, numeAfisat: numeAfisat,
   grupeazaProiecte: grupeazaProiecte, ordoneazaUnitati: ordoneazaUnitati, etichetaComponenta: etichetaComponenta, sumeComponente: sumeComponente, dateGrup: dateGrup,

@@ -10,8 +10,10 @@ Ce se verifică, pe scurt:
   · lista donatorilor, bifarea, tabelul cu cele șase coloane și butonul de detalii (proiectul, data efectivă de începere, data finalizării,
     tipul, suma proiectului, suma debursărilor) și cifrele lui, față de un calcul independent din date/acorduri_legare.json; descrierea (obiectivele) nu mai are coloană, apare sus în rândul deschis;
   · fără dubluri: fiecare act dintr-un singur rând, rândurile-umbrelă omise și enumerate cu motivul, denumiri deosebite la același donator;
-  · obiectivele și datele: din surse oficiale (cu citat și adresă), din AMP (arhiva și raportul live, doar legături sigure; cele probabile
+  · obiectivele și datele: din surse oficiale (cu adresa documentului; citatul și nota din fișier nu se scriu în pagină), din AMP (arhiva și raportul live, doar legături sigure; cele probabile
     doar ca indiciu), introduse în pagină (formularul „Date despre proiect”), cu prioritatea dintre ele; salvarea în date/debursari.json;
+  · fișa proiectului (rândul deschis): patru cartonașe (descriere, date esențiale, perioadă cu durată și situație, parcursul acordului cu pliere la 9+ acte), debursările pe toată
+    lățimea, formularele după deblocare; ordinea actelor, etapele și linkurile calculate independent; fără citate; română, engleză, 1360 / 1000 / 900 / 390 px;
   · fără cod: doar citire, fără formulare și fără bannere pe acorduri; o singură deblocare (bara fixă de sus) pentru toate acordurile; cod greșit, fără drept de scriere, fără rețea;
   · după deblocare: editare în tabel a datei de început, a datei finalizării și a sumei proiectului, plus debursările;
   · adăugare, editare, ștergere de debursări → ce ajunge, de fapt, în fișierul date/debursari.json (și în mesajul commit-ului);
@@ -434,6 +436,16 @@ def context(browser, viewport=(1360, 900)):
     return browser.new_context(viewport={'width': viewport[0], 'height': viewport[1]}, accept_downloads=True)
 
 
+ZI_INGHETATA = '2026-11-10T12:00:00'
+
+
+def context_zi(browser, viewport=(1360, 900), zi=ZI_INGHETATA):
+    """Un context cu data din pagină înghețată la `zi`: „în desfășurare” / „termenul a trecut” se calculează față de azi, iar testul nu trebuie să depindă de ziua în care rulează."""
+    c = context(browser, viewport)
+    c.clock.set_fixed_time(zi)
+    return c
+
+
 def bifeaza(pg, cheie):
     pg.check('.don input[data-d="%s"]' % cheie)
     pg.wait_for_selector('section.panel[data-d="%s"]' % cheie)
@@ -531,6 +543,82 @@ def descriere_rand(pg, r):
 def sursa_celulei(r, k):
     """Etichetele de sursă („sursă oficială”, „AMP”, „introdus de utilizator”) din celula k a unui rând."""
     return [x.strip() for x in r.locator('td').nth(k).locator('.src').all_inner_texts()]
+
+
+# ------------------------------------------------------------ fișa proiectului (secțiunea 21): calculul independent al parcursului și citirea cartonașelor
+ETAPE_ACT = [('neg', 'Inițierea negocierilor', 'Start of negotiations'), ('sem', 'Aprobarea semnării', 'Approval of signing'), ('plg', 'Proiectul de lege', 'Draft law'),
+             ('rat', 'Ratificare / aprobare', 'Ratification / approval'), ('prm', 'Promulgare', 'Promulgation'), ('vig', 'Punere în aplicare', 'Put into effect')]
+TIP_ACT_EN = {'Hotărâre': 'Decision', 'Decret': 'Decree', 'Lege': 'Law', 'Ordin': 'Order', 'Act': 'Act'}
+SURSE_SUMA_TXT = {'acord': ('din textul acordului', 'from the text of the agreement'), 'extern': ('sursă externă', 'external source'), 'titlu': ('din titlul actului', 'from the act title'),
+                  'text': ('din textul actului', 'from the act text'), 'guvern': ('din nota Guvernului', 'from the Government note')}
+
+
+def iso_ro(d):
+    """„15.03.2026” (ZZ.LL.AAAA, ca în registru) → „2026-03-15”; altceva → ''."""
+    m = re.match(r'^(\d{2})\.(\d{2})\.(\d{4})$', d or '')
+    return '%s-%s-%s' % (m.group(3), m.group(2), m.group(1)) if m else ''
+
+
+def parcurs_asteptat(a, en=False):
+    """Parcursul unui acord, calculat independent de pagină: lista [{'iso', 'data', 'act', 'tip', 'eticheta', 'url'}] cu actele în ordinea datelor (cele mai vechi întâi,
+    cele fără dată la urmă); la aceeași dată, ordinea firească a etapelor, apoi inversul ordinii din registru (acolo actele sunt scrise cu cele mai noi întâi).
+    Eticheta = etapele actului în ordinea lor firească, legate cu „ + ” (sau, fără nicio etapă cunoscută, tipul actului)."""
+    rang = {c: i for i, (c, _, _) in enumerate(ETAPE_ACT)}
+    nume = {c: (e if en else r) for c, r, e in ETAPE_ACT}
+    pasi = []
+    for i, x in enumerate(a['acte']):
+        et = sorted([e for e in (x.get('etape') or []) if e in rang], key=rang.get)
+        iso = iso_ro(x.get('data'))
+        tip = TIP_ACT_EN.get(x['tip'], x['tip']) if en else x['tip']
+        pasi.append(((iso == '', iso, rang[et[0]] if et else len(ETAPE_ACT), -i),
+                     {'iso': iso, 'data': x.get('data') or '', 'act': x['act'], 'tip': tip, 'url': x.get('url') or '', 'eticheta': ' + '.join(nume[e] for e in et) if et else tip}))
+    return [p[1] for p in sorted(pasi, key=lambda p: p[0])]
+
+
+def n_acte_txt(n, en=False):
+    """Cum numără pagina actele: „un act”, „9 acte”, „20 de acte”; engleză: „1 act”, „9 acts”."""
+    if en:
+        return '%d %s' % (n, 'act' if n == 1 else 'acts')
+    return 'un act' if n == 1 else '%d %s' % (n, 'de acte' if n >= 20 else 'acte')
+
+
+def legenda_parcurs(a, en=False):
+    """Legenda din titlul cartonașului „Parcursul acordului”: numărul de acte și intervalul anilor (sau data, la un singur act)."""
+    p = parcurs_asteptat(a, en)
+    cap = n_acte_txt(len(p), en)
+    datate = [x for x in p if x['iso']]
+    if datate:
+        cap += ' · ' + (datate[0]['data'] if len(p) == 1 else datate[0]['iso'][:4] + ('–' + datate[-1]['iso'][:4] if datate[-1]['iso'][:4] != datate[0]['iso'][:4] else ''))
+    return cap
+
+
+def fold_ro(s):
+    """Fără diacritice, cu litere mici (ca fold din pagină)."""
+    return ''.join(c for c in unicodedata.normalize('NFD', s or '') if not unicodedata.combining(c)).lower()
+
+
+def act_unic(a):
+    """Un act al acordului care nu apare la niciun alt rând (intrările din fișierul de surse se leagă de rând prin act)."""
+    return next((x['act'] for x in a['acte'] if sum(1 for y in ACORDURI if any(z['act'] == x['act'] for z in y['acte'])) == 1), None)
+
+
+JS_PASI = r"""l => l.map(li => { const q = s => li.querySelector(s), t = q('.pas-d time'), e = q('.pas-t'), a = q('.pas-a a');
+  return { iso: t ? t.getAttribute('datetime') : '', data: q('.pas-d').innerText.trim(), eticheta: e ? e.innerText.trim() : '', act: q('.pas-a').innerText.replace(/ /g, ' ').trim(),
+           href: a ? a.getAttribute('href') : null, titlu: a ? a.getAttribute('title') : null }; })"""
+JS_FAPTE = r"""d => { const o = {}; let k = null; for (const e of d.children) { if (e.tagName === 'DT') k = e.innerText.trim(); else if (k !== null) { o[k] = e.innerText.replace(/ /g, ' ').trim(); k = null; } } return o; }"""
+JS_CARTONASE = r"""(sel) => { const c = document.querySelector(sel + ' .fisa-cols'), r = c.getBoundingClientRect(), sy = window.scrollY, j = document.querySelector(sel + ' .fisa-jos');
+  return { coloane: getComputedStyle(c).columnCount, stanga: r.left, dreapta: r.right, sub: j.getBoundingClientRect().top + sy,
+           carduri: [...c.children].map(s => { const b = s.getBoundingClientRect(); return { clasa: s.className.replace('fs ', ''), s: b.left, d: b.right, sus: b.top + sy, jos: b.bottom + sy }; }) }; }"""
+
+
+def pasi_pagina(det):
+    """Pașii parcursului afișați în fișă (fără rândul „Arată încă …”): [{'iso', 'data', 'eticheta', 'act', 'href', 'titlu'}]."""
+    return det.locator('.cale li.pas:not(.pas-mai)').evaluate_all(JS_PASI)
+
+
+def fapte(card):
+    """Perechile etichetă → text dintr-o listă „fapte” (dt/dd) a unui cartonaș, ca dicționar."""
+    return card.locator('dl.fapte').evaluate(JS_FAPTE)
 
 
 def toate_foile(cale):
@@ -741,7 +829,7 @@ try:
             verifica('blocat, al doilea acord deschis: la fel, fără formulare și fără banner', det1.locator('form').count() == 0 and pg.locator('#sRez form').count() == 0 and pg.locator('#sRez [data-act="unlock"]').count() == 0)
             egal('blocat: un singur buton de deblocare în toată pagina, în bara de acces', [pg.locator('[data-act="unlock"]').count(), pg.locator('#sAcces [data-act="unlock"]').count()], [1, 1])
             verifica('blocat: fără creioane de editare și fără butonul „Debursare” în tabel', pg.locator('#sRez .edt').count() == 0 and pg.locator('#sRez [data-act="adauga"]').count() == 0)
-            verifica('blocat: detaliile se văd în continuare (datele proiectului, datele despre acord), doar în citire', det.locator('.det-proiect .dlp').count() == 1 and det.locator('.det-info').count() == 1 and det.locator('.det-grid.solo').count() == 1)
+            verifica('blocat: detaliile se văd în continuare (datele proiectului, datele despre acord), doar în citire', det.locator('.det-proiect .dlp').count() == 1 and det.locator('.det-info').count() == 1 and det.locator('.fisa-jos.solo').count() == 1)
             egal('blocat: bara de acces spune „Doar citire”', pg.locator('#sAcces b').inner_text(), 'Doar citire')
             verifica('blocat: bara spune că un singur cod deblochează totul (început, finalizare, sumă, debursări)', all(x in pg.locator('#sAcces .acces-txt').inner_text() for x in ('Un singur cod', 'toate acordurile', 'data de început', 'data finalizării', 'suma proiectului', 'debursările')), pg.locator('#sAcces .acces-txt').inner_text())
             egal('bara de acces e „fixă” (position: sticky)', pg.evaluate('getComputedStyle(document.querySelector("#sAcces")).position'), 'sticky')
@@ -1167,7 +1255,7 @@ try:
 
         # ---------------------------------------------------------------- 13. obiective și date din surse oficiale
         if rulez(13):
-            print('\n13. Obiective și date din surse oficiale (adresă și citat exact)')
+            print('\n13. Obiective și date din surse oficiale (adresa documentului; citatul și nota nu se afișează)')
             fals = GitHubFals(intrari=[])
             ctx = context(b)
             pg = pagina(ctx, fals, hash_='#d=BERD', manual=OF, arhiva=False)
@@ -1190,11 +1278,16 @@ try:
             verifica('intrările din fișier care nu s-au folosit (citat prea scurt, act negăsit) sunt anunțate', om.count() == 1 and '2 intrări' in om.locator('summary').inner_text(), om.count())
             om.locator('summary').click()
             verifica('lista celor nefolosite spune de ce', 'lipsește sursa' in om.inner_text() and 'HG0000/1900' in om.inner_text(), om.inner_text()[:300])
-            # detaliile: citatul exact și documentul
+            # detaliile: citatul și nota din fișierul de surse NU se mai scriu în pagină; sursa e doar o etichetă mică, cu link spre document, iar nota și gazda stau în indiciul ei
             det = deschide_rand(pg, 'BERD', pA)
-            dlp = det.locator('.det-proiect .dlp').inner_text()
-            verifica('detalii: citatul exact din sursă, adresa documentului (gazda) și nota', CITAT_A in dlp and 'documents.example.org' in dlp and 'data efectivă a semnării contractului de lucrări' in dlp, dlp[:400])
-            verifica('detalii: linkul spre document are adresa completă', det.locator('.det-proiect .citat a').first.get_attribute('href') == SURSA_A)
+            tot = det.inner_text().replace('\xa0', ' ')
+            verifica('detalii: citatul din sursă nu apare în pagină', CITAT_A not in tot and det.locator('.citat, .notap').count() == 0, tot[:400])
+            verifica('detalii: nici nota, nici adresa documentului nu sunt scrise în pagină (sunt doar în indiciul etichetei)', 'documents.example.org' not in tot and 'data efectivă a semnării contractului de lucrări' not in tot, tot[:400])
+            chip = det.locator('.det-desc a.src.s-oficial').first
+            verifica('detalii: eticheta „sursă oficială” a descrierii are în indiciu gazda documentului și nota din fișier', 'documents.example.org' in (chip.get_attribute('title') or '') and 'data efectivă a semnării contractului de lucrări' in (chip.get_attribute('title') or ''), chip.get_attribute('title'))
+            egal('detalii: etichetele de sursă din fișă (descriere, început, finalizare) duc toate la documentul oficial, cu adresa completă',
+                 det.locator('a.src.s-oficial').evaluate_all('l => l.map(a => a.getAttribute("href"))'), [SURSA_A] * 3)
+            egal('detalii: perioada arată începutul și finalizarea din sursă (datele întregi și cele parțiale, cum le spune sursa)', [x.strip() for x in det.locator('.det-proiect .dlp .dp-v').all_inner_texts()], ['14.05.2019', '12.2027'])
             # căutarea merge și în obiective (română și engleză)
             pg.fill('#q', 'siguranței rutiere')
             pg.wait_for_timeout(300)
@@ -2264,6 +2357,287 @@ try:
             verifica('telefon: după bloc, următorul cartonaș are loc deasupra (nu se lipește de bloc)', bl['urmator'] is not None and bl['urmator']['mt'] == '22px', bl['urmator'])
             lat = pg.evaluate('document.documentElement.scrollWidth - document.documentElement.clientWidth')
             verifica('telefon: pagina nu se lărgește cu blocul deschis', lat <= 0, lat)
+            ctx.close()
+
+        # ---------------------------------------------------------------- 21. fișa proiectului
+        if rulez(21):
+            print('\n21. Fișa proiectului: descriere, date esențiale, perioadă și parcursul acordului (fără citate din surse)')
+            SIMPLE = [a for a in BERD if a['id'] not in in_proiecte_unite(BERD)]
+
+            def alege(nume, pred, cheie=lambda a: 0):
+                c = sorted([a for a in SIMPLE if act_unic(a) and pred(a)], key=cheie)
+                verifica('date de probă: un acord BERD (rând simplu) %s' % nume, len(c) >= 1)
+                return c[0]
+            a_opt = alege('cu opt acte (parcursul se vede întreg), de preferat cu suma într-o altă valută decât euro', lambda a: len(a['acte']) == 8 and a.get('suma'), lambda a: a['suma']['val'] == 'EUR')
+            a_noua = alege('cu cel puțin nouă acte (parcursul se pliază); cel mai scurt, deci exact nouă când există', lambda a: len(a['acte']) >= 9 and a.get('suma'), lambda a: len(a['acte']))
+            a_mare = alege('cu cel puțin 15 acte și cu „alte sume” în acte', lambda a: len(a['acte']) >= 15 and a.get('alte') and a.get('suma'), lambda a: -len(a['acte']))
+            a_unul = alege('cu un singur act și cu sumă', lambda a: len(a['acte']) == 1 and a.get('suma'))
+            a_fara = alege('fără sumă', lambda a: not a.get('suma'))
+            TOATE = [a_noua, a_opt, a_mare, a_unul, a_fara]
+            SURSA_N, SURSA_O, SURSA_M = 'https://documents.example.org/proiect-nou.pdf', 'https://documents.example.org/proiect-opt.html', 'https://documents.example.org/proiect-mare.html'
+            OBI_N = {'ro': 'Reabilitarea și modernizarea drumurilor naționale, pentru un transport mai sigur și mai rapid.', 'en': 'Rehabilitation and modernisation of national roads, for safer and faster transport.'}
+            OBI_O = {'ro': 'Construirea unei centrale termice moderne, cu consum redus de combustibil.', 'en': 'Building a modern heating plant with low fuel consumption.'}
+            CITATE = ['The Project aims to rehabilitate and modernise national roads for safer transport.', 'The loan finances a modern heating plant with low fuel consumption.',
+                      'The works are expected to start in January 2090 and to be completed in 2092.', 'The dates in this document contradict each other, on purpose (a test).']
+            NOTA_N = 'datele sunt cele din raportul de evaluare al proiectului'
+            OF21 = {'omise': MANUAL_REAL['omise'], 'proiecte': [
+                {'acte': [act_unic(a_noua)], 'obiective': OBI_N, 'inceput': '2023-12-05', 'sfarsit': '2028-06', 'sursa': SURSA_N, 'citat': CITATE[0], 'nota': NOTA_N},
+                {'acte': [act_unic(a_opt)], 'obiective': OBI_O, 'inceput': '2012-09-01', 'sfarsit': '2016-03-31', 'sursa': SURSA_O, 'citat': CITATE[1]},
+                {'acte': [act_unic(a_mare)], 'inceput': '2090-01-15', 'sfarsit': '2092', 'sursa': SURSA_M, 'citat': CITATE[2]},
+                {'acte': [act_unic(a_unul)], 'sfarsit': '2029-01-31', 'sursa': SURSA_M, 'citat': CITATE[3]}]}
+            # începutul scris de un om (în date/debursari.json) cade după finalizarea din sursa oficială: două surse care se contrazic (o intrare oficială cu începutul după finalizare se respinge singură)
+            PCONTRA = {'id': 'pcontra21', 'acord': a_unul['id'], 'acte': [x['act'] for x in a_unul['acte']], 'nume': 'Proiect de probă', 'inceput': '2030', 'nota': 'introdus în test', 'la': '2026-10-01T08:00:00.000Z'}
+            PB = 'section.panel[data-d="BERD"]'
+
+            def sel_det(a):
+                return PB + ' tr.det[data-k="BERD|%s"]' % a['id']
+
+            def suma_txt(v, val):
+                return fmt_bani_ro(v) + ' ' + val
+
+            def sursa_txt(sursa, act, en=False):
+                s = SURSE_SUMA_TXT.get(sursa)
+                return ' '.join(x for x in ((s[1 if en else 0] if s else ''), ('(%s)' % act if act else '')) if x)
+
+            def etichete_fapte(a, en=False):
+                e = [('Donors' if en else 'Donatori') if len(donatori_acord(a)) > 1 else ('Donor' if en else 'Donator')]
+                if a.get('parteneri') and donatori_acord({'parteneri': a['parteneri']}) != donatori_acord(a):
+                    e.append('Partners in the register' if en else 'Parteneri în registru')
+                e.append('Agreement amount' if en else 'Suma acordului')
+                if a.get('cost'):
+                    e.append('Total project cost' if en else 'Costul total al proiectului')
+                if a.get('alte'):
+                    e.append('Other amounts in the acts' if en else 'Alte sume în acte')
+                if a.get('suma'):
+                    e.append('Counted in totals' if en else 'Intră în totaluri')
+                return e
+
+            def pasi_asteptati(a, en=False, toate=False):
+                p = parcurs_asteptat(a, en)
+                v = p if (toate or len(p) <= 8) else p[:3] + p[-3:]
+                return [{'iso': x['iso'], 'data': x['data'], 'eticheta': x['eticheta'], 'act': ((x['tip'] + ' · ') if x['tip'] else '') + x['act'], 'href': x['url'] or None} for x in v]
+
+            def pasi_vazuti(det):
+                return [{k: x[k] for k in ('iso', 'data', 'eticheta', 'act', 'href')} for x in pasi_pagina(det)]
+
+            def forma_parcurs(det):
+                return det.locator('.cale > li').evaluate_all('l => l.map(li => li.classList.contains("pas-mai") ? "mai" : "pas")')
+
+            # ---------------------------------------------------------------- 21.1 fără cod, ecran lat, română
+            print('   · fără cod, ecran lat, română')
+            fals = GitHubFals(intrari=[], proiecte=[PCONTRA])
+            ctx = context_zi(b)
+            pg = pagina(ctx, fals, hash_='#d=BERD', manual=OF21, arhiva=False)
+            det = deschide_rand(pg, 'BERD', a_noua)
+            egal('fișa: patru cartonașe, în ordinea descriere → date esențiale → perioadă → parcursul acordului',
+                 det.locator('.fisa-cols > section.fs').evaluate_all('l => l.map(s => s.className.replace("fs ", ""))'), ['det-desc', 'det-info', 'det-proiect', 'fs-cale'])
+            egal('fișa: titlurile cartonașelor', det.locator('.fisa-cols > section.fs > h3 > .fs-t').all_text_contents(), ['Descrierea proiectului', 'Date esențiale', 'Perioada de implementare', 'Parcursul acordului'])
+            egal('fișa, fără cod: sub cartonașe doar debursările, pe toată lățimea, fără niciun formular', [det.locator('.fisa-jos.solo > section.fs-deb').count(), det.locator('form').count(), det.locator('.fisa-jos.solo').count()], [1, 0, 1])
+            tot = det.inner_text().replace('\xa0', ' ')
+            verifica('fără citate din surse: nici citatul, nici nota, nici adresa documentului nu sunt scrise în fișă', CITATE[0] not in tot and NOTA_N not in tot and 'documents.example.org' not in tot and det.locator('.citat, .notap').count() == 0, tot[:300])
+            # descrierea
+            egal('descrierea: obiectivele proiectului, cu legenda „obiective”', [det.locator('.det-desc .dd-t').inner_text().strip(), det.locator('.det-desc > h3 > .fs-s').text_content()], [OBI_N['ro'], 'obiective'])
+            egal('descrierea: sursa e o etichetă mică „sursă oficială”, cu link spre document și, în indiciu, gazda și nota din fișier',
+                 [det.locator('.det-desc a.src.s-oficial').inner_text().strip(), det.locator('.det-desc a.src.s-oficial').get_attribute('href'), 'documents.example.org' in det.locator('.det-desc a.src.s-oficial').get_attribute('title') and NOTA_N in det.locator('.det-desc a.src.s-oficial').get_attribute('title')],
+                 ['sursă oficială', SURSA_N, True])
+            # date esențiale
+            f = fapte(det.locator('.det-info'))
+            egal('date esențiale: rândurile (donator, suma acordului, intră în totaluri) în această ordine', list(f), etichete_fapte(a_noua))
+            verifica('date esențiale: donatorul cu denumirea întreagă sub acronim', 'BERD' in f['Donator'] and 'Banca Europeană pentru Reconstrucție și Dezvoltare' in f['Donator'], f['Donator'])
+            sn = a_noua['suma']
+            verifica('date esențiale: suma acordului, cu sursa ei (%s)' % sursa_txt(sn.get('sursa'), sn.get('act')), suma_txt(sn['v'], sn['val']) in f['Suma acordului'] and sursa_txt(sn.get('sursa'), sn.get('act')) in f['Suma acordului'], f['Suma acordului'])
+            egal('date esențiale: „Intră în totaluri”', f['Intră în totaluri'], 'da' if a_noua['inTotal'] == 'numarat' else f['Intră în totaluri'])
+            # perioada
+            egal('perioada: datele, cum le spune sursa (întreagă și doar luna și anul)', [x.strip() for x in det.locator('.det-proiect .dp-v').all_inner_texts()], ['05.12.2023', '06.2028'])
+            egal('perioada: ambele date au eticheta „sursă oficială”, cu link spre același document', det.locator('.det-proiect a.src.s-oficial').evaluate_all('l => l.map(a => [a.textContent.trim(), a.getAttribute("href")])'), [['sursă oficială', SURSA_N]] * 2)
+            fp = fapte(det.locator('.det-proiect'))
+            egal('perioada: durata (cu ≈, fiindcă finalizarea e doar luna) și situația față de data de azi (10.11.2026)', [fp.get('Durată'), fp.get('Situația')], ['≈ 4 ani și 6 luni', 'în desfășurare'])
+            egal('perioada: situația „în desfășurare” are clasa ei (verde)', det.locator('.det-proiect .sit').get_attribute('class'), 'sit in-curs')
+            # parcursul
+            pn = parcurs_asteptat(a_noua)
+            egal('parcurs: legenda (numărul de acte și anii)', det.locator('.fs-cale > h3 > .fs-s').text_content(), legenda_parcurs(a_noua))
+            egal('parcurs (%d acte): pliat — primele trei, „Arată încă …” și ultimele trei' % len(pn), forma_parcurs(det), ['pas'] * 3 + ['mai'] + ['pas'] * 3)
+            egal('parcurs pliat: actele afișate, în ordinea datelor, cu etapa, tipul, numărul și linkul fiecăruia', pasi_vazuti(det), pasi_asteptati(a_noua))
+            btn = det.locator('.cale .pas-mai button')
+            egal('parcurs pliat: butonul spune câte acte sunt ascunse', [btn.inner_text().strip(), btn.get_attribute('aria-expanded')], ['Arată încă ' + n_acte_txt(len(pn) - 6), 'false'])
+            pas1 = pasi_pagina(det)[0]
+            primul_url = pn[0]['url']
+            egal('parcurs: linkul unui act duce la documentul lui, cu gazda în indiciu', [pas1['href'], pas1['titlu']], [primul_url, 'Deschide actul pe ' + re.sub(r'^www\.', '', primul_url.split('/')[2])])
+            btn.click()
+            egal('parcurs desfășurat: toate actele (%d), în aceeași ordine' % len(pn), pasi_vazuti(det), pasi_asteptati(a_noua, toate=True))
+            egal('parcurs desfășurat: rândul „Arată încă …” a dispărut, iar „Restrânge lista actelor” are focusul', [forma_parcurs(det).count('mai'), pg.evaluate('document.activeElement.getAttribute("data-act") + "|" + document.activeElement.getAttribute("aria-expanded")'),
+                                                                                                          pg.evaluate('document.activeElement.textContent.trim()')], [0, 'cale-comuta|true', 'Restrânge lista actelor'])
+            pg.keyboard.press('Enter')
+            egal('parcurs: Enter pe „Restrânge lista actelor” îl pliază la loc, cu focusul pe butonul „Arată încă …”', [forma_parcurs(det), pg.evaluate('document.activeElement.getAttribute("data-act") + "|" + document.activeElement.getAttribute("aria-expanded")')],
+                 [['pas'] * 3 + ['mai'] + ['pas'] * 3, 'cale-comuta|false'])
+            # forma cartonașelor pe ecran lat
+            lay = pg.evaluate(JS_CARTONASE, sel_det(a_noua))
+            cd = lay['carduri']
+            egal('1360 px: cartonașele curg în două coloane', [lay['coloane'], len({round(c['s']) for c in cd})], ['2', 2])
+            verifica('1360 px: niciun cartonaș nu iese din fișă', all(c['s'] >= lay['stanga'] - 1 and c['d'] <= lay['dreapta'] + 1 for c in cd), (lay['stanga'], lay['dreapta'], [(c['s'], c['d']) for c in cd]))
+            suprapuse = [(x['clasa'], y['clasa']) for i, x in enumerate(cd) for y in cd[i + 1:] if x['s'] < y['d'] - 1 and y['s'] < x['d'] - 1 and x['sus'] < y['jos'] - 1 and y['sus'] < x['jos'] - 1]
+            verifica('1360 px: cartonașele nu se suprapun', suprapuse == [], suprapuse)
+            verifica('1360 px: între cartonașe și cartonașul debursărilor e același spațiu ca între cartonașe (14 px), nu 0', abs(lay['sub'] - max(c['jos'] for c in cd) - 14) <= 1, (lay['sub'], max(c['jos'] for c in cd)))
+            verifica('1360 px: pagina nu are derulare orizontală cu fișa deschisă', pg.evaluate('document.documentElement.scrollWidth <= window.innerWidth'))
+            # titlul întreg al acordului, doar când diferă de denumirea din tabel; același conținut la toate cazurile de probă
+            for a in TOATE:
+                d_ = deschide_rand(pg, 'BERD', a)
+                nume_c = re.sub(r'\s+', ' ', a['nume']).strip()
+                diferit = fold_ro(nume_c) != fold_ro(curata_nume(a.get('scurt') or a['nume']))
+                t_ = d_.locator('.fs-titlu')
+                verifica('titlul acordului (%s): se scrie în descriere doar când diferă de denumirea din tabel' % a['id'], t_.count() == (1 if diferit else 0) and (not diferit or nume_c in t_.text_content()), (diferit, t_.count()))
+            # alte cazuri: opt acte (întreg), multe acte, un act, contradicție, fără sumă
+            print('   · opt acte, multe acte, un singur act, date contradictorii, fără sumă')
+            det = deschide_rand(pg, 'BERD', a_opt)
+            egal('opt acte: parcursul se vede întreg, fără „Arată încă …” și fără buton', [forma_parcurs(det), det.locator('.cale button').count(), pasi_vazuti(det)], [['pas'] * 8, 0, pasi_asteptati(a_opt)])
+            egal('opt acte: legenda', det.locator('.fs-cale > h3 > .fs-s').text_content(), legenda_parcurs(a_opt))
+            f = fapte(det.locator('.det-info'))
+            so = a_opt['suma']
+            ok_suma = suma_txt(so['v'], so['val']) in f['Suma acordului'] and sursa_txt(so.get('sursa'), so.get('act')) in f['Suma acordului']
+            if so['val'] != 'EUR':
+                ok_suma = ok_suma and ('≈ ' + fmt_ro(rotunjit(eur(a_opt)), 0) + ' EUR') in f['Suma acordului']
+            verifica('opt acte: suma acordului în valuta ei (%s), cu echivalentul în euro când nu e euro, și cu sursa' % so['val'], ok_suma, f['Suma acordului'])
+            egal('opt acte: perioada (31.03.2016 a trecut): datele, durata fără ≈ (ambele date întregi) și situația', [[x.strip() for x in det.locator('.det-proiect .dp-v').all_inner_texts()], fapte(det.locator('.det-proiect')).get('Durată'), fapte(det.locator('.det-proiect')).get('Situația')],
+                 [['01.09.2012', '31.03.2016'], '3 ani și 6 luni', 'termenul de finalizare a trecut'])
+            egal('opt acte: „termenul de finalizare a trecut” are clasa ei (galbenă)', det.locator('.det-proiect .sit').get_attribute('class'), 'sit incheiat')
+            det = deschide_rand(pg, 'BERD', a_mare)
+            nm = len(parcurs_asteptat(a_mare))
+            egal('multe acte (%d): pliat, cu numărul celor ascunse' % nm, [forma_parcurs(det), det.locator('.cale .pas-mai button').inner_text().strip(), pasi_vazuti(det)],
+                 [['pas'] * 3 + ['mai'] + ['pas'] * 3, 'Arată încă ' + n_acte_txt(nm - 6), pasi_asteptati(a_mare)])
+            egal('multe acte: legenda', det.locator('.fs-cale > h3 > .fs-s').text_content(), legenda_parcurs(a_mare))
+            f = fapte(det.locator('.det-info'))
+            egal('multe acte: rândurile din date esențiale (cu „Alte sume în acte”)', list(f), etichete_fapte(a_mare))
+            verifica('multe acte: „Alte sume în acte” — fiecare sumă cu sursa ei', all(suma_txt(x['v'], x['val']) in f['Alte sume în acte'] and sursa_txt(x.get('sursa'), x.get('act')) in f['Alte sume în acte'] for x in a_mare['alte']), f['Alte sume în acte'])
+            egal('fără obiective (doar date oficiale): descrierea spune „Obiective neintroduse”, fără etichetă de sursă', [det.locator('.det-desc .dd-t.gol').inner_text().strip(), det.locator('.det-desc a.src').count()], ['Obiective neintroduse', 0])
+            egal('perioada viitoare: datele, durata (doar anii, deci ≈) și „urmează să înceapă”', [[x.strip() for x in det.locator('.det-proiect .dp-v').all_inner_texts()], fapte(det.locator('.det-proiect')).get('Durată'), fapte(det.locator('.det-proiect')).get('Situația')],
+                 [['15.01.2090', '2092'], '≈ 2 ani', 'urmează să înceapă'])
+            egal('„urmează să înceapă” are clasa ei (albastră)', det.locator('.det-proiect .sit').get_attribute('class'), 'sit urmeaza')
+            det = deschide_rand(pg, 'BERD', a_unul)
+            egal('un singur act: parcursul are un pas, fără buton; legenda spune „un act” și data lui', [forma_parcurs(det), det.locator('.cale button').count(), det.locator('.fs-cale > h3 > .fs-s').text_content(), pasi_vazuti(det)],
+                 [['pas'], 0, legenda_parcurs(a_unul), pasi_asteptati(a_unul)])
+            egal('un singur act: legenda începe cu „un act · ”', det.locator('.fs-cale > h3 > .fs-s').text_content().startswith('un act · '), True)
+            fp = fapte(det.locator('.det-proiect'))
+            verifica('date contradictorii (început după finalizare, din surse diferite): avertisment, fără durată și fără situație', 'Începutul e după finalizare' in det.locator('.det-proiect .rau').inner_text() and 'Durată' not in fp and 'Situația' not in fp, fp)
+            egal('date contradictorii: se afișează totuși ambele date, fiecare cu sursa ei (început: utilizator, finalizare: sursă oficială)', [[x.strip() for x in det.locator('.det-proiect .dp-v').all_inner_texts()], [x.strip() for x in det.locator('.det-proiect .psrc .src').all_inner_texts()]],
+                 [['2030', '31.01.2029'], ['introdus de utilizator', 'sursă oficială']])
+            det = deschide_rand(pg, 'BERD', a_fara)
+            f = fapte(det.locator('.det-info'))
+            egal('fără sumă: „Suma acordului” e necunoscută și nu intră în totaluri; fără rândul „Intră în totaluri”', [f['Suma acordului'].replace('\n', ' | '), 'Intră în totaluri' in f], ['necunoscută | nu intră în totaluri', False])
+            fp = fapte(det.locator('.det-proiect'))
+            egal('fără surse: datele proiectului sunt „necunoscută”, fără durată și fără situație', [fp.get('Data efectivă de începere'), fp.get('Data finalizării'), 'Durată' in fp, 'Situația' in fp], ['necunoscută', 'necunoscută', False, False])
+            for a in TOATE:                                                     # niciun citat din fișierul de surse nu apare nicăieri în fișe
+                t_ = deschide_rand(pg, 'BERD', a).inner_text()
+                verifica('fără citate: fișa acordului %s nu conține niciun citat din fișierul de surse' % a['id'], not any(c in t_ for c in CITATE), t_[:200])
+
+            # ---------------------------------------------------------------- 21.2 cu cod: cartonașe + debursări + formulare; starea parcursului se păstrează
+            print('   · după deblocare: debursări pe toată lățimea, formularele unul lângă altul, parcursul rămâne desfășurat')
+            fals.scrie([intrare(a_noua, 1500000, 'EUR', '2024-03-15', 'prima tranșă', id_='dtest21a'), intrare(a_noua, 800000, 'EUR', '2025-02-10', 'a doua tranșă', id_='dtest21b')])
+            ctx.close()
+            ctx = context_zi(b)
+            pg = pagina(ctx, fals, hash_='#d=BERD', manual=OF21, arhiva=False)
+            det = deschide_rand(pg, 'BERD', a_noua)
+            det.locator('.cale .pas-mai button').click()
+            egal('înainte de deblocare: parcursul e desfășurat (toate actele)', len(pasi_vazuti(det)), len(pn))
+            debloca(pg)
+            verifica('deblocat', deblocat(pg))
+            det = deschide_rand(pg, 'BERD', a_noua)
+            egal('după deblocare (rândul se reface): parcursul a rămas desfășurat', [len(pasi_vazuti(det)), forma_parcurs(det).count('mai'), det.locator('.cale-rest').count()], [len(pn), 0, 1])
+            egal('după deblocare: sub cartonașe stau debursările și cele două formulare (nu mai e „solo”)', [det.locator('.fisa-jos.solo').count(), det.locator('.fisa-jos > section').evaluate_all('l => l.map(s => s.className.replace("fs ", ""))')], [0, ['fs-deb', 'fs-ed', 'fs-ed']])
+            egal('după deblocare: formularul de debursare și cel de date despre proiect', [det.locator('.fs-ed form.deb-form').count(), det.locator('.fs-ed form.proj-form').count()], [1, 1])
+            geo = det.evaluate("""d => { const j = d.querySelector('.fisa-jos').getBoundingClientRect(), s = d.querySelector('.fs-deb').getBoundingClientRect(), t = d.querySelector('table.deb-ent').getBoundingClientRect(),
+                                         e = [...d.querySelectorAll('.fs-ed')].map(x => x.getBoundingClientRect()), tb = d.querySelector('table.deb-ent');
+                                       return { j: [j.left, j.right], deb: [s.left, s.right], tabel: [t.left, t.right], ed: e.map(x => [x.left, x.top, x.right]), preaLat: tb.scrollWidth > tb.clientWidth + 1 }; }""")
+            verifica('1360 px: tabelul debursărilor ocupă toată lățimea fișei (nu e strivit într-o jumătate)', abs(geo['deb'][0] - geo['j'][0]) <= 1 and abs(geo['deb'][1] - geo['j'][1]) <= 1 and geo['tabel'][1] - geo['tabel'][0] >= (geo['j'][1] - geo['j'][0]) * 0.9 and not geo['preaLat'], geo)
+            verifica('1360 px: cele două formulare stau unul lângă altul, la aceeași înălțime', len(geo['ed']) == 2 and abs(geo['ed'][0][1] - geo['ed'][1][1]) <= 2 and geo['ed'][0][2] <= geo['ed'][1][0] + 1, geo['ed'])
+            egal('debursările introduse se văd în tabelul din fișă (2 rânduri + total)', det.locator('table.deb-ent tbody tr').count(), 2)
+            verifica('după deblocare nici citatele, nici adresa documentului nu apar în fișă', CITATE[0] not in det.inner_text() and 'documents.example.org' not in det.inner_text())
+            ctx.close()
+
+            # ---------------------------------------------------------------- 21.3 engleză
+            print('   · engleză')
+            ctx = context_zi(b)
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BERD', lang='en', manual=OF21, arhiva=False)
+            det = deschide_rand(pg, 'BERD', a_noua)
+            egal('engleză: titlurile cartonașelor', det.locator('.fisa-cols > section.fs > h3 > .fs-t').all_text_contents(), ['Project description', 'Key facts', 'Implementation period', 'Path of the agreement'])
+            egal('engleză: descrierea în engleză, cu eticheta „official source”', [det.locator('.det-desc .dd-t').inner_text().strip(), det.locator('.det-desc a.src').inner_text().strip(), det.locator('.det-desc > h3 > .fs-s').text_content()], [OBI_N['en'], 'official source', 'objectives'])
+            f = fapte(det.locator('.det-info'))
+            egal('engleză: rândurile din date esențiale și denumirea întreagă a donatorului', [list(f), 'European Bank for Reconstruction and Development' in f['Donor']], [etichete_fapte(a_noua, True), True])
+            sn = a_noua['suma']
+            verifica('engleză: suma cu sursa ei (în engleză) și cu cifrele scrise englezește', ('{:,}'.format(int(sn['v'])) + ' ' + sn['val']) in f['Agreement amount'] and sursa_txt(sn.get('sursa'), sn.get('act'), True) in f['Agreement amount'], f['Agreement amount'])
+            fp = fapte(det.locator('.det-proiect'))
+            egal('engleză: durata și situația', [fp.get('Duration'), fp.get('Status')], ['≈ 4 years and 6 months', 'under way'])
+            egal('engleză: legenda parcursului și pașii (etape și tipuri de act în engleză)', [det.locator('.fs-cale > h3 > .fs-s').text_content(), pasi_vazuti(det)], [legenda_parcurs(a_noua, True), pasi_asteptati(a_noua, True)])
+            egal('engleză: butonul din parcurs', det.locator('.cale .pas-mai button').inner_text().strip(), 'Show %d more acts' % (len(pn) - 6))
+            det.locator('.cale .pas-mai button').click()
+            egal('engleză: după desfășurare, butonul de restrângere', det.locator('.cale-rest').inner_text().strip(), 'Collapse the list of acts')
+            det = deschide_rand(pg, 'BERD', a_opt)
+            egal('engleză: „the completion date has passed”', fapte(det.locator('.det-proiect')).get('Status'), 'the completion date has passed')
+            det = deschide_rand(pg, 'BERD', a_mare)
+            egal('engleză: „not started yet” și durata fără luni („≈ 2 years”)', [fapte(det.locator('.det-proiect')).get('Status'), fapte(det.locator('.det-proiect')).get('Duration')], ['not started yet', '≈ 2 years'])
+            det = deschide_rand(pg, 'BERD', a_fara)
+            egal('engleză: obiective lipsă și sumă necunoscută', [det.locator('.det-desc .dd-t.gol').inner_text().strip(), fapte(det.locator('.det-info'))['Agreement amount'].replace('\n', ' | ')], ['Objectives not entered', 'unknown | not counted in the totals'])
+            ctx.close()
+
+            # ---------------------------------------------------------------- 21.4 telefon și lățimi intermediare
+            print('   · telefon (390 px) și lățimile 1000, 901, 900')
+            ctx = context_zi(b, viewport=(390, 800))
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BERD', manual=OF21, arhiva=False)
+            det = deschide_rand(pg, 'BERD', a_noua)
+            lay = pg.evaluate(JS_CARTONASE, sel_det(a_noua))
+            cd = lay['carduri']
+            egal('telefon: cartonașele într-o singură coloană, în ordinea descriere → date esențiale → perioadă → parcurs', [lay['coloane'], [c['clasa'] for c in sorted(cd, key=lambda c: c['sus'])]], ['1', ['det-desc', 'det-info', 'det-proiect', 'fs-cale']])
+            verifica('telefon: cartonașele au aceeași lățime și stau unul sub altul, fără suprapuneri', len({round(c['s']) for c in cd}) == 1 and len({round(c['d']) for c in cd}) == 1 and all(cd[i]['jos'] <= cd[i + 1]['sus'] + 1 for i in range(len(cd) - 1)), cd)
+            verifica('telefon: cartonașele încap în fereastră', all(c['s'] >= 0 and c['d'] <= 390 for c in cd), [(c['s'], c['d']) for c in cd])
+            verifica('telefon: între cartonașe și cartonașul debursărilor e spațiul obișnuit de 14 px', abs(lay['sub'] - max(c['jos'] for c in cd) - 14) <= 1, (lay['sub'], max(c['jos'] for c in cd)))
+            verifica('telefon: fișa deschisă nu produce derulare orizontală', pg.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), pg.evaluate('[document.documentElement.scrollWidth, window.innerWidth]'))
+            det.locator('.cale .pas-mai button').click()
+            verifica('telefon: nici parcursul desfășurat nu produce derulare orizontală, iar textele nu ies din cartonaș', pg.evaluate('document.documentElement.scrollWidth <= window.innerWidth') and
+                     det.evaluate("d => [...d.querySelectorAll('.fs')].every(s => s.scrollWidth <= s.clientWidth + 1)"))
+            egal('telefon: parcursul desfășurat — toate actele', len(pasi_vazuti(det)), len(pn))
+            ctx.close()
+            ctx = context_zi(b, viewport=(1000, 800))
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BERD', manual=OF21, arhiva=False)
+            det = deschide_rand(pg, 'BERD', a_noua)
+            lay = pg.evaluate(JS_CARTONASE, sel_det(a_noua))
+            egal('1000 px: tot două coloane (tabel, nu cartonașe)', [lay['coloane'], len({round(c['s']) for c in lay['carduri']})], ['2', 2])
+            verifica('1000 px: spațiul de 14 px dintre cartonașe și cartonașul debursărilor', abs(lay['sub'] - max(c['jos'] for c in lay['carduri']) - 14) <= 1, (lay['sub'], [c['jos'] for c in lay['carduri']]))
+            verifica('1000 px: fără derulare orizontală cu fișa deschisă', pg.evaluate('document.documentElement.scrollWidth <= window.innerWidth'))
+            pg.set_viewport_size({'width': 900, 'height': 800})
+            lay = pg.evaluate(JS_CARTONASE, sel_det(a_noua))
+            egal('900 px: o singură coloană (de la 900 px în jos cartonașele se așază unul sub altul)', [lay['coloane'], len({round(c['s']) for c in lay['carduri']})], ['1', 1])
+            pg.set_viewport_size({'width': 901, 'height': 800})
+            lay = pg.evaluate(JS_CARTONASE, sel_det(a_noua))
+            egal('901 px: încă două coloane', lay['coloane'], '2')
+            ctx.close()
+
+            # ---------------------------------------------------------------- 21.5 fișierul adevărat de surse: niciun citat în fișe
+            print('   · fișierul adevărat de surse: citatele și notele nu apar în fișe')
+            ctx = context_zi(b)
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BIRD', manual='real', arhiva=False)
+            PBB = 'section.panel[data-d="BIRD"]'
+            intrari_cu_citat = [p for p in MANUAL_REAL['proiecte'] if p.get('citat') and p.get('obiective')]
+            rec = {}
+            for p in intrari_cu_citat:
+                for c in p['acte']:
+                    rec.setdefault(c, p)
+            verificate, scapate = 0, []
+            for a in [x for x in acorduri_donator('BIRD') if x['id'] not in in_proiecte_unite(acorduri_donator('BIRD'))]:
+                p = next((rec[x['act']] for x in a['acte'] if x['act'] in rec), None)
+                if p is None:
+                    continue
+                d_ = deschide_rand(pg, 'BIRD', a)
+                t_ = d_.inner_text().replace('\xa0', ' ')
+                verificate += 1
+                gazda_ = re.sub(r'^www\.', '', p['sursa'].split('/')[2])
+                if p['citat'][:50] in t_ or (p.get('nota') and p['nota'][:40] in t_) or gazda_ in t_ or d_.locator('.citat, .notap').count():
+                    scapate.append(a['id'])
+                chip = d_.locator('.det-desc a.src.s-oficial')
+                if chip.count() != 1 or chip.get_attribute('href') != p['sursa'] or gazda_ not in (chip.get_attribute('title') or ''):
+                    scapate.append(a['id'] + ' (eticheta)')
+                pg.locator(PBB + ' tr.ac[data-k="BIRD|%s"] .exp' % a['id']).click()
+                if verificate >= 12:
+                    break
+            verifica('fișierul adevărat: %d proiecte BIRD cu citat în fișierul de surse — fișa nu are citat, notă sau gazdă scrise, iar eticheta „sursă oficială” duce la document, cu gazda în indiciu' % verificate, verificate >= 5 and scapate == [], (verificate, scapate))
             ctx.close()
 
         b.close()

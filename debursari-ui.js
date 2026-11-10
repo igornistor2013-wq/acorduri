@@ -35,7 +35,7 @@ var S = {
   proiecteDb: { peAcord: new Map(), orfane: [], vechi: [] }, nesalvateP: new Set(), extra: new Map(),   // datele despre proiecte introduse în pagină
   amp: { faza: 'neinceput', peAcord: new Map(), stare: null, eroare: '', promisiune: null },           // datele de început și de finalizare din AMP
   sel: [], q: '', tip: '', deb: '', sort: 'suma', dq: '', dsort: 'n',
-  deschise: new Set(), f: {}, fe: {}, ed: null, conf: null, pf: {}, pfe: {}, confP: null,
+  deschise: new Set(), cale: new Set(), f: {}, fe: {}, ed: null, conf: null, pf: {}, pfe: {}, confP: null,   // cale: rândurile al căror parcurs al acordului e arătat întreg (nu doar începutul și sfârșitul)
   gdeschise: new Set(),                        // proiectele cu grant și împrumut deschise în tabel: „donator|denumire” → se văd acordurile componente
   subDe: new Map(), unit: new Map(),           // refăcute la fiecare randare: rând (donator|id acord) → proiectul din care face parte; „donator|denumire” → proiectul (acordurile lui)
   re: new Map(),                               // rândurile aflate în editare în tabel: id acord → { f: câmpurile de acum, f0: cele de la deschidere, fe: erorile }
@@ -523,8 +523,10 @@ function titluSursa(x, camp) {
     var ce = camp === 'inceput' ? L('data efectivă de începere (Actual Start Date)', 'actual start date') : camp === 'sfarsit' ? L('data propusă de terminare (Proposed Completion Date)', 'proposed completion date') : '';
     return 'AMP ' + x.idAmp + (x.titluAmp ? ' — ' + x.titluAmp : '') + (ce ? ' · ' + ce : '');
   }
-  if (x.tip === 'oficial') return L('Sursă oficială: ', 'Official source: ') + gazda(x.sursa) + (x.nota ? ' · ' + x.nota : '');
-  return L('Introdus de un utilizator în această pagină', 'Entered by a user on this page') + (x.nota ? ' · ' + x.nota : '');
+  var nota = x.nota ? ' · ' + D.taie(x.nota, 240) : '';            // nota din fișierul de surse rămâne aici, în indiciu; nu se mai scrie în pagină
+  if (x.tip === 'oficial') return L('Sursă oficială: ', 'Official source: ') + gazda(x.sursa) + nota;
+  var la = x.la ? dataOraDin(x.la) : '';
+  return L('Introdus de un utilizator în această pagină', 'Entered by a user on this page') + (la ? L(', la ', ', on ') + la : '') + nota;
 }
 /* eticheta sursei unui câmp: „sursă oficială” (cu link spre document), „AMP” sau „introdus de utilizator” */
 function etSursa(x, camp) {
@@ -536,12 +538,14 @@ function etSursa(x, camp) {
 function nesalvatP(info, x) {
   return x && x.tip === 'manual' && info.db && S.nesalvateP.has(info.db.id) ? '<span class="nes">' + esc(L('nesalvat', 'unsaved')) + '</span>' : '';
 }
-/* descrierea succintă (= obiectivele proiectului): nu mai are coloană în tabel, se vede doar când proiectul e deschis, sus în detalii */
+/* Descrierea proiectului (= obiectivele lui): nu are coloană în tabel, se vede doar când proiectul e deschis, sus în fișă. Sursa se arată ca o etichetă mică cu link
+   spre document; citatul exact și nota din fișierul de surse nu se mai scriu în pagină (rămân în fișier, iar nota și în indiciul etichetei). */
 function htmlDescriere(a, info) {
   var o = info.obiective, desc = D.descriere(a, S.en, info);
-  return '<div class="det-desc"><div class="dd-l">' + esc(L('Descriere succintă', 'Short description')) + '<span class="dd-s">' + esc(L('obiectivele proiectului', 'project objectives')) + '</span></div>' +
-    (desc ? '<div class="dd-t">' + esc(desc) + '</div><div class="psrc">' + etSursa(o) + nesalvatP(info, o) + '</div>' + detaliiSursa(o)
-          : '<div class="dd-t gol">' + esc(L('Obiective neintroduse', 'Objectives not entered')) + '</div>') + '</div>';
+  return '<section class="fs det-desc"><h3><span class="fs-t">' + esc(L('Descrierea proiectului', 'Project description')) + '</span><span class="fs-s">' + esc(L('obiective', 'objectives')) + '</span></h3>' +
+    (desc ? '<div class="dd-t">' + esc(desc) + '</div><div class="psrc">' + etSursa(o) + nesalvatP(info, o) + '</div>'
+          : '<div class="dd-t gol">' + esc(L('Obiective neintroduse', 'Objectives not entered')) + '</div>') +
+    (a.numeComplet && D.fold(a.numeComplet) !== D.fold(a.nume) ? '<div class="fs-titlu"><span>' + esc(L('Titlul acordului', 'Agreement title')) + '</span>' + esc(a.numeComplet) + '</div>' : '') + '</section>';
 }
 function etCamp(camp, nume) {
   return (camp === 'inceput' ? L('Data efectivă de începere: ', 'Actual start date: ') : L('Data finalizării: ', 'Completion date: ')) + nume;
@@ -757,24 +761,57 @@ function htmlIntrari(a, intrari, g) {
     '<tbody>' + rows + '</tbody><tfoot><tr><td>' + esc(L('Total', 'Total')) + '</td><td class="num">' + (g.inVal != null ? esc(fb(g.inVal)) + ' ' + esc(g.valuta) : '') + '</td>' +
     '<td class="num">' + esc(fm(g.eur, 0)) + '</td><td colspan="2"></td></tr></tfoot></table>';
 }
+/* O sumă în fișă: „57.000.000 DST”, cu echivalentul în euro când valuta e alta. */
+function valSuma(v, val, eur) {
+  return '<span class="fp-v">' + esc(fb(v) + ' ' + val) + '</span>' + (val !== 'EUR' && eur != null ? '<span class="fp-eur">≈ ' + esc(fm(eur, 0)) + ' EUR</span>' : '');
+}
+/* sub o valoare: de unde vine („din textul actului (LP155/2016)”), cu text mai mic; nimic dacă nu se știe */
+function subSuma(sursa, act) {
+  var s = D.SURSE_SUMA[sursa], t = [s ? s[S.en ? 1 : 0] : '', act ? '(' + act + ')' : ''].filter(Boolean).join(' ');
+  return t ? '<span class="fp-s">' + esc(t) + '</span>' : '';
+}
+/* „Date esențiale”: donatorul (cu denumirea întreagă), suma acordului și de unde vine, costul total al proiectului, alte sume din acte, dacă intră în totaluri */
 function htmlInfo(a) {
-  var acte = a.acte.map(function (x) {
-    var t = esc(x.act) + (x.data ? ' · ' + esc(x.data) : '');
-    return x.url ? '<a href="' + esc(x.url) + '" target="_blank" rel="noopener" title="' + esc(x.tip + (x.data ? ', ' + x.data : '')) + '">' + t + '</a>' : '<span>' + t + '</span>';
-  }).join('');
-  var src = a.suma ? D.SURSE_SUMA[a.sursaSuma] : null;
   var inTotal = { numarat: L('da', 'yes'), dublura: L('nu: dublură a altui acord', 'no: duplicate of another agreement'), fara_total: L('nu: nu se adună în total', 'no: not added to the total'),
                   fara_curs: L('nu: fără curs de schimb', 'no: no exchange rate'), fara_suma: L('nu: suma nu e cunoscută', 'no: amount not known') }[a.inTotal] || '';
   var dl = [];
-  if (a.numeComplet) dl.push([L('Titlul acordului', 'Agreement title'), esc(a.numeComplet)]);
-  dl.push([L('Parteneri', 'Partners'), esc(a.parteneriText || '—')]);
-  dl.push([L('Acte', 'Acts'), '<span class="acte">' + (acte || '—') + '</span>']);
-  if (a.suma) dl.push([L('Suma', 'Amount'), esc(fb(a.suma.v) + ' ' + a.suma.val) + (src ? ' · ' + esc(src[S.en ? 1 : 0]) : '') + (a.actSuma ? ' (' + esc(a.actSuma) + ')' : '')]);
-  if (a.sumaCorectata) dl.push([L('Suma din registru', 'Amount in the register'), esc(registruSuma(a)) + (a.registru.sursaSuma && D.SURSE_SUMA[a.registru.sursaSuma] ? ' · ' + esc(D.SURSE_SUMA[a.registru.sursaSuma][S.en ? 1 : 0]) : '')]);
-  dl.push([L('Intră în totaluri', 'Counted in totals'), esc(inTotal)]);
-  return '<div class="det-info"><dl>' + dl.map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl></div>';
+  dl.push([a.donatori.length > 1 ? L('Donatori', 'Donors') : L('Donator', 'Donor'), a.donatori.map(function (c) {
+    var nume = D.numeDonator(c, S.en);
+    return '<div class="fp-don">' + (c === D.NEIDENTIFICAT || nume === c ? '<b>' + esc(nume) + '</b>' : '<b>' + esc(c) + '</b><span class="fp-s">' + esc(nume) + '</span>') + '</div>';
+  }).join('')]);
+  if (a.parteneriRegistru && D.donatoriiAcordului(a.parteneriRegistru).join(' / ') !== a.donatori.join(' / ')) dl.push([L('Parteneri în registru', 'Partners in the register'), esc(a.parteneriRegistru)]);
+  dl.push([L('Suma acordului', 'Agreement amount'), a.suma ? valSuma(a.suma.v, a.suma.val, a.eur) + subSuma(a.sursaSuma, a.actSuma)
+    : '<span class="nil">' + esc(L('necunoscută', 'unknown')) + '</span><span class="fp-s">' + esc(L('nu intră în totaluri', 'not counted in the totals')) + '</span>']);
+  if (a.sumaCorectata) dl.push([L('Suma din registru', 'Amount in the register'), esc(registruSuma(a)) + (a.registru.sursaSuma && D.SURSE_SUMA[a.registru.sursaSuma] ? '<span class="fp-s">' + esc(D.SURSE_SUMA[a.registru.sursaSuma][S.en ? 1 : 0]) + '</span>' : '')]);
+  if (a.cost) dl.push([L('Costul total al proiectului', 'Total project cost'), valSuma(a.cost.v, a.cost.val, a.cost.eur) + '<span class="fp-s">' + esc(L('din textul acordului', 'from the text of the agreement')) + '</span>']);
+  if (a.alte && a.alte.length) dl.push([L('Alte sume în acte', 'Other amounts in the acts'), a.alte.map(function (x) { return '<div class="fp-don">' + valSuma(x.v, x.val, x.eur) + subSuma(x.sursa, x.act) + '</div>'; }).join('')]);
+  if (a.suma) dl.push([L('Intră în totaluri', 'Counted in totals'), esc(inTotal)]);
+  return '<section class="fs det-info"><h3><span class="fs-t">' + esc(L('Date esențiale', 'Key facts')) + '</span></h3><dl class="fapte">' + dl.map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl></section>';
 }
-/* ---- secțiunea „Date despre proiect”: ce se știe (cu sursa și citatul), proiectul AMP legat și formularul de introducere */
+/* Parcursul acordului: actele din registru în ordinea datelor, fiecare cu etapa pe care o reprezintă și cu link spre act. Când sunt multe (acordul cu amendamente),
+   se arată primele și ultimele trei, iar restul se deschid cu un buton (starea e în S.cale, pe rând). */
+function nActe(n) { return S.en ? n + (n === 1 ? ' act' : ' acts') : (n === 1 ? 'un act' : n + (n >= 20 ? ' de acte' : ' acte')); }
+function htmlParcurs(a, k) {
+  var pasi = D.parcursAcord(a.acte);
+  if (!pasi.length) return '';
+  var toate = S.cale.has(k), v = D.parcursAfisat(pasi, toate), datate = pasi.filter(function (p) { return p.ord; });
+  var an = function (p) { return p.data.slice(6); }, cap = nActe(pasi.length);
+  if (datate.length) cap += ' · ' + (pasi.length === 1 ? datate[0].data : an(datate[0]) + (an(datate[datate.length - 1]) !== an(datate[0]) ? '–' + an(datate[datate.length - 1]) : ''));
+  var fk = esc(k + '|cale');
+  var pas = function (p) {
+    var et = D.etichetaPas(p, S.en), tip = D.etichetaTipAct(p.tip, S.en);
+    var lnk = p.url ? '<a href="' + esc(p.url) + '" target="_blank" rel="noopener" title="' + esc(L('Deschide actul pe ', 'Open the act on ') + gazda(p.url)) + '">' + esc(p.act) + '</a>' : esc(p.act);
+    var iso = p.ord ? p.ord.slice(0, 4) + '-' + p.ord.slice(4, 6) + '-' + p.ord.slice(6, 8) : '';
+    return '<li class="pas"><div class="pas-d">' + (iso ? '<time datetime="' + iso + '">' + esc(p.data) + '</time>' : '—') + '</div><div class="pas-c">' +
+      (et ? '<div class="pas-t">' + esc(et) + '</div>' : '') + '<div class="pas-a">' + (tip ? esc(tip) + ' · ' : '') + lnk + '</div></div></li>';
+  };
+  var mijloc = v.ascunse ? '<li class="pas pas-mai"><div class="pas-d"></div><div class="pas-c"><button type="button" class="lnk" data-act="cale-comuta" data-fk="' + fk + '" aria-expanded="false">' +
+    esc(L('Arată încă ' + nActe(v.ascunse), 'Show ' + v.ascunse + ' more ' + (v.ascunse === 1 ? 'act' : 'acts'))) + '</button></div></li>' : '';
+  var rest = toate && pasi.length > D.PARCURS_PESTE ? '<button type="button" class="lnk cale-rest" data-act="cale-comuta" data-fk="' + fk + '" aria-expanded="true">' + esc(L('Restrânge lista actelor', 'Collapse the list of acts')) + '</button>' : '';
+  return '<section class="fs fs-cale"><h3><span class="fs-t">' + esc(L('Parcursul acordului', 'Path of the agreement')) + '</span><span class="fs-s">' + esc(cap) + '</span></h3><ol class="cale">' +
+    v.inainte.map(pas).join('') + mijloc + v.dupa.map(pas).join('') + '</ol>' + rest + '</section>';
+}
+/* ---- „Date despre proiect”: formularul de introducere (valorile lui, din ce a salvat omul) și rândul „AMP” (proiectul AMP legat și cât de sigură e legătura) */
 function formProiect(a) {
   var f = S.pf[a.id];
   if (!f) {
@@ -785,57 +822,57 @@ function formProiect(a) {
   }
   return f;
 }
-function detaliiSursa(x) {
-  if (!x) return '';
-  var h = '';
-  if (x.tip === 'oficial') {
-    h += '<div class="citat">' + (x.citat ? '<span class="cap">' + esc(L('citat din sursă', 'quote from the source')) + '</span> „' + esc(x.citat) + '” ' : '') +
-         '<a href="' + esc(x.sursa) + '" target="_blank" rel="noopener">' + esc(gazda(x.sursa)) + '</a></div>';
-  }
-  if (x.nota) h += '<div class="notap">' + esc(x.nota) + '</div>';
-  if (x.tip === 'manual' && x.la) h += '<div class="notap">' + esc(L('introdus la ', 'entered on ') + dataOraDin(x.la)) + '</div>';
-  return h;
-}
 /* rândul „AMP” din secțiune: proiectul AMP legat de acord, datele lui și cât de sigură e legătura */
 function randAmp(a, info) {
   var amp = info.amp, st = S.amp;
   if (!amp) {
     var t = st.faza === 'se-incarca' ? L('se citesc datele din AMP…', 'reading the AMP data…')
-          : st.faza === 'gata' ? L('niciun proiect AMP nu se potrivește sigur cu acest acord (denumirea, finanțatorul și suma) și de aceea nu are date din AMP',
-                                   'no AMP project matches this agreement with certainty (name, funder and amount), so it has no dates from AMP')
+          : st.faza === 'gata' ? L('niciun proiect AMP legat sigur', 'no AMP project linked with certainty')
           : st.faza === 'eroare' ? L('datele din AMP nu s-au putut citi', 'the AMP data could not be read') : '';
-    return t ? ['AMP', '<span class="nil">' + esc(t) + '</span>'] : null;
+    var expl = st.faza === 'gata' ? L('Niciun proiect AMP nu se potrivește sigur cu acest acord (denumirea, finanțatorul și suma), de aceea acordul nu are date din AMP.',
+                                      'No AMP project matches this agreement with certainty (name, funder and amount), so it has no dates from AMP.') : '';
+    return t ? ['AMP', '<span class="nil"' + (expl ? ' title="' + esc(expl) + '"' : '') + '>' + esc(t) + '</span>'] : null;
   }
   var sigur = amp.nivel === 'sigur', fd = function (v) { return v ? esc(D.fmtDataPartiala(v)) : '—'; };
-  var h = '<span data-ampid="' + esc(amp.id) + '">' + esc(amp.id) + '</span>' + (amp.titlu ? ' · ' + esc(amp.titlu) : '') +
-    '<div class="notap">' + esc(L('început (Actual Start Date): ', 'start (Actual Start Date): ')) + '<b>' + fd(amp.inceput) + '</b> · ' +
+  var h = '<span data-ampid="' + esc(amp.id) + '">' + esc(amp.id) + '</span>' + (amp.titlu ? ' · <span title="' + esc(amp.titlu) + '">' + esc(D.taie(amp.titlu, 90)) + '</span>' : '') +
+    '<div class="dp-n">' + esc(L('început (Actual Start Date): ', 'start (Actual Start Date): ')) + '<b>' + fd(amp.inceput) + '</b> · ' +
     esc(L('finalizare propusă (Proposed Completion Date): ', 'proposed completion (Proposed Completion Date): ')) + '<b>' + fd(amp.sfarsit) + '</b></div>';
-  if (sigur) h += '<div class="notap">' + esc(amp.legatura === 'confirmat' ? L('Legătură confirmată de un om (date/legaturi_amp.json).', 'Link confirmed by a person (date/legaturi_amp.json).')
+  if (sigur) h += '<div class="dp-n">' + esc(amp.legatura === 'confirmat' ? L('Legătură confirmată de un om (date/legaturi_amp.json).', 'Link confirmed by a person (date/legaturi_amp.json).')
                                                                         : L('Legătură sigură: denumirea, finanțatorul și suma coincid.', 'Certain link: the name, the funder and the amount agree.')) + '</div>';
-  else h += '<div class="notap avert">' + esc(L('Legătură doar probabilă (denumirea și finanțatorul se potrivesc, dar suma lipsește sau diferă), deci datele nu se folosesc în tabel. Dacă e proiectul acesta, le poți copia în formular și le verifici.',
-                                              'Only a probable link (the name and the funder agree, but the amount is missing or differs), so the dates are not used in the table. If this is the right project, you can copy them into the form and check them.')) + '</div>' +
+  else h += '<div class="dp-n avert" title="' + esc(L('Denumirea și finanțatorul se potrivesc, dar suma lipsește sau diferă, deci datele nu se folosesc în tabel. Dacă e proiectul acesta, le poți copia în formular și le verifici.',
+                                                    'The name and the funder agree, but the amount is missing or differs, so the dates are not used in the table. If this is the right project, you can copy them into the form and check them.')) + '">' +
+       esc(L('Legătură doar probabilă: datele nu se folosesc în tabel.', 'Only a probable link: the dates are not used in the table.')) + '</div>' +
        (cod && (amp.inceput || amp.sfarsit) ? '<div style="margin-top:6px"><button type="button" class="btn mic" data-act="foloseste-amp" data-a="' + esc(a.id) + '">' + esc(L('Copiază datele în formular', 'Copy the dates into the form')) + '</button></div>' : '');
   return ['AMP', h];
 }
-function htmlProiect(a, k) {
-  var info = infoDe(a), dl = [];
+/* „Perioada de implementare”: începutul și finalizarea (fiecare cu eticheta sursei), durata și unde se află proiectul în timp (calculate din cele două date),
+   apoi proiectul AMP legat de acord. Formularul de introdus datele e separat, mai jos (doar după deblocare). */
+function htmlProiect(a, info) {
+  var dl = [];
   [['inceput', L('Data efectivă de începere', 'Actual start date')], ['sfarsit', L('Data finalizării', 'Completion date')]].forEach(function (c) {
     var x = info[c[0]];
-    dl.push([c[1], x ? '<b>' + esc(D.fmtDataPartiala(x.v)) + '</b> <span class="psrc">' + etSursa(x, c[0]) + nesalvatP(info, x) + '</span>' + detaliiSursa(x)
+    dl.push([c[1], x ? '<b class="dp-v">' + esc(D.fmtDataPartiala(x.v)) + '</b><span class="psrc">' + etSursa(x, c[0]) + nesalvatP(info, x) + '</span>'
                      : '<span class="nil">' + esc(L('necunoscută', 'unknown')) + '</span>']);
   });
+  var durata = info.inceput && info.sfarsit ? D.durataProiect(info.inceput.v, info.sfarsit.v) : null;
+  if (durata) dl.push([L('Durată', 'Duration'), esc(D.fmtDurata(durata, S.en))]);
+  var stare = D.stareProiect(info.inceput ? info.inceput.v : '', info.sfarsit ? info.sfarsit.v : '', D.aziIso());
+  if (stare) dl.push([L('Situația', 'Status'), '<span class="sit ' + stare + '" title="' + esc(L('După datele de mai sus, la data de azi', 'Judging by the dates above, as of today')) + '">' + esc(D.etichetaStare(stare, S.en)) + '</span>']);
   if (info.contradictie) dl.push(['', '<span class="rau">⚠ ' + esc(L('Începutul e după finalizare: datele se contrazic. Verifică sursele.', 'The start is after the completion: the dates contradict each other. Check the sources.')) + '</span>']);
   var ra = randAmp(a, info); if (ra) dl.push(ra);
+  return '<section class="fs det-proiect"><h3><span class="fs-t">' + esc(L('Perioada de implementare', 'Implementation period')) + '</span></h3><dl class="fapte dlp">' +
+    dl.map(function (x) { return (x[0] ? '<dt>' + esc(x[0]) + '</dt>' : '<dt></dt>') + '<dd>' + x[1] + '</dd>'; }).join('') + '</dl></section>';
+}
+/* formularul de introdus sau corectat datele proiectului, cu butonul de ștergere a ce s-a introdus (doar după deblocare) */
+function htmlFormProiect(a, k, info) {
   var sterge = '';
-  if (info.db && cod) {
+  if (info.db) {
     sterge = S.confP === a.id
       ? ' <span class="cof">' + esc(L('Sigur?', 'Sure?')) + '</span> <button type="button" class="btn mic rosu" data-act="proiect-sterge-da" data-a="' + esc(a.id) + '">' + esc(L('Șterge', 'Delete')) + '</button> ' +
         '<button type="button" class="btn mic" data-act="proiect-sterge-nu">' + esc(L('Nu', 'No')) + '</button>'
       : ' <button type="button" class="btn rosu" data-act="proiect-sterge" data-a="' + esc(a.id) + '">' + IC.trash + esc(L('Șterge datele introduse', 'Delete the entered data')) + '</button>';
   }
-  var form = cod ? formularProiect(a, k, sterge) : '';
-  return '<div class="det-proiect' + (cod ? '' : ' solo') + '"><div><h3>' + esc(L('Date despre proiect', 'Project data')) + '</h3><dl class="dlp">' +
-    dl.map(function (x) { return (x[0] ? '<dt>' + esc(x[0]) + '</dt>' : '<dt></dt>') + '<dd>' + x[1] + '</dd>'; }).join('') + '</dl></div>' + (cod ? '<div>' + form + '</div>' : '') + '</div>';
+  return formularProiect(a, k, sterge);
 }
 function formularProiect(a, k, sterge) {
   var f = formProiect(a), er = S.pfe[a.id] || {}, dis = '';
@@ -871,10 +908,15 @@ function htmlComponente(a, k, sub) {
       : '<button type="button" class="dc" data-act="spre-componenta" data-spre="' + esc(d + '|' + m.id) + '" data-fk="' + esc(k + '|dc_' + m.id) + '">' + esc(nume) + '</button>';
   }).join('') + '</div>';
 }
+/* Fișa proiectului: cartonașele (descriere, date esențiale, perioadă, parcursul acordului) curg în două coloane echilibrate pe ecran lat și într-una pe telefon, în
+   aceeași ordine; apoi debursările pe toată lățimea și, după deblocare, sub ele, cele două formulare unul lângă altul (adaugă o debursare | datele proiectului). */
 function htmlDetalii(d, a, g, k) {
-  var intrari = S.peAcord.get(a.id) || [], sub = S.subDe.get(k) || null;
-  return '<tr class="det' + (sub ? ' sub' : '') + '" data-k="' + esc(k) + '"><td colspan="7">' + (sub ? htmlComponente(a, k, sub) : '') + '<div class="det-grid' + (cod ? '' : ' solo') + '">' + htmlDescriere(a, infoDe(a)) + '<div>' + htmlIntrari(a, intrari, g) + '</div>' + (cod ? '<div>' + htmlForm(a, k) + '</div>' : '') +
-    htmlProiect(a, k) + htmlInfo(a) + '</div></td></tr>';
+  var intrari = S.peAcord.get(a.id) || [], sub = S.subDe.get(k) || null, info = infoDe(a);
+  var deb = '<section class="fs fs-deb">' + htmlIntrari(a, intrari, g) + '</section>';
+  var jos = cod ? '<div class="fisa-jos">' + deb + '<section class="fs fs-ed">' + htmlForm(a, k) + '</section><section class="fs fs-ed">' + htmlFormProiect(a, k, info) + '</section></div>'
+                : '<div class="fisa-jos solo">' + deb + '</div>';
+  return '<tr class="det' + (sub ? ' sub' : '') + '" data-k="' + esc(k) + '"><td colspan="7">' + (sub ? htmlComponente(a, k, sub) : '') +
+    '<div class="fisa"><div class="fisa-cols">' + htmlDescriere(a, info) + htmlInfo(a) + htmlProiect(a, info) + htmlParcurs(a, k) + '</div>' + jos + '</div></td></tr>';
 }
 
 /* câte din proiectele afișate au obiective, dată de început, dată de finalizare */
@@ -1594,6 +1636,7 @@ function actiune(act, b) {
     case 'comuta': if (k) comutaRand(k); break;
     case 'grup-comuta': if (tr && tr.getAttribute('data-gr')) comutaGrup(tr.getAttribute('data-gr')); break;
     case 'spre-componenta': if (k) spreComponenta(k, b.getAttribute('data-spre')); break;
+    case 'cale-comuta': if (k) { if (S.cale.has(k)) S.cale.delete(k); else S.cale.add(k); refaRand(k); } break;
     case 'adauga': if (k) { deschideRand(k); focuseazaFormular(k); } break;
     case 'rand-ed': if (k) pornesteRand(k, b.getAttribute('data-f')); break;
     case 'rand-salveaza': if (k) salveazaRand(k); break;

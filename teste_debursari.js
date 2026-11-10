@@ -237,6 +237,42 @@ egal('sursa scrisă: o singură sursă sau câmp cu câmp, în ambele limbi', [
   ['sursă oficială', 'obiective: introdus de utilizator; început: introdus de utilizator; finalizare: sursă oficială', 'objectives: entered by a user; start: entered by a user; completion: official source', '']);
 egal('adresa sursei: doar a unei surse oficiale', [D.legaturaSursaProiect(D.infoProiect(A1, { manual: BM.proiecteManual })), D.legaturaSursaProiect(D.infoProiect(A1, { amp: AMP1 })), D.legaturaSursaProiect(D.infoProiect(A1, { db: DB1 }))], [SURSA + '/a1', '', '']);
 
+console.log('\nFișa proiectului: parcursul acordului, durata și starea în timp');
+egal('etapele actelor, în ambele limbi; o etapă necunoscută nu are etichetă', [D.etichetaEtapa('neg', false), D.etichetaEtapa('rat', false), D.etichetaEtapa('vig', false), D.etichetaEtapa('neg', true), D.etichetaEtapa('prm', true), D.etichetaEtapa('x', false)],
+     ['Inițierea negocierilor', 'Ratificare / aprobare', 'Punere în aplicare', 'Start of negotiations', 'Promulgation', '']);
+const ACTE_P = [
+  { act: 'DP3/2020', tip: 'Decret', data: '30.11.2020', url: 'https://x/3', etape: ['prm'] },
+  { act: 'LP2/2020', tip: 'Lege', data: '19.11.2020', url: 'https://x/2', etape: ['rat'] },
+  { act: 'HG1/2020', tip: 'Hotărâre', data: '19.11.2020', url: 'https://x/1', etape: ['plg'] },
+  { act: 'X9/2020', tip: 'Act', data: '', etape: [] },
+  { act: 'DP0/2019', tip: 'Decret', data: '01.02.2019', url: 'https://x/0', etape: ['sem', 'neg', 'necunoscuta'] }
+];
+const PP = D.parcursAcord(ACTE_P);
+egal('parcurs: actele în ordinea datelor, la aceeași dată etapele în ordinea lor firească, cele fără dată la urmă', PP.map(p => p.act), ['DP0/2019', 'HG1/2020', 'LP2/2020', 'DP3/2020', 'X9/2020']);
+egal('parcurs: etapele fiecărui act în ordine firească, fără cele necunoscute; adresa actului se păstrează', [PP[0].etape, PP[4].etape, PP[0].url, PP[4].url], [['neg', 'sem'], [], 'https://x/0', '']);
+egal('parcurs: același rezultat oricum ar fi ordinea din registru (registrul își scrie actele cu cele mai noi întâi)', D.parcursAcord(ACTE_P.slice().reverse()).map(p => p.act), PP.map(p => p.act));
+egal('parcurs: fără acte sau cu un singur act', [D.parcursAcord([]).length, D.parcursAcord(undefined).length, D.parcursAcord([ACTE_P[0]]).length], [0, 0, 1]);
+egal('numele unui pas: etapele unite cu „+”; fără etapă, tipul actului; în ambele limbi', [D.etichetaPas(PP[0], false), D.etichetaPas(PP[0], true), D.etichetaPas(PP[4], false), D.etichetaPas(PP[4], true), D.etichetaPas(D.parcursAcord([{ act: 'D', tip: 'Decret', data: '01.01.2020' }])[0], true)],
+     ['Inițierea negocierilor + Aprobarea semnării', 'Start of negotiations + Approval of signing', 'Act', 'Act', 'Decree']);
+const listaA = n => Array.from({ length: n }, (_, i) => ({ act: 'A' + i }));
+const vAf = (n, toate) => { const v = D.parcursAfisat(listaA(n), toate); return [v.inainte.length, v.ascunse, v.dupa.length, v.total]; };
+egal('parcurs afișat: până la 8 acte toate; de la 9 primele 3 și ultimele 3, cu numărul celor ascunse; la cerere toate', [vAf(1, false), vAf(8, false), vAf(9, false), vAf(36, false), vAf(36, true)], [[1, 0, 0, 1], [8, 0, 0, 8], [3, 3, 3, 9], [3, 30, 3, 36], [36, 0, 0, 36]]);
+egal('parcurs afișat: ce se ascunde e mijlocul (primele 3 și ultimele 3 sunt cele din capete)', (v => [v.inainte.map(x => x.act), v.dupa.map(x => x.act)])(D.parcursAfisat(listaA(10), false)), [['A0', 'A1', 'A2'], ['A7', 'A8', 'A9']]);
+const DUR = (i, s, en) => D.fmtDurata(D.durataProiect(i, s), !!en);
+egal('durata: date întregi → luni calendaristice, scrise în ani și luni (ro și en)', [DUR('2016-03-15', '2021-12-31'), DUR('2016-03-15', '2021-12-31', true), DUR('2020-01-01', '2021-01-01'), DUR('2020-01-01', '2020-02-01'), DUR('2020-01-01', '2040-01-01')],
+     ['5 ani și 9 luni', '5 years and 9 months', '1 an', '1 lună', '20 de ani']);
+egal('durata: ziua contează la luna incompletă; date parțiale dau „≈”; doar anii → ani; „sub o lună” și „sub un an” fără „≈”', [DUR('2020-01-31', '2020-03-15'), DUR('2016-03', '2021-12'), DUR('2016', '2021'), DUR('2026-03-15', '2026-03-20'), DUR('2026', '2026'), DUR('2016-03', '2021'), DUR('2020-01-31', '2020-02-01')],
+     ['1 lună', '≈ 5 ani și 9 luni', '≈ 5 ani', 'sub o lună', 'sub un an', '≈ 5 ani', 'sub o lună']);
+egal('durata: imposibilă când o dată lipsește, nu se înțelege sau începutul e după finalizare', [D.durataProiect('', '2020'), D.durataProiect('2020', ''), D.durataProiect('x', '2020'), D.durataProiect('2021', '2020'), D.durataProiect('2020-05', '2020-03')], [null, null, null, null, null]);
+egal('fmtDurata: fără durată → text gol; „ani” de la 2 la 19, „de ani” de la 20', [D.fmtDurata(null, false), D.fmtDurata(D.durataProiect('2000-01-01', '2012-01-01'), false), D.fmtDurata(D.durataProiect('2000-01-01', '2001-01-01'), true)], ['', '12 ani', '1 year']);
+const STR = (i, s) => D.stareProiect(i, s, '2026-11-10');
+egal('starea în timp: încheiat, în curs, urmează; fără date sau cu date care se contrazic, nimic', [STR('2016-03-15', '2021-12-31'), STR('2025-01-01', '2027-12-31'), STR('2027-01-01', '2028-12-31'), STR('', ''), STR('2021', '2020')], ['incheiat', 'in-curs', 'urmeaza', '', '']);
+egal('starea: o singură dată ajunge doar când spune sigur (finalizarea a trecut sau începutul n-a venit), altfel nimic', [STR('', '2026-11-09'), STR('2026-11-11', ''), STR('2026-11-10', ''), STR('', '2026-11-10'), STR('', '2030')], ['incheiat', 'urmeaza', '', '', '']);
+egal('starea: o dată parțială se ia la limita favorabilă (finalizare „2026” = 31.12.2026, încă în curs; „2026-11” până pe 30.11)', [STR('2026-01', '2026'), STR('2025', '2026-10'), STR('2026-11', '2026-11'), STR('2026-12', '2026-12'), STR('2026-11-10', '2026-11-10')], ['in-curs', 'incheiat', 'in-curs', 'urmeaza', 'in-curs']);
+egal('starea: fără data de azi dată, se ia azi', [D.stareProiect('2000-01-01', '2001-01-01'), D.stareProiect('2090-01-01', '2090-12-31')], ['incheiat', 'urmeaza']);
+egal('starea: etichetele, în ambele limbi', [D.etichetaStare('in-curs', false), D.etichetaStare('incheiat', false), D.etichetaStare('urmeaza', false), D.etichetaStare('in-curs', true), D.etichetaStare('incheiat', true), D.etichetaStare('urmeaza', true), D.etichetaStare('', false)],
+     ['în desfășurare', 'termenul de finalizare a trecut', 'urmează să înceapă', 'under way', 'the completion date has passed', 'not started yet', '']);
+
 console.log('\nDate despre proiect introduse de utilizator');
 egal('citire date: „15.03.2021”, „03.2021”, „2021”, „2021-03-15”, cu „/” sau „-”',
      ['15.03.2021', '5.3.2021', '15/03/2021', '15-03-2021', '2021-03-15', '2021/3/5', '03.2021', '3/2021', '2021-03', '2021', ' 2021 ', ''].map(D.parseDataPartiala),
@@ -781,6 +817,32 @@ console.log('\nProiecte cu grant și împrumut: pe datele reale');
   verifica('totalurile (rezumatul) se calculează pe acorduri: aceleași cu sau fără unire în proiecte', toate.n === R.acorduri.length && Math.abs(toate.sumaEur - totalR.sumaEur) < 1e-6, [toate.n, R.acorduri.length]);
 })();
 
+
+console.log('\nFișa proiectului: pe datele reale');
+(function () {
+  const coduri = new Set(D.ETAPE_ACT.map(e => e[0])), necunoscute = new Set(), faraNume = [], dezordine = [], nepotrivite = [], fara = [];
+  let nActe = 0, cuUrl = 0;
+  real.acorduri.forEach(a => {
+    const p = D.parcursAcord(a.acte);
+    if (p.length !== a.acte.length) nepotrivite.push(a.id);
+    a.acte.forEach(x => (x.etape || []).forEach(e => { if (!coduri.has(e)) necunoscute.add(e); }));
+    for (let i = 1; i < p.length; i++) if (p[i].ord && p[i - 1].ord > p[i].ord) dezordine.push(a.id);
+    p.forEach(x => { nActe++; if (!D.etichetaPas(x, false) || !D.etichetaPas(x, true)) faraNume.push(a.id + ' ' + x.act); if (x.url && x.ord) cuUrl++; else fara.push(a.id + ' ' + x.act); });
+  });
+  verifica('parcurs pe datele reale: fiecare act ajunge în parcurs și toate etapele din registru sunt cunoscute (' + nActe + ' acte)', !nepotrivite.length && !necunoscute.size, [nepotrivite.slice(0, 3), Array.from(necunoscute)]);
+  egal('parcurs pe datele reale: actele sunt în ordinea datelor și fiecare pas are un nume în română și în engleză', [dezordine.slice(0, 3), faraNume.slice(0, 3)], [[], []]);
+  egal('parcurs pe datele reale: fiecare act are dată și adresă (link spre legis.md)', fara.slice(0, 3), []);
+  const fara_dur = [];
+  let cuDate = 0;
+  R.acorduri.forEach(a => {
+    const inf = D.infoProiect(a, { manual: R.proiecteManual });
+    if (inf.inceput && inf.sfarsit) { cuDate++; if (!inf.contradictie && !D.durataProiect(inf.inceput.v, inf.sfarsit.v)) fara_dur.push(a.id); }
+  });
+  verifica('durata pe datele reale: fiecare proiect cu ambele date (' + cuDate + ') are o durată', cuDate >= 100 && !fara_dur.length, fara_dur.slice(0, 3));
+  const peStare = {};
+  R.acorduri.forEach(a => { const inf = D.infoProiect(a, { manual: R.proiecteManual }); const st = D.stareProiect(inf.inceput ? inf.inceput.v : '', inf.sfarsit ? inf.sfarsit.v : '', '2026-11-10') || '-'; peStare[st] = (peStare[st] || 0) + 1; });
+  verifica('starea pe datele reale: toate rezultatele sunt cele cunoscute (' + JSON.stringify(peStare) + ')', Object.keys(peStare).every(k => ['-', 'in-curs', 'incheiat', 'urmeaza'].indexOf(k) >= 0) && (peStare.incheiat || 0) > 20, peStare);
+})();
 
 // fișierul date/debursari.json din repository (completat și din scrisoarea Ministerului Finanțelor, situația la 30.09.2026)
 console.log('\nFișierul date/debursari.json din repository');
