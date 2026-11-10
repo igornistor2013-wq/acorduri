@@ -384,6 +384,8 @@ singur act care cuprinde și grant, și împrumut (de pildă acordul cu FIDA, `h
 dat de registru, fiindcă registrul nu are sumele separate. Regulile sunt în `grupeazaProiecte` și `sumeComponente` din
 `debursari.js`, cu teste în `teste_debursari.js` și în secțiunea 19 din `teste_debursari.py`.
 
+**Fără text explicativ pe pagină.** Paragraful de sub titlu („Acordurile din registrul legis.md, repartizate pe donatori…”) și blocul „De unde vin cifrele” (cinci paragrafe despre sursă, obiective, dubluri, debursări și procent) au fost scoase din „Debursări pe acorduri”. Din bloc au rămas, într-un rând mic, butonul „Descarcă o copie a debursărilor (JSON)” și, când există un cod păstrat pe dispozitiv, „Uită codul păstrat pe acest dispozitiv”, fiindcă sunt funcționale. `randeazaNote()` din `debursari-ui.js` le randează; `#tSub` nu mai există.
+
 **Aspectul paginii (doar ecran).** Un bloc de CSS în `debursari.html`, în `@media screen`, chiar înainte de `@media print`, așază și
 ierarhizează pagina fără să schimbe culorile și fonturile: bara de filtre e un card (căutarea și cele trei filtre pe primul rând,
 butoanele „Excel · total” și „Excel · pe donatori” împreună, la dreapta, pe al doilea; pe telefon, câte unul pe rând); panoul unui

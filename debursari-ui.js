@@ -327,8 +327,6 @@ function scrieHash() {
 /* ------------------------------------------------------------------ randare: capul și bara de acces */
 function randeazaCap() {
   $('#tTitlu').textContent = L('Debursări pe acorduri', 'Disbursements by agreement');
-  $('#tSub').textContent = L('Acordurile din registrul legis.md, repartizate pe donatori. Bifează un donator ca să vezi proiectele lui, cu data de început, data finalizării și suma; descrierea (obiectivele) apare când deschizi proiectul. Datele de început și de finalizare, suma proiectului și debursările se pot edita după ce introduci codul de acces, o singură dată pentru toate acordurile.',
-                              'The agreements from the legis.md register, grouped by donor. Tick a donor to see its projects, with their start date, completion date and amount; the description (objectives) appears when you open a project. The start and completion dates, the project amount and the disbursements can be edited once you enter the access code, one time for all agreements.');
   if (!S.baza) { $('#topMeta').innerHTML = ''; return; }
   var nd = S.intrari.length;
   $('#topMeta').innerHTML =
@@ -1067,28 +1065,8 @@ function randeazaOmise() {
 function randeazaNote() {
   var el = $('#sNote');
   if (!S.baza) { el.innerHTML = ''; return; }
-  var p = [
-    [L('De unde vin cifrele. ', 'Where the figures come from. '),
-     L('Proiectele sunt acordurile din registrul legis.md (un rând adună toate actele aceluiași acord). „Suma proiectului” e suma acordului, așa cum o arată registrul, afară de rândurile la care un utilizator a corectat-o în pagină (acolo e marcată „corectată de utilizator”, iar suma din registru apare alături); echivalentul în euro folosește cursurile BCE din ' + cursData() +
-       '. Un acord finanțat de mai mulți parteneri apare la fiecare dintre ei, dar în totaluri e numărat o singură dată.',
-       'The projects are the agreements from the legis.md register (one row combines all acts of the same agreement). "Project amount" is the agreement amount as the register shows it, except on rows where a user corrected it in the page (those are marked "corrected by a user", with the register amount shown next to it); the euro equivalent uses the ECB rates of ' + cursData() +
-       '. An agreement financed by several partners appears under each of them, but is counted once in the totals.')],
-    [L('Obiectivele și datele proiectelor. ', 'Project objectives and dates. '),
-     L('„Descrierea succintă” înseamnă obiectivele proiectului și apare doar când deschizi proiectul (săgeata din dreapta rândului); în tabel sunt datele, data efectivă de începere și data finalizării proiectului. Fiecare informație vine, în ordine, din: ce a introdus un utilizator în pagină (după ce a pus codul); o sursă oficială (un document cu adresă și citat exact, scrise în date/proiecte_manual.json); AMP, platforma de gestionare a asistenței externe, doar pentru proiectele legate sigur de acord (denumirea, finanțatorul și suma coincid; în AMP, data finalizării e data propusă de terminare). Obiectivele nu vin din AMP. O celulă goală (sau „Obiective neintroduse” în rândul deschis) înseamnă că nu s-a găsit încă o sursă: pagina nu completează cu presupuneri.',
-       'The "short description" means the objectives of the project and appears only when you open a project (the arrow at the right of the row); the table shows the dates, which are the actual start date and the completion date of the project. Each item comes, in this order, from: what a user entered in the page (after entering the code); an official source (a document with its address and an exact quote, written in date/proiecte_manual.json); AMP, the external assistance management platform, only for projects linked with certainty to the agreement (name, funder and amount agree; in AMP, the completion date is the proposed completion date). The objectives do not come from AMP. An empty cell (or "Objectives not entered" in the opened row) means no source has been found yet: the page does not fill in guesses.')],
-    [L('Fără dubluri. ', 'No duplicates. '),
-     L('Fiecare act din registru se află într-un singur rând, iar rândurile cu aceeași denumire la același donator se deosebesc printr-o mențiune (tipul și anul semnării, la nevoie și suma). ' +
-       (S.baza.omise.length ? 'Cele ' + S.baza.omise.length + ' rânduri-umbrelă (negocieri sau memorandumuri care repetă acorduri existente) nu apar în liste; ele sunt enumerate mai jos, cu motivul.' : ''),
-       'Every act of the register is in exactly one row, and rows with the same name under the same donor are told apart by a short mention (the type and the year of signing, and the amount if needed). ' +
-       (S.baza.omise.length ? 'The ' + S.baza.omise.length + ' umbrella rows (negotiations or memoranda that repeat existing agreements) do not appear in the lists; they are listed below, with the reason.' : ''))],
-    [L('Debursările ', 'Disbursements '),
-     L('nu vin dintr-o sursă oficială: se introduc de mână și se păstrează în fișierul date/debursari.json din repository-ul site-ului. Oricine poate citi fișierul; scrie doar cine are codul de acces. Fiecare salvare e un commit, așa că istoricul modificărilor se vede în GitHub și o greșeală se poate anula.',
-       'do not come from an official source: they are entered by hand and kept in the date/debursari.json file in the site repository. Anyone can read the file; only the holder of the access code can write. Every save is a commit, so the history of changes is visible on GitHub and a mistake can be undone.')],
-    [L('Procentul debursat ', 'The disbursed percentage '),
-     L('compară debursările la proiectele cu sumă (cele care intră în total) cu suma lor. Debursările la proiecte fără sumă apar în „Debursat”, dar nu în procent.',
-       'compares the disbursements on projects with an amount (those counted in the total) with their amount. Disbursements on projects without an amount appear in "Disbursed" but not in the percentage.')]
-  ];
-  el.innerHTML = '<div class="note">' + p.map(function (x) { return '<p><b>' + esc(x[0]) + '</b>' + esc(x[1]) + '</p>'; }).join('') +
+  // explicațiile de dedesubt („De unde vin cifrele”, obiectivele, dublurile, debursările, procentul) au fost scoase din pagină; rămân doar cele două legături
+  el.innerHTML = '<div class="note">' +
     '<p><button type="button" class="lnk" data-act="json">' + esc(L('Descarcă o copie a debursărilor (JSON)', 'Download a copy of the disbursements (JSON)')) + '</button>' +
     (areSeif() ? ' · <button type="button" class="lnk" data-act="uita-seif">' + esc(L('Uită codul păstrat pe acest dispozitiv', 'Forget the code kept on this device')) + '</button>' : '') + '</p></div>';
 }

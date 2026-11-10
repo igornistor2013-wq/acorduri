@@ -1,19 +1,14 @@
-Meniul „Acorduri”: „De la lege la bani” a fost scos, iar „Debursări pe acorduri” e acum prima opțiune. Cinci fișiere (plus testul meniului).
+Pagina „Debursări pe acorduri”: am scos textul explicativ. Trei fișiere.
 
-Meniul „Acorduri” (pe toate paginile) are acum trei opțiuni, în ordinea:
-  1. Debursări pe acorduri
-  2. Acorduri · legis.md
-  3. Acorduri · Monitorul Oficial
-„De la lege la bani” nu mai e în meniu și nici în linkurile de la sfârșitul paginii „Debursări pe acorduri”. Pagina însăși nu a fost ștearsă: dacă cineva are adresa index.html#legaturi, ea se deschide ca înainte.
-
-În meniu era și un loc care refăcea etichetele după poziție la schimbarea limbii (RO/EN); l-am pus în noua ordine, ca la trecerea în engleză textele să rămână la opțiunea lor (am verificat: RO și EN, pe toate cele 7 pagini, la 1400 și la 390 px).
+Dispar:
+  - paragraful de sub titlu („Acordurile din registrul legis.md, repartizate pe donatori. Bifează un donator…”);
+  - blocul „De unde vin cifrele” cu cele cinci paragrafe (sursa, obiectivele, dublurile, debursările, procentul).
+Rămâne, într-un rând mic sub tabel, doar linkul „Descarcă o copie a debursărilor (JSON)” (și, când e cazul, „Uită codul păstrat pe acest dispozitiv”), pentru că fac ceva. Dacă vrei să plece și ele, spune-mi.
 
 Pune-le în repository la aceleași căi:
-  meniu.js          (meniul: opțiunea scoasă, Debursări prima, etichetele după poziție)
-  debursari-ui.js   (linkul „De la lege la bani” scos din legăturile de la sfârșitul paginii)
-  debursari.html    (?v= al scripturilor devine 2026-11-10e, ca browserul să ia varianta nouă)
-  teste_tema.py     (testul meniului: trei opțiuni, în noua ordine)
-  README.md         (descrierea meniului)
+  debursari.html    (paragraful scos; ?v= al scripturilor devine 2026-11-10f)
+  debursari-ui.js   (notele scoase, rămân cele două linkuri)
+  README.md         (descrierea)
   CITESTE.txt       (acest text)
-Rezultat: verificările din browser (624), logica (374), AMP (54), legătura (53), legis și cursul trec. (teste_tema.py verifică stilul unei teme noi, pe care paginile nu o folosesc, deci unele verificări ale lui pică și fără această schimbare; am schimbat în el doar linia meniului.)
+Rezultat: verificările din browser (624), logica (374), AMP (54), legătura (53), legis și cursul trec.
 După urcare, GitHub Pages poate ține câteva minute vechea pagină; apoi Ctrl+F5.
