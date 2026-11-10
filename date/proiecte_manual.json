@@ -1,5 +1,5 @@
 {
- "_cum_se_foloseste": "Date despre proiecte, scrise de mână, pentru pagina „Debursări pe acorduri” (debursari.html). Două liste. „omise”: rândurile din registru care nu apar în lista de proiecte, fiindcă sunt rânduri-umbrelă: negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu aceleași sume; fără ele, același proiect ar apărea de două ori. Rândurile omise rămân în registrul de acorduri și nu schimbă totalurile (niciunul nu se adună în total). „acte” sunt codurile actelor ca în registru (ex. HG546/2026), „motiv” spune de ce (în română; „motiv_en” e varianta în engleză), „numarat_la” spune unde e numărată suma. „proiecte”: obiectivele proiectului și datele de început și de finalizare; „acte” = orice cod de act al rândului din registru; „obiective” = {„ro”, „en”}; „inceput” și „sfarsit” = AAAA-LL-ZZ, AAAA-LL sau AAAA, după cât spune sursa; „sursa” = adresa documentului oficial, „citat” = fragmentul exact din document care susține ce s-a scris. Fără sursă și citat, o intrare nu se citește. Ce scrie omul în pagină (după ce introduce codul) se păstrează separat, în date/debursari.json, și are prioritate. Dacă același rând apare în mai multe intrări, fiecare câmp (obiective, început, sfârșit) se ia din prima intrare care îl are.",
+ "_cum_se_foloseste": "Date despre proiecte, scrise de mână, pentru pagina „Debursări pe acorduri” (debursari.html). Două liste. „omise”: rândurile din registru care nu apar în lista de proiecte, fiindcă sunt rânduri-umbrelă: negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu aceleași sume; fără ele, același proiect ar apărea de două ori. Rândurile omise rămân în registrul de acorduri și nu schimbă totalurile (niciunul nu se adună în total). „acte” sunt codurile actelor ca în registru (ex. HG546/2026), „motiv” spune de ce (în română; „motiv_en” e varianta în engleză), „numarat_la” spune unde e numărată suma. „proiecte”: obiectivele proiectului și datele de început și de finalizare; „acte” = orice cod de act al rândului din registru; „obiective” = {„ro”, „en”}; „inceput” și „sfarsit” = AAAA-LL-ZZ, AAAA-LL sau AAAA, după cât spune sursa; „sursa” = adresa documentului oficial, „citat” = fragmentul exact din document care susține ce s-a scris. Fără sursă și citat, o intrare nu se citește. Ce scrie omul în pagină (după ce introduce codul) se păstrează separat, în date/debursari.json, și are prioritate. Dacă același rând apare în mai multe intrări, fiecare câmp (obiective, început, sfârșit) se ia din prima intrare care îl are. „unite”: acorduri cu denumiri diferite în registru, care sunt componentele aceluiași proiect (de pildă un grant și un împrumut); în tabel se arată ca un singur proiect, cu componentele lui. „acte” = cel puțin două coduri de act din registru (câte un acord fiecare), „nume” = denumirea proiectului, „motiv” = de ce sunt același proiect. Acordurile rămân rânduri de sine stătătoare (datele, debursările și sumele lor); se unesc numai la același donator, iar când un filtru ascunde toate în afară de unul, nu se mai unesc.",
  "omise": [
   {
    "acte": [
@@ -54,6 +54,17 @@
    "numarat_la": [
     "LP166/2020"
    ]
+  }
+ ],
+ "unite": [
+  {
+   "acte": [
+    "HG793/2020",
+    "HG169/2020",
+    "HG443/2009"
+   ],
+   "nume": "Asistența financiară a Federației Ruse: grant și împrumuturi de stat",
+   "motiv": "Cele trei acorduri cu Federația Rusă (grantul din 2020, împrumutul din 2020 și creditul de stat din 2009) sunt componentele aceluiași proiect, după cum a hotărât proprietarul paginii. În registru au denumiri diferite, deci nu se pot uni singure după denumire."
   }
  ],
  "proiecte": [
