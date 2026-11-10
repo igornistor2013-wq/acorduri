@@ -499,9 +499,9 @@
   "nota": "Introdus manual, după Raportul privind asistența externă pe 2023 (anexa cu acordurile semnate, „valoarea conform acordului”): împrumutul BIRD pentru „Îmbunătățirea calității educației”: 36,5 mil. EUR și 10,0 mil. USD, semnat la 30.06.2023."
  },
  "HG758/2017": {
-  "v": 4000000,
-  "val": "MDL",
-  "nota": "Introdus manual, după Raportul privind asistența externă pe 2017–2018 (anexa cu acordurile semnate, „valoarea conform acordului”): acordul cu Agenția Elvețiană, faza a II-a, 4 mil. lei (echivalentul a 230 mii USD), semnat la 29.09.2017."
+  "v": 230000,
+  "val": "USD",
+  "nota": "Introdus manual, după Raportul privind asistența externă pe 2017–2018 (anexa cu acordurile semnate, „valoarea conform acordului”): acordul cu Agenția Elvețiană, faza a II-a, semnat la 29.09.2017. În acord suma e de 4 mil. lei, iar raportul o dă și în echivalent: 230 mii USD. Se păstrează echivalentul în dolari fiindcă BCE nu publică un curs al leului moldovenesc, deci suma în lei n-ar putea fi trecută în euro și acordul ar rămâne în afara totalului."
  },
  "DPRM209/2017": {
   "v": 500000000,
