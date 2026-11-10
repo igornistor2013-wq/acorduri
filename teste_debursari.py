@@ -562,6 +562,82 @@ def cu_acord_cofinantat():
     return None
 
 
+def citeste_png(date):
+    """Citește un PNG (8 biți, RGB sau RGBA, fără întrețesere) → (lățime, înălțime, canale, rânduri de octeți). Fără Pillow, ca testele să ruleze oriunde."""
+    import struct, zlib
+    assert date[:8] == b'\x89PNG\r\n\x1a\n'
+    poz, idat = 8, b''
+    while poz < len(date):
+        lung, tip = struct.unpack('>I4s', date[poz:poz + 8])
+        corp = date[poz + 8:poz + 8 + lung]
+        if tip == b'IHDR':
+            lat, inalt, _, tip_culoare = struct.unpack('>IIBB', corp[:10])
+        elif tip == b'IDAT':
+            idat += corp
+        poz += 12 + lung
+    ch = {2: 3, 6: 4}[tip_culoare]
+    brut, pas, randuri, ant, i = zlib.decompress(idat), lat * ch, [], bytearray(lat * ch), 0
+    for _ in range(inalt):
+        f, linie = brut[i], bytearray(brut[i + 1:i + 1 + pas])
+        i += 1 + pas
+        for x in range(pas):
+            a = linie[x - ch] if x >= ch else 0
+            sus, st = ant[x], (ant[x - ch] if x >= ch else 0)
+            if f == 1:
+                linie[x] = (linie[x] + a) & 255
+            elif f == 2:
+                linie[x] = (linie[x] + sus) & 255
+            elif f == 3:
+                linie[x] = (linie[x] + ((a + sus) >> 1)) & 255
+            elif f == 4:
+                p_ = a + sus - st
+                pa, pb, pc = abs(p_ - a), abs(p_ - sus), abs(p_ - st)
+                linie[x] = (linie[x] + (a if pa <= pb and pa <= pc else sus if pb <= pc else st)) & 255
+        randuri.append(linie)
+        ant = linie
+    return lat, inalt, ch, randuri
+
+
+def coloana_pixeli(pg, x, y0, y1):
+    """Culorile (R, G, B) ale pixelilor de pe coloana x, de la y0 la y1 (pixeli CSS, față de începutul paginii), citite dintr-o captură a paginii."""
+    _, _, _, rd = citeste_png(pg.screenshot(clip={'x': x, 'y': y0, 'width': 1, 'height': y1 - y0}, full_page=True))
+    return [tuple(r[0:3]) for r in rd]
+
+
+def rupturi(col, culoare):
+    """Șirurile de pixeli consecutivi, dintr-o coloană, care NU au culoarea dată: lista lungimilor lor."""
+    rez, n = [], 0
+    for c in col:
+        if c != culoare:
+            n += 1
+        elif n:
+            rez.append(n)
+            n = 0
+    return rez + ([n] if n else [])
+
+
+# stilul rândului (al lui și al primei lui celule) și al blocului unui proiect deschis (rândurile „sub” care urmează proiectului unit), citite din pagină
+JS_STIL = """(sel) => {
+  const r = document.querySelector(sel);
+  if (!r) return null;
+  const t = getComputedStyle(r.querySelector('td')), s = getComputedStyle(r);
+  return { fundal: s.backgroundColor, fundalTd: t.backgroundColor, sus: t.borderTopWidth + ' ' + t.borderTopColor, jos: t.borderBottomWidth + ' ' + t.borderBottomColor,
+           imagine: t.backgroundImage === 'none' ? 'none' : (t.backgroundImage.indexOf('linear-gradient') === 0 ? 'bară' : t.backgroundImage), marime: t.backgroundSize,
+           umbra: t.boxShadow, mt: s.marginTop, ml: s.marginLeft, bl: s.borderLeftWidth + ' ' + s.borderLeftColor };
+}"""
+JS_BLOC = """(sel) => {
+  const h = document.querySelector(sel), rows = [h], sy = window.scrollY;
+  let n = h.nextElementSibling;
+  while (n && n.classList.contains('sub')) { rows.push(n); n = n.nextElementSibling; }
+  const td = r => getComputedStyle(r.querySelector('td'));
+  return { clase: rows.map(r => r.className),
+           celule: rows.map(r => { const c = r.querySelector('td').getBoundingClientRect(); return [c.left, c.top + sy, c.bottom + sy]; }),
+           bara: rows.map(r => [td(r).backgroundImage.indexOf('linear-gradient') === 0, td(r).backgroundSize]),
+           urmator: n ? { clasa: n.className, sus: td(n).borderTopWidth + ' ' + td(n).borderTopColor, mt: getComputedStyle(n).marginTop } : null };
+}"""
+JS_CELULA = """(sel) => { const c = document.querySelector(sel).querySelector('td').getBoundingClientRect(), sy = window.scrollY; return [c.left, c.top + sy, c.bottom + sy]; }"""
+
+
 DOAR = set(sys.argv[sys.argv.index('--doar') + 1].split(',')) if '--doar' in sys.argv else None      # ex.: --browser --doar 13,14
 
 
@@ -2027,6 +2103,167 @@ try:
             egal('Excel (fără căutare): tot un rând pe acord (%d), nu pe proiect unit (%d)' % (len(BERD), total_unitati), randuri_date(ws, ra), len(BERD))
             nume_xl = [r[iP].value for r in ws.iter_rows(min_row=ra + 1, max_row=ra + len(BERD))]
             verifica('Excel: fiecare acord al unui proiect unit își păstrează rândul și mențiunea de deosebire (grant / împrumut, an)', nume_g in nume_xl and nume_i in nume_xl and len(set(nume_xl)) == len(nume_xl), nume_xl[:6])
+            ctx.close()
+
+        # ---------------------------------------------------------------- 20. proiectul deschis e un bloc încadrat
+        if rulez(20):
+            print('\n20. Proiectul deschis: bloc încadrat (bară și linii albastre, fundal), ca să nu se confunde cu proiectele din jur')
+            NAVY, ALBASTRU, NAVY_PX = 'rgb(34, 64, 107)', 'rgb(234, 240, 251)', (34, 64, 107)
+            U_BIRD = proiecte_unite(acorduri_donator('BIRD'))
+            verifica('BIRD are cel puțin un proiect cu grant și împrumut (pe el se verifică cadrul)', len(U_BIRD) >= 1, len(U_BIRD))
+            cheie_g = 'modernizarea si imbunatatirea serviciilor de reabilitare' if 'modernizarea si imbunatatirea serviciilor de reabilitare' in U_BIRD else sorted(U_BIRD)[0]
+            PB = 'section.panel[data-d="BIRD"]'
+            HG = PB + ' tr.pg[data-gr="BIRD|%s"]' % cheie_g
+            ctx = context(b)                                                                     # 1360 × 900: tabel, nu cartonașe
+            fals = GitHubFals(intrari=[])
+            pg = pagina(ctx, fals, hash_='#d=BIRD')
+            pg.mouse.move(2, 2)
+            st = pg.evaluate(JS_STIL, HG)
+            verifica('proiect unit închis: fără cadru (fundal obișnuit, fără linie albastră de 2 px, fără bară din fundal), cu bara lui subțire din stânga',
+                     st['fundal'] != ALBASTRU and not st['sus'].startswith('2px') and st['imagine'] == 'none' and NAVY in st['umbra'], st)
+            st = pg.evaluate(JS_STIL, PB + ' tr.ac:not(.sub)')
+            verifica('rând obișnuit închis: fără cadru', st['fundal'] != ALBASTRU and not st['sus'].startswith('2px') and st['imagine'] == 'none' and st['umbra'] == 'none', st)
+
+            # proiectul unit, deschis: rândul lui și componentele
+            pg.locator(HG + ' .exp').click()
+            pg.wait_for_selector(PB + ' tr.ac.sub')
+            pg.mouse.move(2, 2)
+            st = pg.evaluate(JS_STIL, HG)
+            verifica('proiect unit deschis: fundal albastru-deschis, linie albastră de 2 px deasupra și bară albastră de 4 px în stânga',
+                     st['fundal'] == ALBASTRU and st['sus'] == '2px ' + NAVY and st['imagine'] == 'bară' and st['marime'] == '4px 100%', st)
+            bl = pg.evaluate(JS_BLOC, HG)
+            egal('blocul: rândul proiectului și cele două componente', [c.split(' ')[0] for c in bl['clase']], ['pg', 'ac', 'ac'])
+            verifica('toate rândurile blocului au bara albastră din stânga, de 4 px', all(x[0] and x[1] == '4px 100%' for x in bl['bara']), bl['bara'])
+            lef = [c[0] for c in bl['celule']]
+            verifica('bara e aliniată: prima celulă a fiecărui rând începe la aceeași margine (±1 px)', max(lef) - min(lef) <= 1, lef)
+            verifica('rândurile blocului se ating, fără spații între ele (bara e continuă)', all(abs(bl['celule'][i + 1][1] - bl['celule'][i][2]) <= 1.5 for i in range(len(bl['celule']) - 1)), bl['celule'])
+            verifica('după bloc urmează un proiect închis, fără cadru, cu linia albastră de 2 px deasupra (încheie blocul)',
+                     bl['urmator'] is not None and 'deschis' not in bl['urmator']['clasa'] and 'sub' not in bl['urmator']['clasa'] and bl['urmator']['sus'] == '2px ' + NAVY, bl['urmator'])
+            verifica('în tot panoul, doar blocul deschis are bară din fundal (trei rânduri); proiectele din jur nu', pg.evaluate('(p) => [...document.querySelectorAll(p + " tbody td")].filter(t => getComputedStyle(t).backgroundImage.indexOf("linear-gradient") === 0).length', PB) == 3)
+            x0 = int(round(lef[0]))
+            y_sus, y_jos = int(round(bl['celule'][0][1])), int(round(bl['celule'][-1][2]))
+            col = coloana_pixeli(pg, x0 + 1, y_sus, y_jos - 1)                                 # pixelii de pe bară, de la prima linie albastră până deasupra liniei de închidere (aceea se verifică în stil)
+            rup = rupturi(col, NAVY_PX)
+            verifica('pe ecran bara e albastră de sus până jos; singura întrerupere (1 px) e linia dintre cele două componente', max(rup or [0]) <= 1 and len(rup) <= len(bl['clase']) - 2, rup)
+            j = int(round(bl['celule'][1][1])) - y_sus
+            verifica('pe ecran, la trecerea de la rândul proiectului la prima componentă bara nu se întrerupe', all(c == NAVY_PX for c in col[j - 1:j + 2]), col[j - 2:j + 3])
+            col8 = coloana_pixeli(pg, x0 + 9, y_sus, y_jos)
+            verifica('pe ecran, în prima coloană nu apare nicio linie albă între rânduri', all(c != (255, 255, 255) for c in col8), [i for i, c in enumerate(col8) if c == (255, 255, 255)][:5])
+
+            # detaliile unei componente: fac parte din bloc
+            pg.locator(PB + ' tr.ac.sub').first.locator('.exp').click()
+            pg.wait_for_selector(PB + ' tr.det.sub')
+            pg.mouse.move(2, 2)
+            bl = pg.evaluate(JS_BLOC, HG)
+            egal('cu detaliile primei componente: proiectul, componenta, detaliile ei, a doua componentă', [c.split(' ')[0] for c in bl['clase']], ['pg', 'ac', 'det', 'ac'])
+            st = pg.evaluate(JS_STIL, PB + ' tr.det.sub')
+            verifica('detaliile componentei fac parte din bloc: bara albastră și fundal deschis', st['imagine'] == 'bară' and st['marime'] == '4px 100%' and st['fundalTd'] == 'rgb(249, 251, 254)', st)
+            verifica('blocul rămâne încheiat sub ultimul lui rând (linia albastră de 2 px a proiectului următor)', bl['urmator'] is not None and bl['urmator']['sus'] == '2px ' + NAVY and all(x[0] for x in bl['bara']), (bl['urmator'], bl['bara']))
+            y_sus, y_jos = int(round(bl['celule'][0][1])), int(round(bl['celule'][-1][2]))
+            col = coloana_pixeli(pg, x0 + 1, y_sus, y_jos - 1)
+            rup = rupturi(col, NAVY_PX)
+            verifica('pe ecran, cu detaliile deschise, bara rămâne albastră de sus până jos (doar linia de 1 px de sub detalii o taie)', max(rup or [0]) <= 1 and len(rup) <= len(bl['clase']) - 2, rup)
+            for i, nume in ((1, 'de la componentă la detaliile ei'),):
+                j = int(round(bl['celule'][i + 1][1])) - y_sus
+                verifica('pe ecran, trecerea %s nu întrerupe bara' % nume, all(c == NAVY_PX for c in col[j - 1:j + 2]), col[j - 2:j + 3])
+            col8 = coloana_pixeli(pg, x0 + 9, y_sus, y_jos)
+            verifica('pe ecran, cu detaliile deschise, nicio linie albă între rânduri', all(c != (255, 255, 255) for c in col8), [i for i, c in enumerate(col8) if c == (255, 255, 255)][:5])
+
+            # un rând obișnuit, deschis: același cadru, cu detaliile lui
+            pg.locator(HG + ' .exp').click()
+            pg.wait_for_selector(PB + ' tr.ac.sub', state='detached')
+            st = pg.evaluate(JS_STIL, HG)
+            verifica('proiectul unit închis la loc: cadrul dispare (fundal obișnuit, fără linie albastră, fără bară din fundal)', st['fundal'] != ALBASTRU and not st['sus'].startswith('2px') and st['imagine'] == 'none', st)
+            RO = PB + ' tr.ac:not(.sub)'
+            pg.locator(RO).first.locator('.exp').click()
+            pg.wait_for_selector(PB + ' tr.ac.deschis:not(.sub)')
+            pg.mouse.move(2, 2)
+            RD = PB + ' tr.ac.deschis:not(.sub)'
+            st, sd = pg.evaluate(JS_STIL, RD), pg.evaluate(JS_STIL, PB + ' tr.det')
+            verifica('rând obișnuit deschis: fundal albastru-deschis, linie albastră de 2 px deasupra, bara albastră în stânga', st['fundal'] == ALBASTRU and st['sus'] == '2px ' + NAVY and st['imagine'] == 'bară' and st['marime'] == '4px 100%', st)
+            verifica('detaliile lui au aceeași bară și o linie albastră de 2 px dedesubt (încheie blocul)', sd['imagine'] == 'bară' and sd['jos'] == '2px ' + NAVY and sd['fundalTd'] == 'rgb(246, 249, 254)', sd)
+            ra, rd = pg.evaluate(JS_CELULA, RD), pg.evaluate(JS_CELULA, PB + ' tr.det')
+            col = coloana_pixeli(pg, int(round(ra[0])) + 1, int(round(ra[1])), int(round(rd[2])) + 1)
+            verifica('pe ecran, bara rândului obișnuit e albastră fără nicio întrerupere, din rând în detaliile lui', rupturi(col, NAVY_PX) == [], rupturi(col, NAVY_PX))
+            pg.locator(RD + ' .exp').click()
+            pg.wait_for_selector(PB + ' tr.det', state='detached')
+            st = pg.evaluate(JS_STIL, RO)
+            verifica('rândul obișnuit închis la loc: fără cadru', st['fundal'] != ALBASTRU and not st['sus'].startswith('2px') and st['imagine'] == 'none', st)
+
+            # după deblocare: bara de editare face parte din bloc, dar nu îl încheie
+            print('   · bara de editare, în blocul deschis')
+            debloca(pg)
+            verifica('deblocat', deblocat(pg))
+            pg.locator(HG + ' .exp').click()
+            pg.wait_for_selector(PB + ' tr.ac.sub')
+            c1 = pg.locator(PB + ' tr.ac.sub').first
+            c1.locator('.edt[data-f="suma"]').click()
+            pg.wait_for_selector(PB + ' tr.re.sub')
+            pg.mouse.move(2, 2)
+            bl = pg.evaluate(JS_BLOC, HG)
+            egal('componenta în editare: proiectul, componenta, bara de editare, apoi detaliile ei (rămase deschise), a doua componentă', [c.split(' ')[0] for c in bl['clase']], ['pg', 'ac', 're', 'det', 'ac'])
+            st = pg.evaluate(JS_STIL, PB + ' tr.re.sub')
+            verifica('bara de editare a componentei are bara albastră și nu e luată drept sfârșit de bloc (fără linie albastră de 2 px deasupra)', st['imagine'] == 'bară' and not st['sus'].startswith('2px'), st)
+            verifica('blocul rămâne întreg: toate rândurile au bara și blocul se încheie după ultimul rând', all(x[0] for x in bl['bara']) and bl['urmator'] is not None and bl['urmator']['sus'] == '2px ' + NAVY, (bl['bara'], bl['urmator']))
+            st = pg.evaluate(JS_STIL, PB + ' tr.ac.sub.edit')
+            verifica('rândul în editare își păstrează fundalul crem (se vede că e în editare)', st['fundal'] == 'rgb(255, 253, 244)' and st['imagine'] == 'bară', st)
+            pg.locator(HG + ' .exp').click()
+            pg.wait_for_selector(PB + ' tr.ac.sub', state='detached')
+            RO0 = pg.locator(RO).first
+            RO0.locator('.exp').click()
+            pg.wait_for_selector(RD)
+            RO0.locator('.edt[data-f="sfarsit"]').click()
+            pg.wait_for_selector(PB + ' tr.ac.deschis.edit')
+            pg.mouse.move(2, 2)
+            st = pg.evaluate(JS_STIL, PB + ' tr.ac.deschis:not(.sub) + tr.re')
+            verifica('rând obișnuit deschis, în editare: bara de editare are bara albastră (blocul nu se întrerupe)', st is not None and st['imagine'] == 'bară', st)
+            ra, rd = pg.evaluate(JS_CELULA, RD), pg.evaluate(JS_CELULA, PB + ' tr.det')
+            col = coloana_pixeli(pg, int(round(ra[0])) + 1, int(round(ra[1])), int(round(rd[2])) + 1)
+            rup = rupturi(col, NAVY_PX)
+            verifica('pe ecran, bara rândului obișnuit în editare e albastră de sus până jos (doar linia de 1 px de sub bara de editare o taie)', max(rup or [0]) <= 1 and len(rup) <= 1, rup)
+            pg.locator(RD + ' .exp').click()
+            pg.wait_for_selector(PB + ' tr.det', state='detached')
+            r2 = pg.locator(PB + ' tr.ac:not(.sub):not(.edit)').first
+            r2.locator('.edt[data-f="inceput"]').click()
+            pg.wait_for_selector(PB + ' tr.ac.edit:not(.deschis)')
+            st = pg.evaluate(JS_STIL, PB + ' tr.ac.edit:not(.deschis) + tr.re')
+            verifica('rând închis, în editare: fără cadru și fără bară (nu face parte dintr-un bloc deschis)', st is not None and st['imagine'] == 'none' and not st['sus'].startswith('2px'), st)
+            ctx.close()
+
+            # lățimi: tabelul se încadrează de la 821 px; sub 820 px sunt cartonașe, cu bloc din cartonașe
+            print('   · lățimi: 1000, 821/820 și telefon')
+            ctx = context(b, viewport=(1000, 800))
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BIRD')
+            pg.locator(HG + ' .exp').click()
+            pg.wait_for_selector(PB + ' tr.ac.sub')
+            pg.locator(PB + ' tr.ac.sub').first.locator('.exp').click()
+            pg.wait_for_selector(PB + ' tr.det.sub')
+            pg.mouse.move(2, 2)
+            st = pg.evaluate(JS_STIL, HG)
+            verifica('1000 px: același cadru (fundal albastru, linie de 2 px, bară)', st['fundal'] == ALBASTRU and st['sus'] == '2px ' + NAVY and st['imagine'] == 'bară', st)
+            lat = pg.evaluate('document.documentElement.scrollWidth - document.documentElement.clientWidth')
+            verifica('1000 px: pagina nu se lărgește cu blocul deschis', lat <= 0, lat)
+            pg.set_viewport_size({'width': 821, 'height': 800})
+            st = pg.evaluate(JS_STIL, HG)
+            verifica('821 px: încă tabel, cu cadru', st['sus'] == '2px ' + NAVY and st['imagine'] == 'bară' and st['mt'] == '0px', st)
+            pg.set_viewport_size({'width': 820, 'height': 800})
+            st = pg.evaluate(JS_STIL, HG)
+            verifica('820 px: cartonașe; cadrul de tabel nu se aplică (fără bară din fundal), proiectul deschis are bordură albastră și loc deasupra', st['imagine'] == 'none' and st['bl'] == '4px ' + NAVY and st['fundal'] == ALBASTRU and st['mt'] == '22px', st)
+            ctx.close()
+            ctx = context(b, viewport=(390, 800))
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BIRD')
+            pg.locator(HG + ' .exp').click()
+            pg.wait_for_selector(PB + ' tr.ac.sub')
+            pg.locator(PB + ' tr.ac.sub').first.locator('.exp').click()
+            pg.wait_for_selector(PB + ' tr.det.sub')
+            pg.mouse.move(2, 2)
+            bl = pg.evaluate(JS_BLOC, HG)
+            st, sc, sdt = pg.evaluate(JS_STIL, HG), pg.evaluate(JS_STIL, PB + ' tr.ac.sub'), pg.evaluate(JS_STIL, PB + ' tr.det.sub')
+            verifica('telefon: cartonașul proiectului deschis are fundal albastru, bordură și bară albastre și loc deasupra, față de cartonașul dinainte', st['fundal'] == ALBASTRU and st['bl'] == '4px ' + NAVY and st['mt'] == '22px' and st['imagine'] == 'none', st)
+            verifica('telefon: componentele sunt cartonașe trase spre dreapta, cu bară albastră în stânga, iar detaliile lor se lipesc de ele', sc['ml'] == '24px' and sc['bl'] == '4px ' + NAVY and sdt['ml'] == '24px' and sdt['imagine'] == 'none', (sc, sdt))
+            verifica('telefon: după bloc, următorul cartonaș are loc deasupra (nu se lipește de bloc)', bl['urmator'] is not None and bl['urmator']['mt'] == '22px', bl['urmator'])
+            lat = pg.evaluate('document.documentElement.scrollWidth - document.documentElement.clientWidth')
+            verifica('telefon: pagina nu se lărgește cu blocul deschis', lat <= 0, lat)
             ctx.close()
 
         b.close()

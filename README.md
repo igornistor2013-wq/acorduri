@@ -203,7 +203,7 @@ care legis.md îl primește.
 | `date/proiecte_manual.json` | Date despre proiecte, scrise de mână și cu sursă. „omise”: rândurile-umbrelă ale registrului, care nu apar în lista de proiecte (cu motivul). „proiecte”: obiectivele proiectului și, când sursa le dă, data de început și de finalizare; fiecare intrare are adresa documentului oficial și citatul exact — fără ele nu se citește. Vezi „Debursări pe acorduri” |
 | `date/debursari.json` | „Baza de date” a paginii: debursările introduse de mână, o înregistrare pe linie, și — la cheia `proiecte`, scrisă doar când nu e goală — datele despre proiecte introduse în pagină (obiective, început, finalizare). Fișier public; îl scrie doar pagina, prin API-ul GitHub, cu codul de acces. Fiecare salvare e un commit. La 3 noiembrie 2026 conține și datele din scrisoarea Ministerului Finanțelor (situația la 30.09.2026): 31 de debursări cumulate și datele de început/finalizare la 34 de rânduri, fiecare cu nota care citează scrisoarea (vezi „Datele din scrisoarea Ministerului Finanțelor”) |
 | `teste_debursari.js` | Testele logicii (obiective și date cu sursele lor, rânduri omise, totaluri, operații, conflicte de scriere, PIN, specificațiile Excel). Rulare: `node teste_debursari.js` |
-| `teste_debursari.py` | Verifică fișierele paginii (inclusiv `date/proiecte_manual.json`) și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”, inclusiv deblocarea unică, editarea în tabel și proiectele cu grant și împrumut unite într-un rând, secțiunea 19); `--doar 13,14` rulează doar secțiunile numerotate (de la 13 în sus; 1–12 rulează doar fără `--doar`) |
+| `teste_debursari.py` | Verifică fișierele paginii (inclusiv `date/proiecte_manual.json`) și, cu `--browser`, pagina întreagă împotriva unui GitHub simulat (vezi „Debursări pe acorduri”, inclusiv deblocarea unică, editarea în tabel și proiectele cu grant și împrumut unite într-un rând, secțiunea 19, și proiectul deschis, încadrat, secțiunea 20); `--doar 13,14` rulează doar secțiunile numerotate (de la 13 în sus; 1–12 rulează doar fără `--doar`) |
 | `raport_legis.md`, `jurnal_legis.md` | Raportul ultimei rulări și istoricul zilelor cu acte noi. Le scrie `legis_watch.py`; apar în repository după prima rulare reușită a lui `legis_local.bat` |
 | `CNAME` | Domeniul propriu |
 
@@ -356,6 +356,15 @@ donatorului spune „N proiecte (M acorduri)", iar Excel-ul are tot câte un râ
 singur act care cuprinde și grant, și împrumut (de pildă acordul cu FIDA, `hg969/2008`) rămâne un singur rând, cu tipul
 dat de registru, fiindcă registrul nu are sumele separate. Regulile sunt în `grupeazaProiecte` și `sumeComponente` din
 `debursari.js`, cu teste în `teste_debursari.js` și în secțiunea 19 din `teste_debursari.py`.
+
+**Proiectul deschis e un bloc încadrat.** Când un proiect e deschis (rândul lui cu detaliile, sau proiectul cu grant și
+împrumut, cu componentele și detaliile lor), tot ce ține de el are fundal albastru-deschis, o **linie albastră de 2 px
+deasupra și dedesubt** și o **bară albastră în stânga**, continuă de la rândul proiectului până la ultimul lui rând, ca să
+nu se confunde cu proiectele din jur (care rămân albe, fără cadru). Bara e fundalul primei celule a fiecărui rând (nu o
+umbră interioară), cu originea în marginea celulei: așa acoperă și linia de 1 px dintre rânduri. Pe telefon, unde tabelul
+devine cartonașe, proiectul deschis are bordură albastră și un loc deasupra, față de cartonașul dinainte. Stilurile sunt la
+sfârșitul stilurilor tabelului din `debursari.html`; secțiunea 20 din `teste_debursari.py` le verifică, inclusiv pe ecran
+(pixelii barei), la 1360, 1000, 821/820 și 390 px, cu bara de editare după deblocare.
 
 **Rânduri omise, ca un proiect să nu apară de două ori.** Cinci rânduri ale registrului nu apar în liste:
 sunt rânduri-umbrelă, adică negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu

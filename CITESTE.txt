@@ -1,11 +1,15 @@
-Pagina „Debursări pe acorduri”: împrumutul unui proiect cu grant și împrumut se vede și când detaliile unui grant sunt deschise. Patru fișiere; designul rămâne cel vechi, se adaugă doar o linie în detaliile componentelor.
-Raportat: la „Moldova, măsuri în situație de urgență, reziliență și competitivitate. Operațiunea de politici de dezvoltare 2” (BIRD) nu se găsea componenta de împrumut. Ea exista (al treilea rând, „Împrumut, 2023”, 92,1 mil. EUR, HG202/2023), dar detaliile primului grant, deschise, sunt înalte (circa 600 px) și împingeau rândul împrumutului cam 700 px mai jos, în afara ferestrei.
-Acum, sus în detaliile fiecărei componente apare linia „Componentele proiectului”: toate componentele proiectului (aici: Grant, 2023, 88,4 mil. USD · Grant, 2023, 9,3 mil. USD · Împrumut, 2023), cea curentă marcată. Un clic pe alta închide detaliile de acum, o deschide pe ea, mută focusul pe butonul ei și derulează la rândul ei (sub bara de acces; rândul se luminează o clipă). Merge și cu Enter, în engleză („Components of the project”) și pe telefon (pastilele se așază pe rânduri). Un rând obișnuit nu are linia.
+Pagina „Debursări pe acorduri”: proiectul deschis se vede ca un bloc încadrat, ca să nu se mai confunde cu proiectele din jur. Patru fișiere; designul rămâne cel vechi (aceleași culori și fonturi), se schimbă doar cum arată proiectul când îl deschizi.
+Raportat: când se deschide un proiect (cu detaliile și descrierea lui, sau, la grant + împrumut, cu componentele), rândurile deschise se amestecau cu celelalte proiecte: fundal aproape alb și o bară subțire, cenușie, în stânga.
+Acum, la ferestre de la 821 px în sus (tabelul), orice proiect deschis are:
+  · fundal albastru-deschis (rândul proiectului; componentele și detaliile, în nuanțe apropiate);
+  · linie albastră de 2 px deasupra și dedesubt;
+  · bară albastră de 4 px în stânga, continuă de la rândul proiectului până la ultimul lui rând (la grant + împrumut: rândul proiectului, componentele și detaliile lor).
+Proiectele din jur rămân albe, fără cadru; blocul se încheie clar sub ultimul lui rând. Un rând obișnuit și detaliile lui arată la fel. După deblocare, bara de editare face parte din bloc (rândul în editare rămâne crem). Pe telefon (cartonașe) proiectul deschis are bordură albastră, fundal albastru-deschis și un loc deasupra față de cartonașul dinainte; componentele au bara albastră în stânga.
 Pune-le în repository la aceleași căi:
-  debursari-ui.js     (linia nouă, `htmlComponente`, și trecerea de la o componentă la alta, `spreComponenta`)
-  debursari.html      (stilurile liniei și ale rândului luminat; `?v=` al lui debursari-ui.js e acum 2026-11-09b, ca browserul să nu păstreze varianta din dimineața asta)
-  teste_debursari.py  (în secțiunea 19: proiectul BIRD de mai sus, cu clic, tastatură, engleză și telefon; testul pentru `?v=` acceptă o literă după dată)
-  README.md           (linia nouă și regula literei din `?v=`)
-Rezultat: verificările din browser (toate cele 19 secțiuni) și celelalte suite trec.
-Fișierele de mai sus nu sunt scrise de verificările automate (acestea scriu doar în date/, legis_acorduri.html, rss.xml și sitemap.xml), deci le poți înlocui direct. Baza pachetului: commit-ul f04ee47 din 09.11.2026 (cel cu pachetul anterior, „proiecte cu grant și împrumut într-un rând”).
+  debursari.html      (stilurile blocului încadrat; `?v=` al lui debursari-ui.js e acum 2026-11-09c, ca browserul să nu păstreze varianta veche)
+  debursari-ui.js     (o clasă în plus, „sub”, la bara de editare a unei componente, ca s-o recunoască stilurile)
+  teste_debursari.py  (secțiunea 20: stilurile, rândurile blocului, pixelii barei de pe ecran la 1360, 1000, 821/820 și 390 px, cu bara de editare)
+  README.md           (paragraful „Proiectul deschis e un bloc încadrat”)
+Rezultat: verificările din browser (toate cele 20 de secțiuni) și celelalte suite trec.
+Fișierele de mai sus nu sunt scrise de verificările automate (acestea scriu doar în date/, legis_acorduri.html, rss.xml și sitemap.xml), deci le poți înlocui direct. Baza pachetului: commit-ul c26bb2f din 09.11.2026 („Acte noi”), care conține pachetul anterior (linia „Componentele proiectului”).
 După urcare, GitHub Pages poate ține câteva minute vechea pagină; apoi Ctrl+F5.

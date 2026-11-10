@@ -570,7 +570,7 @@ function htmlSumaEd(a, k, nume) {
 }
 function htmlBaraRand(a, k) {
   var re = S.re.get(a.id);
-  return '<tr class="re" data-k="' + esc(k) + '"><td colspan="7"><div class="re-bar">' +
+  return '<tr class="re' + (S.subDe.has(k) ? ' sub' : '') + '" data-k="' + esc(k) + '"><td colspan="7"><div class="re-bar">' +
     '<label>' + esc(L('Sursa informației (opțional)', 'Source of the information (optional)')) + '<input type="text" data-re="nota" maxlength="' + D.MAX_NOTA + '" autocomplete="off" data-fk="' + esc(k + '|re_nota') +
       '" value="' + esc(re.f.nota) + '" placeholder="' + esc(L('de pildă: raportul anual al proiectului, pag. 3', 'for example: the project annual report, p. 3')) + '"></label>' +
     '<div class="re-btns"><button type="button" class="btn p" data-act="rand-salveaza">' + esc(L('Salvează', 'Save')) + '</button><button type="button" class="btn" data-act="rand-anuleaza">' + esc(L('Anulează', 'Cancel')) + '</button></div>' +
