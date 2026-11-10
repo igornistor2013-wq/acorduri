@@ -1,19 +1,18 @@
-Pagina „Debursări pe acorduri”: proiectul deschis arată acum ca o fișă ordonată, fără citate din surse și cu mai multe detalii. Șapte fișiere; designul rămâne cel vechi (aceleași culori și fonturi), se schimbă doar ce se vede când deschizi un proiect.
-Raportat: când se deschidea un proiect, totul părea haotic (secțiuni amestecate, citate lungi din surse, o descriere săracă); citatele din surse nu sunt necesare, iar descrierea trebuie să spună mai mult.
-Acum, rândul deschis arată o fișă în cartonașe albe, cu titlu mic, în această ordine:
-  · Descrierea proiectului: obiectivele, cu sursa ca etichetă mică („sursă oficială”, cu link spre document); titlul întreg al acordului, când diferă de denumirea din tabel. Citatul și nota din fișierul de surse NU se mai afișează: rămân în date/proiecte_manual.json, ca dovadă, iar nota și gazda documentului se văd doar când treci cu mouse-ul peste etichetă;
-  · Date esențiale: donatorul cu denumirea întreagă, suma acordului (cu echivalentul în euro și de unde vine), costul total al proiectului și alte sume din acte, când registrul le are, și dacă intră în totaluri;
-  · Perioada de implementare: data de început și de finalizare, fiecare cu sursa ei, apoi durata și situația („în desfășurare”, „termenul de finalizare a trecut”, „urmează să înceapă”), calculate din cele două date, față de ziua de azi; proiectul AMP legat;
-  · Parcursul acordului: actele din registru în ordinea datelor, fiecare cu etapa pe care o reprezintă (negocieri, semnare, proiect de lege, ratificare, promulgare, punere în aplicare), tipul și numărul actului, cu link către el. La nouă acte sau mai multe se văd primele trei și ultimele trei, iar restul se deschid cu „Arată încă N acte” (și se strâng la loc cu „Restrânge lista actelor”).
-Sub cartonașe: debursările, pe toată lățimea, iar după deblocare, unul lângă altul, formularul de debursare și cel de date despre proiect. Pe ecran lat cartonașele curg în două coloane echilibrate; de la 900 px în jos (și pe telefon), într-una, în aceeași ordine.
-Nimic nu se inventează: tot ce se vede vine din registru, din surse sau se calculează din date. Textul descrierii vine doar din surse (obiectivele), deci un proiect fără obiective spune în continuare „Obiective neintroduse”. Descrieri mai ample, scrise pe larg, se pot adăuga pentru proiectele importante (un câmp nou, cu sursă), dacă vrei.
+Pagina „Debursări pe acorduri”: detaliile unui proiect se deschid acum într-o fereastră separată, mai mică, deasupra paginii, nu mai în tabel, între proiectele vecine. Cinci fișiere; designul rămâne cel vechi (aceleași culori și fonturi), se schimbă doar locul unde se deschid detaliile.
+Raportat: când se deschidea un proiect, pagina cu detalii se încurca cu proiectele de alături; trebuia să se deosebească mai tare și să se deschidă într-o pagină separată, mai mică.
+Acum, butonul din dreapta rândului (și butonul „Debursare”, după deblocare) deschide o fereastră mică, centrată, pe fundal întunecat:
+  · pagina din spate se întunecă, nu se derulează și nu poate fi atinsă cât e deschisă fereastra; tabelul nu se mai desface, deci proiectele vecine rămân cum erau;
+  · sus, un antet care rămâne pe loc: tipul și situația acordului, denumirea proiectului, semnarea și cofinanțatorii, butonul „Închide”;
+  · dedesubt, aceeași fișă ca înainte (descrierea, datele esențiale, perioada, parcursul acordului, debursările și, după deblocare, formularele), care se derulează în fereastră;
+  · se închide cu „Închide”, cu Esc sau cu un clic pe fundalul întunecat; focusul se întoarce pe rândul de unde ai deschis; o schimbare a filtrelor din adresă o închide;
+  · la un proiect cu grant și împrumut, în antet apare linia „Componentele proiectului”: un clic pe o componentă schimbă fereastra pe ea, fără s-o închidă. Proiectul cu grant și împrumut se desface în continuare în tabel (cu componentele lui), în blocul albastru încadrat; doar detaliile s-au mutat în fereastră;
+  · pe telefon fereastra ocupă tot ecranul; rămâne lipită sus doar bara cu tipul și „Închide”, iar denumirea și fișa se derulează împreună.
 Pune-le în repository la aceleași căi:
-  debursari.html      (stilurile fișei; `?v=` al lui debursari.js și debursari-ui.js e acum 2026-11-10, ca browserul să nu păstreze varianta veche)
-  debursari.js        (calculele noi: parcursul acordului, durata, situația față de azi)
-  debursari-ui.js     (fișa: cartonașele, parcursul cu pliere, sursa ca etichetă, fără citat)
-  teste_debursari.js  (testele calculelor noi)
-  teste_debursari.py  (secțiunea 21: fișa în browser; secțiunile 2 și 13 adaptate: fără citate în pagină)
-  README.md           (paragraful „Fișa proiectului”)
-Rezultat: verificările din browser (toate cele 21 de secțiuni, 579 de verificări), logica paginii (364), AMP (54), legătura (53) și legis trec. Fișa a fost privită și la 1743, 1360, 1000 și 390 px, cu și fără cod, la un proiect obișnuit și la o componentă de grant + împrumut.
-Fișierele de mai sus nu sunt scrise de verificările automate (acestea scriu doar în date/, legis_acorduri.html, rss.xml și sitemap.xml), deci le poți înlocui direct. Baza pachetului: commit-ul 8f7f573 din 10.11.2026, care conține pachetul anterior (proiectul deschis ca bloc încadrat).
+  debursari.html      (fereastra proiectului: `<dialog id="fisa">` și stilurile ei; `?v=` al lui debursari.js și debursari-ui.js e acum 2026-11-10b, ca browserul să nu păstreze varianta veche)
+  debursari-ui.js     (deschiderea, închiderea și redesenarea ferestrei, pastilele componentelor; rândul nu se mai desface în tabel)
+  teste_debursari.py  (secțiunile 2, 3, 10, 11 și 13–21 adaptate la fereastră; secțiunea nouă 22: fereastra în sine)
+  README.md           (paragrafele despre fereastra proiectului și despre blocul încadrat al proiectului cu grant și împrumut)
+  CITESTE.txt         (acest text)
+Rezultat: verificările din browser (toate cele 22 de secțiuni, 620 de verificări), logica paginii (364), AMP (54), legătura (53) și legis trec. Fereastra a fost privită și la 1743, 1360, 1000 și 390 px, cu și fără cod, la un proiect obișnuit și la o componentă a unui proiect cu grant și împrumut.
+Fișierele de mai sus nu sunt scrise de verificările automate (acestea scriu doar în date/, legis_acorduri.html, rss.xml și sitemap.xml), deci le poți înlocui direct. Baza pachetului: commit-ul c51f10e din 10.11.2026, care conține pachetul anterior (fișa proiectului în cartonașe, deschisă în tabel).
 După urcare, GitHub Pages poate ține câteva minute vechea pagină; apoi Ctrl+F5.

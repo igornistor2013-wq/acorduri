@@ -195,9 +195,9 @@ care legis.md îl primește.
 | `legatura_acorduri.py` | Scrie `date/acorduri_legare.json`: deschide pagina registrului într-un browser fără ecran și îi cere lista acordurilor așa cum le vede ea (grupate, denumite, cu suma aleasă și trecută în euro). Are nevoie de Playwright |
 | `date/acorduri_legare.json` | Acordurile din registru, gata grupate, un acord pe linie. Citit de pagina „De la lege la bani". Se rescrie doar când se schimbă ceva |
 | `date/legaturi_amp.json` | Legăturile acord ↔ proiect AMP confirmate de oameni (vezi mai jos). Se completează de mână sau din pagină |
-| `debursari.html` | Pagina „Debursări pe acorduri”: structura și stilurile. Scripturile ei sunt `debursari.js` și `debursari-ui.js` (vezi „Debursări pe acorduri”), încărcate cu `?v=AAAA-LL-ZZ`: **la fiecare modificare a unuia dintre ele schimbă data din `debursari.html`** (dacă data de azi e deja pusă, adaugă o literă: `?v=2026-11-09b`), altfel browserul poate păstra o variantă veche (de pildă se vedea doar butonul „Debursare”, fără creioanele de editare). Un test verifică prezența lui `?v=` |
+| `debursari.html` | Pagina „Debursări pe acorduri”: structura (inclusiv `<dialog id="fisa">`, fereastra proiectului) și stilurile. Scripturile ei sunt `debursari.js` și `debursari-ui.js` (vezi „Debursări pe acorduri”), încărcate cu `?v=AAAA-LL-ZZ`: **la fiecare modificare a unuia dintre ele schimbă data din `debursari.html`** (dacă data de azi e deja pusă, adaugă o literă: `?v=2026-11-09b`), altfel browserul poate păstra o variantă veche (de pildă se vedea doar butonul „Debursare”, fără creioanele de editare). Un test verifică prezența lui `?v=` |
 | `debursari.js` | Logica paginii, fără DOM, ca s-o poată testa Node: donatorii și proiectele lor, rândurile omise, obiectivele și datele proiectelor (sursele și ordinea lor), totalurile (aceleași reguli ca în registru), proiectele cu grant și împrumut unite într-un singur rând (`grupeazaProiecte`, `sumeComponente`, `ordoneazaUnitati`), operațiile asupra fișierului de date și salvarea lui prin API-ul GitHub („Depozit”), păstrarea codului cu PIN („Seif”) și specificațiile celor trei fișiere Excel |
-| `debursari-ui.js` | Interfața paginii: alegerea donatorilor, tabelul, fereastra cu codul, formularele de debursare și de date despre proiect, panourile „AMP”, „Rânduri omise” și „Date fără acord găsit”, butoanele Excel, engleza și varianta pentru telefon. Nu ține codul nicăieri în afara memoriei paginii |
+| `debursari-ui.js` | Interfața paginii: alegerea donatorilor, tabelul, fereastra cu codul, fereastra proiectului (`#fisa`, cu fișa lui), formularele de debursare și de date despre proiect, panourile „AMP”, „Rânduri omise” și „Date fără acord găsit”, butoanele Excel, engleza și varianta pentru telefon. Nu ține codul nicăieri în afara memoriei paginii |
 | `amp-date.js` | Datele de început și de finalizare din AMP pentru acordurile din „Debursări pe acorduri”: citește raportul AMP live (nr. 661, prin proxy-ul amp.vivi.md) și, când nu răspunde, arhiva `arhiva.js`; leagă un acord de un proiect AMP doar când denumirea, finanțatorul și suma coincid („sigur”) sau când un om a confirmat legătura în `date/legaturi_amp.json`; o legătură doar „probabilă” rămâne indiciu, nu dă date în tabel. Funcții pure, ca să le poată testa Node |
 | `teste_amp_date.js` | Testele lui `amp-date.js`: formatele datelor, regulile de potrivire (sigur, probabil, ambiguu, prea vechi), legăturile confirmate sau respinse, raportul live față de arhivă, oprirea după 20 de secunde și o verificare pe arhiva AMP + registrul real. Rulare: `node teste_amp_date.js` |
 | `date/proiecte_manual.json` | Date despre proiecte, scrise de mână și cu sursă. „omise”: rândurile-umbrelă ale registrului, care nu apar în lista de proiecte (cu motivul). „proiecte”: obiectivele proiectului și, când sursa le dă, data de început și de finalizare; fiecare intrare are adresa documentului oficial și citatul exact — fără ele nu se citește (citatul și nota rămân în fișier, ca dovadă; pagina nu le scrie, doar adresa documentului apare ca etichetă „sursă oficială”). Vezi „Debursări pe acorduri” |
@@ -329,9 +329,9 @@ al lui, dar în totaluri se numără o singură dată; fără partener în regis
 Bifezi unul sau mai mulți donatori și apare lista proiectelor lor, cu coloanele **Proiectul**,
 **Data efectivă de începere**, **Data finalizării**, **Tip de finanțare**, **Suma proiectului** (în valuta
 acordului și în euro) și **Suma debursărilor** (cu procentul debursat). **Descrierea succintă** (obiectivele
-proiectului) nu are coloană: apare doar când deschizi proiectul, în fișa lui, cu sursa ca etichetă mică. Butonul
-din dreapta deschide **fișa proiectului** (vezi mai jos): descrierea, datele esențiale, perioada, parcursul acordului,
-debursările și, după deblocare, formularele. Se poate căuta (denumire, obiective, act, partener), filtra (tip de
+proiectului) nu are coloană: apare doar când deschizi proiectul, în fereastra lui, cu sursa ca etichetă mică. Butonul
+din dreapta deschide **fereastra proiectului**, o fereastră separată, mai mică, deasupra paginii (vezi mai jos): descrierea,
+datele esențiale, perioada, parcursul acordului, debursările și, după deblocare, formularele. Se poate căuta (denumire, obiective, act, partener), filtra (tip de
 finanțare, cu sau fără debursări) și sorta. Donatorii bifați și filtrele rămân în adresa paginii
 (`#d=BERD|BEI&tip=…`), deci o selecție se trimite ca link. Pe laptop și pe desktop (ferestre de 1250 px sau mai
 late) fiecare tabel încape întreg în panoul lui, chiar cu toți donatorii bifați; pe un ecran mai îngust tabelul se
@@ -357,17 +357,31 @@ singur act care cuprinde și grant, și împrumut (de pildă acordul cu FIDA, `h
 dat de registru, fiindcă registrul nu are sumele separate. Regulile sunt în `grupeazaProiecte` și `sumeComponente` din
 `debursari.js`, cu teste în `teste_debursari.js` și în secțiunea 19 din `teste_debursari.py`.
 
-**Proiectul deschis e un bloc încadrat.** Când un proiect e deschis (rândul lui cu detaliile, sau proiectul cu grant și
-împrumut, cu componentele și detaliile lor), tot ce ține de el are fundal albastru-deschis, o **linie albastră de 2 px
-deasupra și dedesubt** și o **bară albastră în stânga**, continuă de la rândul proiectului până la ultimul lui rând, ca să
-nu se confunde cu proiectele din jur (care rămân albe, fără cadru). Bara e fundalul primei celule a fiecărui rând (nu o
-umbră interioară), cu originea în marginea celulei: așa acoperă și linia de 1 px dintre rânduri. Pe telefon, unde tabelul
-devine cartonașe, proiectul deschis are bordură albastră și un loc deasupra, față de cartonașul dinainte. Stilurile sunt la
-sfârșitul stilurilor tabelului din `debursari.html`; secțiunea 20 din `teste_debursari.py` le verifică, inclusiv pe ecran
-(pixelii barei), la 1360, 1000, 821/820 și 390 px, cu bara de editare după deblocare.
+**Proiectul cu grant și împrumut, desfăcut în tabel, e un bloc încadrat.** Un rând obișnuit nu se mai desface în tabel (detaliile
+lui sunt în fereastra proiectului, vezi mai jos), deci nu are cadru. Doar proiectul cu grant și împrumut se desface în tabel,
+ca să i se vadă componentele; cât e desfăcut, rândul lui și componentele (inclusiv bara de editare a unei componente) au
+fundal albastru-deschis, o **linie albastră de 2 px deasupra și dedesubt** și o **bară albastră în stânga**, continuă de la rândul
+proiectului până la ultimul lui rând, ca să nu se confunde cu proiectele din jur (care rămân albe, fără cadru). Bara e fundalul
+primei celule a fiecărui rând (nu o umbră interioară), cu originea în marginea celulei: așa acoperă și linia de 1 px dintre
+rânduri. Pe telefon, unde tabelul devine cartonașe, proiectul desfăcut are bordură albastră și un loc deasupra, față de
+cartonașul dinainte. Stilurile sunt la sfârșitul stilurilor tabelului din `debursari.html`; secțiunea 20 din `teste_debursari.py`
+le verifică, inclusiv pe ecran (pixelii barei), la 1360, 1000, 821/820 și 390 px, cu bara de editare după deblocare.
 
-**Fișa proiectului (ce se vede când deschizi un proiect).** Detaliile unui rând sunt o fișă ordonată, în cartonașe albe cu
-titlu mic, în această ordine: **Descrierea proiectului** (obiectivele, cu sursa ca etichetă mică „sursă oficială” /
+**Fereastra proiectului (ce se vede când deschizi un proiect).** Detaliile unui proiect nu se mai desfac în tabel, între
+proiectele vecine (unde se amestecau cu ele), ci se deschid într-o **fereastră separată, mai mică, deasupra paginii**: un
+`<dialog id="fisa">` modal, pe fundal întunecat; pagina din spate nu se derulează și nu poate fi atinsă cât e deschisă. Sus,
+un antet care rămâne pe loc: tipul și situația acordului, denumirea proiectului, semnarea și cofinanțatorii, butonul
+**Închide** și, la un proiect cu grant și împrumut, linia **Componentele proiectului** (un clic pe o componentă schimbă
+fereastra pe ea, fără s-o închidă; proiectul rămâne desfăcut sau închis în tabel, cum era). Fereastra se închide cu
+**Închide**, cu **Esc** sau cu un clic pe fundalul întunecat (nu și când o selecție de text începută în fereastră se
+termină pe fundal), iar **focusul se întoarce pe butonul rândului** de unde s-a deschis (la un proiect cu grant și împrumut,
+pe rândul componentei afișate la urmă); o schimbare a filtrelor din adresă o închide. Dedesubt de antet, fișa se derulează în
+fereastră; pe telefon (820 px și mai puțin) fereastra ocupă tot ecranul și rămâne lipită sus doar bara cu tipul și „Închide”,
+iar denumirea, componentele și fișa se derulează împreună. Fereastra e în afara tabelului și a zonei `#debRoot`, deci are
+propriii ascultători de evenimente în `debursari-ui.js` (`deschideFisa`, `inchideFisa`, `randeazaFisa`, `spreComponenta`,
+`nodFk`); se redesenează odată cu tabelul (de pildă la schimbarea limbii sau după o salvare), păstrând focusul, ce a scris
+omul în câmpuri și poziția de derulare. Conținutul ei e marcat `data-no-tr` (traducerea o face pagina, prin `L(ro, en)`, nu
+`traducere.js`). Fișa din fereastră e o succesiune ordonată de cartonașe albe cu titlu mic, în această ordine: **Descrierea proiectului** (obiectivele, cu sursa ca etichetă mică „sursă oficială” /
 „AMP” / „introdus de utilizator”, iar la oficial, link spre document; când titlul întreg al acordului diferă de denumirea
 din tabel, apare dedesubt), **Date esențiale** (donatorul cu denumirea întreagă sub acronim, suma acordului cu valuta, echivalentul
 în euro și de unde vine suma, costul total al proiectului și alte sume din acte, când registrul le are, și dacă intră în totaluri),
@@ -377,7 +391,7 @@ azi; „≈” când o dată e doar luna sau anul; fără durată și situație 
 AMP legat) și **Parcursul acordului** (actele din registru în ordinea datelor, fiecare cu etapa pe care o reprezintă — inițierea
 negocierilor, aprobarea semnării, proiectul de lege, ratificarea, promulgarea, punerea în aplicare — tipul și numărul actului,
 cu link spre el; un acord cu **nouă acte sau mai multe** arată primele trei și ultimele trei, iar restul se deschid cu
-butonul „Arată încă N acte”, care se închide cu „Restrânge lista actelor”; starea se păstrează când rândul se reface). Pe
+butonul „Arată încă N acte”, care se închide cu „Restrânge lista actelor”; starea se păstrează când fereastra se redesenează sau se redeschide). Pe
 ecran lat cartonașele curg în două coloane echilibrate, de la 900 px în jos într-una (descriere, date, perioadă, parcurs); sub
 ele, pe toată lățimea, **debursările**, iar după deblocare, unul lângă altul, formularul de debursare și cel de „Date despre
 proiect”. **Citatul exact și nota din `date/proiecte_manual.json` nu se mai scriu în pagină**: rămân în fișier, ca dovadă pentru
@@ -387,10 +401,14 @@ de finalizare; **textul descrierii vine doar din surse** (obiectivele), așa că
 neintroduse” până când cineva introduce obiectivele (formularul „Date despre proiect” sau o intrare nouă în `date/proiecte_manual.json`).
 Logica pură e în `debursari.js` (`parcursAcord`, `parcursAfisat`, `durataProiect`, `fmtDurata`, `stareProiect`), cu teste în
 `teste_debursari.js`; afișarea e în `debursari-ui.js` (`htmlDescriere`, `htmlInfo`, `htmlProiect`, `htmlParcurs`, `htmlDetalii`;
-starea parcursului desfășurat e `S.cale`), stilurile în `debursari.html` (`.fisa`, `.fs`, `.fapte`, `.cale`); secțiunea 21 din
-`teste_debursari.py` o verifică în browser: ordinea actelor, etapele, linkurile și legendele sunt calculate independent din
-registru, cu data înghețată (10.11.2026) pentru „în desfășurare / încheiat”, în română și engleză, la 1360, 1000, 901/900 și
-390 px, cu și fără cod, și cu fișierul adevărat de surse (niciun citat în pagină).
+starea parcursului desfășurat e `S.cale`, fereastra deschisă e `S.fisa`), stilurile în `debursari.html` (`dialog#fisa`, `.fw`,
+`.fisa`, `.fs`, `.fapte`, `.cale`); secțiunea 21 din `teste_debursari.py` verifică în browser conținutul fișei: ordinea actelor,
+etapele, linkurile și legendele sunt calculate independent din registru, cu data înghețată (10.11.2026) pentru „în desfășurare /
+încheiat”, în română și engleză, la 1360, 1000, 901/900 și 390 px, cu și fără cod, și cu fișierul adevărat de surse (niciun citat
+în pagină). Secțiunea 22 verifică fereastra în sine: deschiderea și închiderea (Închide, Esc, clic pe fundal, o selecție care
+iese pe fundal), focusul (pe titlu la deschidere, înapoi pe rând la închidere, în fereastră la Tab), derularea pe loc cu antetul
+fix, schimbarea componentei, formularele după deblocare (ce s-a scris rămâne la redesenare; Esc într-o debursare aflată în
+editare nu închide fereastra), telefonul (ecran întreg, bara lipită sus) și lățimile 1000, 821 și 820 px.
 
 **Rânduri omise, ca un proiect să nu apară de două ori.** Cinci rânduri ale registrului nu apar în liste:
 sunt rânduri-umbrelă, adică negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu
@@ -736,7 +754,7 @@ panourile „AMP", „Rânduri omise" și „Date fără acord găsit", câmpuri
 editare, ștergere, verificarea fișierului scris), coada după reîncărcare, PIN-ul, debursări existente și orfane,
 cele trei fișiere Excel (deschise cu openpyxl; datele întregi sunt date adevărate), engleza, telefonul, lățimea
 paginii cu toți donatorii bifați (de la 1920 la 390 px), starea din adresă, tastatura, lipsa erorilor JavaScript și a cererilor spre alte adrese decât pagina, `api.github.com`
-și `amp.vivi.md`. Cu `--doar 13,14` rulează doar secțiunile numerotate.
+și `amp.vivi.md`, plus fereastra proiectului (secțiunea 22: deschidere, închidere, focus, derulare, componente, telefon). Cu `--doar 13,14` rulează doar secțiunile numerotate (secțiunile 1–12 rulează doar fără `--doar`).
 
 **Limite.** Debursările sunt cele introduse de oameni și nu sunt verificate față de AMP sau o altă sursă;
 pagina nu le leagă de proiectele AMP („De la lege la bani" arată debursările din AMP). Obiectivele din

@@ -8,12 +8,14 @@ se poartă ca el: cod valid sau nu, drept de scriere sau doar de citire, „sha�
 schimbat între timp, cădere de rețea; raportul AMP live e simulat la fel (cade sau întoarce un CSV de probă). Cheile de probă sunt inventate.
 Ce se verifică, pe scurt:
   · lista donatorilor, bifarea, tabelul cu cele șase coloane și butonul de detalii (proiectul, data efectivă de începere, data finalizării,
-    tipul, suma proiectului, suma debursărilor) și cifrele lui, față de un calcul independent din date/acorduri_legare.json; descrierea (obiectivele) nu mai are coloană, apare sus în rândul deschis;
+    tipul, suma proiectului, suma debursărilor) și cifrele lui, față de un calcul independent din date/acorduri_legare.json; descrierea (obiectivele) nu mai are coloană, apare sus în fereastra proiectului;
   · fără dubluri: fiecare act dintr-un singur rând, rândurile-umbrelă omise și enumerate cu motivul, denumiri deosebite la același donator;
   · obiectivele și datele: din surse oficiale (cu adresa documentului; citatul și nota din fișier nu se scriu în pagină), din AMP (arhiva și raportul live, doar legături sigure; cele probabile
     doar ca indiciu), introduse în pagină (formularul „Date despre proiect”), cu prioritatea dintre ele; salvarea în date/debursari.json;
-  · fișa proiectului (rândul deschis): patru cartonașe (descriere, date esențiale, perioadă cu durată și situație, parcursul acordului cu pliere la 9+ acte), debursările pe toată
-    lățimea, formularele după deblocare; ordinea actelor, etapele și linkurile calculate independent; fără citate; română, engleză, 1360 / 1000 / 900 / 390 px;
+  · fereastra proiectului (un <dialog> modal, deschis din butonul rândului, nu un rând de detalii în tabel): antet (tip, situație, denumire, „Închide”, pastilele componentelor la un proiect
+    cu grant și împrumut), apoi fișa: patru cartonașe (descriere, date esențiale, perioadă cu durată și situație, parcursul acordului cu pliere la 9+ acte), debursările pe toată
+    lățimea, formularele după deblocare; ordinea actelor, etapele și linkurile calculate independent; fără citate; română, engleză, 1360 / 1000 / 900 / 390 px; deschidere și
+    închidere (Închide, Esc, clic pe fundal), focusul, derularea (pe loc, antet fix), telefon pe tot ecranul, schimbarea componentei (secțiunea 22);
   · fără cod: doar citire, fără formulare și fără bannere pe acorduri; o singură deblocare (bara fixă de sus) pentru toate acordurile; cod greșit, fără drept de scriere, fără rețea;
   · după deblocare: editare în tabel a datei de început, a datei finalizării și a sumei proiectului, plus debursările;
   · adăugare, editare, ștergere de debursări → ce ajunge, de fapt, în fișierul date/debursari.json (și în mesajul commit-ului);
@@ -452,6 +454,7 @@ def bifeaza(pg, cheie):
 
 
 def deschide_dialog(pg):
+    inchide_fisa(pg)                         # cât e deschisă fereastra proiectului, pagina din spate e inertă
     pg.click('#sAcces [data-act="unlock"]')
     pg.wait_for_selector('#dlg[open]')
 
@@ -485,12 +488,24 @@ def nume_rand(r):
     return r.locator('.exp').get_attribute('aria-label').split(': ', 1)[1]
 
 
+def inchide_fisa(pg):
+    """Închide fereastra proiectului, dacă e deschisă (cât e deschisă, pagina din spate e inertă: în tabel nu se poate da clic)."""
+    if pg.locator('#fisa[open]').count():
+        pg.click('#fisa .fw-x')
+        pg.wait_for_selector('#fisa[open]', state='detached')
+
+
+def fisa_sel(donator, id_):
+    """Selectorul rădăcinii ferestrei proiectului pentru rândul „donator|id acord”."""
+    return '#fisa[open] .fw[data-k="%s"]' % (donator + '|' + id_)
+
+
 def deschide_rand(pg, donator, a):
-    r = rand_acord(pg, donator, a['id'])
-    if r.get_attribute('class').find('deschis') < 0:
-        r.locator('.exp').click()
-    pg.wait_for_selector('section.panel[data-d="%s"] tr.det[data-k="%s"]' % (donator, donator + '|' + a['id']))
-    return pg.locator('section.panel[data-d="%s"] tr.det[data-k="%s"]' % (donator, donator + '|' + a['id']))
+    """Deschide fereastra proiectului pentru acordul `a` (închide întâi pe cea deschisă) și întoarce rădăcina ei: formularele, cartonașele și debursările sunt în ea."""
+    inchide_fisa(pg)
+    rand_acord(pg, donator, a['id']).locator('.exp').click()
+    pg.wait_for_selector(fisa_sel(donator, a['id']))
+    return pg.locator(fisa_sel(donator, a['id']))
 
 
 def completeaza(det, suma=None, data=None, val=None, nota=None):
@@ -520,23 +535,20 @@ def trimite_proiect(det):
 
 
 def descriere_rand(pg, r):
-    """Descrierea succintă (obiectivele) nu mai are coloană în tabel: se vede sus, în partea deschisă a rândului.
-    Deschide rândul (dacă era închis), citește blocul și îl închide la loc.
+    """Descrierea succintă (obiectivele) nu mai are coloană în tabel: se vede sus, în fereastra proiectului.
+    Deschide fereastra rândului `r`, citește blocul și o închide la loc.
     Întoarce {'text', 'gol', 'src' (etichetele de sursă), 'href'/'n_link'/'t_link' (eticheta „sursă oficială”, cu adresa documentului)}."""
     k = r.get_attribute('data-k')
-    era = 'deschis' in (r.get_attribute('class') or '')
-    if not era:
-        r.locator('.exp').click()
-    det = pg.locator('tr.det[data-k="%s"]' % k)
+    inchide_fisa(pg)
+    r.locator('.exp').click()
+    det = pg.locator('#fisa[open] .fw[data-k="%s"]' % k)
     det.wait_for()
     b = det.locator('.det-desc')
     lnk = b.locator('a.src.s-oficial')
     rez = {'text': b.locator('.dd-t').inner_text().strip(), 'gol': b.locator('.dd-t.gol').count() == 1,
            'src': [x.strip() for x in b.locator('.psrc .src').all_inner_texts()],
            'n_link': lnk.count(), 'href': lnk.get_attribute('href') if lnk.count() else None, 't_link': lnk.inner_text().strip() if lnk.count() else None}
-    if not era:
-        pg.locator('tr.ac[data-k="%s"] .exp' % k).click()
-        det.wait_for(state='detached')
+    inchide_fisa(pg)
     return rez
 
 
@@ -829,7 +841,9 @@ try:
             verifica('blocat, al doilea acord deschis: la fel, fără formulare și fără banner', det1.locator('form').count() == 0 and pg.locator('#sRez form').count() == 0 and pg.locator('#sRez [data-act="unlock"]').count() == 0)
             egal('blocat: un singur buton de deblocare în toată pagina, în bara de acces', [pg.locator('[data-act="unlock"]').count(), pg.locator('#sAcces [data-act="unlock"]').count()], [1, 1])
             verifica('blocat: fără creioane de editare și fără butonul „Debursare” în tabel', pg.locator('#sRez .edt').count() == 0 and pg.locator('#sRez [data-act="adauga"]').count() == 0)
-            verifica('blocat: detaliile se văd în continuare (datele proiectului, datele despre acord), doar în citire', det.locator('.det-proiect .dlp').count() == 1 and det.locator('.det-info').count() == 1 and det.locator('.fisa-jos.solo').count() == 1)
+            verifica('blocat: detaliile se văd în continuare (datele proiectului, datele despre acord), doar în citire', det1.locator('.det-proiect .dlp').count() == 1 and det1.locator('.det-info').count() == 1 and det1.locator('.fisa-jos.solo').count() == 1)
+            verifica('blocat: fereastra proiectului nu are niciun buton de deblocare (deblocarea e în bara de sus)', det1.locator('[data-act="unlock"]').count() == 0)
+            inchide_fisa(pg)
             egal('blocat: bara de acces spune „Doar citire”', pg.locator('#sAcces b').inner_text(), 'Doar citire')
             verifica('blocat: bara spune că un singur cod deblochează totul (început, finalizare, sumă, debursări)', all(x in pg.locator('#sAcces .acces-txt').inner_text() for x in ('Un singur cod', 'toate acordurile', 'data de început', 'data finalizării', 'suma proiectului', 'debursările')), pg.locator('#sAcces .acces-txt').inner_text())
             egal('bara de acces e „fixă” (position: sticky)', pg.evaluate('getComputedStyle(document.querySelector("#sAcces")).position'), 'sticky')
@@ -892,13 +906,13 @@ try:
             tot2 = det2.locator('form input, form select, form textarea, form button[type=submit]')
             verifica('o singură deblocare pentru toate acordurile: alt acord are formularele (debursare și proiect) active, fără alt cod', det2.locator('form.deb-form').count() == 1 and det2.locator('form.proj-form').count() == 1 and tot2.count() >= 10 and all(tot2.nth(i).is_enabled() for i in range(tot2.count())) and pg.locator('[data-act="unlock"]').count() == 0, tot2.count())
             verifica('formularul de proiect are și suma proiectului, cu valută', det2.locator('form.proj-form [name=suma]').count() == 1 and det2.locator('form.proj-form [name=val]').count() == 1)
-            rand_acord(pg, 'BERD', altul['id']).locator('.exp').click()
+            det = deschide_rand(pg, 'BERD', a1)
             f = completeaza(det, suma='1.250.000,50', data='2026-10-01', val='EUR', nota='Tranșa 1, cererea nr. 4')
             verifica('previzualizarea arată cum a fost citită suma', '1.250.000,50 EUR' in det.locator('.prev').inner_text(), det.locator('.prev').inner_text())
             f.locator('button[type=submit]').click()
-            pg.wait_for_selector('section.panel[data-d="BERD"] tr.det .deb-ent tbody tr')
+            pg.wait_for_selector('#fisa .deb-ent tbody tr')
             asteapta_salvat(pg, fals, 1)
-            rand_in = pg.locator('section.panel[data-d="BERD"] tr.det .deb-ent tbody tr').first.inner_text()
+            rand_in = pg.locator('#fisa .deb-ent tbody tr').first.inner_text()
             verifica('debursarea apare în lista rândului (data, suma, nota)', '01.10.2026' in rand_in and '1.250.000,50 EUR' in rand_in and 'Tranșa 1' in rand_in, rand_in)
             fi = fals.intrari()
             egal('fișierul din „baza de date” are o intrare', len(fi), 1)
@@ -956,11 +970,16 @@ try:
             egal('ștergere: a rămas o singură intrare, cea în euro', [(x['suma'], x['val']) for x in fals.intrari()], [(1300000, 'EUR')])
             verifica('mesajul commit-ului pentru ștergere', fals.commituri[3].startswith('Debursări: șters: '), fals.commituri)
             verifica('toate scrierile au cheia în antetul Authorization și merg doar la api.github.com', all(c[2] == 'Bearer ' + TOKEN and c[1].startswith('https://api.github.com/') for c in fals.scrieri_cu_cheie()))
+            pg.wait_for_timeout(250)
+            pg.screenshot(path=str(DESC / 'fereastra-deblocat.png'))
+            inchide_fisa(pg)
             # blocare la loc
             pg.click('#sAcces [data-act="lock"]')
             pg.wait_for_timeout(200)
             pg.screenshot(path=str(DESC / 'desktop-deblocat.png'))
-            verifica('„Blochează” scoate din nou formularele, la toate acordurile deodată', not deblocat(pg) and pg.locator('section.panel[data-d="BERD"] tr.det form').count() == 0 and pg.locator('#sRez .edt').count() == 0 and pg.locator('#sAcces [data-act="unlock"]').count() == 1)
+            det = deschide_rand(pg, 'BERD', a1)
+            verifica('„Blochează” scoate din nou formularele, la toate acordurile deodată', not deblocat(pg) and det.locator('form').count() == 0 and pg.locator('#sRez .edt').count() == 0 and pg.locator('#sAcces [data-act="unlock"]').count() == 1)
+            inchide_fisa(pg)
             # reîncărcare: citit public
             pg.reload(wait_until='networkidle')
             pg.wait_for_selector('.don')
@@ -1202,9 +1221,14 @@ try:
             verifica('fiecare celulă are eticheta ei pe cartonaș', pg.locator('tr.ac').first.locator('td[data-l]').count() == 6)
             verifica('cu tabelul deschis nu apare derulare orizontală', True)
             pg.locator('tr.ac').first.locator('.exp').click()
-            pg.wait_for_selector('tr.det')
-            verifica('rând deschis pe telefon: fără derulare orizontală', pg.evaluate('document.documentElement.scrollWidth <= window.innerWidth'), pg.evaluate('[document.documentElement.scrollWidth, window.innerWidth]'))
+            pg.wait_for_selector('#fisa[open] .fw')
+            verifica('fereastra proiectului pe telefon: fără derulare orizontală (nici a paginii, nici a ferestrei)', pg.evaluate('document.documentElement.scrollWidth <= window.innerWidth') and
+                     pg.evaluate('(() => { const f = document.querySelector("#fisa .fw"); return f.scrollWidth <= f.clientWidth && document.querySelector("#fisa .fw-corp").scrollWidth <= document.querySelector("#fisa .fw-corp").clientWidth; })()'),
+                     pg.evaluate('[document.documentElement.scrollWidth, window.innerWidth]'))
+            egal('fereastra proiectului pe telefon ocupă tot ecranul (390 × 800)', pg.evaluate('(() => { const r = document.querySelector("#fisa").getBoundingClientRect(); return [r.left, r.top, r.width, r.height]; })()'), [0, 0, 390, 800])
+            pg.wait_for_timeout(250)
             pg.screenshot(path=str(DESC / 'telefon.png'), full_page=False)
+            inchide_fisa(pg)
             ctx.close()
 
             # ---------------------------------------------------------------- 11. adresa cu selecție
@@ -1218,9 +1242,16 @@ try:
             # un rând se deschide cu Enter pe buton
             pg.locator('section.panel[data-d="BEI"] tr.ac .exp').first.focus() if pg.locator('section.panel[data-d="BEI"] tr.ac .exp').count() else None
             if pg.locator('section.panel[data-d="BEI"] tr.ac .exp').count():
+                btn = pg.locator('section.panel[data-d="BEI"] tr.ac .exp').first
+                kk = btn.locator('xpath=ancestor::tr[1]').get_attribute('data-k')
+                verifica('butonul rândului anunță că deschide o fereastră (aria-haspopup="dialog")', btn.get_attribute('aria-haspopup') == 'dialog' and btn.get_attribute('aria-expanded') is None, btn.get_attribute('aria-haspopup'))
                 pg.keyboard.press('Enter')
-                pg.wait_for_selector('section.panel[data-d="BEI"] tr.det')
-                verifica('Enter pe butonul rândului îl deschide (aria-expanded=true)', pg.locator('section.panel[data-d="BEI"] tr.ac .exp').first.get_attribute('aria-expanded') == 'true')
+                pg.wait_for_selector('#fisa[open] .fw[data-k="%s"]' % kk)
+                verifica('Enter pe butonul rândului deschide fereastra proiectului, iar focusul trece pe titlul ei', pg.evaluate('document.activeElement.id') == 'fisaTitlu', pg.evaluate('document.activeElement.outerHTML')[:120])
+                egal('fereastra e un dialog modal numit după proiect (aria-labelledby spre titlu)', [pg.evaluate('document.querySelector("#fisa").matches(":modal")'), pg.get_attribute('#fisa', 'aria-labelledby')], [True, 'fisaTitlu'])
+                pg.keyboard.press('Escape')
+                pg.wait_for_selector('#fisa[open]', state='detached')
+                verifica('Esc închide fereastra, iar focusul se întoarce pe butonul rândului', pg.evaluate('document.activeElement === document.querySelector("section.panel[data-d=\\"BEI\\"] tr.ac .exp")'), pg.evaluate('document.activeElement.outerHTML')[:140])
             ctx.close()
 
             # ---------------------------------------------------------------- 12. fără fișierul de date
@@ -1288,6 +1319,7 @@ try:
             egal('detalii: etichetele de sursă din fișă (descriere, început, finalizare) duc toate la documentul oficial, cu adresa completă',
                  det.locator('a.src.s-oficial').evaluate_all('l => l.map(a => a.getAttribute("href"))'), [SURSA_A] * 3)
             egal('detalii: perioada arată începutul și finalizarea din sursă (datele întregi și cele parțiale, cum le spune sursa)', [x.strip() for x in det.locator('.det-proiect .dlp .dp-v').all_inner_texts()], ['14.05.2019', '12.2027'])
+            inchide_fisa(pg)
             # căutarea merge și în obiective (română și engleză)
             pg.fill('#q', 'siguranței rutiere')
             pg.wait_for_timeout(300)
@@ -1369,6 +1401,7 @@ try:
             egal('tabel: obiectivele introduse', descriere_rand(pg, rC)['text'], 'Sprijin pentru reforma sectorului energetic și securitatea aprovizionării.')
             egal('tabel: datele introduse, cu eticheta „introdus de utilizator”', [celula_data(rC, 1)[1].split('\n')[0], celula_data(rC, 2)[1].split('\n')[0], descriere_rand(pg, rC)['src'], sursa_celulei(rC, 1), sursa_celulei(rC, 2)],
                  ['15.03.2024', '2028', ['introdus de utilizator'], ['introdus de utilizator'], ['introdus de utilizator']])
+            detC = deschide_rand(pg, 'BERD', pC)       # descriere_rand a închis fereastra: se deschide din nou, formularul se reia din ce s-a salvat
             verifica('formularul se reia din ce s-a salvat (data parțială rămâne parțială)', detC.locator('form.proj-form [name=sfarsit]').input_value() == '2028' and detC.locator('form.proj-form [name=inceput]').input_value() == '15.03.2024')
             # prioritatea pe câmp: ce scrie omul bate sursa oficială, dar numai pentru câmpul scris
             detA = deschide_rand(pg, 'BERD', pA)
@@ -1379,12 +1412,14 @@ try:
             egal('prioritate pe câmp: obiectivele rămân cele oficiale; începutul e cel introdus; finalizarea rămâne cea oficială',
                  [descriere_rand(pg, rA)['text'], celula_data(rA, 1)[1].split('\n')[0], celula_data(rA, 2)[1].split('\n')[0]], [OBI_A['ro'], '01.02.2020', '12.2027'])
             egal('prioritate pe câmp: sursele afișate', [descriere_rand(pg, rA)['src'], sursa_celulei(rA, 1), sursa_celulei(rA, 2)], [['sursă oficială'], ['introdus de utilizator'], ['sursă oficială']])
+            detA = deschide_rand(pg, 'BERD', pA)
             completeaza_proiect(detA, obiective='Obiective corectate de un utilizator.')
             trimite_proiect(detA)
             asteapta_salvat(pg, fals, 3)
             egal('modificare: aceeași înregistrare (nu se adaugă una nouă)', len(fals.proiecte()), 2)
             egal('obiectivele introduse înlocuiesc pe cele oficiale', descriere_rand(pg, rand_acord(pg, 'BERD', pA['id']))['text'], 'Obiective corectate de un utilizator.')
             # ștergere cu confirmare: ce era oficial se întoarce
+            detA = deschide_rand(pg, 'BERD', pA)
             detA.locator('[data-act="proiect-sterge"]').click()
             verifica('ștergere: cere confirmare („Sigur?”)', 'Sigur?' in detA.locator('form.proj-form').inner_text())
             detA.locator('[data-act="proiect-sterge-nu"]').click()
@@ -1397,10 +1432,15 @@ try:
             verifica('mesajul commit-ului pentru ștergere: „Date proiecte: șters: …”', fals.commituri[3].startswith('Date proiecte: șters: '), fals.commituri)
             rA = rand_acord(pg, 'BERD', pA['id'])
             egal('după ștergere, rândul revine la sursa oficială', [descriere_rand(pg, rA)['text'], celula_data(rA, 1)[1].split('\n')[0], sursa_celulei(rA, 1)], [OBI_A['ro'], '14.05.2019', ['sursă oficială']])
-            # blocarea la loc și citirea publică, fără cod
+            # blocarea la loc și citirea publică, fără cod (cât e deschisă fereastra, pagina din spate e inertă: se închide întâi)
+            detA = deschide_rand(pg, 'BERD', pA)
+            verifica('înainte de blocare, fereastra proiectului are formularul de date', detA.locator('form.proj-form').count() == 1)
+            inchide_fisa(pg)
             pg.click('#sAcces [data-act="lock"]')
             pg.wait_for_timeout(200)
-            verifica('„Blochează” scoate și formularul de proiect', pg.locator('form.proj-form').count() == 0 and pg.locator('#sRez .edt').count() == 0)
+            detA = deschide_rand(pg, 'BERD', pA)
+            verifica('„Blochează” scoate și formularul de proiect (și din fereastra deschisă din nou)', detA.locator('form.proj-form').count() == 0 and pg.locator('#sRez .edt').count() == 0)
+            inchide_fisa(pg)
             pg.reload(wait_until='networkidle')
             pg.wait_for_selector('section.panel[data-d="BERD"] tr.ac')
             egal('după reîncărcare, datele salvate se văd public, fără cod', descriere_rand(pg, rand_acord(pg, 'BERD', pC['id']))['text'], 'Sprijin pentru reforma sectorului energetic și securitatea aprovizionării.')
@@ -1564,6 +1604,7 @@ try:
             verifica('detalii: „Legătură confirmată de un om”', 'Legătură confirmată de un om' in det.locator('.det-proiect .dlp').inner_text())
             pg.wait_for_selector('.det-proiect a.amp-link', timeout=15000)
             egal('codul AMP devine link spre fișa proiectului în AMP', pg.locator('.det-proiect a.amp-link').first.get_attribute('href'), 'https://amp.gov.md/aim/viewActivityPreview.do~activityId=7777')
+            inchide_fisa(pg)
             with pg.expect_download(timeout=60000) as d:
                 pg.click('section.panel[data-d="BERD"] [data-act="excel-donator"]')
             cale = DESC / 'berd-amp.xlsx'
@@ -1661,14 +1702,18 @@ try:
                 if (p.get('obiective') or {}).get('ro'):
                     r_ = {i for c in p['acte'] for i in pe_act.get(c, ())}
                     cu_obi |= {sorted(r_)[0]} if r_ else set()
-            # descrierea apare doar în rândul deschis: se deschid toate rândurile (unul câte unul, comutarea e sincronă), se citește blocul de sus, apoi se închid la loc
+            # descrierea apare doar în fereastra proiectului: se deschide pe rând fereastra fiecărui rând (deschiderea și închiderea sunt sincrone), se citește blocul de sus și se închide la loc
             in_pagina = set(pg.evaluate('''() => {
-                let g = 0, b;
-                while (g++ < 3000 && (b = document.querySelector("section.panel[data-d] tr.ac:not(.deschis) .exp"))) b.click();
-                const r = [...document.querySelectorAll("section.panel[data-d] tr.det")].filter(d => d.querySelector(".det-desc .dd-t:not(.gol)")).map(d => d.getAttribute("data-k").split("|").slice(1).join("|"));
-                g = 0; while (g++ < 3000 && (b = document.querySelector("section.panel[data-d] tr.ac.deschis .exp"))) b.click();
+                const F = document.getElementById("fisa"), r = [];
+                [...document.querySelectorAll("section.panel[data-d] tr.ac .exp")].forEach(b => {
+                    b.click();
+                    const w = F.querySelector(".fw");
+                    if (w && w.querySelector(".det-desc .dd-t:not(.gol)")) r.push(w.getAttribute("data-k").split("|").slice(1).join("|"));
+                    F.querySelector(".fw-x").click();
+                });
                 return r;
             }'''))
+            verifica('după citirea tuturor rândurilor, fereastra proiectului e închisă și goală', pg.locator('#fisa[open]').count() == 0 and pg.evaluate('document.getElementById("fisa").innerHTML') == '')
             egal('obiectivele din date/proiecte_manual.json: rândurile care le au în fișier (%d) sunt cele care le arată în pagină' % len(cu_obi), sorted(in_pagina), sorted(cu_obi))
             # fiecare intrare din fișier are sursă și citat (altfel pagina o respinge): același test de pe Node, aici pe fișierul din repository
             verifica('fișierul adevărat: fiecare intrare are adresa documentului (http), citat de cel puțin 12 caractere, obiective sau date, în formatul AAAA, AAAA-LL sau AAAA-LL-ZZ',
@@ -1763,7 +1808,8 @@ try:
             egal('detalii: formularul de proiect arată suma corectată și valuta', [detC.locator('form.proj-form [name=suma]').input_value(), detC.locator('form.proj-form [name=val]').input_value()], ['12.345.678,90', 'USD'])
             inf = detC.locator('.det-info').inner_text().replace('\xa0', ' ')
             verifica('detalii: „Suma din registru” cu valoarea de acolo, iar „Suma” spune că e corectată', 'suma din registru' in inf.lower() and reg_txt in inf and 'corectată de utilizator' in inf, inf)
-            # --- Excel: suma nouă și nota
+            # --- Excel: suma nouă și nota (cât e deschisă fereastra proiectului, pagina din spate e inertă: se închide întâi)
+            inchide_fisa(pg)
             with pg.expect_download(timeout=60000) as d:
                 pg.click('section.panel[data-d="BERD"] [data-act="excel-donator"]')
             cale = DESC / 'berd-suma-corectata.xlsx'
@@ -1988,19 +2034,19 @@ try:
             egal('deschis: aria-expanded, iar rândul proiectului rămâne deasupra componentelor', [h.locator('.exp').get_attribute('aria-expanded'), pg.evaluate('document.querySelector("' + PJ + ' tr.pg").nextElementSibling.getAttribute("data-k")')], ['true', 'BERD|' + grant['id']])
             verifica('numărătorile rămân pe acorduri: indicatorul „Proiecte” = acordurile lui BERD, suma din antet = calculul independent', pg.locator('.kpi .val').first.inner_text() == str(len(BERD)) and
                      ('suma ' + fmt_ro(rotunjit(suma_numarata([a for a in BERD])), 0)) not in dsum, (pg.locator('.kpi .val').first.inner_text(), dsum))
-            # detaliile unei componente, apoi închiderea și redeschiderea proiectului
+            # detaliile unei componente se deschid în fereastra proiectului (peste pagină, nu sub rând), apoi închiderea și redeschiderea proiectului în tabel
             rg = pg.locator(P + ' tr.ac.sub[data-k="BERD|%s"]' % grant['id'])
             rg.locator('.exp').click()
-            pg.wait_for_selector(P + ' tr.det[data-k="BERD|%s"]' % grant['id'])
-            egal('detaliile grantului se deschid sub componenta lui', pg.evaluate('document.querySelector("' + PJ + ' tr.ac.sub[data-k=\'BERD|' + grant['id'] + '\']").nextElementSibling.className'), 'det sub')
+            pg.wait_for_selector(fisa_sel('BERD', grant['id']))
+            egal('detaliile grantului se deschid în fereastra proiectului, nu sub componentă: tabelul nu primește niciun rând de detalii, iar componentele rămân la loc',
+                 [pg.locator(P + ' tr.det').count(), pg.evaluate('document.getElementById("fisa").matches(":modal")'), pg.locator(P + ' tr.ac.sub').count()], [0, True, 2])
+            inchide_fisa(pg)
             h.locator('.exp').click()
             pg.wait_for_selector(P + ' tr.ac.sub', state='detached')
-            egal('închis din nou: nici componentele, nici detaliile lor nu mai sunt în tabel', [pg.locator(P + ' tr.ac.sub').count(), pg.locator(P + ' tr.det').count(), pg.locator(P + ' tr.pg').count()], [0, 0, 1])
+            egal('închis din nou: componentele nu mai sunt în tabel', [pg.locator(P + ' tr.ac.sub').count(), pg.locator(P + ' tr.det').count(), pg.locator(P + ' tr.pg').count()], [0, 0, 1])
             h.locator('.exp').click()
-            pg.wait_for_selector(P + ' tr.det[data-k="BERD|%s"]' % grant['id'])
-            egal('redeschis: detaliile deschise înainte rămân deschise', [pg.locator(P + ' tr.ac.sub').count(), pg.locator(P + ' tr.det').count()], [2, 1])
-            rg.locator('.exp').click()
-            pg.wait_for_selector(P + ' tr.det', state='detached')
+            pg.wait_for_selector(P + ' tr.ac.sub')
+            egal('redeschis: ambele componente sunt la loc, tot fără rânduri de detalii', [pg.locator(P + ' tr.ac.sub').count(), pg.locator(P + ' tr.det').count()], [2, 0])
             # clic pe rând (nu doar pe buton) și tastatură
             h.locator('td').first.click()
             pg.wait_for_selector(P + ' tr.ac.sub', state='detached')
@@ -2068,9 +2114,9 @@ try:
                      pg.evaluate('(() => { const c = document.querySelector("' + PJ + ' tr.pg td:nth-child(5)").getBoundingClientRect(), r = document.querySelector("' + PJ + ' tr.pg").getBoundingClientRect(); return c.right <= r.right + 1; })()'))
             ctx.close()
 
-            # proiectul cu două granturi și un împrumut (BIRD, „Operațiunea de politici de dezvoltare 2”): detaliile unei componente sunt înalte și împing împrumutul sub ele,
-            # în afara ferestrei; linia „Componentele proiectului” din detalii îl arată, iar un clic pe el duce la el
-            print('   · linia „Componentele proiectului”, în detaliile unei componente')
+            # proiectul cu două granturi și un împrumut (BIRD, „Operațiunea de politici de dezvoltare 2”): fereastra unei componente arată sus, în antet, toate componentele
+            # proiectului („Componentele proiectului”), iar un clic pe una schimbă fereastra pe ea, fără s-o închidă
+            print('   · linia „Componentele proiectului”, în fereastra unei componente')
             ctx = context(b, viewport=(1080, 800))
             pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BIRD&q=politici%20de%20dezvoltare%202')
             PB, PJB = 'section.panel[data-d="BIRD"]', "section.panel[data-d='BIRD']"
@@ -2083,44 +2129,46 @@ try:
             comp = pg.locator(PB + ' tr.ac.sub')
             nume_comp = comp.locator('.pname').all_inner_texts()
             egal('proiectul deschis: trei componente, în ordinea grant, grant, împrumut', [comp.count(), comp.locator('.tag').all_inner_texts()], [3, ['Grant', 'Grant', 'Împrumut']])
+            id_g1 = [x['id'] for x in dpo if x['categorie'] == 'Grant'][0]
+            id_g2 = [x['id'] for x in dpo if x['categorie'] == 'Grant'][1]
             comp.first.locator('.exp').click()
-            pg.wait_for_selector(PB + ' tr.det')
-            strip = pg.locator(PB + ' tr.det .det-comp')
-            egal('detaliile primului grant: linia „Componentele proiectului” are toate cele trei componente, cu numele din rândurile lor', [strip.locator('.dc-l').text_content(), strip.locator('.dc').all_inner_texts()], ['Componentele proiectului', nume_comp])
+            pg.wait_for_selector(fisa_sel('BIRD', id_g1))
+            strip = pg.locator('#fisa[open] .det-comp')
+            egal('fereastra primului grant: linia „Componentele proiectului” are toate cele trei componente, cu numele din rândurile lor', [strip.locator('.dc-l').text_content(), strip.locator('.dc').all_inner_texts()], ['Componentele proiectului', nume_comp])
             egal('componenta curentă (primul grant) e marcată, celelalte două sunt butoane', [strip.locator('.dc.cur').all_inner_texts(), strip.locator('.dc.cur').get_attribute('aria-current'), strip.locator('button.dc').count()], [[nume_comp[0]], 'true', 2])
+            egal('titlul ferestrei e denumirea comună a proiectului (cea din rândul lui), iar tabelul nu are niciun rând de detalii',
+                 [pg.locator('#fisa[open] .fw-titlu').inner_text(), pg.locator(PB + ' tr.det').count()], [pg.locator(PB + ' tr.pg[data-gr="BIRD|%s"] .pname' % cheie_dpo).inner_text(), 0])
             box = strip.locator('button.dc').last.bounding_box()
-            verifica('împrumutul se vede în linie, pe ecran, fără derulare', box is not None and 0 <= box['y'] and box['y'] + box['height'] <= 800, box)
-            verifica('(cauza) rândul împrumutului e sub detaliile grantului, în afara ferestrei', pg.locator(PB + ' tr.ac.sub[data-k="BIRD|%s"]' % id_imp).bounding_box()['y'] > 800)
+            verifica('împrumutul se vede în fereastră, pe ecran, fără derulare (nu mai e împins sub detalii, ca în tabel)', box is not None and 0 <= box['y'] and box['y'] + box['height'] <= 800, box)
             strip.locator('button.dc').last.click()
-            pg.wait_for_selector(PB + ' tr.det[data-k="BIRD|%s"]' % id_imp)
-            egal('un clic pe „Împrumut”: se deschid detaliile împrumutului, cele ale grantului se închid', pg.locator(PB + ' tr.det').evaluate_all('l => l.map(r => r.getAttribute("data-k"))'), ['BIRD|' + id_imp])
-            pg.wait_for_function('s => { const t = document.querySelector(s).getBoundingClientRect().top; return t >= 0 && t < 300; }', arg=PJB + " tr.ac.sub[data-k='BIRD|" + id_imp + "']", timeout=10000)
-            verifica('pagina a derulat la rândul împrumutului (sub bara de acces), iar rândul e deschis', pg.locator(PB + ' tr.ac.sub[data-k="BIRD|%s"]' % id_imp).get_attribute('class').find('deschis') >= 0)
-            egal('focusul e pe butonul rândului împrumutului', pg.evaluate('(() => { const a = document.activeElement; return [a.classList.contains("exp"), a.closest("tr").getAttribute("data-k")]; })()'), [True, 'BIRD|' + id_imp])
-            egal('în detaliile împrumutului, componenta curentă e împrumutul, iar celelalte două sunt butoane', [pg.locator(PB + ' tr.det .det-comp .dc.cur').all_inner_texts(), pg.locator(PB + ' tr.det .det-comp button.dc').all_inner_texts()], [[nume_comp[2]], nume_comp[:2]])
+            pg.wait_for_selector(fisa_sel('BIRD', id_imp))
+            egal('un clic pe „Împrumut”: fereastra trece la împrumut (rămâne una singură, deschisă)', [pg.locator('#fisa[open]').count(), pg.locator('#fisa[open] .fw').evaluate_all('l => l.map(r => r.getAttribute("data-k"))')], [1, ['BIRD|' + id_imp]])
+            egal('focusul e pe titlul ferestrei (conținutul s-a schimbat, butonul apăsat a dispărut)', pg.evaluate('document.activeElement.id'), 'fisaTitlu')
+            egal('în fereastra împrumutului, componenta curentă e împrumutul, iar celelalte două sunt butoane', [pg.locator('#fisa[open] .det-comp .dc.cur').all_inner_texts(), pg.locator('#fisa[open] .det-comp button.dc').all_inner_texts()], [[nume_comp[2]], nume_comp[:2]])
             # tastatură: Enter pe butonul celui de-al doilea grant
-            pg.locator(PB + ' tr.det .det-comp button.dc').nth(1).focus()
+            pg.locator('#fisa[open] .det-comp button.dc').nth(1).focus()
             pg.keyboard.press('Enter')
-            pg.wait_for_selector(PB + ' tr.det[data-k="BIRD|%s"]' % [x['id'] for x in dpo if x['categorie'] == 'Grant'][1])
-            egal('Enter pe butonul unei componente deschide detaliile ei și le închide pe celelalte', [pg.locator(PB + ' tr.det').count(), pg.locator(PB + ' tr.det .det-comp .dc.cur').all_inner_texts()], [1, [nume_comp[1]]])
-            # proiectul închis și redeschis: linia nu rămâne decât în detaliile deschise
+            pg.wait_for_selector(fisa_sel('BIRD', id_g2))
+            egal('Enter pe butonul unei componente deschide fereastra ei, în locul celei curente', [pg.locator('#fisa[open] .fw').count(), pg.locator('#fisa[open] .det-comp .dc.cur').all_inner_texts()], [1, [nume_comp[1]]])
+            # fereastra închisă, proiectul închis în tabel: nu rămâne nimic din ea
+            inchide_fisa(pg)
             pg.locator(PB + ' tr.pg[data-gr="BIRD|%s"] .exp' % cheie_dpo).click()
             pg.wait_for_selector(PB + ' tr.ac.sub', state='detached')
-            egal('proiectul închis: nici componentele, nici linia nu mai sunt în tabel', [pg.locator(PB + ' tr.ac.sub').count(), pg.locator(PB + ' .det-comp').count()], [0, 0])
+            egal('proiectul închis: nici componentele, nici fereastra, nici linia nu mai sunt în pagină', [pg.locator(PB + ' tr.ac.sub').count(), pg.locator('#fisa[open]').count(), pg.locator('.det-comp').count()], [0, 0, 0])
             # un rând obișnuit (nu componentă) nu are linia
             rand_simplu = pg.locator(PB + ' tr.ac:not(.sub)').first
             rand_simplu.locator('.exp').click()
-            pg.wait_for_selector(PB + ' tr.det')
-            egal('detaliile unui rând obișnuit nu au linia „Componentele proiectului”', pg.locator(PB + ' .det-comp').count(), 0)
-            rand_simplu.locator('.exp').click()
+            pg.wait_for_selector('#fisa[open] .fw')
+            egal('fereastra unui rând obișnuit nu are linia „Componentele proiectului”', pg.locator('#fisa[open] .det-comp').count(), 0)
+            inchide_fisa(pg)
             # engleză
             pg.locator(PB + ' tr.pg[data-gr="BIRD|%s"] .exp' % cheie_dpo).click()
             pg.wait_for_selector(PB + ' tr.ac.sub')
             pg.locator(PB + ' tr.ac.sub').first.locator('.exp').click()
-            pg.wait_for_selector(PB + ' tr.det .det-comp')
+            pg.wait_for_selector('#fisa[open] .det-comp')
             pg.evaluate('Traducere.seteaza("en")')
             pg.wait_for_timeout(500)
-            stripe = pg.locator(PB + ' tr.det .det-comp').first               # detaliile deschise mai înainte (al doilea grant) au rămas deschise
+            stripe = pg.locator('#fisa[open] .det-comp').first               # fereastra deschisă se schimbă pe loc în engleză
             egal('în engleză: „Components of the project” și numele componentelor (Grant, Grant, Loan)', [stripe.locator('.dc-l').text_content(), [x.split(',')[0] for x in stripe.locator('.dc').all_inner_texts()]], ['Components of the project', ['Grant', 'Grant', 'Loan']])
             pg.evaluate('Traducere.seteaza("ro")')
             pg.wait_for_timeout(300)
@@ -2131,10 +2179,10 @@ try:
             pg.locator(PB + ' tr.pg[data-gr="BIRD|%s"] .exp' % cheie_dpo).click()
             pg.wait_for_selector(PB + ' tr.ac.sub')
             pg.locator(PB + ' tr.ac.sub').first.locator('.exp').click()
-            pg.wait_for_selector(PB + ' tr.det .det-comp')
+            pg.wait_for_selector('#fisa[open] .det-comp')
             lat = pg.evaluate('document.documentElement.scrollWidth - document.documentElement.clientWidth')
-            verifica('telefon: cu linia deschisă pagina nu se lărgește', lat <= 0, lat)
-            verifica('telefon: pastilele componentelor încap în cartonașul detaliilor', pg.evaluate('(() => { const td = document.querySelector("' + PJB + ' tr.det > td").getBoundingClientRect(); return [...document.querySelectorAll("' + PJB + ' tr.det .dc")].every(b => { const r = b.getBoundingClientRect(); return r.left >= td.left - 1 && r.right <= td.right + 1; }); })()'))
+            verifica('telefon: cu fereastra deschisă pagina nu se lărgește', lat <= 0, lat)
+            verifica('telefon: pastilele componentelor încap în fereastră (care ocupă tot ecranul)', pg.evaluate('(() => { const w = document.querySelector("#fisa .fw").getBoundingClientRect(); return [...document.querySelectorAll("#fisa .dc")].every(b => { const r = b.getBoundingClientRect(); return r.left >= w.left - 1 && r.right <= w.right + 1; }); })()'))
             ctx.close()
 
             # după deblocare: componentele se editează ca orice rând; rândul proiectului se reface cu sumele noi
@@ -2173,6 +2221,7 @@ try:
             egal('antetul donatorului: debursat 1.000.000 EUR', 'debursat 1.000.000 EUR' in txt(pg.locator(P + ' .dsum')), True)
             # Excel: tot câte un rând pe acord (nu pe proiect unit), cu denumirile deosebite și suma fiecărui acord
             def excel_berd(nume):
+                inchide_fisa(pg)                                          # cât e deschisă fereastra proiectului, pagina din spate e inertă
                 with pg.expect_download(timeout=60000) as d:
                     pg.click(P + ' [data-act="excel-donator"]')
                 cale = DESC / nume
@@ -2200,7 +2249,7 @@ try:
 
         # ---------------------------------------------------------------- 20. proiectul deschis e un bloc încadrat
         if rulez(20):
-            print('\n20. Proiectul deschis: bloc încadrat (bară și linii albastre, fundal), ca să nu se confunde cu proiectele din jur')
+            print('\n20. Proiectul unit deschis în tabel: bloc încadrat (bară și linii albastre, fundal); rândurile obișnuite nu au cadru, detaliile lor sunt în fereastra proiectului')
             NAVY, ALBASTRU, NAVY_PX = 'rgb(34, 64, 107)', 'rgb(234, 240, 251)', (34, 64, 107)
             U_BIRD = proiecte_unite(acorduri_donator('BIRD'))
             verifica('BIRD are cel puțin un proiect cu grant și împrumut (pe el se verifică cadrul)', len(U_BIRD) >= 1, len(U_BIRD))
@@ -2243,45 +2292,27 @@ try:
             col8 = coloana_pixeli(pg, x0 + 9, y_sus, y_jos)
             verifica('pe ecran, în prima coloană nu apare nicio linie albă între rânduri', all(c != (255, 255, 255) for c in col8), [i for i, c in enumerate(col8) if c == (255, 255, 255)][:5])
 
-            # detaliile unei componente: fac parte din bloc
+            # detaliile unei componente se deschid în fereastra proiectului: tabelul, deci și blocul, rămân neschimbate
             pg.locator(PB + ' tr.ac.sub').first.locator('.exp').click()
-            pg.wait_for_selector(PB + ' tr.det.sub')
-            pg.mouse.move(2, 2)
-            bl = pg.evaluate(JS_BLOC, HG)
-            egal('cu detaliile primei componente: proiectul, componenta, detaliile ei, a doua componentă', [c.split(' ')[0] for c in bl['clase']], ['pg', 'ac', 'det', 'ac'])
-            st = pg.evaluate(JS_STIL, PB + ' tr.det.sub')
-            verifica('detaliile componentei fac parte din bloc: bara albastră și fundal deschis', st['imagine'] == 'bară' and st['marime'] == '4px 100%' and st['fundalTd'] == 'rgb(249, 251, 254)', st)
-            verifica('blocul rămâne încheiat sub ultimul lui rând (linia albastră de 2 px a proiectului următor)', bl['urmator'] is not None and bl['urmator']['sus'] == '2px ' + NAVY and all(x[0] for x in bl['bara']), (bl['urmator'], bl['bara']))
-            y_sus, y_jos = int(round(bl['celule'][0][1])), int(round(bl['celule'][-1][2]))
-            col = coloana_pixeli(pg, x0 + 1, y_sus, y_jos - 1)
-            rup = rupturi(col, NAVY_PX)
-            verifica('pe ecran, cu detaliile deschise, bara rămâne albastră de sus până jos (doar linia de 1 px de sub detalii o taie)', max(rup or [0]) <= 1 and len(rup) <= len(bl['clase']) - 2, rup)
-            for i, nume in ((1, 'de la componentă la detaliile ei'),):
-                j = int(round(bl['celule'][i + 1][1])) - y_sus
-                verifica('pe ecran, trecerea %s nu întrerupe bara' % nume, all(c == NAVY_PX for c in col[j - 1:j + 2]), col[j - 2:j + 3])
-            col8 = coloana_pixeli(pg, x0 + 9, y_sus, y_jos)
-            verifica('pe ecran, cu detaliile deschise, nicio linie albă între rânduri', all(c != (255, 255, 255) for c in col8), [i for i, c in enumerate(col8) if c == (255, 255, 255)][:5])
+            pg.wait_for_selector('#fisa[open] .fw')
+            bl2 = pg.evaluate(JS_BLOC, HG)
+            egal('cu fereastra unei componente deschisă, blocul din tabel e neschimbat: proiectul și cele două componente, fără rând de detalii', [[c.split(' ')[0] for c in bl2['clase']], pg.locator(PB + ' tr.det').count()], [['pg', 'ac', 'ac'], 0])
+            verifica('fereastra e deasupra paginii (nu în tabel) și cadrul blocului nu s-a mișcat', pg.evaluate('document.getElementById("fisa").matches(":modal")') and bl2['celule'] == bl['celule'] and all(x[0] for x in bl2['bara']), (bl['celule'], bl2['celule']))
+            inchide_fisa(pg)
 
-            # un rând obișnuit, deschis: același cadru, cu detaliile lui
+            # un rând obișnuit: fără cadru nici cu fereastra deschisă (doar proiectele unite au bloc în tabel)
             pg.locator(HG + ' .exp').click()
             pg.wait_for_selector(PB + ' tr.ac.sub', state='detached')
             st = pg.evaluate(JS_STIL, HG)
             verifica('proiectul unit închis la loc: cadrul dispare (fundal obișnuit, fără linie albastră, fără bară din fundal)', st['fundal'] != ALBASTRU and not st['sus'].startswith('2px') and st['imagine'] == 'none', st)
             RO = PB + ' tr.ac:not(.sub)'
             pg.locator(RO).first.locator('.exp').click()
-            pg.wait_for_selector(PB + ' tr.ac.deschis:not(.sub)')
+            pg.wait_for_selector('#fisa[open] .fw')
             pg.mouse.move(2, 2)
-            RD = PB + ' tr.ac.deschis:not(.sub)'
-            st, sd = pg.evaluate(JS_STIL, RD), pg.evaluate(JS_STIL, PB + ' tr.det')
-            verifica('rând obișnuit deschis: fundal albastru-deschis, linie albastră de 2 px deasupra, bara albastră în stânga', st['fundal'] == ALBASTRU and st['sus'] == '2px ' + NAVY and st['imagine'] == 'bară' and st['marime'] == '4px 100%', st)
-            verifica('detaliile lui au aceeași bară și o linie albastră de 2 px dedesubt (încheie blocul)', sd['imagine'] == 'bară' and sd['jos'] == '2px ' + NAVY and sd['fundalTd'] == 'rgb(246, 249, 254)', sd)
-            ra, rd = pg.evaluate(JS_CELULA, RD), pg.evaluate(JS_CELULA, PB + ' tr.det')
-            col = coloana_pixeli(pg, int(round(ra[0])) + 1, int(round(ra[1])), int(round(rd[2])) + 1)
-            verifica('pe ecran, bara rândului obișnuit e albastră fără nicio întrerupere, din rând în detaliile lui', rupturi(col, NAVY_PX) == [], rupturi(col, NAVY_PX))
-            pg.locator(RD + ' .exp').click()
-            pg.wait_for_selector(PB + ' tr.det', state='detached')
             st = pg.evaluate(JS_STIL, RO)
-            verifica('rândul obișnuit închis la loc: fără cadru', st['fundal'] != ALBASTRU and not st['sus'].startswith('2px') and st['imagine'] == 'none', st)
+            verifica('rând obișnuit cu fereastra deschisă: fără cadru (fundal obișnuit, fără linie albastră de 2 px, fără bară), niciun rând „deschis” sau de detalii în tabel',
+                     st['fundal'] != ALBASTRU and not st['sus'].startswith('2px') and st['imagine'] == 'none' and pg.locator(PB + ' tr.ac.deschis').count() == 0 and pg.locator(PB + ' tr.det').count() == 0, st)
+            inchide_fisa(pg)
 
             # după deblocare: bara de editare face parte din bloc, dar nu îl încheie
             print('   · bara de editare, în blocul deschis')
@@ -2294,7 +2325,7 @@ try:
             pg.wait_for_selector(PB + ' tr.re.sub')
             pg.mouse.move(2, 2)
             bl = pg.evaluate(JS_BLOC, HG)
-            egal('componenta în editare: proiectul, componenta, bara de editare, apoi detaliile ei (rămase deschise), a doua componentă', [c.split(' ')[0] for c in bl['clase']], ['pg', 'ac', 're', 'det', 'ac'])
+            egal('componenta în editare: proiectul, componenta, bara de editare, a doua componentă', [c.split(' ')[0] for c in bl['clase']], ['pg', 'ac', 're', 'ac'])
             st = pg.evaluate(JS_STIL, PB + ' tr.re.sub')
             verifica('bara de editare a componentei are bara albastră și nu e luată drept sfârșit de bloc (fără linie albastră de 2 px deasupra)', st['imagine'] == 'bară' and not st['sus'].startswith('2px'), st)
             verifica('blocul rămâne întreg: toate rândurile au bara și blocul se încheie după ultimul rând', all(x[0] for x in bl['bara']) and bl['urmator'] is not None and bl['urmator']['sus'] == '2px ' + NAVY, (bl['bara'], bl['urmator']))
@@ -2303,24 +2334,11 @@ try:
             pg.locator(HG + ' .exp').click()
             pg.wait_for_selector(PB + ' tr.ac.sub', state='detached')
             RO0 = pg.locator(RO).first
-            RO0.locator('.exp').click()
-            pg.wait_for_selector(RD)
             RO0.locator('.edt[data-f="sfarsit"]').click()
-            pg.wait_for_selector(PB + ' tr.ac.deschis.edit')
+            pg.wait_for_selector(PB + ' tr.ac.edit:not(.sub)')
             pg.mouse.move(2, 2)
-            st = pg.evaluate(JS_STIL, PB + ' tr.ac.deschis:not(.sub) + tr.re')
-            verifica('rând obișnuit deschis, în editare: bara de editare are bara albastră (blocul nu se întrerupe)', st is not None and st['imagine'] == 'bară', st)
-            ra, rd = pg.evaluate(JS_CELULA, RD), pg.evaluate(JS_CELULA, PB + ' tr.det')
-            col = coloana_pixeli(pg, int(round(ra[0])) + 1, int(round(ra[1])), int(round(rd[2])) + 1)
-            rup = rupturi(col, NAVY_PX)
-            verifica('pe ecran, bara rândului obișnuit în editare e albastră de sus până jos (doar linia de 1 px de sub bara de editare o taie)', max(rup or [0]) <= 1 and len(rup) <= 1, rup)
-            pg.locator(RD + ' .exp').click()
-            pg.wait_for_selector(PB + ' tr.det', state='detached')
-            r2 = pg.locator(PB + ' tr.ac:not(.sub):not(.edit)').first
-            r2.locator('.edt[data-f="inceput"]').click()
-            pg.wait_for_selector(PB + ' tr.ac.edit:not(.deschis)')
-            st = pg.evaluate(JS_STIL, PB + ' tr.ac.edit:not(.deschis) + tr.re')
-            verifica('rând închis, în editare: fără cadru și fără bară (nu face parte dintr-un bloc deschis)', st is not None and st['imagine'] == 'none' and not st['sus'].startswith('2px'), st)
+            st = pg.evaluate(JS_STIL, PB + ' tr.ac.edit:not(.sub) + tr.re')
+            verifica('rând obișnuit în editare: bara de editare fără cadru și fără bară (nu face parte dintr-un bloc; doar proiectele unite au bloc)', st is not None and st['imagine'] == 'none' and not st['sus'].startswith('2px'), st)
             ctx.close()
 
             # lățimi: tabelul se încadrează de la 821 px; sub 820 px sunt cartonașe, cu bloc din cartonașe
@@ -2329,8 +2347,6 @@ try:
             pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BIRD')
             pg.locator(HG + ' .exp').click()
             pg.wait_for_selector(PB + ' tr.ac.sub')
-            pg.locator(PB + ' tr.ac.sub').first.locator('.exp').click()
-            pg.wait_for_selector(PB + ' tr.det.sub')
             pg.mouse.move(2, 2)
             st = pg.evaluate(JS_STIL, HG)
             verifica('1000 px: același cadru (fundal albastru, linie de 2 px, bară)', st['fundal'] == ALBASTRU and st['sus'] == '2px ' + NAVY and st['imagine'] == 'bară', st)
@@ -2347,13 +2363,11 @@ try:
             pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BIRD')
             pg.locator(HG + ' .exp').click()
             pg.wait_for_selector(PB + ' tr.ac.sub')
-            pg.locator(PB + ' tr.ac.sub').first.locator('.exp').click()
-            pg.wait_for_selector(PB + ' tr.det.sub')
             pg.mouse.move(2, 2)
             bl = pg.evaluate(JS_BLOC, HG)
-            st, sc, sdt = pg.evaluate(JS_STIL, HG), pg.evaluate(JS_STIL, PB + ' tr.ac.sub'), pg.evaluate(JS_STIL, PB + ' tr.det.sub')
+            st, sc = pg.evaluate(JS_STIL, HG), pg.evaluate(JS_STIL, PB + ' tr.ac.sub')
             verifica('telefon: cartonașul proiectului deschis are fundal albastru, bordură și bară albastre și loc deasupra, față de cartonașul dinainte', st['fundal'] == ALBASTRU and st['bl'] == '4px ' + NAVY and st['mt'] == '22px' and st['imagine'] == 'none', st)
-            verifica('telefon: componentele sunt cartonașe trase spre dreapta, cu bară albastră în stânga, iar detaliile lor se lipesc de ele', sc['ml'] == '24px' and sc['bl'] == '4px ' + NAVY and sdt['ml'] == '24px' and sdt['imagine'] == 'none', (sc, sdt))
+            verifica('telefon: componentele sunt cartonașe trase spre dreapta, cu bară albastră în stânga', sc['ml'] == '24px' and sc['bl'] == '4px ' + NAVY, sc)
             verifica('telefon: după bloc, următorul cartonaș are loc deasupra (nu se lipește de bloc)', bl['urmator'] is not None and bl['urmator']['mt'] == '22px', bl['urmator'])
             lat = pg.evaluate('document.documentElement.scrollWidth - document.documentElement.clientWidth')
             verifica('telefon: pagina nu se lărgește cu blocul deschis', lat <= 0, lat)
@@ -2390,7 +2404,7 @@ try:
             PB = 'section.panel[data-d="BERD"]'
 
             def sel_det(a):
-                return PB + ' tr.det[data-k="BERD|%s"]' % a['id']
+                return fisa_sel('BERD', a['id'])                                # rădăcina ferestrei proiectului (fișa nu mai e un rând de tabel)
 
             def suma_txt(v, val):
                 return fmt_bani_ro(v) + ' ' + val
@@ -2634,10 +2648,224 @@ try:
                 chip = d_.locator('.det-desc a.src.s-oficial')
                 if chip.count() != 1 or chip.get_attribute('href') != p['sursa'] or gazda_ not in (chip.get_attribute('title') or ''):
                     scapate.append(a['id'] + ' (eticheta)')
-                pg.locator(PBB + ' tr.ac[data-k="BIRD|%s"] .exp' % a['id']).click()
+                inchide_fisa(pg)
                 if verificate >= 12:
                     break
             verifica('fișierul adevărat: %d proiecte BIRD cu citat în fișierul de surse — fișa nu are citat, notă sau gazdă scrise, iar eticheta „sursă oficială” duce la document, cu gazda în indiciu' % verificate, verificate >= 5 and scapate == [], (verificate, scapate))
+            ctx.close()
+
+        # ---------------------------------------------------------------- 22. fereastra proiectului
+        if rulez(22):
+            print('\n22. Fereastra proiectului: detaliile se deschid separat, deasupra paginii, nu se mai amestecă cu proiectele vecine')
+            PB = 'section.panel[data-d="BERD"]'
+            SIMPLU = [a for a in BERD if a['id'] not in in_proiecte_unite(BERD)]
+            a22 = sorted([a for a in SIMPLU if len(a['acte']) >= 9 and a.get('suma')], key=lambda a: -len(a['acte']))[0]       # un acord cu parcurs lung: fereastra are de derulat
+            a22b = sorted([a for a in SIMPLU if a['id'] != a22['id'] and a.get('suma')], key=lambda a: a['id'])[0]
+            norm = lambda t: re.sub(r'\s+', ' ', t).strip()
+            focus_pe = '(() => { const a = document.activeElement; return [a.classList.contains("exp"), a.closest("tr") ? a.closest("tr").getAttribute("data-k") : null]; })()'
+
+            def inchisa(pg):
+                """Fereastra e închisă și starea paginii a luat act (evenimentul „close” vine puțin după ce dispare atributul „open”)."""
+                pg.wait_for_selector('#fisa[open]', state='detached')
+                pg.wait_for_function('DebursariUI.stare().fisa === null')
+            nimic_deschis = '[document.getElementById("fisa").innerHTML, document.documentElement.classList.contains("fisa-deschisa"), DebursariUI.stare().fisa]'
+
+            # ---------------------------------------------------------------- 22.1 ecran lat
+            print('   · ecran lat (1360 × 900): deschidere, închidere, focus, fundal')
+            fals = GitHubFals(intrari=[])
+            ctx = context_zi(b)
+            pg = pagina(ctx, fals, hash_='#d=BERD', manual=OF, arhiva=False)
+            egal('înainte de deschidere: fereastra e în pagină, închisă și goală, iar pagina se derulează', [pg.locator('dialog#fisa').count(), pg.locator('#fisa[open]').count(), pg.evaluate(nimic_deschis), pg.evaluate('getComputedStyle(document.documentElement).overflow')],
+                 [1, 0, ['', False, None], 'visible'])
+            r = rand_acord(pg, 'BERD', a22['id'])
+            btn = r.locator('.exp')
+            egal('butonul rândului anunță o fereastră (aria-haspopup), nu o secțiune care se desface (fără aria-expanded)', [btn.get_attribute('aria-haspopup'), btn.get_attribute('aria-expanded')], ['dialog', None])
+            btn.click()
+            pg.wait_for_selector(fisa_sel('BERD', a22['id']))
+            F = pg.locator('#fisa')
+            egal('deschisă: dialog modal cu un singur proiect; tabelul din spate nu primește niciun rând de detalii și niciun rând „deschis”', [pg.evaluate('document.getElementById("fisa").matches(":modal")'), F.locator('.fw').count(), pg.locator(PB + ' tr.det').count(), pg.locator(PB + ' tr.ac.deschis').count()], [True, 1, 0, 0])
+            egal('antet: tipul acordului, titlul = denumirea din rând, butonul „Închide” (cu eticheta lui)', [F.locator('.fw-tags .tag').count() >= 1, norm(F.locator('.fw-titlu').inner_text()), F.locator('.fw-x').text_content().strip(), F.locator('.fw-x').get_attribute('aria-label')],
+                 [True, norm(r.locator('.pname').inner_text()), 'Închide', 'Închide fereastra proiectului'])
+            egal('antet: fereastra e legată de titlul ei (aria-labelledby) și titlul primește focusul', [F.get_attribute('aria-labelledby'), pg.evaluate('document.activeElement.id')], ['fisaTitlu', 'fisaTitlu'])
+            egal('pagina din spate nu se mai derulează cât e deschisă fereastra', [pg.evaluate('document.documentElement.classList.contains("fisa-deschisa")'), pg.evaluate('getComputedStyle(document.documentElement).overflow')], [True, 'hidden'])
+            bx = F.bounding_box()
+            verifica('fereastra e mai mică decât pagina și centrată, cu margine în jur (lățime ≤ 1000, înălțime ≤ 860 din 900)', bx['width'] <= 1001 and bx['height'] <= 861 and abs(bx['x'] + bx['width'] / 2 - 680) <= 2 and bx['x'] >= 150 and bx['y'] >= 18, bx)
+            egal('din spate rămâne un fundal întunecat (rgba(15, 25, 45, 0.55))', pg.evaluate('getComputedStyle(document.getElementById("fisa"), "::backdrop").backgroundColor'), 'rgba(15, 25, 45, 0.55)')
+            verifica('tabelul din spate nu mai poate fi atins: în afara ferestrei, punctul aparține ferestrei (fundalului ei), nu unui rând', pg.evaluate('(() => { const e = document.elementFromPoint(20, 450); return !!e && e.id === "fisa"; })()'))
+            ies = []
+            for i in range(30):
+                pg.keyboard.press('Tab')
+                if not pg.evaluate('(() => { const a = document.activeElement; return a === document.body || a === document.documentElement || !!a.closest("#fisa"); })()'):      # în fereastră, sau (la capăt) în interfața browserului
+                    ies.append(i)
+            verifica('Tab (30 de apăsări): focusul nu ajunge pe niciun element din pagina din spate (rămâne în fereastră, cu o trecere prin interfața browserului la capăt)', ies == [], ies)
+            pg.keyboard.press('Escape')
+            inchisa(pg)
+            egal('Esc închide fereastra: nu rămâne nimic în ea, pagina se derulează din nou, iar focusul e înapoi pe butonul rândului', [pg.evaluate(nimic_deschis), pg.evaluate(focus_pe)], [['', False, None], [True, 'BERD|' + a22['id']]])
+            pg.keyboard.press('Enter')
+            pg.wait_for_selector(fisa_sel('BERD', a22['id']))
+            pg.click('#fisa .fw-x')
+            inchisa(pg)
+            egal('Enter pe butonul rândului deschide fereastra; „Închide” o închide, cu focusul înapoi pe rând', [pg.evaluate(nimic_deschis), pg.evaluate(focus_pe)], [['', False, None], [True, 'BERD|' + a22['id']]])
+            btn.click()
+            pg.wait_for_selector(fisa_sel('BERD', a22['id']))
+            pg.mouse.click(20, 450)
+            inchisa(pg)
+            egal('un clic pe fundalul din spate închide fereastra (focusul înapoi pe rând)', [pg.evaluate(nimic_deschis), pg.evaluate(focus_pe)], [['', False, None], [True, 'BERD|' + a22['id']]])
+            btn.click()
+            pg.wait_for_selector(fisa_sel('BERD', a22['id']))
+            bx = F.bounding_box()
+            pg.mouse.move(bx['x'] + 80, bx['y'] + 40)
+            pg.mouse.down()
+            pg.mouse.move(20, 450, steps=6)
+            pg.mouse.up()
+            pg.wait_for_timeout(200)
+            verifica('o apăsare care începe în fereastră și se termină pe fundal (o selecție de text) nu închide fereastra', pg.locator('#fisa[open]').count() == 1)
+            pg.mouse.click(bx['x'] + 80, bx['y'] + 40)
+            pg.wait_for_timeout(150)
+            verifica('un clic în fereastră n-o închide', pg.locator('#fisa[open]').count() == 1)
+            pg.evaluate('Traducere.seteaza("en")')
+            pg.wait_for_timeout(400)
+            egal('în engleză, cu fereastra deschisă: se schimbă pe loc (aceeași fereastră, butonul „Close”)', [pg.locator('#fisa[open]').count(), F.locator('.fw').get_attribute('data-k'), F.locator('.fw-x').text_content().strip(), F.locator('.fw-x').get_attribute('aria-label')],
+                 [1, 'BERD|' + a22['id'], 'Close', 'Close the project window'])
+            pg.evaluate('Traducere.seteaza("ro")')
+            pg.wait_for_timeout(300)
+            egal('înapoi în română: „Închide”', F.locator('.fw-x').text_content().strip(), 'Închide')
+            pg.evaluate('location.hash = "#d=BERD&q=gazelor"')
+            inchisa(pg)
+            egal('schimbarea filtrelor din adresă închide fereastra (nu mai are ce arăta)', pg.evaluate(nimic_deschis), ['', False, None])
+            verifica('fereastra proiectului n-a produs erori și n-a lăsat pagina fără derulare', pg.evaluate('getComputedStyle(document.documentElement).overflow') == 'visible')
+            ctx.close()
+
+            # ---------------------------------------------------------------- 22.2 ecran jos: fereastra se derulează în interior, antetul rămâne pe loc
+            print('   · ecran jos (1360 × 600): conținutul se derulează în fereastră, antetul rămâne')
+            ctx = context_zi(b, viewport=(1360, 600))
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BERD', manual=OF, arhiva=False)
+            rand_acord(pg, 'BERD', a22['id']).locator('.exp').scroll_into_view_if_needed()
+            y_pagina = pg.evaluate('Math.round(window.scrollY)')
+            rand_acord(pg, 'BERD', a22['id']).locator('.exp').click()
+            pg.wait_for_selector(fisa_sel('BERD', a22['id']))
+            js_m = '''() => { const c = document.querySelector("#fisa .fw-corp"), cap = document.querySelector("#fisa .fw-cap").getBoundingClientRect(), x = document.querySelector("#fisa .fw-x").getBoundingClientRect(), f = document.getElementById("fisa").getBoundingClientRect();
+                return { sh: c.scrollHeight, ch: c.clientHeight, st: c.scrollTop, capTop: Math.round(cap.top), xTop: Math.round(x.top), xJos: Math.round(x.bottom), fSus: Math.round(f.top), fJos: Math.round(f.bottom), pagina: Math.round(window.scrollY) }; }'''
+            m0 = pg.evaluate(js_m)
+            verifica('fereastra e mai joasă decât 600 px și are mai mult conținut decât încape (se derulează în interior)', m0['fJos'] - m0['fSus'] <= 560 and m0['sh'] > m0['ch'] + 80, m0)
+            pg.evaluate('document.querySelector("#fisa .fw-corp").scrollTop = 260')
+            m1 = pg.evaluate(js_m)
+            verifica('după derulare conținutul s-a mișcat (260 px), dar antetul și „Închide” au rămas pe loc, în fereastră', m1['st'] >= 250 and m1['capTop'] == m0['capTop'] and m1['xTop'] == m0['xTop'] and m1['xTop'] >= m1['fSus'] and m1['xJos'] <= m1['fJos'], (m0, m1))
+            pg.evaluate('document.querySelector("#fisa .cale .pas-mai button").click()')                       # desfășoară parcursul: fereastra se redesenează
+            pg.wait_for_timeout(200)
+            m2 = pg.evaluate(js_m)
+            verifica('desfășurarea parcursului redesenează fereastra, dar poziția de derulare se păstrează (nu sare la început)', abs(m2['st'] - m1['st']) <= 2 and m2['sh'] > m1['sh'], (m1, m2))
+            egal('în timpul derulării, pagina din spate a rămas pe loc (la rândul de unde s-a deschis fereastra)', [m0['pagina'] > 100, abs(m0['pagina'] - y_pagina) <= 60, m2['pagina']], [True, True, m0['pagina']])
+            pg.keyboard.press('Escape')
+            inchisa(pg)
+            egal('după închidere, pagina e tot unde a fost (fără salt la început)', pg.evaluate('Math.round(window.scrollY)'), m0['pagina'])
+            ctx.close()
+
+            # ---------------------------------------------------------------- 22.3 proiect cu grant și împrumut
+            print('   · proiect cu grant și împrumut: pastilele componentelor schimbă fereastra')
+            U22 = proiecte_unite(BERD)
+            gaze = U22[cheie_nume('Securitatea furnizării gazelor naturale')]
+            grant = [x for x in gaze if x['categorie'] == 'Grant'][0]
+            imprumut = [x for x in gaze if x['categorie'] == 'Împrumut'][0]
+            ctx = context_zi(b)
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BERD&q=gazelor%20naturale')
+            h = pg.locator(PB + ' tr.pg')
+            h.locator('.exp').click()
+            pg.wait_for_selector(PB + ' tr.ac.sub')
+            pg.locator(PB + ' tr.ac.sub[data-k="BERD|%s"] .exp' % grant['id']).click()
+            pg.wait_for_selector(fisa_sel('BERD', grant['id']))
+            F = pg.locator('#fisa')
+            egal('proiect unit: titlul ferestrei e denumirea comună, meta începe cu numele componentei (în română), iar linia „Componentele proiectului” are cele două componente', [norm(F.locator('.fw-titlu').inner_text()), norm(F.locator('.fw-meta b').first.inner_text()),
+                 F.locator('.det-comp .dc').count(), F.locator('.det-comp .dc.cur').count(), F.locator('.det-comp button.dc').count()], [norm(h.locator('.pname').inner_text()), 'Grant, ' + grant['semnat'][-4:], 2, 1, 1])
+            F.locator('button.dc').click()
+            pg.wait_for_selector(fisa_sel('BERD', imprumut['id']))
+            egal('un clic pe pastila „Împrumut”: aceeași fereastră, acum pentru împrumut (una singură, deschisă; starea paginii se aliniază)', [pg.locator('#fisa[open]').count(), F.locator('.fw').count(), F.locator('.fw').get_attribute('data-k'), pg.evaluate('DebursariUI.stare().fisa')],
+                 [1, 1, 'BERD|' + imprumut['id'], 'BERD|' + imprumut['id']])
+            egal('după schimbare: focusul e pe titlu, componenta curentă e împrumutul, iar antetul spune „Împrumut”', [pg.evaluate('document.activeElement.id'), F.locator('.det-comp .dc.cur').inner_text().strip(), F.locator('.fw-tags .tag').first.inner_text().strip()],
+                 ['fisaTitlu', 'Împrumut, ' + imprumut['semnat'][-4:], 'Împrumut'])
+            pg.keyboard.press('Escape')
+            inchisa(pg)
+            egal('Esc: focusul ajunge pe rândul componentei afișate la urmă (împrumutul), iar proiectul rămâne desfăcut în tabel', [pg.evaluate(focus_pe), pg.locator(PB + ' tr.ac.sub').count(), h.locator('.exp').get_attribute('aria-expanded')],
+                 [[True, 'BERD|' + imprumut['id']], 2, 'true'])
+            ctx.close()
+
+            # ---------------------------------------------------------------- 22.4 după deblocare: formulare, starea se păstrează la redesenare
+            print('   · după deblocare: „Debursare” din rând, formularele din fereastră, starea se păstrează')
+            fals = GitHubFals(intrari=[intrare(a22b, 500000, 'EUR', '2025-06-01', 'prima tranșă', id_='dtest22a')])
+            ctx = context_zi(b)
+            pg = pagina(ctx, fals, hash_='#d=BERD', manual=OF, arhiva=False)
+            debloca(pg)
+            r = rand_acord(pg, 'BERD', a22b['id'])
+            r.locator('[data-act="adauga"]').click()
+            pg.wait_for_selector(fisa_sel('BERD', a22b['id']))
+            F = pg.locator('#fisa')
+            det = pg.locator(fisa_sel('BERD', a22b['id']))
+            egal('butonul „Debursare” din rând deschide fereastra, cu focusul pe câmpul „Suma”', [pg.evaluate('document.activeElement.getAttribute("name")'), det.locator('form.deb-form').count(), det.locator('form.proj-form').count()], ['suma', 1, 1])
+            det.locator('form.deb-form [name=suma]').fill('1.250.000')
+            det.locator('form.deb-form [name=nota]').fill('probă pentru fereastră')
+            det.locator('form.deb-form [name=suma]').focus()
+            pg.evaluate('Traducere.seteaza("en")')
+            pg.wait_for_timeout(400)
+            pg.evaluate('Traducere.seteaza("ro")')
+            pg.wait_for_timeout(300)
+            egal('fereastra se redesenează (schimbarea limbii), dar ce a scris omul rămâne scris, iar focusul rămâne pe câmpul „Suma”', [det.locator('form.deb-form [name=suma]').input_value(), det.locator('form.deb-form [name=nota]').input_value(), pg.evaluate('document.activeElement.getAttribute("name")'), pg.locator('#fisa[open]').count()],
+                 ['1.250.000', 'probă pentru fereastră', 'suma', 1])
+            completeaza(det, data='2026-10-02', val='EUR')
+            det.locator('form.deb-form button[type=submit]').click()
+            asteapta_salvat(pg, fals, 1)
+            egal('după salvare fereastra rămâne deschisă și arată cele două debursări, iar formularul s-a golit', [pg.locator('#fisa[open]').count(), det.locator('table.deb-ent tbody tr').count(), det.locator('form.deb-form [name=suma]').input_value()], [1, 2, ''])
+            verifica('în tabelul din spate, rândul arată debursările (1.750.000 EUR, 2 debursări)', '1.750.000' in rand_acord(pg, 'BERD', a22b['id']).locator('td').nth(5).inner_text().replace('\xa0', ' ') and '2 debursări' in rand_acord(pg, 'BERD', a22b['id']).locator('td').nth(5).inner_text(), rand_acord(pg, 'BERD', a22b['id']).locator('td').nth(5).inner_text())
+            # editarea unei debursări din fereastră: Esc în câmp renunță la editare, fără să închidă fereastra
+            det.locator('[data-act="ed"][data-id="dtest22a"]').click()
+            pg.wait_for_selector('#fisa [data-ed="suma"]')
+            pg.fill('#fisa [data-ed="suma"]', '999')
+            pg.keyboard.press('Escape')
+            pg.wait_for_timeout(200)
+            egal('Esc în câmpurile unei debursări aflate în editare renunță la editare, iar fereastra rămâne deschisă', [pg.locator('#fisa [data-ed]').count(), pg.locator('#fisa[open]').count(), fals.n_put], [0, 1, 1])
+            pg.keyboard.press('Escape')                                                                           # acum, în afara editării, Esc închide fereastra
+            inchisa(pg)
+            egal('apoi Esc închide fereastra, cu focusul înapoi pe rând', [pg.evaluate(nimic_deschis), pg.evaluate(focus_pe)], [['', False, None], [True, 'BERD|' + a22b['id']]])
+            r.locator('.edt[data-f="sfarsit"]').click()                                                          # fereastra se deschide și peste un rând aflat în editare în tabel; editorul din tabel rămâne neatins
+            pg.wait_for_selector('tr.ac.edit[data-k="BERD|%s"]' % a22b['id'])
+            r.locator('.exp').click()
+            pg.wait_for_selector(fisa_sel('BERD', a22b['id']))
+            egal('rând în editare în tabel: fereastra se deschide totuși, iar editorul din tabel rămâne', [pg.locator('#fisa[open]').count(), pg.locator('tr.ac.edit[data-k="BERD|%s"]' % a22b['id']).count()], [1, 1])
+            ctx.close()
+
+            # ---------------------------------------------------------------- 22.5 telefon și lățimi intermediare
+            print('   · telefon (390 × 844) și lățimile 1000, 821, 820')
+            ctx = context_zi(b, viewport=(390, 844))
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BERD', manual=OF, arhiva=False)
+            rand_acord(pg, 'BERD', a22['id']).locator('.exp').click()
+            pg.wait_for_selector(fisa_sel('BERD', a22['id']))
+            F = pg.locator('#fisa')
+            bx = F.bounding_box()
+            egal('telefon: fereastra ocupă tot ecranul', [round(bx['x']), round(bx['y']), round(bx['width']), round(bx['height'])], [0, 0, 390, 844])
+            verifica('telefon: fără derulare orizontală cu fereastra deschisă', pg.evaluate('document.documentElement.scrollWidth <= window.innerWidth') and pg.evaluate('document.querySelector("#fisa .fw").scrollWidth <= document.querySelector("#fisa .fw").clientWidth + 1'),
+                     pg.evaluate('[document.documentElement.scrollWidth, window.innerWidth]'))
+            pg.evaluate('document.querySelector("#fisa .fw").scrollTop = 700')
+            m = pg.evaluate('''() => { const w = document.querySelector("#fisa .fw"), b = document.querySelector("#fisa .fw-bar").getBoundingClientRect(), x = document.querySelector("#fisa .fw-x").getBoundingClientRect();
+                return { st: w.scrollTop, sh: w.scrollHeight, ch: w.clientHeight, barSus: Math.round(b.top), barJos: Math.round(b.bottom), xSus: Math.round(x.top), xJos: Math.round(x.bottom) }; }''')
+            verifica('telefon: fișa se derulează în fereastră (antetul cu titlul iese odată cu conținutul), dar bara cu tipul și „Închide” rămâne lipită sus, vizibilă', m['st'] >= 500 and m['st'] >= m['sh'] - m['ch'] - 1 and m['barSus'] == 0 and m['xSus'] >= 0 and m['xJos'] <= m['barJos'], m)
+            pg.click('#fisa .fw-x')
+            inchisa(pg)
+            egal('telefon: „Închide” (apăsat după derulare) închide fereastra; pagina din spate se derulează iar', [pg.evaluate(nimic_deschis), pg.evaluate('getComputedStyle(document.documentElement).overflow')], [['', False, None], 'visible'])
+            ctx.close()
+            ctx = context_zi(b, viewport=(1000, 800))
+            pg = pagina(ctx, GitHubFals(intrari=[]), hash_='#d=BERD', manual=OF, arhiva=False)
+            rand_acord(pg, 'BERD', a22['id']).locator('.exp').click()
+            pg.wait_for_selector(fisa_sel('BERD', a22['id']))
+            bx = pg.locator('#fisa').bounding_box()
+            verifica('1000 px: fereastra e încă fereastră, cu 16 px de margine pe fiecare parte (lățime 968)', abs(bx['width'] - 968) <= 1 and abs(bx['x'] - 16) <= 1 and bx['height'] <= 761, bx)
+            pg.set_viewport_size({'width': 821, 'height': 800})
+            pg.wait_for_timeout(200)
+            bx = pg.locator('#fisa').bounding_box()
+            verifica('821 px: tot fereastră (lățime 789, centrată), nu ecran întreg', abs(bx['width'] - 789) <= 1 and bx['x'] >= 15 and bx['height'] <= 761, bx)
+            pg.set_viewport_size({'width': 820, 'height': 800})
+            pg.wait_for_timeout(200)
+            bx = pg.locator('#fisa').bounding_box()
+            egal('820 px: ecran întreg', [round(bx['x']), round(bx['y']), round(bx['width']), round(bx['height'])], [0, 0, 820, 800])
+            verifica('820 px: fără derulare orizontală', pg.evaluate('document.documentElement.scrollWidth <= window.innerWidth'))
             ctx.close()
 
         b.close()
