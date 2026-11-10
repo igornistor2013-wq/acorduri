@@ -38,7 +38,6 @@ var S = {
   amp: { faza: 'neinceput', peAcord: new Map(), stare: null, eroare: '', promisiune: null },           // datele de început și de finalizare din AMP
   sel: [], q: '', tip: '', deb: '', sort: 'suma', dq: '', dsort: 'n',
   fisa: null, cale: new Set(), f: {}, fe: {}, ed: null, conf: null, pf: {}, pfe: {}, confP: null,   // fisa: rândul („donator|id acord”) al cărui proiect e deschis în fereastra proiectului; cale: rândurile al căror parcurs al acordului e arătat întreg (nu doar începutul și sfârșitul)
-  gdeschise: new Set(),                        // proiectele cu grant și împrumut deschise în tabel: „donator|denumire” → se văd acordurile componente
   subDe: new Map(), unit: new Map(),           // refăcute la fiecare randare: rând (donator|id acord) → proiectul din care face parte; „donator|denumire” → proiectul (acordurile lui)
   re: new Map(),                               // rândurile aflate în editare în tabel: id acord → { f: câmpurile de acum, f0: cele de la deschidere, fe: erorile }
   dlg: { mod: 'cod', eroare: '', ocupat: false, tine: false }
@@ -649,28 +648,28 @@ function htmlDebGrup(r) {
   return h + '<div class="amt-sub">' + r.nIntrari + ' ' + (r.nIntrari === 1 ? L('debursare', 'disbursement') : L('debursări', 'disbursements')) + (r.ultima ? ' · ' + esc(L('ultima ', 'last ')) + esc(D.dataRo(r.ultima)) : '') + '</div>';
 }
 function htmlAntet(d, u) {
-  var gk = d.cheie + '|' + u.cheie, deschis = S.gdeschise.has(gk), sc = D.sumeComponente(u.membri), dt = D.dateGrup(u.membri, infoDe);
+  var gk = d.cheie + '|' + u.cheie, sc = D.sumeComponente(u.membri), dt = D.dateGrup(u.membri, infoDe);
   var r = D.rezumat(u.membri, S.peAcord, S.baza.cursuri), cof = [];
   u.membri.forEach(function (a) { a.donatori.forEach(function (x) { if (x !== d.cheie && cof.indexOf(x) < 0) cof.push(x); }); });
   var meta = ['<span class="grp-t">' + esc(sc.tipuri.map(function (t) { return (D.etichetaTip(t.categorie, S.en) || '').toLowerCase(); }).filter(Boolean).join(' + ')) + '</span>',
               esc(u.membri.length + ' ' + L('acorduri', 'agreements'))];
   if (cof.length) meta.push('<span class="cof">' + esc(L('cofinanțat cu ', 'co-financed with ') + cof.join(', ')) + '</span>');
   var tags = sc.tipuri.map(function (t) { return '<span class="tag ' + (CLASA_TIP[t.categorie] || 't-alt') + '">' + esc(D.etichetaTip(t.categorie, S.en) || '—') + '</span>'; }).join('');
-  return '<tr class="pg' + (deschis ? ' deschis' : '') + '" data-gr="' + esc(gk) + '">' +
+  return '<tr class="pg" data-gr="' + esc(gk) + '" data-ac="' + esc(u.membri.map(function (a) { return a.id; }).join(' ')) + '">' +      // data-ac: acordurile proiectului (componentele nu sunt rânduri în tabel, se aleg în fereastră)
     '<td data-l="' + esc(L('Proiectul', 'Project')) + '"><div class="pname">' + esc(u.nume) + '</div><div class="pmeta">' + meta.join(' · ') + '</div></td>' +
     '<td class="dcol" data-l="' + esc(L('Data efectivă de începere', 'Actual start date')) + '">' + dataGrup(dt.inceput, 'inceput') + '</td>' +
     '<td class="dcol" data-l="' + esc(L('Data finalizării', 'Completion date')) + '">' + dataGrup(dt.sfarsit, 'sfarsit') + '</td>' +
     '<td data-l="' + esc(L('Tip de finanțare', 'Type of financing')) + '"><div class="tags">' + tags + '</div></td>' +
     '<td class="num" data-l="' + esc(L('Suma proiectului, pe componente', 'Project amount, by component')) + '"><div class="split">' + sc.tipuri.map(htmlSumaTip).join('') + htmlTotalGrup(sc) + '</div></td>' +
     '<td class="num" data-l="' + esc(L('Suma debursărilor', 'Disbursed amount')) + '">' + htmlDebGrup(r) + '</td>' +
-    '<td class="act"><button type="button" class="exp" data-act="grup-comuta" data-fk="' + esc(gk + '|gexp') + '" aria-expanded="' + (deschis ? 'true' : 'false') + '" aria-label="' +
-      esc((deschis ? L('Închide acordurile proiectului: ', 'Close the agreements of the project: ') : L('Deschide acordurile proiectului: ', 'Open the agreements of the project: ')) + u.nume) + '">' + IC.chev + '</button></td></tr>';
+    '<td class="act"><button type="button" class="exp" data-act="grup-deschide" data-fk="' + esc(gk + '|gexp') + '" aria-haspopup="dialog" aria-label="' +
+      esc(L('Deschide proiectul, cu componentele lui: ', 'Open the project, with its components: ') + u.nume) + '">' + IC.chev + '</button></td></tr>';
 }
 function htmlGrup(d, u) {
   var gk = d.cheie + '|' + u.cheie;
   S.unit.set(gk, u);
   u.membri.forEach(function (a) { S.subDe.set(d.cheie + '|' + a.id, { gk: gk, membri: u.membri }); });
-  return htmlAntet(d, u) + (S.gdeschise.has(gk) ? u.membri.map(function (a) { return htmlRand(d, a); }).join('') : '');
+  return htmlAntet(d, u);               // componentele nu se desfac în tabel: se aleg în fereastra proiectului (htmlComponente)
 }
 
 /* fișa din fereastra proiectului: debursările introduse, formularul de adăugare și datele despre acord */
@@ -905,10 +904,10 @@ function formularProiect(a, k, sterge) {
    fără s-o închidă. */
 function htmlComponente(a, k, sub) {
   var d = k.slice(0, k.indexOf('|')), et = L('Componentele proiectului', 'Components of the project');
-  return '<div class="det-comp" role="group" aria-label="' + esc(et) + '"><span class="dc-l">' + esc(et) + '</span>' + sub.membri.map(function (m) {
-    var nume = D.etichetaComponenta(m, sub.membri, S.en);
-    return m.id === a.id ? '<span class="dc cur" aria-current="true">' + esc(nume) + '</span>'
-      : '<button type="button" class="dc" data-act="spre-componenta" data-spre="' + esc(d + '|' + m.id) + '" data-fk="' + esc(k + '|dc_' + m.id) + '">' + esc(nume) + '</button>';
+  return '<div class="det-comp" role="group" aria-label="' + esc(et) + '"><span class="dc-l">' + esc(et) + '<small>' + esc(L(' · alege componenta', ' · choose a component')) + '</small></span>' + sub.membri.map(function (m) {
+    var nume = D.etichetaComponenta(m, sub.membri, S.en), suma = m.suma ? '<small>' + esc(fb(m.suma.v) + ' ' + m.suma.val) + '</small>' : '';
+    return m.id === a.id ? '<span class="dc cur" aria-current="true"><b>' + esc(nume) + '</b>' + suma + '</span>'
+      : '<button type="button" class="dc" data-act="spre-componenta" data-spre="' + esc(d + '|' + m.id) + '" data-fk="' + esc(k + '|dc_' + m.id) + '"><b>' + esc(nume) + '</b>' + suma + '</button>';
   }).join('') + '</div>';
 }
 /* Fereastra proiectului. Detaliile unui proiect nu se mai deschid în tabel, între proiectele vecine, ci într-o fereastră separată, mai mică, deasupra paginii
@@ -1159,20 +1158,6 @@ function refaAntet(gk) {
     h.parentNode.replaceChild(tmp.firstChild, h);
   });
 }
-function refaGrup(gk) {
-  var h = RAD.querySelector('tr.pg[data-gr="' + qs(gk) + '"]'), u = S.unit.get(gk), d = donatorDeGrup(gk);
-  if (!h || !u || !d) { randeazaRez(); return; }
-  pastreazaFocus(function () {
-    var urm = h.nextElementSibling;
-    while (urm && (urm.classList.contains('sub') || urm.classList.contains('re'))) { var de_sters = urm; urm = urm.nextElementSibling; de_sters.parentNode.removeChild(de_sters); }
-    var tmp = document.createElement('tbody');
-    tmp.innerHTML = htmlGrup(d, u);
-    while (tmp.firstChild) h.parentNode.insertBefore(tmp.firstChild, h);
-    h.parentNode.removeChild(h);
-  });
-  legaLinkuriAmp();
-}
-
 /* ------------------------------------------------------------------ acțiuni: selecție, filtre, rânduri */
 function comutaDonator(cheie, pornit) {
   var i = S.sel.indexOf(cheie), eraGol = !S.sel.length;
@@ -1199,9 +1184,12 @@ function dupaSelectie() {
   });
 }
 function dupaFiltre() { scrieHash(); randeazaRez(); }
-function comutaGrup(gk) {
-  if (S.gdeschise.has(gk)) S.gdeschise.delete(gk); else S.gdeschise.add(gk);
-  refaGrup(gk);
+/* Proiectul cu mai multe componente (grant, împrumut) nu se desface în tabel: rândul lui (sau butonul din dreapta) deschide fereastra proiectului, pe prima componentă;
+   celelalte se aleg în fereastră, din filele „Componentele proiectului”. */
+function deschideGrup(gk) {
+  var u = S.unit.get(gk), d = donatorDeGrup(gk);
+  if (!u || !d || !u.membri.length) return;
+  deschideFisa(d.cheie + '|' + u.membri[0].id);
 }
 /* ---- fereastra proiectului: deschidere, schimbarea componentei, închidere, refacere (conținutul: htmlFisa) */
 var fisaOpener = null;                         // elementul din tabel de la care s-a deschis fereastra: la închidere, focusul se întoarce la el
@@ -1249,7 +1237,8 @@ function dupaInchidereaFisei() {
   S.fisa = null; fisaOpener = null; fisaApasat = false;
   FISA.innerHTML = '';
   document.documentElement.classList.remove('fisa-deschisa');
-  var n = op && op.isConnected ? op : RAD.querySelector('tr.ac[data-k="' + qs(k) + '"] .exp');         // focusul se întoarce pe rândul de unde s-a deschis fereastra
+  var sub = S.subDe.get(k);
+  var n = op && op.isConnected ? op : (sub ? RAD.querySelector('tr.pg[data-gr="' + qs(sub.gk) + '"] .exp') : RAD.querySelector('tr.ac[data-k="' + qs(k) + '"] .exp'));         // focusul se întoarce pe rândul de unde s-a deschis fereastra (la un proiect cu componente, pe rândul proiectului)
   if (n) n.focus();
 }
 /* De la fereastra unei componente la a alteia, a aceluiași proiect (pastilele „Componentele proiectului”): fereastra rămâne deschisă și arată cealaltă componentă. */
@@ -1670,7 +1659,7 @@ RAD.addEventListener('click', function (ev) {
   var pg = ev.target.closest('tr.pg');
   if (pg && RAD.contains(pg) && !ev.target.closest('a,button,input,select,textarea,label')) {
     if (window.getSelection && String(window.getSelection())) return;
-    comutaGrup(pg.getAttribute('data-gr'));
+    deschideGrup(pg.getAttribute('data-gr'));
   }
 });
 function actiune(act, b) {
@@ -1692,7 +1681,7 @@ function actiune(act, b) {
     case 'scoate': comutaDonator(b.getAttribute('data-d'), false); break;
     case 'fisa': if (k) deschideFisa(k); break;
     case 'fisa-inchide': inchideFisa(); break;
-    case 'grup-comuta': if (tr && tr.getAttribute('data-gr')) comutaGrup(tr.getAttribute('data-gr')); break;
+    case 'grup-deschide': if (tr && tr.getAttribute('data-gr')) deschideGrup(tr.getAttribute('data-gr')); break;
     case 'spre-componenta': if (k) spreComponenta(k, b.getAttribute('data-spre')); break;
     case 'cale-comuta': if (k) { if (S.cale.has(k)) S.cale.delete(k); else S.cale.add(k); refaRand(k); } break;
     case 'adauga': if (k) deschideFisa(k, { camp: 'suma' }); break;

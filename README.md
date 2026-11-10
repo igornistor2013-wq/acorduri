@@ -340,11 +340,12 @@ derulează în panoul lui, iar pagina nu se lărgește. Pe telefon tabelul devin
 **Proiecte cu grant și împrumut: un singur rând, cu sumele pe componente.** (Acorduri cu denumiri diferite în registru, dar care sunt același proiect, se unesc de mână, vezi „unite” mai jos.) Registrul are separat grantul și
 împrumutul aceluiași proiect (două acorduri, aceeași denumire, ani diferiți). Pagina le arată ca **un singur rând**,
 cu denumirea comună o singură dată și, la „Suma proiectului", cât e grant, cât e împrumut (fiecare în valuta lui) și
-**totalul** în euro; sub denumire scrie tipurile și numărul de acorduri („grant + împrumut · 2 acorduri"). Un clic pe
-rând (sau pe butonul din dreapta) deschide **acordurile componente**, ca rânduri obișnuite, numite după tip și an
-(„Grant, 2023", „Împrumut, 2022"), cu datele, debursările, detaliile și editarea lor: creioanele și butonul „Debursare"
-sunt la componente, nu la rândul proiectului. Fereastra unei componente are în antet linia **„Componentele proiectului”**:
-toate componentele (cea curentă marcată); un clic pe alta schimbă fereastra pe ea, fără s-o închidă. Rândul proiectului arată
+**totalul** în euro; sub denumire scrie tipurile și numărul de acorduri („grant + împrumut · 2 acorduri"). Proiectul **nu se desface în tabel**: un clic pe rând
+(sau pe butonul din dreapta) deschide **fereastra proiectului**, pe prima componentă, iar componentele (numite după tip și an,
+„Grant, 2023", „Împrumut, 2022") se aleg în fereastră, din filele liniei **„Componentele proiectului · alege componenta”**:
+fiecare filă are o casetă bifată la cea afișată, numele și suma componentei în valuta ei; un clic pe alta schimbă fereastra pe ea,
+fără s-o închidă. Datele, debursările, detaliile și formularele (debursare, date despre proiect, inclusiv suma) sunt în fereastra
+componentei; rândul proiectului nu are creioane, nici butonul „Debursare”, iar rândul are `data-ac` (acordurile lui). Rândul proiectului arată
 debursările însumate ale componentelor, cu procentul din totalul proiectului, iar datele de început și de finalizare sunt cele din acorduri (începutul cel mai
 timpuriu, finalizarea cea mai târzie, cu mențiunea „din acorduri"). Se unesc numai rândurile cu aceeași denumire
 (fără diacritice și punctuație) **la același donator**, când între ele sunt și grant, și împrumut: două acorduri de
@@ -367,31 +368,27 @@ sunt cartonașe; tabelul are celule mai aerisite și un antet de coloane ușor c
 acordurile al căror nume diferă în registru (de pildă cele trei ale Federației Ruse: grantul HG 793/2020, împrumutul HG 169/2020
 și creditul de stat HG 443/2009). Acestea se unesc de mână: o intrare în `unite` are `acte` (cel puțin două coduri de act, ca în
 „omise”), `nume` (denumirea sub care se arată proiectul) și `motiv`; fără una dintre ele intrarea se respinge, cu mesaj. Rândul
-unit se comportă ca proiectul cu grant și împrumut (sume pe componente, bloc încadrat, fereastră pe componentă), dar se unește și
+unit se comportă ca proiectul cu grant și împrumut (sume pe componente, fereastră cu file pe componentă), dar se unește și
 fără pereche grant + împrumut, și cu orice tipuri. Rămân valabile condițiile: același donator și cel puțin două acorduri rămase după
 filtre (un filtru care ascunde toate în afară de unul îl desface în rând obișnuit). Cheia grupului e `~` + denumirea normalizată, ca
 să nu se încurce cu un grup automat. Se scoate sau se schimbă ștergând/editând intrarea. Teste: `teste_debursari.js`, secțiunea 16
 (forma intrărilor) și secțiunea 23 (rândul Rusia în browser) din `teste_debursari.py`.
 
-**Proiectul cu grant și împrumut, desfăcut în tabel, e un bloc încadrat.** Un rând obișnuit nu se mai desface în tabel (detaliile
-lui sunt în fereastra proiectului, vezi mai jos), deci nu are cadru. Doar proiectul cu grant și împrumut se desface în tabel,
-ca să i se vadă componentele; cât e desfăcut, rândul lui și componentele (inclusiv bara de editare a unei componente) au
-fundal albastru-deschis, o **linie albastră de 2 px deasupra și dedesubt** și o **bară albastră în stânga**, continuă de la rândul
-proiectului până la ultimul lui rând, ca să nu se confunde cu proiectele din jur (care rămân albe, fără cadru). Bara e fundalul
-primei celule a fiecărui rând (nu o umbră interioară), cu originea în marginea celulei: așa acoperă și linia de 1 px dintre
-rânduri. Pe telefon, unde tabelul devine cartonașe, proiectul desfăcut are bordură albastră și un loc deasupra, față de
-cartonașul dinainte. Stilurile sunt la sfârșitul stilurilor tabelului din `debursari.html`; secțiunea 20 din `teste_debursari.py`
-le verifică, inclusiv pe ecran (pixelii barei), la 1360, 1000, 821/820 și 390 px, cu bara de editare după deblocare.
+**Proiectul cu componente nu mai are bloc încadrat.** Până acum se desfăcea în tabel, cu rândul lui și componentele într-un bloc cu fundal
+albastru și bară; acum rândul rămâne neschimbat la deschidere (fundal obișnuit, bara subțire din stânga), iar tabelul nu primește
+rânduri de componente. Regulile CSS ale blocului (`tr.pg.deschis`, `tr.ac.sub`) au rămas în `debursari.html`, nefolosite. Secțiunea 20
+din `teste_debursari.py` verifică, la 1360, 1000, 820 și 390 px, că tabelul e neschimbat cu fereastra deschisă, că pagina nu se lărgește și
+că filele încap în fereastră.
 
 **Fereastra proiectului (ce se vede când deschizi un proiect).** Detaliile unui proiect nu se mai desfac în tabel, între
 proiectele vecine (unde se amestecau cu ele), ci se deschid într-o **fereastră separată, mai mică, deasupra paginii**: un
 `<dialog id="fisa">` modal, pe fundal întunecat; pagina din spate nu se derulează și nu poate fi atinsă cât e deschisă. Sus,
 un antet care rămâne pe loc: tipul și situația acordului, denumirea proiectului, semnarea și cofinanțatorii, butonul
-**Închide** și, la un proiect cu grant și împrumut, linia **Componentele proiectului** (un clic pe o componentă schimbă
-fereastra pe ea, fără s-o închidă; proiectul rămâne desfăcut sau închis în tabel, cum era). Fereastra se închide cu
+**Închide** și, la un proiect cu grant și împrumut, linia **Componentele proiectului** (filele cu casetă bifată: un clic pe o componentă schimbă
+fereastra pe ea, fără s-o închidă; un proiect cu componente se deschide din rândul lui, pe prima componentă). Fereastra se închide cu
 **Închide**, cu **Esc** sau cu un clic pe fundalul întunecat (nu și când o selecție de text începută în fereastră se
-termină pe fundal), iar **focusul se întoarce pe butonul rândului** de unde s-a deschis (la un proiect cu grant și împrumut,
-pe rândul componentei afișate la urmă); o schimbare a filtrelor din adresă o închide. Dedesubt de antet, fișa se derulează în
+termină pe fundal), iar **focusul se întoarce pe butonul rândului** de unde s-a deschis (la un proiect cu componente,
+pe butonul rândului proiectului, indiferent ce componentă era afișată); o schimbare a filtrelor din adresă o închide. Dedesubt de antet, fișa se derulează în
 fereastră; pe telefon (820 px și mai puțin) fereastra ocupă tot ecranul și rămâne lipită sus doar bara cu tipul și „Închide”,
 iar denumirea, componentele și fișa se derulează împreună. Fereastra e în afara tabelului și a zonei `#debRoot`, deci are
 propriii ascultători de evenimente în `debursari-ui.js` (`deschideFisa`, `inchideFisa`, `randeazaFisa`, `spreComponenta`,

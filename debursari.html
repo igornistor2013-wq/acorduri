@@ -244,6 +244,15 @@
   button.dc{cursor:pointer}
   button.dc:hover{background:var(--blue-bg)}
   .dc.cur{background:var(--navy);border-color:var(--navy);color:#fff}
+  .dc{display:inline-flex;flex-direction:column;gap:1px;border-radius:10px;padding:7px 14px 7px 32px;position:relative;min-width:128px}
+  .dc b{font-weight:700;font-size:12.5px}
+  .dc small{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink-dim)}
+  .dc.cur small{color:#cfd9ec}
+  /* „bifa” de la începutul fiecărei componente: plină la cea afișată, goală la celelalte */
+  .dc::before{content:'';position:absolute;left:10px;top:50%;width:14px;height:14px;margin-top:-7px;border:2px solid var(--line-strong);border-radius:4px;background:#fff}
+  .dc.cur::before{background:#fff var(--bifa-ico,none);border-color:#fff}
+  .dc.cur::after{content:'';position:absolute;left:14.5px;top:50%;width:4px;height:8px;margin-top:-6px;border:solid var(--navy);border-width:0 2px 2px 0;transform:rotate(45deg)}
+  .dc-l small{text-transform:none;letter-spacing:0;font-weight:500}
   /* listele de date (date esențiale, perioadă): eticheta la stânga, valoarea la dreapta, rânduri despărțite de o linie fină */
   .fapte{margin:0;display:grid;grid-template-columns:104px minmax(0,1fr);column-gap:14px;font-size:13px;color:#2b3350}
   .fapte dt{margin:0;padding:8px 0;border-top:1px solid var(--line);color:var(--ink-dim);font-size:12px;font-weight:600;line-height:1.45;overflow-wrap:anywhere}
@@ -543,9 +552,9 @@
 <dialog id="dlg" data-no-tr aria-labelledby="dlgTitlu"></dialog>
 
 <script src="traducere.js" defer></script>
-<script src="debursari.js?v=2026-11-10c"></script>
+<script src="debursari.js?v=2026-11-10d"></script>
 <script src="legatura-amp.js"></script>
 <script src="amp-date.js"></script>
-<script src="debursari-ui.js?v=2026-11-10c"></script>
+<script src="debursari-ui.js?v=2026-11-10d"></script>
 </body>
 </html>
