@@ -12,9 +12,10 @@
   "nota": "Introdus manual: împrumut BIRD de 17 700 000 EUR, potrivit textului acordului (PDF necitit automat); aceeași sumă în documentul de evaluare al Băncii Mondiale (PAD4824)."
  },
  "LP53/2024": {
-  "v": 150000000,
+  "v": 300000000,
   "val": "EUR",
-  "nota": "Introdus manual, după textul acordului: împrumut de până la 150 000 000 EUR, din care Tranșa 1 de 90 000 000 EUR și Tranșa 2 de 60 000 000 EUR. Citirea automată luase doar Tranșa 1."
+  "u": "https://www.legis.md/UserFiles/Image/RO/2026/mo246-249ro/Acord_ro.PDF",
+  "nota": "Total după Acordul de modificare nr. 1 (19.12.2025, Legea 98/2026): «până la trei sute de milioane de euro (300.000.000 EUR)». Inițial 150 mil. EUR (Tranșa 1: 90 mil., Tranșa 2: 60 mil.)."
  },
  "LP103/2020": {
   "v": 35700000,
@@ -278,10 +279,10 @@
   "nota": "Introdus manual, după textul acordului atașat: facilitate de împrumut cu o valoare totală a principalului de maximum 1 500 000 000 EUR. Cei 67,5 mil. EUR din același text sunt doar prefinanțarea."
  },
  "LP232/2023": {
-  "v": 150000000,
+  "v": 295000000,
   "val": "EUR",
-  "nota": "Introdus de autorul registrului: asistență macrofinanciară de până la 150 de milioane EUR. Suma se regăsește în acordul de împrumut și în cel de grant, deci memorandumul nu intră în totaluri.",
-  "fara_total": true
+  "fara_total": true,
+  "nota": "MFA 2022 după addendumul ratificat prin această lege (Decizia (UE) 2023/1165): până la 295 mil. EUR (220 împrumut + 75 grant), inițial 150 mil. Numărat la LP191/2022 și LP194/2022."
  },
  "LP194/2020": {
   "v": 18939000,
@@ -454,9 +455,11 @@
   "nota": "Introdus manual, după Raportul privind asistența externă pe 2021 (anexa cu acordurile semnate, „valoarea conform acordului”): „Contractul de Reziliență COVID-19”, 15 mil. EUR (grant, suport bugetar), semnat la 19.02.2021."
  },
  "HG432/2021": {
-  "v": 60000000,
+  "v": 240000000,
   "val": "EUR",
-  "nota": "Introdus manual, după Raportul privind asistența externă pe 2021 (anexa cu acordurile semnate, „valoarea conform acordului”): acordul inițial din 15.12.2021, 60 mil. EUR (grant, suport bugetar); majorat ulterior prin amendamente."
+  "extern": true,
+  "u": "https://www.moldpres.md/en/news/2023/10/12/23008017",
+  "nota": "60 mil. EUR (acordul din 15.12.2021) + 75 mil. (Amendamentul nr. 1, 2022; EEAS: în total 135 mil.) + 105 mil. (Amendamentul nr. 2, semnat la 12.10.2023, Moldpres) = 240 mil. EUR, grant."
  },
  "HG412/2022": {
   "v": 1549000000,
@@ -489,9 +492,11 @@
   "nota": "Introdus manual, după Raportul privind asistența externă pe 2022 (anexa cu acordurile semnate, „valoarea conform acordului”): Programul „UE pentru Reforme”, 27 mil. EUR (grant), semnat la 09.11.2022."
  },
  "HG176/2023": {
-  "v": 5700000,
-  "val": "EUR",
-  "nota": "Introdus manual, după Raportul privind asistența externă pe 2023 (anexa cu acordurile semnate, „valoarea conform acordului”): memorandumul cu Agenția Elvețiană, faza a treia a proiectului MENSANA, 5,7 mil. EUR."
+  "v": 5690000,
+  "val": "CHF",
+  "extern": true,
+  "u": "https://radiomoldova.md/p/9250",
+  "nota": "Radio Moldova (29.03.2023), memorandumul pentru faza a III-a: «5.69 million francs». Raportul privind asistența externă pe 2023 dădea 5,7 mil. EUR (echivalentul în euro)."
  },
  "HG253/2023": {
   "v": 36500000,
@@ -853,11 +858,11 @@
   "nota": "Nota de argumentare a Guvernului (document oficial nepublicat online): «trei proiecte prioritare finanțate de Ministerul Federal de Externe al Germaniei, în valoare totală de 5,512 milioane euro» (1 + 1,5 + 3,012)."
  },
  "HG90/2025": {
-  "v": 64000000,
+  "v": 174000000,
   "val": "EUR",
   "extern": true,
-  "u": "https://enlargement.ec.europa.eu/document/download/daaccc43-3308-4f11-a1ac-ebfcfe908b87_en?filename=C_2024_9169_1_EN_annexe_acte_autonome_nlw_part1_v3.pdf",
-  "nota": "Decizia CE C(2024) 9169: «Total amount of EU budget contribution EUR 64 000 000.00» (57 suport bugetar + 7 complementar), ca în nota Guvernului. Suma inițială: Amendamentul nr. 1 (HG178/2025) prevede 174 mil. EUR."
+  "u": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2025-04/05-NU-169-CS-MAE-2025.pdf",
+  "nota": "Nota Guvernului la Amendamentul nr. 1 (HG178/2025): «mărirea sumei Acordului de finanțare de la 67mln euro la 174 mln. Euro» (167 suport bugetar + 7). Inițial 64 mil. (Decizia CE C(2024) 9169)."
  },
  "HG186/2025": {
   "v": 7700000,
@@ -1073,5 +1078,110 @@
   "extern": true,
   "u": "https://d-portal.org/q.xml?aid=DE-1-202268050",
   "nota": "KfW/BMZ (IATI, DE-1-202268050): angajament de 40.000.000 EUR la 18.11.2022; descrierea: «The project volume of EUR 40 million». Plătit integral la 28.11.2022."
+ },
+ "LP184/2025": {
+  "v": 290000000,
+  "val": "EUR",
+  "u": "https://www.legis.md/UserFiles/Image/RO/2025/mo375-378ro/Acord_184_ro.pdf",
+  "nota": "Total după Acordul de modificare nr. 4 (26.06.2025): împrumut «de până la două sute nouăzeci de milioane de Euro (290.000.000 EUR)». Anterior 250 mil. (nr. 3), inițial 150 mil. EUR."
+ },
+ "LP161/2025": {
+  "v": 1600000,
+  "val": "EUR",
+  "u": "https://www.legis.md/UserFiles/Image/RO/2025/mo343-345ro/237_2025_Acord_ro(1).pdf",
+  "nota": "Amendamentul nr. 1 (19.05.2025): BERD «a convenit să acorde un grant în valoare de până la 1.600.000 EUR» (nota Guvernului: extinderea sumei de grant). Inițial 600 000 EUR (Legea 24/2024)."
+ },
+ "LP272/2017": {
+  "v": 60000000,
+  "val": "EUR",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=105644&lang=ro",
+  "nota": "Legea 272/2017, art. 1: împrumutul UE «în mărime de 60000000,0 de euro» (Decizia (UE) 2017/1565: 60 mil. împrumut + 40 mil. grant). Cei 100 mil. citiți erau din memorandumul atașat."
+ },
+ "LP194/2022": {
+  "v": 75000000,
+  "val": "EUR",
+  "extern": true,
+  "u": "https://oeil.europarl.europa.eu/oeil/en/document-summary?id=1731305",
+  "nota": "MFA 2022, după Decizia (UE) 2023/1165: «up to EUR 75 million in the form of grants». 30 mil. EUR la semnare (22.06.2022) + 45 mil. prin addendumul din 20.07.2023 (Legea 231/2023)."
+ },
+ "LP191/2022": {
+  "v": 220000000,
+  "val": "EUR",
+  "extern": true,
+  "u": "https://oeil.europarl.europa.eu/oeil/en/document-summary?id=1731305",
+  "nota": "MFA 2022, după Decizia (UE) 2023/1165: «up to EUR 220 million will be provided in the form of loans». 120 mil. EUR la semnare (22.06.2022) + 100 mil. prin addendumul din 2023 (Legea 230/2023)."
+ },
+ "LP224/2010": {
+  "v": 8300000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=84453&lang=ro",
+  "nota": "Pe același rând: creditul AID de 6,8 mil. DST (Legea 224/2010) și finanțarea adițională de 1,5 mil. DST (Credit 5637-MD, Legea 152/2015), după textul legilor: în total 8,3 mil. DST."
+ },
+ "LP176/2012": {
+  "v": 27400000,
+  "val": "DST",
+  "u": "https://www.legis.md/cautare/getResults?doc_id=22703&lang=ro",
+  "nota": "Pe același rând, după textul legilor: 11,6 mil. DST (L. 176/2012) + 8,7 mil. DST (Credit 5639-MD, L. 122/2015) + 7,1 mil. DST (Credit 5858-MD, L. 224/2016). A treia (13,5 mil. EUR) e la DP1610/2020."
+ },
+ "LP173/2011": {
+  "v": 12700000,
+  "val": "DST",
+  "nota": "Art. 1 al legii: credit AID «în sumă de 12,7 milioane de drepturi speciale de tragere», semnat la 01.07.2011. Avansul de 2 mil. USD pentru pregătirea proiectului (LP223/2010) se refinanțează din credit; nu se adună."
+ },
+ "LP25/2018": {
+  "v": 20000000,
+  "val": "USD",
+  "extern": true,
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P148537",
+  "nota": "Banca Mondială, P148537: «IBRD + IDA Commitment 20.00» (mil. USD) = credit AID de 10,9 mil. DST (15 mil. USD) + împrumut BIRD de 5 mil. USD (Legea 25/2018). Avansul din 2017 se refinanțează din ele."
+ },
+ "LP194/2007": {
+  "v": 17900000,
+  "val": "DST",
+  "extern": true,
+  "u": "https://documents1.worldbank.org/curated/en/772891468045872660/pdf/C4320.pdf",
+  "nota": "Acordul de finanțare 4320-MD din 03.07.2007: credit de «SDR 11,300,000» + finanțarea adițională de 6,6 mil. DST (Legea 79/2012, semnată la 20.12.2011) = 17,9 mil. DST."
+ },
+ "LP10/2022": {
+  "v": 74000000,
+  "val": "EUR",
+  "extern": true,
+  "u": "https://www.eib.org/en/press/all/2021-469-team-europe-eib-invests-in-modern-safe-and-efficient-railway-transport-in-moldova",
+  "nota": "BEI (2021): «€24 million (in addition to €50 million already committed in 2016)». Acordul de modificare și reformulare din 17.12.2021 (Legea 10/2022) ridică împrumutul la 74 mil. EUR."
+ },
+ "LP286/2004": {
+  "v": 11700000,
+  "val": "DST",
+  "extern": true,
+  "u": "https://ieg.worldbankgroup.org/node/3626",
+  "nota": "IEG (Banca Mondială), RISP: credit inițial de 10,5 mil. USD (2002; 8,3 mil. DST, Legea 1274/2002) + credit suplimentar de 5 mil. USD (aprilie 2004; 3,4 mil. DST, Legea 286/2004) = 11,7 mil. DST."
+ },
+ "LP240/2005": {
+  "v": 13500000,
+  "val": "DST",
+  "extern": true,
+  "u": "https://documents1.worldbank.org/curated/en/589411468279324458/pdf/491A5EE80FF2FBD385256F03000CAB4F.pdf",
+  "nota": "Acordul de credit 3061-MD din 08.06.1998: «SDR 11,500,000»; modificarea semnată la Washington la 07.07.2005 (Legea 240/2005) adaugă 2 mil. DST (circa 3 mil. USD) = 13,5 mil. DST."
+ },
+ "HG938/2016": {
+  "v": 512400000,
+  "val": "USD",
+  "extern": true,
+  "u": "https://www.moldpres.md/eng/economy/moldova-to-benefit-from-us-grant-to-strengthen-transportation-infrastructure-and-boost-trade",
+  "nota": "Moldpres (18.12.2024), amendamentul nr. 19 (80 mil. USD, declarația comună din 15.01.2025): «the total financial support through the Assistance Agreement will exceed 512.4 million USD»."
+ },
+ "HG1062/2016": {
+  "v": 134632542.51,
+  "val": "USD",
+  "extern": true,
+  "u": "https://www.moldpres.md/en/news/2024/08/29/24006709",
+  "nota": "Moldpres (29.08.2024), amendamentul nr. 15 (12 232 777 USD): «the sum of the funds of this Agreement will be increased to 134,632,542.51 dollars»."
+ },
+ "HG802/2024": {
+  "v": 3300000,
+  "val": "CHF",
+  "extern": true,
+  "u": "https://p4h.world/en/news/moldova-received-2nd-phase-grant-from-swiss-agency-for-development-and-cooperation-to-improve-health-financing/",
+  "nota": "P4H (25.12.2024): faza a II-a (01.05.2024–30.06.2027), «a grant of over CHF 3.3 million». Suma exactă din acord nu e publică: e o limită inferioară."
  }
 }

@@ -230,7 +230,6 @@
   },
   {
    "acte": [
-    "DP1048/2023",
     "DP987/2023",
     "LP166/2023"
    ],
@@ -1790,7 +1789,6 @@
   {
    "acte": [
     "DP525/2022",
-    "DP524/2022",
     "LP166/2022"
    ],
    "obiective": {
@@ -2017,7 +2015,6 @@
   },
   {
    "acte": [
-    "HG784/2023",
     "HG411/2023"
    ],
    "obiective": {
@@ -2045,19 +2042,28 @@
   },
   {
    "acte": [
-    "OMS737/2025",
-    "HG949/2020",
-    "HG1388/2016"
+    "OMS737/2025"
    ],
    "obiective": {
     "ro": "Contribuția la îmbunătățirea stării de sănătate a populației Moldovei prin reducerea poverii bolilor netransmisibile. Rezultate: instituțiile naționale de sănătate promovează măsurile „best buys” ale OMS și lucrează bazat pe dovezi și multisectorial pentru a spori alfabetizarea populației în materie de sănătate; serviciile integrate de calitate previn și tratează mai bine bolile netransmisibile; femeile și bărbații își asumă răspunderea pentru propria sănătate, își cer drepturile și cer socoteală factorilor de decizie, inclusiv pentru pacienții cei mai vulnerabili.",
     "en": "To contribute to the improvement of the health status of the Moldovan population through the reduction of the burden of NCDs. Outcomes: national health institutions promote WHO best buys and work in an evidence-based, multi-sectoral manner to increase health literacy; quality integrated services improve the prevention and management of NCDs; men and women take responsibility for their own health, demand their rights and hold decision-makers to account for reaching even the most vulnerable NCD patients."
    },
-   "inceput": "2015-01-01",
+   "inceput": "2024-10-01",
    "sfarsit": "2028-06-30",
    "sursa": "https://www.eda.admin.ch/deza/en/home/projekte/projekte.filterResults.olddesign.par_projectfilter_copy_page1.html/content/dezaprojects/SDC/en/2015/7F06103/phase3.html?oldPagePath=%2Fcontent%2Fdeza%2Fen%2Fhome%2Fprojekte%2Fprojekte.html",
    "citat": "To contribute to the improvement of the health status of the Moldovan population through the reduction of the burden of NCDs. … National health institutions (and their territorial structures) promote WHO best buys and work in an evidence-based, multi-sectoral manner to increase health literacy of the population. … Quality integrated services, under-pinned by regulations and education of service providers, improve the prevention and management of NCDs. … Men and women take responsibility for their own health, demand their rights, and hold decision-makers to account for reaching even the most vulnerable NCD patients. … Phase 1 01.01.2015 - 30.09.2020 (Completed) … Phase 3 01.10.2024 - 30.06.2028 (Current phase)",
-   "nota": "Fișa SDC «Reducing the burden of non-communicable diseases – Healthy Life Project» listează faza 1 (01.01.2015–30.09.2020, încheiată) și faza 3 (01.10.2024–30.06.2028, în curs); faza 2 nu apare în listă. Data de început e cea a fazei 1, data de finalizare — cea a fazei 3 în curs. Bugetul elvețian al fazei 3 (5 120 000 CHF) coincide cu suma din registru (acordul OMS737/2025); rândul reunește mai multe acte (HG1252/2016, HG1388/2016, HG949/2020, OMS737/2025). Obiectivul și rezultatele sunt cele ale fazei 3 (text original în engleză)."
+   "nota": "Fișa SDC «Reducing the burden of non-communicable diseases – Healthy Life Project» listează faza 1 (01.01.2015–30.09.2020, încheiată) și faza 3 (01.10.2024–30.06.2028, în curs); faza 2 nu apare în listă. Datele sunt ale fazei 3, a acordului OMS737/2025; bugetul elvețian al fazei (5 120 000 CHF) coincide cu suma din registru. Obiectivul și rezultatele sunt cele ale fazei 3 (text original în engleză)."
+  },
+  {
+   "acte": [
+    "HG1388/2016",
+    "HG1252/2016"
+   ],
+   "inceput": "2015-01-01",
+   "sfarsit": "2020-09-30",
+   "sursa": "https://www.eda.admin.ch/deza/en/home/projekte/projekte.filterResults.olddesign.par_projectfilter_copy_page1.html/content/dezaprojects/SDC/en/2015/7F06103/phase3.html?oldPagePath=%2Fcontent%2Fdeza%2Fen%2Fhome%2Fprojekte%2Fprojekte.html",
+   "citat": "Phase 1 01.01.2015 - 30.09.2020 (Completed)",
+   "nota": "Aceeași fișă SDC ca pentru faza 3: faza 1 a proiectului, 01.01.2015–30.09.2020, încheiată — memorandumul aprobat prin HG1388/2016. Faza 2 (HG949/2020) nu apare în fișă."
   },
   {
    "acte": [
@@ -3617,7 +3623,6 @@
   },
   {
    "acte": [
-    "HG596/2026",
     "DP455/2025",
     "LP292/2025",
     "HG703/2025",
@@ -4588,7 +4593,6 @@
   },
   {
    "acte": [
-    "HG127/2019",
     "HG284/2015"
    ],
    "obiective": {
@@ -4615,7 +4619,6 @@
   },
   {
    "acte": [
-    "HG60/2019",
     "HG537/2017",
     "HG493/2016"
    ],
@@ -4641,7 +4644,6 @@
   },
   {
    "acte": [
-    "HG802/2024",
     "HG603/2019"
    ],
    "obiective": {
@@ -4654,8 +4656,6 @@
   },
   {
    "acte": [
-    "HG176/2023",
-    "HG1067/2018",
     "HG838/2014"
    ],
    "obiective": {
