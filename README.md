@@ -544,9 +544,9 @@ Discrepanțe, rămase pentru decizia ta (nu s-a schimbat nimic în registru):
 
 | Rând | Registru | Anexa MF | Ce se vede |
 |---|---|---|---|
-| BEI, infrastructura feroviară (Legea 298/2016) | 50 mil. EUR (LP10/2022) | 74 mil. EUR (59,2 mil. debursat + 14,8 nedebursat) | pagina arată 118,4% debursat |
-| BERD, Reabilitarea drumurilor IV (Legea 191/2013) | 250 mil. EUR (LP333/2022) | 290 mil. EUR (234,4 + 55,6) | pagina arată 93,8%, anexa 80,8% |
-| BERD, Reabilitarea drumurilor V (Legea 53/2024) | 150 mil. EUR (LP53/2024) | 300 mil. EUR (nimic debursat) | fără debursare scrisă |
+| BEI, infrastructura feroviară (Legea 298/2016) | ~~50 mil. EUR (LP10/2022)~~ → **74 mil. EUR** (acordul de modificare și reformulare din 17.12.2021, Legea 10/2022) | 74 mil. EUR (59,2 mil. debursat + 14,8 nedebursat) | rezolvat (nov. 2026): registrul și anexa coincid, 80% |
+| BERD, Reabilitarea drumurilor IV (Legea 191/2013) | ~~250 mil. EUR (LP333/2022)~~ → **290 mil. EUR** (Acordul de modificare nr. 4, LP184/2025) | 290 mil. EUR (234,4 + 55,6) | rezolvat (nov. 2026): registrul și anexa coincid, 80,8% |
+| BERD, Reabilitarea drumurilor V (Legea 53/2024) | ~~150 mil. EUR (LP53/2024)~~ → **300 mil. EUR** (Acordul de modificare nr. 1, Legea 98/2026) | 300 mil. EUR (nimic debursat) | rezolvat (nov. 2026): registrul și anexa coincid |
 | BERD și BEI, Chișinău termoficare (Legile 14/2025 și 203/2025) | 143,5 mil. EUR | 143,0 mil. în coloana „suma”, dar 143,5 mil. în coloanele de debursat + nedebursat | anexa se contrazice; registrul coincide cu soldurile |
 | BIRD și AID, Conectivitate rurală (Legile 176/2025 și 177/2024) | BIRD 92,4 / AID 5,6 mil. EUR | BIRD 5,6 / AID 92,4 mil. EUR în coloana „suma” (soldurile arată BIRD 92,4) | coloana „suma” pare inversată în anexă; registrul e corect |
 | Yenul (JICA, Legea 171/2020) | 2.059 mil. JPY = 11,1 mil. EUR la cursul BCE din 1 iulie 2026 | 11,4 mil. EUR debursat (cursurile din zilele tragerilor) | pagina arată 102,8%, anexa 99,1% |
@@ -557,8 +557,8 @@ de 01.09.2029) și FIDA IFAD VIII (30.03.2027 față de 30.09.2028); început la
 ale finanțatorului sau ale proiectului; cele din anexă, termenul de implementare al împrumutului: nu înseamnă același lucru.
 Neconcordanțe în anexa însăși (datele de început și de final nu sunt în cauză): semnarea CEB „Locuințe publice III” (19.12.2024, după
 intrarea în vigoare din 28.05.2024; registrul: 19.03.2024) și semnarea BIRD „Învățământul superior” suplimentar (02.06.2026, după
-intrarea în vigoare din 31.07.2025). Rândul BERD „CET-Nord” al registrului grupează acte din 2014–2015, 2021–2022 și 2025; în anexă e Faza II
-(semnată 24.12.2021, Legea 99/2022), iar nota o spune.
+intrarea în vigoare din 31.07.2025). Rândul BERD „CET-Nord” al registrului grupa acte din 2014–2015, 2021–2022 și 2025; în anexă e Faza II (semnată 24.12.2021,
+Legea 99/2022). Din noiembrie 2026 faza I și faza II sunt rânduri separate, iar înregistrările din anexă stau pe rândul fazei II.
 
 Un utilizator poate corecta oricând aceste înregistrări din pagină (creionul din tabel); `teste_debursari.js` verifică fișierul: fiecare
 înregistrare are rând, notele au cel mult 200 de caractere, totalul MF se potrivește, iar nicio dată nu se scrie peste una oficială.
@@ -814,6 +814,56 @@ AMP se văd doar la proiectele legate sigur de un acord, iar raportul live trebu
 (altfel pagina arată arhiva, până în 2022). Un acord al cărui partener nu e recunoscut în registru apare la
 „(neidentificat)". Data „semnat" e cea din registru; la câteva rânduri registrul o arată greșit (coloana
 `Semnat` din registrul legis.md, de pildă la HG174/2006), iar pagina o preia ca atare.
+
+## Verificarea acordurilor după amendamente (noiembrie 2026)
+
+Toate rândurile registrului au fost verificate după aceeași regulă, pornind de la fișa acordului BERD pentru drumuri
+(Legea 191/2013), care arăta 250 mil. EUR deși Acordul de modificare nr. 4 (Legea 184/2025) ridicase împrumutul la 290 mil.:
+
+* **Suma** unui rând = suma acordului după ultimul amendament ratificat, nu suma primului act citit. Regula automată ia
+  atașamentul celui mai vechi act, deci un amendament care mărește suma nu ajunge în rând: suma corectă e pusă în
+  `date/sume_manual.json`, cu sursa și citatul. Finanțările adiționale ale aceluiași proiect, pe același rând, se adună
+  (de pildă MAC-P, AID: 11,6 + 8,7 + 7,1 mil. DST). Avansul pentru pregătirea unui proiect (Banca Mondială) nu se adună:
+  se rambursează din creditul principal.
+* **Data semnării** din capul fișei = data acordului de bază. `semnatAcord` (în `acorduri.html`) nu mai ia data unui
+  amendament sau a unui acord de avans când rândul are acordul de bază; o ia din titlul amendamentului („…la Acordul …
+  semnat la …”) dacă altfel lipsește. `signed_on` (în `monitor_watch.py`) citește acum și „semnate”, „încheiat”, „întocmit”.
+* **Un rând = un acord.** Acordurile cu titluri aproape identice ajunseseră pe același rând, iar suma unuia trecea pe
+  celălalt: România 2010 și 2022 (câte 100 mil. EUR), Polonia 2010 și 2022, memorandumurile MFA 2020 și 2022, împrumutul și
+  grantul MFA 2017 față de 2022, CET-Nord faza I și faza II, „Livada Moldovei” și „Livada Moldovei II”, acordurile-cadru BDCE
+  din 2005, 2007, 2009 și 2018, cele două granturi BDCE „Locuințe publice III”, cele trei granturi ale Fondului fiduciar
+  multidonator (2022, 2023, 2023), două împrumuturi FIDA (2004, 2006), fazele proiectelor elvețiene (MENSANA, bolile
+  netransmisibile, acoperirea universală, „Generație Sănătoasă”, migrația), schimburile de note cu Germania pe ani etc.
+  Mutările sunt în `date/contopiri_manual.json` („muta”, fiecare cu o notă), iar denumirile care le deosebesc — în „uneste”.
+  Înregistrările din `date/debursari.json` și `date/proiecte_manual.json` au fost mutate pe rândul acordului lor
+  (`teste_debursari.js` verifică să nu amestece două rânduri).
+* **AMP.** Legăturile sigure confirmate de mână sunt în `date/legaturi_amp.json` (57 de rânduri), iar cele propuse greșit
+  de potrivirea automată (alt proiect, altă fază) — în „respinse” (9). Comparația s-a făcut cu arhiva AMP din repository
+  (`arhiva.js`); căutarea live pe amp.gov.md nu a fost accesibilă. Contractul de consolidare a statului (UE) are acum suma
+  după amendamente (240 mil. EUR), iar AMP — cea inițială (60 mil.), deci legătura e confirmată de mână.
+
+A doua trecere, pe punctele rămase deschise după prima:
+
+* **BDCE 2007** = acordul-cadru F/P 1569 (2006) pentru locuințele sociale, faza I, 4,9 mil. EUR (IPN; textul Legii 87/2018);
+  Amendamentul nr. 1 la el (2018) stătea pe un rând separat, cu aceeași sumă, și a fost mutat pe rândul acordului.
+* **BEI, calea ferată**: 74 mil. EUR (50 în 2016 + 24 prin acordul de modificare și reformulare din 17.12.2021, Legea 10/2022).
+* **RISP (AID)**: 11,7 mil. DST (8,3 din 2002 + 3,4 creditul suplimentar din 2004). **Cadastrul (AID)**: 13,5 mil. DST
+  (11,5 din 08.06.1998 + 2 prin modificarea din 07.07.2005).
+* **USAID**: cele două acorduri DOAG din 28.09.2016 erau fiecare pe două rânduri (amendamentul nr. 11 le-a schimbat titlul).
+  Acum câte un rând, cu suma după ultimul amendament: creșterea economică — peste 512,4 mil. USD (amendamentul nr. 19),
+  democrația participativă — 134 632 542,51 USD (amendamentul nr. 15), ambele după Moldpres.
+* **Elveția**: MENSANA, faza a III-a — 5,69 mil. CHF (Radio Moldova; raportul de asistență externă dădea 5,7 mil. EUR);
+  acoperirea universală, faza a II-a — peste 3,3 mil. CHF (P4H), limită inferioară.
+* **Data semnării**: la ratificarea unui amendament, o dată cu mai puțin de un an înaintea actului e a amendamentului, nu a
+  acordului de bază (Cadastrul arăta 07.07.2005 în loc de 1998; acum rândul rămâne fără dată, pentru că niciun titlu nu dă
+  data acordului din 08.06.1998).
+
+Rămase deschise: acordul-cadru BDCE din 2009 (Legea 4/2009) — probabil împrumutul pentru Spitalul Clinic Republican, dar
+textul legii nu a putut fi citit; amendamentele UE din 2025 („UE pentru Reforme”, „UE pentru redresare și reziliență”,
+„Sprijin pentru integrarea în UE”, Facilitatea de cooperare tehnică) — hotărârile nu spun nicio sumă, iar textele lor nu
+sunt publice; addendumurile UE mai vechi; acordurile USAID din 2010–2012 (fără sumă în registru); bugetele fazelor
+elvețiene MENSANA I–II, bolile netransmisibile I–II, „Generație Sănătoasă” și migrația I–II; finalul BERD IV (31.12.2028)
+vine doar din anexa MF (AMP are încă 05.09.2021; începutul, 25.07.2014, coincide cu „Actual Start Date” din AMP).
 
 ## Exporturile Excel ale graficelor și tabelelor
 

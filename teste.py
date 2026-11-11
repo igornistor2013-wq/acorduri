@@ -531,6 +531,13 @@ def test_data_semnarii():
          mw.signed_on("Acord semnat la Chișinău la 27 iunie 2023"), "27.06.2023")
     egal("data semnării: absentă",
          mw.signed_on("Acord de împrumut fără dată"), "")
+    egal("data semnării: la plural",
+         mw.signed_on("ratificarea Acordului de finanțare și a Acordului de împrumut, semnate la Chișinău la 28 noiembrie 2017"),
+         "28.11.2017")
+    egal("data semnării: „încheiat”",
+         mw.signed_on("Acordul-cadru de împrumut, încheiat la Paris la 5 iunie 2025"), "05.06.2025")
+    egal("data semnării: „întocmit”",
+         mw.signed_on("Acordul de grant, întocmit la Chișinău la 23 iunie 2025"), "23.06.2025")
 
 
 # ------------------------------------------- același număr, emitenți diferiți

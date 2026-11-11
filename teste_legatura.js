@@ -153,8 +153,14 @@ verifica('niciun acord nu are două legături „suma" cu sume foarte diferite',
 const gasit = (cauta, idAmp, parteneri) => R.rezultate.some(x => x.acord.scurt.toLowerCase().indexOf(cauta) > -1 && (!parteneri || x.acord.parteneri.indexOf(parteneri) > -1) &&
   x.legaturi.some(l => l.idProiect === idAmp && l.nivel === 'suma'));
 verifica('„Deșeuri solide" (BEI, 25 mil. EUR) se leagă de 8721197417527', gasit('deșeuri solide', '8721197417527', 'BEI'));
-verifica('Contractul de consolidare a statului (UE, 60 mil. EUR) se leagă de 8721160017102', gasit('consolidarea statului', '8721160017102') || gasit('consolidare a statului', '8721160017102') ||
-         R.rezultate.some(x => x.legaturi.some(l => l.idProiect === '8721160017102' && l.nivel === 'suma')));
+// Registrul dă suma după amendamente (60 + 75 + 105 = 240 mil. EUR), AMP — acordul inițial (60 mil.): potrivirea automată
+// nu mai are cum s-o prindă la nivelul „suma", de aceea legătura e confirmată de mână în date/legaturi_amp.json.
+const CONFIRMATE = JSON.parse(fs.readFileSync(path.join(AICI, 'date', 'legaturi_amp.json'), 'utf8')).confirmate || {};
+const confirmat = (idAcord, idAmp) => (CONFIRMATE[idAcord] || []).indexOf(idAmp) > -1;
+verifica('Contractul de consolidare a statului (UE) se leagă de 8721160017102 (automat sau confirmat în legaturi_amp.json)',
+         gasit('consolidarea statului', '8721160017102') || gasit('consolidare a statului', '8721160017102') ||
+         R.rezultate.some(x => x.legaturi.some(l => l.idProiect === '8721160017102' && l.nivel === 'suma')) ||
+         G.some(a => /consolidare a statului/i.test(a.nume) && confirmat(a.id, '8721160017102')));
 verifica('Răspuns de urgență la COVID-19 (AID) se leagă de 8721150613679',
          R.rezultate.some(x => x.legaturi.some(l => l.idProiect === '8721150613679' && l.nivel === 'suma')));
 const drumuri = R.rezultate.filter(x => /drumurilor din moldova . proiectul (v|vi)$/i.test(x.acord.scurt));

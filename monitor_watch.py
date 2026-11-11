@@ -541,9 +541,14 @@ def partner(title):
 
 
 def signed_on(title):
-    """Extrage data semnării dacă apare în denumire."""
+    """Extrage data semnării dacă apare în denumire.
+
+    Și la plural („acordurile …, semnate la Chișinău la 28 noiembrie 2017”) și cu
+    „încheiat”/„întocmit” („întocmit prin schimb de note …, încheiat la Paris la 5 iunie 2025”):
+    aceeași dată a semnării, scrisă altfel. Fără ele, rândul lua data altui act."""
     m = re.search(
-        r"semnat[ăa]?\s+(?:la\s+[^,]{0,40}?\s+)?la\s+(\d{1,2})\s+([a-zăâîșț]+)\s+(\d{4})",
+        r"(?:semnat[ăae]?|semnați|semnaţi|încheiat[ăae]?|încheiați|încheiaţi|întocmit[ăae]?)"
+        r"\s+(?:la\s+[^,]{0,40}?\s+)?la\s+(\d{1,2})\s+([a-zăâîșț]+)\s+(\d{4})",
         title, re.IGNORECASE)
     if not m:
         return ""

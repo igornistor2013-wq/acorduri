@@ -1953,6 +1953,68 @@
     return map;
   }
 
+  /* Data semnării ACORDULUI de pe rând, nu a unui amendament al lui.
+     Data fiecărui act vine din titlu (monitor_watch.signed_on): prima „semnat la … <data>”. La o
+     hotărâre despre „Acordul de modificare nr. 4, semnat la Chișinău la 26 iunie 2025, la Acordul de
+     împrumut …, semnat la Chișinău la 28 iunie 2013” aceea e data amendamentului, iar rândul lua cea
+     mai veche dată a actelor lui: BERD, „drumuri IV” arăta 08.06.2016 (Acordul de modificare nr. 1) în
+     loc de 28.06.2013. Acum, când data rândului e doar a unui amendament (acord de modificare,
+     amendament, addendum, protocol adițional, scrisoare de modificare), se ia data acordului la care
+     se referă amendamentele: prima dată de după „la Acordul …”/„a Contractului …” („din 28 iunie
+     2013”, „semnat la … 28 iunie 2013”, „încheiat la … 19 mai 2020”), cea mai veche, împreună cu
+     datele actelor care nu sunt amendamente. Când niciun titlu nu dă data acordului de bază, rândul
+     rămâne fără dată: e mai bine decât data unui amendament dată drept data acordului. Un rând fără
+     dată o primește, dacă titlul unui amendament o spune. Data unui act care nu e amendament rămâne
+     neatinsă, ca înainte. */
+  var LUNI_SEMN = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august',
+                   'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
+  var RE_MODIF_SEMN = /(acord\w*\s+de\s+modificare|amendament\w*|addendum\w*|adendum\w*|protocol\w*\s+aditional\w*|scrisor\w*\s+de\s+modificare)/;
+  var RE_BAZA_SEMN = /\b(?:la|a)\s+(?:acord(?:ul|ului|urile|urilor)?(?:-cadru)?|contract(?:ul|ului|ele|elor)|memorandum(?:ul|ului)|tratat(?:ul|ului)|conventi(?:a|ei)|intelegere(?:a|ii)|protocol(?:ul|ului))\b/;
+  var RE_DATA_SEMN = /(?:\bdin|\b(?:semnat|incheiat|intocmit)[aei]?\s+(?:la\s+[^,]{0,40}?\s+)?la)\s+(\d{1,2})\s+([a-z]+)\s+(\d{4})/;
+  function faraDiacSemn(s){ return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  // null: actul nu e despre un amendament; '': e, dar titlul nu dă data acordului de bază
+  function dataAcorduluiDeBaza(titlu){
+    var n = faraDiacSemn(titlu), m = RE_MODIF_SEMN.exec(n);
+    if (!m || /^amendament\w*\s+la\s+proiectul/.test(n.slice(m.index))) return null;   // amendament la un proiect de lege, nu la acord
+    var rest = n.slice(m.index + m[0].length), b = RE_BAZA_SEMN.exec(rest);
+    if (!b) return '';
+    var d = RE_DATA_SEMN.exec(rest.slice(b.index + b[0].length));
+    if (!d) return '';
+    var luna = LUNI_SEMN.indexOf(d[2]) + 1, zi = +d[1];
+    if (!luna || zi < 1 || zi > 31) return '';
+    return (zi < 10 ? '0' : '') + zi + '.' + (luna < 10 ? '0' : '') + luna + '.' + d[3];
+  }
+  var RE_AVANS_SEMN = /\bacord\w*\s+de\s+avans\b/;
+  function zileSemn(d){ var m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(d || ''); return m ? Date.UTC(+m[3], +m[2] - 1, +m[1]) / 864e5 : NaN; }
+  function semnatAcord(g){
+    var cur = g.semnat || '';
+    var info = g.acte.map(function(a){
+      var t = a.titlu || '', n = faraDiacSemn(t), b = dataAcorduluiDeBaza(t);
+      // La ratificarea unui amendament, singura dată de după „la Acordul …” poate fi chiar a amendamentului: „…ratificarea
+      // Acordului de modificare a Acordului de credit (Primul Proiect de Cadastru) …, semnat la 7 iulie 2005”, hotărâre din
+      // 3 octombrie 2005. Un amendament se ratifică la câteva săptămâni sau luni după semnare, iar acordul de bază e de regulă
+      // cu ani mai vechi: o dată cu mai puțin de un an înaintea actului de ratificare nu e luată drept data acordului de bază.
+      if (b && /ratific/.test(n)){
+        var zile = zileSemn(a.data_editie) - zileSemn(b);
+        if (zile >= 0 && zile < 365) b = '';
+      }
+      return { b: b, s: a.semnat || '', avans: RE_AVANS_SEMN.test(n) };
+    });
+    // Acordul de avans (pregătirea proiectului) se semnează înaintea acordului de finanțare și e rambursat din el:
+    // când rândul are și acordul de finanțare, cu data lui, data rândului e a acestuia, nu a avansului.
+    if (info.some(function(x){ return x.b === null && !x.avans && x.s; }))
+      info = info.filter(function(x){ return !x.avans; });
+    // data rândului e a unui act care nu e amendament: rămâne, ca înainte
+    if (cur && info.some(function(x){ return x.b === null && x.s === cur; })) return cur;
+    // data e doar a unui amendament (sau lipsește): data acordului de bază, cea mai veche
+    var data = '', k = '';
+    info.forEach(function(x){
+      var m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(x.b === null ? x.s : x.b);
+      if (m && (!k || m[3] + m[2] + m[1] < k)){ k = m[3] + m[2] + m[1]; data = m[0]; }
+    });
+    return data;
+  }
+
   function grupeaza(acte){
     var map = {};
     acte.forEach(function(a){
@@ -2115,6 +2177,7 @@
       var g = map[k];
       g.sumaT = sumaDinText(g);
       g.numeScurt = numeScurt(g.nume);
+      g.semnat = semnatAcord(g);          // data acordului de bază, nu a unui amendament (vezi semnatAcord)
       // textul acordului semnat (atașat la lege): cea mai sigură sursă a sumei
       var cuAcord = g.acte.filter(function(a){ return a.acord; }), cuCost = g.acte.filter(function(a){ return a.cost; });
       // o sumă pusă de mână (date/sume_manual.json) trece înaintea oricărei sume citite automat
