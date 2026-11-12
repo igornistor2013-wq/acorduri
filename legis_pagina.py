@@ -104,6 +104,43 @@ def manual_pentru(cod, manual, cate_ordine):
     return (manual[cand[0]], cand[0]) if len(cand) == 1 else (None, None)
 
 
+CAMPURI_CONTRIB = (('u', 400), ('citat', 220), ('nota', 220), ('scutiri', 220), ('alte', 220))
+
+
+def contributie_pentru_pagina(c, toate):
+    """Intrarea din date/contributii_guvern.json, cu câmpurile pe care le arată pagina, sau None.
+
+    Aceleași reguli ca în acorduri.html (contribPagina): „v"/„val" = banii din bugetul de stat,
+    cât spune sursa; „fara": true = sursa spune că proiectul nu cere bani de la buget;
+    „nu_se_aplica": motivul = sprijin bugetar, asistență macrofinanciară (banii intră în buget); „scutiri"
+    și „alte" = text care nu se adună; „vezi": "LP190/2013" = contribuția întregului proiect,
+    scrisă (și numărată în totaluri) la acordul acela — de acolo se iau cifra și sursa. O
+    trimitere spre o intrare care nu există sau care trimite mai departe nu dă nimic."""
+    if not isinstance(c, dict):
+        return None
+    tinta = None
+    if c.get('vezi'):
+        tinta = toate.get(c['vezi'])
+        if not isinstance(tinta, dict) or tinta.get('vezi'):
+            return None
+    b, o = tinta or c, {}
+    if isinstance(b.get('v'), (int, float)) and b['v'] > 0:
+        o['v'], o['val'] = b['v'], b.get('val', 'EUR')
+    elif b.get('fara'):
+        o['fara'] = True
+    elif b.get('nu_se_aplica'):
+        o['nu'] = str(b['nu_se_aplica'])[:220]
+    if c.get('vezi'):
+        o['vezi'] = str(c['vezi'])
+    for k, n in CAMPURI_CONTRIB:
+        x = c.get(k) or (tinta or {}).get(k)
+        if x:
+            o[k] = str(x)[:n]
+    if o.get('u') and not re.match(r'https?://', o['u'], re.I):
+        del o['u']
+    return o if (o.get('v') or o.get('fara') or o.get('nu') or o.get('scutiri') or o.get('alte')) else None
+
+
 def decizii_pe_monitor(mo, decizii):
     """Actele din date.json (Monitorul Oficial) care au o decizie de mână în date/categorii_manual.json:
     {cheia actului din date.json: decizia}. Același cod ca în registrul legis („HG430/2026"; ordinul
@@ -276,6 +313,15 @@ def main(BRUT=None, OUT=None):
         manual = json.load(open(AICI / 'date' / 'sume_manual.json', encoding='utf-8'))
     except Exception:
         manual = {}
+    # Contribuția Guvernului la fiecare acord (date/contributii_guvern.json), pe codul actului, ca
+    # sumele puse de mână; pagina o recitește la deschidere (contribPagina din acorduri.html).
+    try:
+        contributii = json.load(open(AICI / 'date' / 'contributii_guvern.json', encoding='utf-8'))
+    except Exception:
+        contributii = {}
+    if not isinstance(contributii, dict):
+        contributii = {}
+    contrib_folosite = set()
     cu_suma = 0
     cate_ordine, chei_folosite = {}, set()
     for a in acte.values():
@@ -333,6 +379,12 @@ def main(BRUT=None, OUT=None):
                     a['acord']['extern'] = True
             elif m.get('ascunde'):
                 a.pop('acord', None)
+        cg, cheia_c = manual_pentru(a.get('act'), contributii, cate_ordine)
+        if isinstance(cg, dict):
+            contrib_folosite.add(cheia_c)
+            nou = contributie_pentru_pagina(cg, contributii)
+            if nou:
+                a['contrib'] = nou
     if sume:
         print(cu_suma, 'acte cu sumă găsită în textul integral (din', len(sume), 'citite)')
     # O cheie din sume_manual.json care nu mai corespunde niciunui act e o sumă care a
@@ -346,6 +398,17 @@ def main(BRUT=None, OUT=None):
         if rezumat:
             with open(rezumat, 'a', encoding='utf-8') as g:
                 g.write('### ⚠️ Sume puse de mână fără act\n\n' + mesaj + '\n')
+
+    # La fel pentru contribuțiile Guvernului: o cheie fără act e o contribuție care a dispărut din pagină.
+    orfane_c = sorted(k for k, v in contributii.items() if isinstance(v, dict) and k not in contrib_folosite)
+    if orfane_c and rulare_reala:
+        mesaj = ('ATENȚIE: %d chei din date/contributii_guvern.json nu corespund niciunui act din registru, '
+                 'deci contribuțiile lor nu apar în pagină: %s' % (len(orfane_c), ', '.join(orfane_c[:30])))
+        print(mesaj)
+        rezumat = __import__('os').environ.get('GITHUB_STEP_SUMMARY')
+        if rezumat:
+            with open(rezumat, 'a', encoding='utf-8') as g:
+                g.write('### ⚠️ Contribuții ale Guvernului fără act\n\n' + mesaj + '\n')
 
     # O decizie din categorii_manual.json care nu mai corespunde niciunui act e o categorie
     # care a încetat să se aplice pe tăcute (cod scris greșit, act scos din registru).

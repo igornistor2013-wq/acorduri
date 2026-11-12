@@ -188,6 +188,7 @@ care legis.md îl primește.
 | `legis_local.bat` | Aceeași verificare, rulată de pe calculatorul tău (Windows) |
 | `legis_sume.py` | Sumele acordurilor, din textul integral al actelor: descarcă PDF-ul fiecărui act de pe legis.md (legi, hotărâri, ordine; fără decrete), caută „în sumă de…”, „în valoare de…” și scrie rezultatul, cu fragmentul de text, în `date/legis_sume.json`. Rulat de `legis_local.bat`; continuă de unde a rămas |
 | `date/sume_manual.json` | Sume puse de mână, pe codul actului (`LP203/2022`). Citirea automată greșește uneori — o tranșă în locul sumei întregi, bugetul unui program întreg, o dată chiar un cont bancar. Ce e aici bate orice sumă citită automat: `{"v": …, "val": "EUR", "nota": "…"}` pune suma, `{"ascunde": true}` o ascunde pe cea greșită. Cu `{"fara_text": true}` se ascunde suma citită greșit din textul actului, cu `{"fara_cost": true}` costul proiectului citit greșit din atașament (de pildă pragul de la care se cere studiu de fezabilitate, luat drept cost), cu `{"fara_guvern": true}` suma luată din nota Guvernului când aceea e a unui program întreg (Interreg, URBACT: sute de milioane pentru toate țările participante), nu a acordului Moldovei. Cu `{"fara_total": true}` suma rămâne pe rând, dar nu se adună în totalurile pe tipuri de finanțare: același acord numărat pe alt rând (un memorandum care repetă suma din acordurile de împrumut și de grant; o înțelegere anterioară al cărei proiect e inclus în totalul unei înțelegeri mai noi) sau o valoare care nu e suma acordată prin acest act. Cu `{"extern": true}` suma vine dintr-o sursă din afara actelor din registru — decizia de finanțare a UE, pagina oficială a finanțatorului, textul acordului publicat de Ministerul Finanțelor, un comunicat oficial: `u` e adresa sursei, `nota` e citatul din ea; pagina o marchează „ext.” și, în loc de „documentul (PDF, legis.md)”, trimite la sursă (în `date/acorduri_legare.json` are `sursa: "extern"`). Se introduce așa doar o sumă dovedită cu un citat dintr-o sursă oficială care numește același acord; când sursa dă doar costul unui program, o sumă pe mai multe tranșe sau o cifră contrazisă de altă sursă, suma nu se pune. Pentru acordurile UE din 2008–2017, fără textul acordului semnat, se ia contribuția UE din fișa acțiunii (decizia anuală de finanțare, enlargement.ec.europa.eu) sau, la cele din 2008–2009, din raportul Comisiei SEC(2009) 514; nota spune atunci „Suma inițială”, fiindcă addendumurile din rând pot schimba totalul. Invers, când suma de pe rând e totalul de după un amendament (acordul FICR din 2026: 300 000 CHF la semnare, 580 000 CHF după amendamentul nr. 1), nota o spune și păstrează suma inițială, cu sursa ei. Când documentul dă echivalentul în euro al unei sume anunțate public în altă valută (MSIP, HG654/2024: 794 407,37 EUR față de 750 000 CHF anunțate de AGEPI și IPI), se introduce suma din document, în euro, iar nota spune și cifra publică, cu sursa ei în `u`. Granturile japoneze se iau din pagina oficială a Ministerului de Externe (schimbul de note, „限度” = plafon în yeni), cu data schimbului de note în notă. Sumele de aici se aplică și registrului din Monitor, inclusiv actelor foarte noi care sunt doar în Monitorul Oficial (cod scos din număr și tip: `HG430/2026`). Fișierul e citit de pagină la fiecare deschidere și de `legis_pagina.py`. O sumă pusă la inițierea negocierilor, din comunicatul Guvernului (plafon sau sumă preconizată, ca la HG562/2026, HG567/2026 și HG569/2026), bate și ea suma din textul acordului: când acordul se semnează sau se ratifică, se verifică din nou și se înlocuiește ori se scoate, altfel rămâne pe rând, fiindcă suma pusă de mână are prioritate. Dacă `extern` e pus și `u` lipsește, sursa e un document oficial nepublicat online (de pildă o notă a Cancelariei de Stat primită de la minister): pagina scrie „document oficial nepublicat online”, iar `nota` spune care document e și citează propoziția cu suma. Registrul nu are curs pentru lei și nu numără sume în lei (cursurile sunt cele de referință ale BCE din `PER_EUR`, în `acorduri.html`, la data din `CURS_DATA`, puse de `curs_bce.py` în fiecare dimineață; o valută nouă — ca coroana cehă, adăugată pentru proiectul RESTART: 22 902 012,92 CZK, 24,254 CZK pentru 1 EUR la 1 iulie 2026 — cere cursul ei acolo (și în lista `DE_LA_BCE` din `curs_bce.py`, ca să se actualizeze) și un loc în `_VALUTE` din `teste_legis.py`; fără curs, suma se vede pe rând, dar nu se adună); când nota dă suma în lei cu echivalentul aproximativ într-o valută (6 693 543 MDL ≈ 386 910 USD), se introduce valuta, iar nota păstrează propoziția întreagă. Un ordin venit din Monitorul Oficial apare cu un cod provizoriu, fără emitent (`O147/2026`), până ajunge în istoricul legis.md, unde are codul întreg (`OMMPS147/2026`); suma pusă sub oricare dintre cele două forme rămâne valabilă și sub cealaltă, cât timp în registru e un singur ordin cu acel număr și an. La fiecare construire a paginii, `legis_pagina.py` anunță cheile din fișier care nu mai corespund niciunui act |
+| `date/contributii_guvern.json` | Contribuția Guvernului la fiecare acord — banii din bugetul de stat planificați pentru proiect, cât spune o sursă publică —, pe codul unui act al acordului: `{"v", "val", "u", "citat", "nota"}`; `{"fara": true}` = sursa arată că nu se cer bani de la buget; `{"nu_se_aplica": "sprijin bugetar"}` = banii intră direct în buget; `{"vezi": "LP176/2024"}` = contribuția aceluiași proiect, scrisă la acordul principal; `scutiri` și `alte` sunt doar text și nu se adună. Un rând are cel mult o intrare. Vezi „Contribuția Guvernului (noiembrie 2026)” |
 | `legis_consola.js` | Aceeași citire a acordurilor atașate, dar fără nimic de instalat: se lipește în consola browserului (F12) pe www.legis.md. Citește PDF-urile cu pdf.js și pe cele scanate cu OCR (tesseract.js), ia și actele noi, și descarcă `legis_sume.json` gata de urcat în `date/`, plus `sume_lipsa.csv`. Continuă de unde a rămas. Pașii sunt scriși la începutul fișierului |
 | `legis_atasamente.py` | Sumele din acordurile atașate la acte: deschide fișa fiecărui act pe legis.md, descarcă PDF-urile atașate (textul acordului), citește cu OCR pe cele scanate (dacă Tesseract e instalat) și scrie suma acordului și costul proiectului în `date/legis_sume.json`, la „atas”. Rulat de `legis_local.bat` după `legis_sume.py`; continuă de unde a rămas. Așteaptă ca fișa să-și încarce conținutul și redeschide o dată actele notate „fără atașamente” de versiunile care nu așteptau. O descărcare eșuată se notează și se trece mai departe; dacă legis.md nu mai răspunde deloc, se oprește și reia data viitoare. Ce rămâne fără sumă ajunge în `sume_lipsa.csv`, cu motivul |
 | `gov_sume.py` | Sumele acordurilor din notele de argumentare ale Guvernului: citește de pe gov.md ordinea de zi a fiecărei ședințe și, pentru punctele despre acorduri, PDF-ul notei („Aspectul financiar”). Rulat zilnic de `.github/workflows/sume.yml`; rezultatul, `date/gov_sume.json`, e citit de pagina Acorduri la deschidere (sumele marcate cu G). Ședințele din ultimele zece zile se recitesc la fiecare rulare, fiindcă ordinea de zi se completează până în ziua ședinței; o notă care n-a putut fi descărcată se reîncearcă la rulările următoare. Multe puncte au pe gov.md doar proiectul hotărârii, fără nota de argumentare; atunci `sume` rămâne gol, iar suma se introduce de mână în `date/sume_manual.json`, cu `extern`, din nota primită pe altă cale sau din comunicatul oficial al Guvernului ori al finanțatorului (citatul în `nota`, adresa în `u`). Așa au venit fără sumă hotărârile din 7 și 15 octombrie 2026 (BERD irigații, CEB, BIRD, Japonia: PDF-urile NU-876, NU-860, NU-718, NU-959 și NU-939 de pe gov.md conțin doar proiectul hotărârii); sumele lor s-au pus din comunicatele Guvernului, ale MAIA și ale BERD din 13–15 octombrie 2026 |
@@ -864,6 +865,119 @@ textul legii nu a putut fi citit; amendamentele UE din 2025 („UE pentru Reform
 sunt publice; addendumurile UE mai vechi; acordurile USAID din 2010–2012 (fără sumă în registru); bugetele fazelor
 elvețiene MENSANA I–II, bolile netransmisibile I–II, „Generație Sănătoasă” și migrația I–II; finalul BERD IV (31.12.2028)
 vine doar din anexa MF (AMP are încă 05.09.2021; începutul, 25.07.2014, coincide cu „Actual Start Date” din AMP).
+
+## Contribuția Guvernului (noiembrie 2026)
+
+`date/contributii_guvern.json` spune, pentru fiecare acord, câți bani din bugetul de stat sunt planificați pentru proiect,
+cât spune o sursă publică. Cheia e codul unui act al acordului, ca în `date/sume_manual.json`; un rând al registrului are
+cel mult o intrare (`teste_legatura.js`). Forma intrărilor:
+
+* `{"v": 83920000, "val": "USD", "u": "…", "citat": "…", "nota": "…"}` — suma în bani; `citat` e rândul din sursă,
+  în limba ei (cel mult 220 de caractere), `nota` spune ce document e;
+* `{"fara": true, "u", "citat", "nota"}` — sursa arată că proiectul nu cere bani de la buget (costul total e egal cu
+  finanțarea băncilor și a donatorilor, „Borrower/Recipient 0.00”, „Contribuția Guvernului 0,00”); pagina arată 0;
+* `{"nu_se_aplica": "sprijin bugetar", "nota"}` — sprijin bugetar, asistență macrofinanciară, operațiuni de politici de
+  dezvoltare: banii intră direct în buget, deci nu e un proiect de cofinanțat; pagina arată „nu se aplică”;
+* `{"vezi": "LP176/2024", "nota"}` — același proiect finanțat prin mai multe acorduri (creditul AID și împrumutul BIRD,
+  împrumutul și granturile aceluiași program): contribuția se scrie o dată, la acordul principal, se arată pe toate
+  rândurile și se numără o singură dată;
+* `scutiri` — scutirile de TVA și de taxe vamale, `alte` — banii autorităților locale, ai beneficiarilor, ai
+  întreprinderilor: doar text, nu se adună niciodată la contribuția Guvernului.
+
+Unde se vede: în celula „Suma” (o linie „contribuția Guvernului: …”, cu citatul în indiciu), în fișa acordului (cifra,
+citatul, linkul spre sursă, scutirile), în exportul Excel al registrului (grupa „CONTRIBUȚIA GUVERNULUI”: suma, valuta,
+echivalentul în euro — adunat și în rândul de total —, ce spune sursa, scutirile, sursa ca link), în
+`date/acorduri_legare.json` (câmpul `contributie`) și în „De la lege la bani”: rândul „Contribuția Guvernului” din „Date
+esențiale” (cu „necunoscută” când nu există intrare) și trei coloane în exportul Excel. Fereastra proiectului din „De la
+lege la bani” nu scrie citate, note sau gazde (regula tuturor câmpurilor ei): arată cifra și eticheta „sursă oficială”,
+cu gazda, nota și detaliile scutirilor în indiciu; textul întreg rămâne în registru și în Excel. `legis_pagina.py` o pune în pagină
+la construire și anunță cheile care nu mai corespund unui act; pagina recitește fișierul la deschidere, deci ajunge să-l
+urci pe GitHub (`legaturi.yml` reconstruiește atunci și `date/acorduri_legare.json`).
+
+În `date/acorduri_legare.json`, `contributie` are câmpurile intrării, plus `act` (actul de la care vine) și `eur`
+(echivalentul în euro; 0 la `fara`, `null` când suma e în lei sau nu se aplică). Pe un rând cu `vezi`, `eur` e al
+proiectului întreg, numărat deja la acordul principal: cine adună contribuțiile sare peste rândurile cu `vezi`, cum fac
+exporturile Excel.
+
+Surse: planurile de finanțare ale Băncii Mondiale (fișele proiectelor de pe projects.worldbank.org și documentele de
+evaluare PAD/PID: „Borrower/Recipient”, „Counterpart Funding”), rapoartele Președintelui FIDA („Contribution of
+borrower”), procesele-verbale ale Comitetului interministerial pentru planificare strategică (2025–2026), raportul
+tabelar al MIDR privind valorificarea asistenței externe în 2024 (coloana „Contribuția Guvernului”), contractul de
+finanțare BEI pentru spitalele regionale (planul de finanțare din preambul), notele de argumentare ale Guvernului și
+comunicatele Guvernului, rapoartele MF și articolele Monitorului Fiscal despre sprijinul bugetar.
+
+Rezultatul, după trei treceri: 161 de rânduri din 495 au intrare — 30 cu o sumă în bani (cca 358 mil. EUR la cursurile
+din pagină), 26 cu 0, 68 „nu se aplică” (sprijin bugetar, asistență macrofinanciară, ajustare structurală, granturi
+japoneze pentru importuri, împrumuturile de stat pentru buget de la Rusia, 2020, România, 2015, și Polonia, 2022,
+capitalul de lucru și garanția BERD pentru cumpărarea de gaze și energie), 33 trimiteri spre acordul principal al
+aceluiași proiect și 4 doar cu text (bani ai autorităților locale sau ai beneficiarilor). A doua trecere a adăugat
+e-Transformarea guvernării (3 mil. USD), RISP II (2,5 mil. USD, cu cele două finanțări suplimentare), controlul gripei
+aviare (0,75 mil. USD), serviciile de reabilitare (0,1 mil. USD), penitenciarul din Chișinău (25,9 mil. EUR: bugetul de
+75,9 mil. minus împrumutul și grantul BDCE, după nota MJ din 2024) și zero la interconectarea cu România (fazele I și II)
+și la finanțarea suplimentară a Agriculturii competitive pentru subproduse de origine animală. A treia trecere: zero la
+mecanismul revolving de eficiență energetică (MEERM, 2026: 50 mil. USD împrumut + 2 mil. USD grant = costul) și „nu se
+aplică” la cele trei împrumuturi de stat pentru buget.
+
+Celelalte n-au încă intrare. La cele mai multe nicio sursă publică găsită nu spune suma: granturile și asistența tehnică
+(UE, Elveția, Japonia, Germania, SUA, China), fondurile fiduciare ale Băncii Mondiale. La altele documentul cu planul de
+finanțare n-a fost găsit sau nu e complet: împrumuturile JICA, creditele bilaterale (România, Rusia, Polonia), proiectele
+feroviare BERD și BEI, deșeurile solide (BERD, BEI), Livada Moldovei, drumurile din 2007 (Banca Mondială, BERD, BEI: costul
+de cca 50 mil. USD e dat fără partea Fondului rutier) și câteva proiecte ale Băncii Mondiale (competitivitatea ÎMMM, 2022;
+competitivitatea II, 2014; adaptarea la schimbările climatice, 2017; managementul dezastrelor, 2010, unde finanțarea
+suplimentară din 2015 are „Borrower/Recipient 0.00”, dar creditul de bază nu are planul publicat; finanțarea rurală, 1998;
+rețeaua de asistență socială, 2011).
+
+De citit cu grijă:
+
+* „Borrower/Recipient” (Banca Mondială) și „Contribution of borrower” (FIDA) sunt partea Republicii Moldova; la
+  proiectele recreditate unei întreprinderi (termoficarea din Chișinău, 2014) documentul nu spune dacă banii vin din buget
+  sau de la întreprindere — nota o spune. La programul de sănătate pe rezultate (2014), cele 82,9 mil. USD sunt
+  cheltuielile Guvernului pentru programul pe care creditul îl susține.
+* „Contribuția Guvernului din Planul de creștere” (irigațiile, școlile, învățământul profesional tehnic) sunt bani ai UE
+  trecuți prin bugetul de stat; sunt numărați ca bani din buget, iar nota o spune.
+* Locuințele sociale (BDCE): tabelul MIDR trece partea locală la „Contribuția Guvernului”, dar lista proiectelor MIDR o
+  numește „contribuția APL” — e trecută la `alte`, nu ca bani din bugetul de stat.
+* Spitalele regionale: contractul BEI dă cca 18 mil. EUR resurse proprii pentru ambele spitale; CIPS a stabilit în 2025
+  pentru Bălți 21 mil. EUR din Planul de creștere. Se numără cifra din contract, o singură dată, iar nota o pomenește pe
+  cealaltă.
+* La drumurile BERD și BEI, raportul MIDR are „Contribuția Guvernului” 0,00: Guvernul acoperă TVA și taxele vamale prin
+  scutiri, iar suma lor nu e dată.
+* Penitenciarul din Chișinău: nota MJ spune că, după împrumutul de 49 mil. EUR și grantul BDCE de 1 mil. EUR, „restul”
+  bugetului e contribuția Guvernului, care acoperă și deficitul de cca 19 mil. EUR; cele 25,9 mil. EUR sunt această
+  diferență, la bugetul de 75,9 mil. EUR din 2023. Amendamentul nr. 3 (2026) poate schimba bugetul.
+* Interconectarea cu România: 0 înseamnă că pachetul băncilor și al UE e egal cu costul total publicat (270 mil. EUR la
+  faza I, 77 mil. EUR la faza a II-a); Moldelectrica poate pune bani proprii, dar sursele nu-i arată.
+
+## Testele din browser și ordinul care nu era acord (noiembrie 2026)
+
+`teste_legis.py --browser` avea 6 teste care picau de la o zi la alta, fără ca pagina să fie greșită:
+
+* RESTART (de două ori), CRESTA și rândul de context din exportul Excel (de două ori) așteptau cursul BCE din 1 iulie 2026
+  (24,254 CZK, 0,9234 CHF pentru 1 EUR) și textul „cursul BCE din 1 iulie 2026”. `curs_bce.py` schimbă cursul în fiecare
+  dimineață, așa că testele iau acum cursul și data din pagină (`curs_bce.cursurile_din_pagina`) și calculează echivalentul
+  la fel ca pagina (`curs_bce.euro`).
+* Panoul de sume avea un al patrulea card, „Asistență financiară”, cu „—”, care trecea singur pe rândul al doilea sub 990
+  px. Cardul venea de la un singur act: ordinul nr. 139 din 20.10.2026 („Instrucțiunea privind determinarea eligibilității
+  operatorilor economici … cota de cofinanțare a Republicii Moldova … Mecanismul de reformă și creștere”), o regulă
+  internă, nu un acord. `legis_clasifica.py` exclude acum actele care aprobă o instrucțiune (`aprobarea instrucțiunii`, în
+  `EXCLUDE_CADRU`; din toate titlurile din registre, regula scoate doar acest act), iar ordinul a fost scos din `date.json`,
+  fiindcă un act deja intrat rămâne acolo până îl scoate un om (`reclasifica` din `monitor_watch.py`). Registrul legis.md
+  are acum 495 de rânduri. Datele deschise (`date/acorduri_*.csv`, `.json`, `date/cautare.json`) se refac la următoarea
+  rulare a `monitor.yml`.
+
+`teste_debursari.py --browser` avea 8 eșecuri, 3 dintre ele și pe `main`-ul de dinainte:
+
+* Cele 3 de la AMP veneau din date: oamenii au confirmat între timp multe legături în `date/legaturi_amp.json` (97 sigure,
+  13 probabile). Testul cerea cel puțin 20 de legături probabile (acum cere 5, cât să fie verificate ambele căi), alegea
+  pentru fișă o legătură confirmată de un om și aștepta eticheta „Legătură sigură” (acum alege o legătură găsită de pagină,
+  dacă există, și verifică eticheta potrivită), iar la bara AMP compara legăturile cu confirmările reale, deși pagina
+  primește în test doar confirmarea testului (acum compară cu legăturile găsite fără confirmările oamenilor, plus una).
+* Celelalte 5 veneau de la contribuția Guvernului din fereastra proiectului: rândul nou din „Date esențiale” (3 teste,
+  care așteaptă acum și rândul „Contribuția Guvernului”) și citatele, notele și gazdele pe care fereastra le scria, deși
+  regula ei e să nu scrie niciunul (2 teste: unul le căuta direct, celălalt măsura fereastra pe telefon, care se lungise).
+  Fereastra arată acum doar cifra și eticheta „sursă oficială”, cu indiciu; testul „fișierul adevărat de surse” verifică
+  și contribuția, iar testul care numără etichetele „sursă oficială” ale fișei le numără doar pe cele trei ale câmpurilor
+  din fișierul de surse (descrierea, începutul, finalizarea).
 
 ## Exporturile Excel ale graficelor și tabelelor
 

@@ -47,6 +47,8 @@ CAZURI = [
     ('cu privire la aprobarea Regulamentului privind autorizarea centrelor de asistenţă tehnică pentru maşinile de casă şi de control/imprimantele fiscale', None, None),
     ('cu privire la Oficiul de Gestionare a Programelor de Asistență Externă', None, None),
     ('privind contractele de credit pentru consumatori', None, None),
+    # o instrucțiune internă despre cofinanțare (ordinul nr. 139 din 20.10.2026), nu un acord
+    ('cu privire la aprobarea Instrucțiunii privind determinarea eligibilității operatorilor economici, precum și determinarea originii mărfurilor de către autoritățile publice în procesul de implementare a cotei de cofinanțare a Republicii Moldova în cadrul proiectelor investiționale, aprobate prin Platforma de investiții pentru politica de vecinătate în cadrul Mecanismului de reformă și creștere pentru Republica Moldova', None, None),
     ('pentru ratificarea Acordului de finanțare dintre Republica Moldova și Fondul Internațional pentru Dezvoltarea Agricolă în vederea realizării Proiectului de Reziliență Rurală (IFAD VII)', 'Împrumut', None),
     # asistența financiară se împarte după rambursare: nerambursabilă = grant, rambursabilă = împrumut (credit)
     ('pentru ratificarea Acordului privind asistenţa financiară rambursabilă dintre Republica Moldova şi România', 'Împrumut', 'România'),
@@ -326,6 +328,16 @@ try:
     _dec_t = {'categorie': 'Grant', 'motiv': 'nota spune „grant"', 'sursa': 'Nota CS-2684 din 15.07.2026 (document nepublicat)'}
     json.dump({'_nota': 'ignorat', 'HG430/2026': _dec_t, 'OMDED147/2026': _dec_t, 'HG999/2026': _dec_t},
               open(_tmp / 'date' / 'categorii_manual.json', 'w', encoding='utf-8'), ensure_ascii=False)
+    # contribuția Guvernului (date/contributii_guvern.json): sumă, zero, „nu se aplică", trimitere și o cheie fără act
+    json.dump({'_cum_se_foloseste': 'x',
+               'LP156/2026': {'v': 12000000, 'val': 'EUR', 'u': 'https://exemplu.md/nota.pdf', 'citat': 'contribuția Guvernului 12 mil. EUR',
+                              'nota': 'Nota Guvernului', 'scutiri': 'TVA: 3 mil. lei'},
+               'LP155/2026': {'vezi': 'LP156/2026', 'nota': 'același program'},
+               'LP115/2025': {'nu_se_aplica': 'sprijin bugetar', 'nota': 'banii intră în buget', 'u': 'javascript:alert(1)'},
+               'HG45/2009': {'fara': True, 'u': 'https://exemplu.md/fisa', 'citat': 'Total = grant'},
+               'OMDED182/2025': {'vezi': 'HG1/2000'},
+               'HG888/2026': {'v': 1, 'val': 'EUR', 'u': 'https://x.md', 'citat': 'x'}},
+              open(_tmp / 'date' / 'contributii_guvern.json', 'w', encoding='utf-8'), ensure_ascii=False)
     _p = subprocess.run([sys.executable, str(_tmp / 'legis_pagina.py')], capture_output=True, text=True, timeout=120)
     _pag = (_tmp / 'legis_acorduri.html').read_text(encoding='utf-8') if (_tmp / 'legis_acorduri.html').exists() else ''
     _m = re.search(r'window\.__LEGIS__ = (\{.*?\});</script>', _pag, re.S)
@@ -357,6 +369,18 @@ try:
              str(_a.get('O147/2026')))
     verifica('un act fără decizie își păstrează categoria din titlu și nu primește „decizie"',
              'decizie' not in _a.get('LP156/2026', {'decizie': 1}) and _a.get('LP156/2026', {}).get('categorie') == 'Împrumut', str(_a.get('LP156/2026')))
+    _cg = lambda c: _a.get(c, {}).get('contrib')
+    verifica('contribuția Guvernului ajunge pe act: suma, valuta, sursa, citatul și scutirile (care nu se adună)',
+             _cg('LP156/2026') == {'v': 12000000, 'val': 'EUR', 'u': 'https://exemplu.md/nota.pdf', 'citat': 'contribuția Guvernului 12 mil. EUR',
+                                   'nota': 'Nota Guvernului', 'scutiri': 'TVA: 3 mil. lei'}, str(_cg('LP156/2026')))
+    verifica('„vezi" ia cifra și sursa de la acordul la care trimite, cu nota proprie',
+             (_cg('LP155/2026') or {}).get('vezi') == 'LP156/2026' and (_cg('LP155/2026') or {}).get('v') == 12000000
+             and (_cg('LP155/2026') or {}).get('nota') == 'același program' and (_cg('LP155/2026') or {}).get('u') == 'https://exemplu.md/nota.pdf', str(_cg('LP155/2026')))
+    verifica('„nu se aplică" (sprijin bugetar) și „fara" (zero) ajung în pagină; o adresă javascript: nu',
+             _cg('LP115/2025') == {'nu': 'sprijin bugetar', 'nota': 'banii intră în buget'} and (_cg('HG45/2009') or {}).get('fara') is True, [_cg('LP115/2025'), _cg('HG45/2009')])
+    verifica('o trimitere spre o intrare care nu există nu inventează o cifră', _cg('OMDED182/2025') is None, str(_cg('OMDED182/2025')))
+    verifica('o contribuție care nu mai corespunde niciunui act e spusă pe ecran',
+             'HG888/2026' in _p.stdout and 'contributii_guvern.json' in _p.stdout, _p.stdout[-400:])
     verifica('o decizie care nu mai corespunde niciunui act e spusă pe ecran',
              'HG999/2026' in _p.stdout and 'categorii_manual.json' in _p.stdout and 'HG430/2026' not in _p.stdout.split('HG999/2026')[0].split('ATENȚIE')[-1],
              _p.stdout[-400:])
@@ -383,6 +407,33 @@ for _k, _v in _sm.items():
             _sm_rele.append((_k, 'adresa sursei nu începe cu https://'))
 verifica('sume_manual.json: fiecare cheie e un cod de act, sumele sunt pozitive, în valute cunoscute; sursele externe au notă (≤ 220 de caractere) și adresă https',
          not _sm_rele, _sm_rele[:5])
+_cgv = json.loads((AICI / 'date' / 'contributii_guvern.json').read_text(encoding='utf-8'))
+_cg_rele = []
+for _k, _v in _cgv.items():
+    if _k.startswith('_'):
+        continue
+    if not _COD.match(_k) or not isinstance(_v, dict):
+        _cg_rele.append((_k, 'cheie sau valoare')); continue
+    _tip = [t for t in ('v', 'fara', 'nu_se_aplica', 'vezi') if _v.get(t)]
+    if len(_tip) > 1 or (not _tip and not (_v.get('scutiri') or _v.get('alte'))):
+        _cg_rele.append((_k, 'trebuie exact una dintre: v, fara, nu_se_aplica, vezi (sau doar scutiri/alte)'))
+    if _v.get('v') is not None and not (isinstance(_v['v'], (int, float)) and _v['v'] > 0 and _v.get('val') in _VALUTE):
+        _cg_rele.append((_k, 'suma sau valuta'))
+    if (_v.get('v') or _v.get('fara')) and not (str(_v.get('u', '')).startswith('https://') and _v.get('citat')):
+        _cg_rele.append((_k, 'o sumă sau un zero are nevoie de sursă (u, https) și de citat'))
+    if _v.get('nu_se_aplica') and not _v.get('nota'):
+        _cg_rele.append((_k, '„nu_se_aplica" fără notă care spune de ce'))
+    if _v.get('vezi'):
+        _t = _cgv.get(_v['vezi'])
+        if _v['vezi'] == _k or not isinstance(_t, dict) or _t.get('vezi'):
+            _cg_rele.append((_k, '„vezi" trebuie să trimită la o altă intrare, care nu trimite mai departe'))
+    for _c in ('citat', 'nota', 'scutiri', 'alte', 'nu_se_aplica'):
+        if len(str(_v.get(_c, ''))) > 220:
+            _cg_rele.append((_k, _c + ' trece de 220 de caractere (pagina o taie)'))
+    if _v.get('u') and not str(_v['u']).startswith('https://'):
+        _cg_rele.append((_k, 'adresa sursei nu începe cu https://'))
+verifica('contributii_guvern.json: fiecare cheie e un cod de act; sumele au valută și sursă cu citat; zero-ul are sursă; „nu se aplică" are notă; „vezi" trimite la o intrare reală',
+         not _cg_rele and len([k for k in _cgv if not k.startswith('_')]) > 100, _cg_rele[:5])
 _cm = json.loads((AICI / 'date' / 'contopiri_manual.json').read_text(encoding='utf-8'))
 _cm_rele, _in_muta = [], {}
 for _tip in ('muta', 'uneste'):
@@ -524,6 +575,10 @@ _orfane = [k for k in list(_conf['confirmate']) + list(_conf['respinse']) + list
 verifica('nicio confirmare din legaturi_amp.json nu are un id de acord care nu mai există', _orfane == [], _orfane)
 
 if '--browser' in sys.argv:
+    # Cursul și data lui se iau din pagină: curs_bce.py le schimbă în fiecare dimineață, deci un test care ar
+    # aștepta un curs fix (24,254 CZK la 1 iulie 2026) ar pica de a doua zi, fără ca pagina să fie greșită.
+    import curs_bce as _cb
+    _CURS_DATA, _PER_EUR = _cb.cursurile_din_pagina((AICI / 'acorduri.html').read_text(encoding='utf-8'))
     print('Browser, pe legis.md simulat')
 
     class Legis(BaseHTTPRequestHandler):
@@ -689,7 +744,8 @@ if '--browser' in sys.argv:
                       'Etape parcurse (din 5)', 'Etapa atinsă', '1. Inițiere negocieri', '2. Aprobare semnare', '3. Aprobare proiect de lege',
                       '4. Ratificare sau aprobare', '5. Decret de promulgare', 'În vigoare din', 'Temeiul datei', 'Ani', 'Nr. acte', 'Prima publicare',
                       'Ultima publicare', 'Sursa sumei', 'Fragmentul din act', 'Link sursă', 'Costul total al proiectului', 'Valuta costului',
-                      'Denumirea completă', 'Link în registru']
+                      'Denumirea completă', 'Link în registru', 'Contribuția Guvernului (bani din buget)', 'Valuta contribuției',
+                      'Contribuția Guvernului, echivalent EUR', 'Contribuția: ce spune sursa', 'Scutiri și alte contribuții (nu se adună)', 'Sursa contribuției']
     ANTET_ACTE = ['Data ediției', 'Ediția', 'Act', 'Tip de finanțare', 'Suport bugetar', 'Partener', 'Etapa', 'Denumirea acordului',
                   'Titlul complet al actului', 'Semnat', 'Link']
 
@@ -799,11 +855,11 @@ if '--browser' in sys.argv:
                     verifica(_nume + ': granturile sectoriale japoneze (patru tranșe, trei de câte 300 mil. yeni) sunt patru rânduri, toate numărate în total',
                              len(_sec) == 4 and all(r['Intră în total?'] == 'da' for r in _sec) and sorted(r['Suma'] for r in _sec) == [300000000, 300000000, 300000000, 400000000],
                              [(r['Acordul'][:40], r['Suma'], r['Intră în total?']) for r in _sec])
-                    # coroanele cehe au curs (BCE, 1 iulie 2026): fără el, rândul ar fi rămas „nu: fără curs", în afara totalului
+                    # coroanele cehe au curs (BCE, adăugat la 1 iulie 2026): fără el, rândul ar fi rămas „nu: fără curs", în afara totalului
                     _rst = [r for r in _rand if 'RESTART' in (r['Denumirea completă'] or '')]
                     verifica(_nume + ': proiectul ceh RESTART (22 902 012,92 CZK) e un singur rând, numărat în total, cu echivalentul în euro la cursul BCE',
                              len(_rst) == 1 and _rst[0]['Valuta'] == 'CZK' and _rst[0]['Intră în total?'] == 'da' and abs(_rst[0]['Suma'] - 22902012.92) < 0.01
-                             and abs(_rst[0]['Echivalent EUR'] - 22902012.92 / 24.254) <= 0.5 + 1e-6,
+                             and abs(_rst[0]['Echivalent EUR'] - 22902012.92 / _PER_EUR['CZK']) <= 0.5 + 1e-6,
                              [(r['Acordul'][:40], r['Suma'], r['Valuta'], r['Echivalent EUR'], r['Intră în total?']) for r in _rst])
                 # pe ambele pagini: rând cu rând, cifrele din fișier sunt cele din datele paginii (window.__ACORDURI__)
                 _gresite = []
@@ -835,13 +891,13 @@ if '--browser' in sys.argv:
                          all(isinstance(r['Etape parcurse (din 5)'], int) and 0 <= r['Etape parcurse (din 5)'] <= 5
                              and r['Etape parcurse (din 5)'] == sum(1 for k in ANTET_ACORDURI[11:16] if r[k] == 'da') for r in _rand), [r['Acordul'][:30] for r in _rand[:2]])
                 _ultim = 6 + len(_rand) - 1
-                verifica(_nume + ': antetul și prima coloană rămân pe loc la derulare (B6), cu filtre pe toată lista', _ws.freeze_panes == 'B6' and _ws.auto_filter.ref == 'A5:AC%d' % _ultim, (_ws.freeze_panes, _ws.auto_filter.ref))
+                verifica(_nume + ': antetul și prima coloană rămân pe loc la derulare (B6), cu filtre pe toată lista', _ws.freeze_panes == 'B6' and _ws.auto_filter.ref == 'A5:AI%d' % _ultim, (_ws.freeze_panes, _ws.auto_filter.ref))
                 verifica(_nume + ': titlul e în banda albastră închisă, antetul albastru cu text alb, grupele de coloane deasupra',
                          _ws['A1'].fill.fgColor.rgb == 'FF14233C' and _ws['A5'].fill.fgColor.rgb == 'FF1E4B8C' and _ws['A5'].font.color.rgb == 'FFFFFFFF'
-                         and [_ws[c + '4'].value for c in ('A', 'E', 'I', 'S', 'W')] == ['ACORD', 'SUMA ȘI TOTALUL', 'PARCURSUL ACORDULUI', 'ACTELE PUBLICATE', 'SURSE ȘI DETALII'],
-                         [_ws[c + '4'].value for c in ('A', 'E', 'I', 'S', 'W')])
+                         and [_ws[c + '4'].value for c in ('A', 'E', 'I', 'S', 'W', 'AD')] == ['ACORD', 'SUMA ȘI TOTALUL', 'PARCURSUL ACORDULUI', 'ACTELE PUBLICATE', 'SURSE ȘI DETALII', 'CONTRIBUȚIA GUVERNULUI'],
+                         [_ws[c + '4'].value for c in ('A', 'E', 'I', 'S', 'W', 'AD')])
                 _sub = _ws['A2'].value
-                verifica(_nume + ': rândul de context spune sursa, lipsa filtrelor, numărul de acorduri și data', _sub.startswith('Sursa: ') and 'fără filtre' in _sub and ('%d de acorduri' % _info['grupuri']) in _sub.replace(' %d acorduri' % _info['grupuri'], ' %d de acorduri' % _info['grupuri']) and 'Generat: ' in _sub and 'cursul BCE din 1 iulie 2026' in _sub, _sub)
+                verifica(_nume + ': rândul de context spune sursa, lipsa filtrelor, numărul de acorduri și data', _sub.startswith('Sursa: ') and 'fără filtre' in _sub and ('%d de acorduri' % _info['grupuri']) in _sub.replace(' %d acorduri' % _info['grupuri'], ' %d de acorduri' % _info['grupuri']) and 'Generat: ' in _sub and ('cursul BCE din ' + _CURS_DATA) in _sub, _sub)
                 verifica(_nume + ': sursa din antet e cea a paginii', ('legis.md' in _sub) == (_nume == 'legis_acorduri') and ('monitorul.gov.md' in _sub) == (_nume == 'acorduri'), _sub[:120])
                 _reguli = {}
                 for _rng in _ws.conditional_formatting:
@@ -851,6 +907,14 @@ if '--browser' in sys.argv:
                          len(_reguli.get('C6:C%d' % _ultim, [])) == 4 and len(_reguli.get('H6:H%d' % _ultim, [])) == 4, {k: len(v) for k, v in _reguli.items()})
                 _total_f = [c.value for c in _ws[_ultim + 1]]
                 verifica(_nume + ': rândul de total adună coloana „Echivalent EUR" cu SUBTOTAL (se recalculează la filtrare)', _total_f[0] == 'Total (rândurile vizibile)' and _total_f[6] == '=SUBTOTAL(109,G6:G%d)' % _ultim, _total_f[:7])
+                verifica(_nume + ': rândul de total adună și contribuția Guvernului în euro (coloana AF)', _total_f[31] == '=SUBTOTAL(109,AF6:AF%d)' % _ultim, _total_f[29:33])
+                _cu_c = [r for r in _rand if r['Contribuția: ce spune sursa']]
+                _cu_link = [r for r in range(6, _ultim + 1) if _ws.cell(row=r, column=35).value]
+                verifica(_nume + ': rândurile cu contribuție au sursa ca link, iar sumele contribuției sunt numere',
+                         len(_cu_c) > (50 if _nume == 'legis_acorduri' else 10)
+                         and all(_ws.cell(row=r, column=35).hyperlink and re.match(r'https?://', _ws.cell(row=r, column=35).hyperlink.target) for r in _cu_link)
+                         and all(r['Contribuția Guvernului (bani din buget)'] is None or isinstance(r['Contribuția Guvernului (bani din buget)'], (int, float)) for r in _rand)
+                         and all(r['Contribuția Guvernului, echivalent EUR'] is None or isinstance(r['Contribuția Guvernului, echivalent EUR'], (int, float)) for r in _rand), len(_cu_c))
                 _wbv = openpyxl.load_workbook(_f1, data_only=True)
                 _cache = _wbv['Acorduri'].cell(row=_ultim + 1, column=7).value
                 verifica(_nume + ': valoarea calculată a totalului e trecută în fișier (se vede și fără recalculare)', _cache is not None and abs(_cache - _suma_eur) < 1, (_cache, _suma_eur))
@@ -1318,16 +1382,16 @@ if '--browser' in sys.argv:
              and _ita[0]['suma']['val'] == 'EUR' and _ita[0]['faraTotal'] is True, [(a['categorie'], a['suma'], a['faraTotal']) for a in _ita])
     _rs = _rd('HG115/2026', 'OMMPS264/2025', 'HG166/2026', 'OMMPS98/2026')
     verifica('Cehia, proiectul RESTART: ordinul de semnare a memorandumului (2025) și actele amendamentului nr. 1 (2026) stau pe un singur rând, asistență tehnică; '
-             '22 902 012,92 CZK dintr-o sursă externă, trecut în euro la cursul BCE din 1 iulie 2026 (24,254)',
+             '22 902 012,92 CZK dintr-o sursă externă, trecut în euro la cursul BCE din pagină (%s: %s CZK)' % (_CURS_DATA, _PER_EUR['CZK']),
              len(_rs) == 1 and _ac(_rs[0]) == {'HG115/2026', 'OMMPS264/2025', 'HG166/2026', 'OMMPS98/2026'} and _rs[0]['categorie'] == 'Asistență tehnică'
              and _rs[0]['suma'] and _rs[0]['suma']['v'] == 22902012.92 and _rs[0]['suma']['val'] == 'CZK' and _rs[0]['suma']['sursa'] == 'extern'
-             and _rs[0]['suma']['eur'] == round(22902012.92 / 24.254) and not _rs[0]['faraTotal'],
+             and _rs[0]['suma']['eur'] == _cb.euro(22902012.92, 'CZK', _PER_EUR) and not _rs[0]['faraTotal'],
              [(a['scurt'], a['categorie'], a['suma'], sorted(_ac(a))) for a in _rs])
     _cr = _rd('HG574/2025')
-    verifica('CRESTA (Elveția, Ministerul Justiției): un singur rând, asistență tehnică, 1 880 000 CHF dintr-o sursă externă, trecut în euro la cursul BCE din 1 iulie 2026',
+    verifica('CRESTA (Elveția, Ministerul Justiției): un singur rând, asistență tehnică, 1 880 000 CHF dintr-o sursă externă, trecut în euro la cursul BCE din pagină (%s)' % _CURS_DATA,
              len(_cr) == 1 and _ac(_cr[0]) == {'HG574/2025'} and _cr[0]['categorie'] == 'Asistență tehnică' and _cr[0]['suma']
              and (_cr[0]['suma']['v'], _cr[0]['suma']['val'], _cr[0]['suma']['sursa']) == (1880000, 'CHF', 'extern')
-             and _cr[0]['suma']['eur'] == round(1880000 / 0.9234) and not _cr[0]['faraTotal'], [(a['scurt'], a['categorie'], a['suma']) for a in _cr])
+             and _cr[0]['suma']['eur'] == _cb.euro(1880000, 'CHF', _PER_EUR) and not _cr[0]['faraTotal'], [(a['scurt'], a['categorie'], a['suma']) for a in _cr])
     _ms = _rd('HG654/2024')
     verifica('MSIP (proiectul moldo-elvețian în domeniul proprietății intelectuale, SECO): un singur rând, Grant (decizia de mână bate „asistență tehnică" din titlu); '
              '794 407,37 EUR dintr-o sursă externă, numărat o singură dată, fără conversie',

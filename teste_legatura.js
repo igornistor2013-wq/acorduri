@@ -168,5 +168,23 @@ verifica('fazele V și VI ale proiectului de drumuri nu primesc legături „sum
          drumuri.length < 2 || !drumuri.every(x => x.legaturi.some(l => l.nivel === 'suma' && l.idProiect === drumuri[0].legaturi[0].idProiect)));
 verifica('toate cele ' + G.length + ' de acorduri din registru sunt în rezultat', R.rezultate.length === G.length);
 
+console.log('\nContribuția Guvernului (date/contributii_guvern.json) pe rândurile registrului');
+const CG = JSON.parse(fs.readFileSync(path.join(AICI, 'date', 'contributii_guvern.json'), 'utf8'));
+const cheiCG = Object.keys(CG).filter(k => k[0] !== '_');
+const randDe = {};
+G.forEach(a => a.acte.forEach(x => { randDe[x.act] = a; }));
+const multe = G.filter(a => a.acte.filter(x => CG[x.act]).length > 1).map(a => a.id + ': ' + a.acte.filter(x => CG[x.act]).map(x => x.act).join(', '));
+verifica('fiecare rând are cel mult o intrare (altfel nu e clar care cifră e valabilă după amendamente)', !multe.length, multe.slice(0, 5));
+const faraRand = cheiCG.filter(k => !randDe[k]);
+verifica('fiecare cheie din fișier e un act al unui rând din registru', !faraRand.length, faraRand.slice(0, 10));
+const veziRau = cheiCG.filter(k => CG[k].vezi && (!randDe[CG[k].vezi] || randDe[CG[k].vezi] === randDe[k]));
+verifica('„vezi" trimite la un acord de pe alt rând (același proiect, alt acord)', !veziRau.length, veziRau.slice(0, 5));
+const cuC = G.filter(a => a.contributie);
+verifica('rândurile cu intrare au câmpul „contributie” în date/acorduri_legare.json (' + cuC.length + ' de rânduri)',
+         cuC.length === new Set(cheiCG.filter(k => randDe[k]).map(k => randDe[k].id)).size, [cuC.length, cheiCG.length]);
+const eurRau = cuC.filter(a => a.contributie.v > 0 && R0curs(a.contributie));
+function R0curs(c) { return c.val === 'EUR' && c.eur !== Math.round(c.v); }
+verifica('contribuțiile în euro au echivalentul egal cu suma', !eurRau.length, eurRau.slice(0, 3).map(a => a.id));
+
 console.log('\n' + (esuate.length ? esuate.length + ' teste au picat: ' + esuate.join('; ') : 'Toate testele au trecut (' + ok + ').'));
 process.exit(esuate.length ? 1 : 0);

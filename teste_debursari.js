@@ -694,9 +694,31 @@ const cS = H(fp, 'Suma proiectului');       // coloanele de sumă vin una după 
 egal('donator: suma și echivalentul în euro', [fp.randuri[0][cS], fp.randuri[0][cS + 1], fp.randuri[0][cS + 2], fp.randuri[1][cS]], [5000000, 'EUR', 5000000, '']);
 egal('donator: debursat (în valuta proiectului și în euro), procent (în puncte), rest', [fp.randuri[0][cS + 3], fp.randuri[0][cS + 4], fp.randuri[0][cS + 5], fp.randuri[0][cS + 6]], [100000, 100000, 2, 4900000]);
 egal('donator: fără debursări → celule goale, număr 0', [fp.randuri[1][cS + 3], fp.randuri[1][cS + 5], fp.randuri[1][cS + 7]], ['', '', 0]);
-egal('donator: totalul se calculează cu formule pe coloanele de sumă (echivalent EUR, debursat EUR, rest, număr)', fp.total.suma, [cS + 2, cS + 4, cS + 6, cS + 7]);
+egal('donator: totalul se calculează cu formule pe coloanele de sumă (echivalent EUR, debursat EUR, rest, număr, contribuția Guvernului în EUR)', fp.total.suma, [cS + 2, cS + 4, cS + 6, cS + 7, H(fp, 'Contribuția Guvernului, echivalent EUR')]);
 egal('donator: fără obiective și fără date, celulele sunt goale și sursa nu inventează nimic', [fp.randuri[0][1], fp.randuri[0][2], fp.randuri[0][3], fp.randuri[0][H(fp, 'Sursa obiectivelor și a datelor')]], ['', '', '', '']);
 egal('donator: foaia Debursări are intrarea lui UE', xs.foi[1].randuri.map(r => [r[0], r[1], r[2], r[3], r[4]]), [['UE', 'Sprijin pentru justiție', '2026-05-01', 100000, 'EUR']]);
+
+console.log('\nContribuția Guvernului (date/contributii_guvern.json, prin registru)');
+egal('contributie: suma, valuta și echivalentul trec; adresa doar dacă e http(s)', D.contributie({ v: 5e6, val: 'USD', eur: 4392515, u: 'https://x.org/a', citat: 'Borrower/Recipient 5.00', vezi: '' }),
+     { v: 5e6, val: 'USD', eur: 4392515, citat: 'Borrower/Recipient 5.00', u: 'https://x.org/a' });
+egal('contributie: „fara” → 0 în euro, fără o adresă javascript:; „nu” (sprijin bugetar) fără euro', [D.contributie({ fara: true, u: 'javascript:alert(1)' }), D.contributie({ nu: 'sprijin bugetar', nota: 'x' })],
+     [{ fara: true, eur: 0 }, { nu: 'sprijin bugetar', nota: 'x' }]);
+egal('contributie: intrare goală sau greșită → null', [D.contributie(null), D.contributie({}), D.contributie({ v: -3 }), D.contributie('x')], [null, null, null, null]);
+const JSON_C = { cursuri: CURSURI, acorduri: [
+  ac('c1', 'Drumuri locale', 'AID', S(57000000, 'DST'), { categorie: 'Împrumut', contributie: { v: 7500000, val: 'USD', eur: 6588773, u: 'https://projects.worldbank.org/x', citat: 'Borrower/Recipient 7.50' } }),
+  ac('c2', 'Drumuri locale — grant', 'AID', S(1000000, 'USD'), { contributie: { v: 7500000, val: 'USD', eur: 6588773, vezi: 'LP155/2016', u: 'https://projects.worldbank.org/x' } }),
+  ac('c3', 'Sprijin bugetar', 'AID', S(1000000, 'USD'), { contributie: { nu: 'sprijin bugetar', nota: 'DPO' } }),
+  ac('c4', 'Fără date', 'AID', S(1000000, 'USD'))] };
+const BC = D.pregateste(JSON_C);
+egal('pregateste: contribuția ajunge pe acord; fără ea — null', BC.acorduri.map(a => a.contributie ? (a.contributie.v || a.contributie.nu) : null), [7500000, 7500000, 'sprijin bugetar', null]);
+const fc = D.excelDonator(ctx(false), BC.donatori.filter(d => d.cheie === 'AID')[0]).foi[0];
+const cC = H(fc, 'Contribuția Guvernului (bani din buget)');
+const rc = nume => fc.randuri.filter(r => r[0] === nume)[0];
+egal('Excel: contribuția, valuta și euro; la „vezi” euro lipsește (se numără o dată, la acordul principal); la sprijin bugetar și fără date — goale',
+     [rc('Drumuri locale').slice(cC, cC + 3), rc('Drumuri locale — grant').slice(cC, cC + 3), rc('Sprijin bugetar').slice(cC, cC + 3), rc('Fără date').slice(cC, cC + 3)],
+     [[7500000, 'USD', 6588773], [7500000, 'USD', ''], ['', '', ''], ['', '', '']]);
+egal('Excel: „Sursa contribuției” are gazda ca text', rc('Drumuri locale')[H(fc, 'Sursa contribuției')], 'projects.worldbank.org');
+verifica('Excel: nota spune ce e contribuția și câte proiecte o au', fc.note.some(n => typeof n === 'string' && n.indexOf('Contribuția Guvernului: banii din bugetul de stat') === 0 && n.indexOf('3 din 4 proiecte') > 0), fc.note.filter(n => typeof n === 'string').map(n => n.slice(0, 60)));
 const cuFiltre = D.excelDonator(Object.assign(ctx(false), { filtre: 'filtre: tip: Grant' }), donUE);
 verifica('filtrele active din pagină apar în antetul fișierului', cuFiltre.foi.every(f => f.subtitlu.indexOf('filtre: tip: Grant') > 0), cuFiltre.foi.map(f => f.subtitlu));
 verifica('fără filtre, antetul nu pomenește filtre', xs.foi.every(f => f.subtitlu.indexOf('filtre') < 0), xs.foi.map(f => f.subtitlu));

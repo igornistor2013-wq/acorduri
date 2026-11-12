@@ -384,10 +384,22 @@ def amp_gata(pg):
 
 
 _AMP_AST = {}
+_AMP_AST_CONF = {}
 
 
-def amp_asteptat():
-    """Ce spune amp-date.js, rulat în Node pe arhiva reală și pe registrul real (raportul live căzut): {'stare': …, 'peAcord': {id rând: {id, inceput, sfarsit, nivel, legatura}}}."""
+def amp_asteptat(confirmari=None):
+    """Ce spune amp-date.js, rulat în Node pe arhiva reală și pe registrul real (raportul live căzut): {'stare': …, 'peAcord': {id rând: {id, inceput, sfarsit, nivel, legatura}}}.
+    Cu `confirmari`, amp-date.js primește acele confirmări în locul celor din date/legaturi_amp.json (cum le primește pagina în test)."""
+    if confirmari is not None:
+        cheie = json.dumps(confirmari, sort_keys=True)
+        if cheie not in _AMP_AST_CONF:
+            with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False, encoding='utf-8') as f:
+                json.dump(confirmari, f)
+            try:
+                _AMP_AST_CONF[cheie] = _ruleaza_amp(f.name)
+            finally:
+                os.unlink(f.name)
+        return _AMP_AST_CONF[cheie]
     if not _AMP_AST:
         cod_js = r"""
 const fs = require('fs'), vm = require('vm'), cale = process.argv[1];
@@ -398,15 +410,22 @@ const reg = JSON.parse(fs.readFileSync('date/acorduri_legare.json', 'utf8'));
 const baza = D.pregateste(reg, JSON.parse(fs.readFileSync('date/proiecte_manual.json', 'utf8')));
 const rows = reg.acorduri.filter(x => baza.peId.has(x.id));
 const ARCH = vm.runInNewContext(fs.readFileSync('arhiva.js', 'utf8') + ';ARCHIVE');
-A.incarca({ acorduri: rows, confirmari: JSON.parse(fs.readFileSync('date/legaturi_amp.json', 'utf8')), arhiva: ARCH,
+A.incarca({ acorduri: rows, confirmari: JSON.parse(fs.readFileSync(process.argv[2] || 'date/legaturi_amp.json', 'utf8')), arhiva: ARCH,
             fetch: async () => { throw new TypeError('Failed to fetch'); } }).then(r => {
   const o = {}; r.peAcord.forEach((v, k) => { o[k] = v; });
   process.stdout.write(JSON.stringify({ stare: r.stare, peAcord: o, n: rows.length }));
 });
 """
-        r = subprocess.run(['node', '-e', cod_js, str(AICI)], capture_output=True, text=True)
-        _AMP_AST.update(json.loads(r.stdout))
+        _AMP_AST.update(_ruleaza_amp(None, cod_js))
     return _AMP_AST
+
+
+def _ruleaza_amp(cale_conf, cod_js=None):
+    if cod_js is None:
+        cod_js = _ruleaza_amp.cod
+    _ruleaza_amp.cod = cod_js
+    r = subprocess.run(['node', '-e', cod_js, str(AICI)] + ([cale_conf] if cale_conf else []), capture_output=True, text=True)
+    return json.loads(r.stdout)
 
 
 def arhiva_amp():
@@ -1324,8 +1343,9 @@ try:
             verifica('detalii: nici nota, nici adresa documentului nu sunt scrise în pagină (sunt doar în indiciul etichetei)', 'documents.example.org' not in tot and 'data efectivă a semnării contractului de lucrări' not in tot, tot[:400])
             chip = det.locator('.det-desc a.src.s-oficial').first
             verifica('detalii: eticheta „sursă oficială” a descrierii are în indiciu gazda documentului și nota din fișier', 'documents.example.org' in (chip.get_attribute('title') or '') and 'data efectivă a semnării contractului de lucrări' in (chip.get_attribute('title') or ''), chip.get_attribute('title'))
+            # doar etichetele celor trei câmpuri din fișierul de surse: contribuția Guvernului din „Date esențiale” are eticheta ei
             egal('detalii: etichetele de sursă din fișă (descriere, început, finalizare) duc toate la documentul oficial, cu adresa completă',
-                 det.locator('a.src.s-oficial').evaluate_all('l => l.map(a => a.getAttribute("href"))'), [SURSA_A] * 3)
+                 det.locator('.det-desc a.src.s-oficial, .det-proiect a.src.s-oficial').evaluate_all('l => l.map(a => a.getAttribute("href"))'), [SURSA_A] * 3)
             egal('detalii: perioada arată începutul și finalizarea din sursă (datele întregi și cele parțiale, cum le spune sursa)', [x.strip() for x in det.locator('.det-proiect .dlp .dp-v').all_inner_texts()], ['14.05.2019', '12.2027'])
             inchide_fisa(pg)
             # căutarea merge și în obiective (română și engleză)
@@ -1502,7 +1522,9 @@ try:
             AMP_AST = amp_asteptat()
             sigure = {k: v for k, v in AMP_AST['peAcord'].items() if v['nivel'] == 'sigur'}
             probabile = {k: v for k, v in AMP_AST['peAcord'].items() if v['nivel'] == 'probabil'}
-            verifica('amp-date.js pe arhiva și registrul reale: există legături sigure și probabile (%d și %d)' % (len(sigure), len(probabile)), len(sigure) >= 30 and len(probabile) >= 20, (len(sigure), len(probabile)))
+            # pe măsură ce oamenii confirmă legături în date/legaturi_amp.json, cele probabile devin sigure: pragul cere doar
+            # destule legături din fiecare fel ca să fie verificate ambele căi (în noiembrie 2026: 97 sigure, 13 probabile)
+            verifica('amp-date.js pe arhiva și registrul reale: există legături sigure și probabile (%d și %d)' % (len(sigure), len(probabile)), len(sigure) >= 30 and len(probabile) >= 5, (len(sigure), len(probabile)))
             arh = arhiva_amp()
             don_amp = Counter(d for k in sigure for d in donatori_acord(BY_ID[k])).most_common(1)[0][0]
             fals = GitHubFals(intrari=[])
@@ -1535,11 +1557,14 @@ try:
                     nepotriviri.append((k, v['id'], rec.get('ds'), rec.get('de'), v.get('inceput'), v.get('sfarsit')))
             egal('datele legăturilor sigure = datele din arhiva AMP, citită independent în Python (%d proiecte)' % len(arh), nepotriviri, [])
             # linkurile spre fișa AMP se cer abia când se deschide un rând care are un proiect AMP
-            rs = next(k for k in sigure if don_amp in donatori_acord(BY_ID[k]))
+            rs = next((k for k in sigure if don_amp in donatori_acord(BY_ID[k]) and sigure[k].get('legatura') != 'confirmat'), None) \
+                 or next(k for k in sigure if don_amp in donatori_acord(BY_ID[k]))
+            et_leg = 'Legătură confirmată de un om' if sigure[rs].get('legatura') == 'confirmat' else 'Legătură sigură'
+            print('     (rândul %s: %s)' % (rs, et_leg))
             verifica('amp-linkuri.js și lista de linkuri nu se cer cât timp niciun rând cu AMP nu e deschis', pg.amp.livrate('paginate') == [] and pg.locator('script[src^="amp-linkuri.js"]').count() == 0)
             det = deschide_rand(pg, don_amp, BY_ID[rs])
             dl = det.locator('.det-proiect .dlp').inner_text()
-            verifica('detalii: proiectul AMP legat (cod), datele lui, „Legătură sigură”', sigure[rs]['id'] in dl and 'Legătură sigură' in dl and 'Actual Start Date' in dl and 'Proposed Completion Date' in dl, dl[:500])
+            verifica('detalii: proiectul AMP legat (cod), datele lui, „%s”' % et_leg, sigure[rs]['id'] in dl and et_leg in dl and 'Actual Start Date' in dl and 'Proposed Completion Date' in dl, dl[:500])
             pg.wait_for_function('document.querySelectorAll("script[src^=\\"amp-linkuri.js\\"]").length === 1', timeout=10000)
             pg.wait_for_timeout(600)
             verifica('după deschiderea rândului, lista de linkuri se cere o singură dată', len(pg.amp.livrate('paginate')) == 1, pg.amp.cereri)
@@ -1601,7 +1626,11 @@ try:
             cls = pg.locator('#sAmp .amp-st').get_attribute('class')
             tx = pg.locator('#sAmp .amp-st').inner_text().replace('\xa0', ' ')
             verifica('bara AMP: raportul live citit, fără avertisment', 'avert' not in cls and 'eroare' not in cls and 'nu a răspuns' not in tx, (cls, tx))
-            verifica('bara AMP: o legătură sigură în plus (cea confirmată de un om)', '%d din %d proiecte sunt legate sigur' % (len(sigure) + 1, len(RANDURI)) in tx, tx)
+            # pagina primește aici confirmările testului în locul celor din date/legaturi_amp.json, deci numărul de comparat
+            # e al legăturilor sigure găsite cu aceleași confirmări (fără cele ale oamenilor din fișierul real), plus cea nouă
+            fara_om = {'confirmate': {}, 'respinse': {}, 'fara_proiect': []}
+            sigure_fara_om = [k for k, v in amp_asteptat(fara_om)['peAcord'].items() if v['nivel'] == 'sigur']
+            verifica('bara AMP: o legătură sigură în plus (cea confirmată de un om): %d + 1' % len(sigure_fara_om), '%d din %d proiecte sunt legate sigur' % (len(sigure_fara_om) + 1, len(RANDURI)) in tx, tx)
             cerere = amp.livrate('/661')
             verifica('cererea către raport: POST, cu interogarea în corp', len(cerere) == 1 and cerere[0][0] == 'POST', cerere)
             r = rand_acord(pg, 'BERD', rc['id'])
@@ -2370,6 +2399,7 @@ try:
                 e.append('Agreement amount' if en else 'Suma acordului')
                 if a.get('cost'):
                     e.append('Total project cost' if en else 'Costul total al proiectului')
+                e.append('Government contribution' if en else 'Contribuția Guvernului')    # mereu: „necunoscută” când nu e intrare
                 if a.get('alte'):
                     e.append('Other amounts in the acts' if en else 'Alte sume în acte')
                 if a.get('suma'):
@@ -2598,6 +2628,12 @@ try:
                 chip = d_.locator('.det-desc a.src.s-oficial')
                 if chip.count() != 1 or chip.get_attribute('href') != p['sursa'] or gazda_ not in (chip.get_attribute('title') or ''):
                     scapate.append(a['id'] + ' (eticheta)')
+                # contribuția Guvernului urmează aceeași regulă: fără citat și notă în pagină, sursa e eticheta din „Date esențiale”
+                cg = a.get('contributie') or {}
+                if (cg.get('citat') and cg['citat'][:40] in t_) or (cg.get('nota') and cg['nota'][:40] in t_):
+                    scapate.append(a['id'] + ' (contribuția)')
+                if cg.get('u') and d_.locator('.det-info a.src.s-oficial[href="%s"]' % cg['u']).count() != 1:
+                    scapate.append(a['id'] + ' (eticheta contribuției)')
                 inchide_fisa(pg)
                 if verificate >= 12:
                     break

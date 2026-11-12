@@ -302,6 +302,20 @@ function donatoriiAcordului(parteneri) {
   });
   return v.length ? v : [NEIDENTIFICAT];
 }
+/* Contribuția Guvernului dintr-un rând al registrului (câmpul „contributie” din date/acorduri_legare.json; vine din
+   date/contributii_guvern.json): banii din bugetul de stat, cât spune sursa, sau 0 („fara”) când sursa spune că proiectul nu
+   cere bani de la buget; „vezi” = contribuția întregului proiect, numărată la acordul acela; scutirile și contribuțiile
+   altora sunt doar text. Doar câmpurile de forma așteptată trec; adresa sursei, numai dacă e http(s). Fără nimic util: null. */
+function contributie(c) {
+  if (!c || typeof c !== 'object') return null;
+  const o = {};
+  if (numar(c.v) && c.v > 0) { o.v = c.v; o.val = typeof c.val === 'string' && c.val ? c.val : 'EUR'; o.eur = numar(c.eur) ? c.eur : null; }
+  else if (c.fara === true) { o.fara = true; o.eur = 0; }
+  else if (typeof c.nu === 'string' && c.nu.trim()) o.nu = c.nu.trim();          // nu se aplică: sprijin bugetar, asistență macrofinanciară
+  ['vezi', 'nota', 'citat', 'scutiri', 'alte', 'act'].forEach(function (k) { if (typeof c[k] === 'string' && c[k].trim()) o[k] = c[k].trim(); });
+  if (typeof c.u === 'string' && /^https?:\/\//i.test(c.u)) o.u = c.u;
+  return o.v || o.fara || o.nu || o.scutiri || o.alte ? o : null;
+}
 /* Denumirile din registru se taie uneori în mijlocul unei paranteze („Proiectul de dezvoltare al sistemului electroenergetic (”). */
 function curataNume(s) {
   s = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
@@ -368,6 +382,7 @@ function pregateste(json, manualBrut) {
       eur: eur, inTotal: inTotal, eurTotal: inTotal === 'numarat' ? eur : null,
       registru: { suma: s, sursaSuma: s ? (s.sursa || '') : '', actSuma: s ? (s.act || '') : '', eur: eur, inTotal: inTotal },   // suma din registru, neatinsă: aplicaSume o repune când o corectură dispare
       alte: a.alte || [], cost: a.cost || null,
+      contributie: contributie(a.contributie),       // contribuția Guvernului (date/contributii_guvern.json, prin registru)
       acte: acte, coduri: acte.map(function (y) { return y.act; }).filter(Boolean),
       url: (acte.filter(function (y) { return y.url; })[0] || {}).url || '',
       deosebire: null
@@ -589,6 +604,8 @@ function textSursaProiect(info, en) {
   if (tipuri.length === 1) return etichetaSursaProiect(tipuri[0], en);
   return camp.map(function (x) { return x[1] + ': ' + etichetaSursaProiect(x[0].tip, en); }).join('; ');
 }
+/* gazda unei adrese, ca text de link în Excel: „documents1.worldbank.org” */
+function gazdaLink(u) { const m = /^https?:\/\/([^\/?#:]+)/i.exec(u || ''); return m ? m[1].replace(/^www\./i, '') : ''; }
 /* Adresa documentului care susține un câmp: a sursei oficiale; pentru ce vine din AMP, nu există una (proiectul AMP se leagă separat). */
 function legaturaSursaProiect(info) {
   const c = [info.obiective, info.inceput, info.sfarsit].filter(function (x) { return x && x.tip === 'oficial' && x.sursa; })[0];
@@ -1185,7 +1202,11 @@ function foaieProiecte(c, o) {
   const cInTotal = col(t('Intră în total?', 'In the total?'), 'c', 16);
   const cSursa = col(t('Sursa obiectivelor și a datelor', 'Source of objectives and dates'), 't', 30);
   const cLink = col(t('Link legis.md', 'legis.md link'), 't', 13);
-  const randuri = [], urluri = [], urluriSursa = [];
+  const cContrib = col(t('Contribuția Guvernului (bani din buget)', 'Government contribution (budget cash)'), 'e', 16);
+  const cValContrib = col(t('Valuta contribuției', 'Contribution currency'), 'c', 9);
+  const cContribEur = col(t('Contribuția Guvernului, echivalent EUR', 'Government contribution, EUR equivalent'), 'e', 16);
+  const cContribSursa = col(t('Sursa contribuției', 'Source of the contribution'), 't', 18);
+  const randuri = [], urluri = [], urluriSursa = [], urluriContrib = [];
   const infoDe = c.infoDe || function (a) { return infoProiect(a, { db: c.proiecteDb, manual: c.proiecteManual, amp: c.amp }); };
   const nr = { obiective: 0, inceput: 0, sfarsit: 0, n: 0 };
   o.acorduri.forEach(function (a) {
@@ -1213,13 +1234,20 @@ function foaieProiecte(c, o) {
     r[cUltima] = g.ultima || '';
     r[cInTotal] = textInTotal(a.inTotal, t);
     r[cLink] = a.url ? 'legis.md' : '';
-    randuri.push(r); urluri.push(a.url); urluriSursa.push(legaturaSursaProiect(info));
+    const cg = a.contributie;
+    r[cContrib] = cg ? (cg.v > 0 ? cg.v : cg.fara ? 0 : '') : '';
+    r[cValContrib] = cg && cg.v > 0 ? cg.val : '';
+    // „vezi”: contribuția întregului proiect e numărată în euro o singură dată, la acordul la care trimite
+    r[cContribEur] = cg && !cg.vezi && cg.eur != null ? Math.round(cg.eur) : '';
+    r[cContribSursa] = cg && cg.u ? gazdaLink(cg.u) : '';
+    randuri.push(r); urluri.push(a.url); urluriSursa.push(legaturaSursaProiect(info)); urluriContrib.push(cg && cg.u ? cg.u : '');
   });
   const latimi = {}; cols.forEach(function (x, k) { latimi[k] = x[2]; });
   const etichete = {}; etichete[cTip] = CULORI_TIP;
   etichete[cInTotal] = [[t('da', 'yes'), 'FF16794F', 'FFE3F4EC'], [t('nu: dublură', 'no: duplicate'), 'FF6B7284', 'FFEEF0F4'],
                         [t('nu: nu se adună', 'no: not added up'), 'FF6B7284', 'FFEEF0F4'], [t('nu: fără curs', 'no: no rate'), 'FF6B7284', 'FFEEF0F4']];
   const linkuri = {}; linkuri[cLink] = function (rand, i) { return urluri[i]; }; linkuri[cSursa] = function (rand, i) { return urluriSursa[i]; };
+  linkuri[cContribSursa] = function (rand, i) { return urluriContrib[i]; };
   const re = rezumat(o.acorduri, c.peAcord, c.cursuri);
   const note = [
     t('Un rând = un acord din registrul legis.md (actele aceluiași acord sunt grupate). „Suma proiectului” e suma acordului, așa cum o arată registrul; ' +
@@ -1240,6 +1268,9 @@ function foaieProiecte(c, o) {
     note.push(t('La ' + corectate.length + ' proiecte suma a fost corectată de un utilizator în pagină și înlocuiește suma din registru (între paranteze: suma din registru → suma corectată): ' + lst + (corectate.length > 12 ? '; …' : '') + '.',
       'For ' + corectate.length + ' projects the amount was corrected by a user in the page and replaces the register amount (in brackets: register amount → corrected amount): ' + lst + (corectate.length > 12 ? '; …' : '') + '.'));
   }
+  const nrContrib = o.acorduri.filter(function (a) { return a.contributie; }).length;
+  note.push(t('Contribuția Guvernului: banii din bugetul de stat planificați pentru proiect, cât spune sursa din coloana „Sursa contribuției” (nota Guvernului, planul de finanțare al finanțatorului, fișa proiectului); 0 = sursa spune că proiectul nu cere bani de la buget; celula goală = nicio sursă găsită nu spune suma sau contribuția nu se aplică (sprijin bugetar, asistență macrofinanciară: banii intră direct în buget). Scutirile de taxe și contribuțiile în natură sau ale altora nu sunt incluse. O contribuție a unui proiect finanțat prin mai multe acorduri are echivalentul în euro doar la acordul la care e numărată. Aici: ' + nrContrib + ' din ' + o.acorduri.length + ' proiecte au o contribuție găsită.',
+    'Government contribution: the state-budget cash planned for the project, as stated by the source in the "Source of the contribution" column (Government note, the funder\'s financing plan, the project page); 0 = the source says the project needs no budget money; an empty cell = no source found states the amount, or a contribution does not apply (budget support, macro-financial assistance: the money goes straight into the budget). Tax exemptions and in-kind or third-party contributions are not included. A contribution to a project financed through several agreements has its EUR equivalent only at the agreement where it is counted. Here: ' + nrContrib + ' of ' + o.acorduri.length + ' projects have a contribution found.'));
   if (c.ampNota) note.push(c.ampNota);                // ce s-a întâmplat cu citirea datelor din AMP (raport live, arhivă)
   if (c.omise && c.omise.length) note.push(t('Nu sunt incluse ' + c.omise.length + ' rânduri-umbrelă din registru (negocieri sau memorandumuri pentru acorduri care au deja rândurile lor, cu aceleași sume): ' + c.omise.map(function (x) { return x.a.nume; }).join('; ') + '.',
     c.omise.length + ' umbrella rows of the register are not included (negotiations or memoranda for agreements that already have their own rows, with the same amounts): ' + c.omise.map(function (x) { return x.a.nume; }).join('; ') + '.'));
@@ -1249,12 +1280,13 @@ function foaieProiecte(c, o) {
   return {
     foaie: o.foaie, titlu: o.titlu, subtitlu: o.subtitlu,
     antete: cols.map(function (x) { return x[0]; }), tipuri: cols.map(function (x) { return x[1]; }).join(''), randuri: randuri, latimi: latimi,
-    total: { eticheta: t('Total (rândurile vizibile)', 'Total (visible rows)'), suma: [cEur, cDebEur, cRest, cNr] },
+    total: { eticheta: t('Total (rândurile vizibile)', 'Total (visible rows)'), suma: [cEur, cDebEur, cRest, cNr, cContribEur] },
     /* maxLinii 10: obiectivele (cel mult 600 de caractere) încap întregi în coloana „Descriere succintă”; un rând mai scurt își ia singur înălțimea */
     inghetaColoane: 1, maxLinii: 10, paginiLatime: 'auto', bare: [cPct],
     grupe: [{ de: cProiect, pana: cSfa, text: t('PROIECTUL', 'THE PROJECT') }, { de: cTip, pana: cSemnat, text: t('ACORDUL', 'THE AGREEMENT') },
             { de: cSuma, pana: cEur, text: t('SUMA PROIECTULUI', 'PROJECT AMOUNT') },
-            { de: cDebVal, pana: cUltima, text: t('DEBURSĂRI', 'DISBURSEMENTS') }, { de: cInTotal, pana: cLink, text: t('DETALII', 'DETAILS') }],
+            { de: cDebVal, pana: cUltima, text: t('DEBURSĂRI', 'DISBURSEMENTS') }, { de: cInTotal, pana: cLink, text: t('DETALII', 'DETAILS') },
+            { de: cContrib, pana: cContribSursa, text: t('CONTRIBUȚIA GUVERNULUI', 'GOVERNMENT CONTRIBUTION') }],
     etichete: etichete, linkuri: linkuri, note: note, culoareFila: o.culoare || 'FF1E4B8C', subsol: c.subsol
   };
 }
@@ -1369,7 +1401,7 @@ return {
   fold: fold, taie: taie, slug: slug, fmtSuma: fmtSuma, fmtBani: fmtBani, dataTextEn: dataTextEn, fmtCompact: fmtCompact, parseSuma: parseSuma,
   dataRo: dataRo, esteDataIso: esteDataIso, aziIso: aziIso, dataOraRo: dataOraRo, ordRo: ordRo,
   donatoriiAcordului: donatoriiAcordului, curataNume: curataNume, stadiu: stadiu, etichetaStadiu: etichetaStadiu, etichetaTip: etichetaTip, numeDonator: numeDonator,
-  deduCursuri: deduCursuri, pregateste: pregateste, descriere: descriere,
+  deduCursuri: deduCursuri, pregateste: pregateste, descriere: descriere, contributie: contributie,
   ETAPE_ACT: ETAPE_ACT, PARCURS_PESTE: PARCURS_PESTE, PARCURS_CAPETE: PARCURS_CAPETE,
   etichetaEtapa: etichetaEtapa, etichetaTipAct: etichetaTipAct, parcursAcord: parcursAcord, etichetaPas: etichetaPas, parcursAfisat: parcursAfisat,
   durataProiect: durataProiect, fmtDurata: fmtDurata, stareProiect: stareProiect, etichetaStare: etichetaStare,

@@ -193,6 +193,9 @@ EXCLUDE_CADRU = [
     r"contractelor\s+de\s+creditare\s+si\s+de\s+sprijin",
     r"asistentei\s+medicale\s+cetatenilor",
     r"dreptului\s+de\s+sedere",
+    # o instrucțiune e o regulă internă, nu un acord: ordinul din 20.10.2026 despre eligibilitatea operatorilor
+    # economici în proiectele cu cota de cofinanțare a Moldovei (Planul de creștere) intra ca „Asistență financiară"
+    r"aprobarea\s+instructiunii",
 ]
 
 

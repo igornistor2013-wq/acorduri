@@ -771,7 +771,27 @@ function subSuma(sursa, act) {
   var s = D.SURSE_SUMA[sursa], t = [s ? s[S.en ? 1 : 0] : '', act ? '(' + act + ')' : ''].filter(Boolean).join(' ');
   return t ? '<span class="fp-s">' + esc(t) + '</span>' : '';
 }
-/* „Date esențiale”: donatorul (cu denumirea întreagă), suma acordului și de unde vine, costul total al proiectului, alte sume din acte, dacă intră în totaluri */
+/* Contribuția Guvernului în fișă (date/contributii_guvern.json, prin registru): banii din bugetul de stat cât spune sursa, 0 când sursa spune
+   că proiectul nu cere bani de la buget, „necunoscută” când nicio sursă găsită nu spune; dedesubt, de unde e cifra (citatul, adresa) și,
+   separat, scutirile și contribuțiile altora, care nu se adună. Notele sunt scrise în română și rămân așa și în engleză. */
+function htmlContributie(c) {
+  if (!c) return '<span class="nil">' + esc(L('necunoscută', 'unknown')) + '</span><span class="fp-s">' + esc(L('nicio sursă găsită nu spune suma', 'no source found states the amount')) + '</span>';
+  var sub = function (x) { return '<span class="fp-s">' + esc(x) + '</span>'; };
+  var h = c.v > 0 ? valSuma(c.v, c.val, c.eur) : c.fara ? '<span class="fp-v">0</span>' + sub(L('sursa spune că proiectul nu cere bani de la bugetul de stat', 'the source says the project needs no state-budget money'))
+        : c.nu ? '<span class="fp-v">' + esc(L('nu se aplică', 'not applicable')) + '</span>' + sub(c.nu)
+        : '<span class="nil">' + esc(L('suma în bani nu e spusă în sursă', 'cash amount not stated in the source')) + '</span>';
+  if (c.vezi) h += sub(L('contribuția întregului proiect, numărată o singură dată, la acordul ', 'contribution of the whole project, counted once, at agreement ') + c.vezi);
+  if (c.scutiri) h += sub(L('plus scutiri de taxe, care nu se adună', 'plus tax exemptions, not added'));
+  if (c.alte) h += sub(L('plus alte contribuții naționale, care nu se adună', 'plus other national contributions, not added'));
+  // ca la celelalte câmpuri ale fișei: niciun citat, nicio notă și nicio gazdă scrise în pagină; sursa e eticheta
+  // „sursă oficială”, cu gazda, nota și detaliile scutirilor în indiciu (textul întreg e în registru și în Excel)
+  if (c.u) {
+    var ind = [c.nota, c.scutiri && L('Scutiri: ', 'Exemptions: ') + c.scutiri, c.alte && L('Alte contribuții: ', 'Other contributions: ') + c.alte].filter(Boolean).join(' · ');
+    h += '<span class="psrc">' + etSursa({ tip: 'oficial', sursa: c.u, nota: ind }, 'contributie') + '</span>';
+  }
+  return h;
+}
+/* „Date esențiale”: donatorul (cu denumirea întreagă), suma acordului și de unde vine, costul total al proiectului, contribuția Guvernului, alte sume din acte, dacă intră în totaluri */
 function htmlInfo(a) {
   var inTotal = { numarat: L('da', 'yes'), dublura: L('nu: dublură a altui acord', 'no: duplicate of another agreement'), fara_total: L('nu: nu se adună în total', 'no: not added to the total'),
                   fara_curs: L('nu: fără curs de schimb', 'no: no exchange rate'), fara_suma: L('nu: suma nu e cunoscută', 'no: amount not known') }[a.inTotal] || '';
@@ -785,6 +805,7 @@ function htmlInfo(a) {
     : '<span class="nil">' + esc(L('necunoscută', 'unknown')) + '</span><span class="fp-s">' + esc(L('nu intră în totaluri', 'not counted in the totals')) + '</span>']);
   if (a.sumaCorectata) dl.push([L('Suma din registru', 'Amount in the register'), esc(registruSuma(a)) + (a.registru.sursaSuma && D.SURSE_SUMA[a.registru.sursaSuma] ? '<span class="fp-s">' + esc(D.SURSE_SUMA[a.registru.sursaSuma][S.en ? 1 : 0]) + '</span>' : '')]);
   if (a.cost) dl.push([L('Costul total al proiectului', 'Total project cost'), valSuma(a.cost.v, a.cost.val, a.cost.eur) + '<span class="fp-s">' + esc(L('din textul acordului', 'from the text of the agreement')) + '</span>']);
+  dl.push([L('Contribuția Guvernului', 'Government contribution'), htmlContributie(a.contributie)]);
   if (a.alte && a.alte.length) dl.push([L('Alte sume în acte', 'Other amounts in the acts'), a.alte.map(function (x) { return '<div class="fp-don">' + valSuma(x.v, x.val, x.eur) + subSuma(x.sursa, x.act) + '</div>'; }).join('')]);
   if (a.suma) dl.push([L('Intră în totaluri', 'Counted in totals'), esc(inTotal)]);
   return '<section class="fs det-info"><h3><span class="fs-t">' + esc(L('Date esențiale', 'Key facts')) + '</span></h3><dl class="fapte">' + dl.map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl></section>';
