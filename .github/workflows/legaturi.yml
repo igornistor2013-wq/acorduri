@@ -34,6 +34,7 @@ on:
       - date/sume_manual.json
       - date/categorii_manual.json
       - date/contopiri_manual.json
+      - date/contributii_guvern.json
       - date/legaturi_legis.json
 
 permissions:
