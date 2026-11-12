@@ -1,0 +1,837 @@
+{
+ "_cum_se_foloseste": "Contribuția Guvernului la fiecare acord: banii din bugetul de stat planificați pentru proiect, pe codul unui act al acordului din registrul legis.md (ca în sume_manual.json). {\"v\": suma, \"val\": \"USD\", \"u\": \"adresa sursei\", \"citat\": \"fraza sau rândul din sursă, în limba sursei (≤ 220 de caractere)\", \"nota\": \"ce e cifra și de unde e (≤ 220)\"}. {\"fara\": true, \"u\", \"citat\"} = sursa spune că proiectul nu cere bani de la bugetul de stat (pagina arată 0). {\"nu_se_aplica\": \"motivul\"} = acordul nu finanțează un proiect pe care Guvernul să-l cofinanțeze (sprijin bugetar, asistență macrofinanciară, operațiune de politici de dezvoltare: banii intră direct în buget). \"scutiri\" = scutirile de TVA și de taxe vamale, doar text: nu se adună. \"alte\" = contribuțiile în natură sau ale altora (autorități locale, întreprinderi, beneficiari), doar text. {\"vezi\": \"LP190/2013\", \"nota\"} pe un acord al aceluiași proiect = contribuția întregului proiect e scrisă la acordul acela: se arată și aici, dar se numără o singură dată. Un rând al registrului are cel mult o intrare. Se scrie doar ce spune o sursă: fără sursă, acordul nu are intrare, iar fereastra proiectului arată „necunoscută”. Cheile care încep cu _ sunt ignorate.",
+ "LP226/2025": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP225/2025": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP215/2024": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP184/2023": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP197/2022": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP198/2022": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP293/2016": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG1214/2016": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP69/2014": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP70/2014": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP225/2010": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG186/2025": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Grant din fondul fiduciar multidonator care cofinanțează operațiunea de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat; nu e un proiect cofinanțat de Guvern."
+ },
+ "LP216/2024": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Grant din fondul fiduciar multidonator care cofinanțează operațiunea de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat; nu e un proiect cofinanțat de Guvern."
+ },
+ "LP254/2023": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Grant din fondul fiduciar multidonator care cofinanțează operațiunea de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat; nu e un proiect cofinanțat de Guvern."
+ },
+ "LP166/2023": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Grant din fondul fiduciar multidonator care cofinanțează operațiunea de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat; nu e un proiect cofinanțat de Guvern."
+ },
+ "LP349/2022": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Grant din fondul fiduciar multidonator care cofinanțează operațiunea de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat; nu e un proiect cofinanțat de Guvern."
+ },
+ "HP1174/2002": {
+  "nu_se_aplica": "ajustare structurală (sprijin bugetar)",
+  "nota": "Credit de ajustare structurală al Băncii Mondiale: bani pentru buget și balanța de plăți, eliberați pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP717/2001": {
+  "nu_se_aplica": "ajustare structurală (sprijin bugetar)",
+  "nota": "Credit de ajustare structurală al Băncii Mondiale: bani pentru buget și balanța de plăți, eliberați pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HP551/1999": {
+  "nu_se_aplica": "ajustare structurală (sprijin bugetar)",
+  "nota": "Credit de ajustare structurală al Băncii Mondiale: bani pentru buget și balanța de plăți, eliberați pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HP1348/1997": {
+  "nu_se_aplica": "ajustare structurală (sprijin bugetar)",
+  "nota": "Credit de ajustare structurală al Băncii Mondiale: bani pentru buget și balanța de plăți, eliberați pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HP315/1994": {
+  "nu_se_aplica": "ajustare structurală (sprijin bugetar)",
+  "nota": "Credit de ajustare structurală al Băncii Mondiale: bani pentru buget și balanța de plăți, eliberați pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP150/2008": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Credit pentru susținerea reducerii sărăciei al Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu e un proiect cofinanțat de Guvern."
+ },
+ "LP32/2007": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Credit pentru susținerea reducerii sărăciei al Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu e un proiect cofinanțat de Guvern."
+ },
+ "LP194/2022": {
+  "nu_se_aplica": "asistență macrofinanciară",
+  "nota": "Asistență macrofinanciară a UE: bani pentru buget și balanța de plăți, eliberați în tranșe pentru condițiile convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP191/2022": {
+  "nu_se_aplica": "asistență macrofinanciară",
+  "nota": "Asistență macrofinanciară a UE: bani pentru buget și balanța de plăți, eliberați în tranșe pentru condițiile convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP193/2022": {
+  "nu_se_aplica": "asistență macrofinanciară",
+  "nota": "Asistență macrofinanciară a UE: bani pentru buget și balanța de plăți, eliberați în tranșe pentru condițiile convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP166/2020": {
+  "nu_se_aplica": "asistență macrofinanciară",
+  "nota": "Asistență macrofinanciară a UE: bani pentru buget și balanța de plăți, eliberați în tranșe pentru condițiile convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP167/2020": {
+  "nu_se_aplica": "asistență macrofinanciară",
+  "nota": "Asistență macrofinanciară a UE: bani pentru buget și balanța de plăți, eliberați în tranșe pentru condițiile convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP278/2018": {
+  "nu_se_aplica": "asistență macrofinanciară",
+  "nota": "Asistență macrofinanciară a UE: bani pentru buget și balanța de plăți, eliberați în tranșe pentru condițiile convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP272/2017": {
+  "nu_se_aplica": "asistență macrofinanciară",
+  "nota": "Asistență macrofinanciară a UE: bani pentru buget și balanța de plăți, eliberați în tranșe pentru condițiile convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG90/2025": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG613/2011": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP118/2025": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Facilitatea de reformă și creștere a UE, împrumutul: sprijin bugetar, eliberat pentru reformele din Agenda de reforme; banii intră în buget, nu finanțează un proiect cofinanțat de Guvern."
+ },
+ "LP236/2023": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Împrumut JICA pentru politici de dezvoltare (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG232/2008": {
+  "nu_se_aplica": "grant neproiect (import de bunuri)",
+  "nota": "Grant neproiect al Japoniei pentru sprijinirea ajustărilor structurale: plătește importuri de bunuri convenite, nu un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG2501/2007": {
+  "nu_se_aplica": "grant neproiect (import de bunuri)",
+  "nota": "Grant neproiect al Japoniei pentru sprijinirea ajustărilor structurale: plătește importuri de bunuri convenite, nu un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG230/2006": {
+  "nu_se_aplica": "grant neproiect (import de bunuri)",
+  "nota": "Grant neproiect al Japoniei pentru sprijinirea ajustărilor structurale: plătește importuri de bunuri convenite, nu un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG246/2005": {
+  "nu_se_aplica": "grant neproiect (import de bunuri)",
+  "nota": "Grant neproiect al Japoniei pentru sprijinirea ajustărilor structurale: plătește importuri de bunuri convenite, nu un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG432/2021": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze.",
+  "u": "https://www.mf.gov.md/sites/default/files/Raport%20ODA%202021.pdf"
+ },
+ "DP34/2021": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze.",
+  "u": "https://www.mf.gov.md/sites/default/files/Raport%20ODA%202021.pdf"
+ },
+ "HG1257/2016": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze.",
+  "u": "https://www.mf.gov.md/sites/default/files/Raport%20Asisten%C8%9B%C4%83%20Extern%C4%83%202020%20MD.pdf"
+ },
+ "LP177/2015": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze.",
+  "u": "https://monitorul.fisc.md/ru/analysis_and_statistics/susinerea-din-partea-partenerilor-de-dezvoltare.html"
+ },
+ "HG857/2014": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze.",
+  "u": "https://monitorul.fisc.md/editorial/ue-a-debursat-sumele-destinate-programelor-de-suport-bugetar.html"
+ },
+ "HG6/2014": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze.",
+  "u": "https://monitorul.fisc.md/editorial/ue-a-debursat-sumele-destinate-programelor-de-suport-bugetar.html"
+ },
+ "HG852/2012": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze.",
+  "u": "https://monitorul.fisc.md/editorial/ue-a-debursat-sumele-destinate-programelor-de-suport-bugetar.html"
+ },
+ "HG12/2014": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze.",
+  "u": "https://monitorul.fisc.md/editorial/ministerul-finanelor-vine-cu-precizari.html"
+ },
+ "HG885/2014": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Program de sprijin bugetar al UE: banii intră direct în bugetul de stat, pentru reforma convenită; nu finanțează un proiect pe care Guvernul să-l cofinanțeze.",
+  "u": "https://monitorul.fisc.md/editorial/ministerul-finanelor-vine-cu-precizari.html"
+ },
+ "HG804/2012": {
+  "nu_se_aplica": "sprijin bugetar sectorial",
+  "nota": "Program de suport al politicii sectoriale (SPSP) al UE, adică sprijin bugetar sectorial: banii intră în bugetul de stat; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG873/2011": {
+  "nu_se_aplica": "sprijin bugetar sectorial",
+  "nota": "Program de suport al politicii sectoriale (SPSP) al UE, adică sprijin bugetar sectorial: banii intră în bugetul de stat; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HP215/1994": {
+  "nu_se_aplica": "asistență macrofinanciară",
+  "nota": "Asistență macrofinanciară a UE: bani pentru buget și balanța de plăți, eliberați în tranșe pentru condițiile convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HP962/1996": {
+  "nu_se_aplica": "asistență macrofinanciară",
+  "nota": "Asistență macrofinanciară a UE: bani pentru buget și balanța de plăți, eliberați în tranșe pentru condițiile convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "DPRM1306/2007": {
+  "nu_se_aplica": "asistență macrofinanciară",
+  "nota": "Asistență macrofinanciară a UE: bani pentru buget și balanța de plăți, eliberați în tranșe pentru condițiile convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG499/1992": {
+  "nu_se_aplica": "credit pentru importuri",
+  "nota": "Împrumut al CEE pentru importuri de produse agroalimentare și medicale (programul pentru fostele republici sovietice): nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "HG405/2026": {
+  "v": 34200000,
+  "val": "EUR",
+  "u": "https://www.gov.md/sites/default/files/users-media/media-15/CIPS_PV%20nr.5_2026.pdf",
+  "citat": "împrumut BERD - 344,0 mil. EUR (80%), grant CEF 7,5 mil. EUR, grant UE NIP 11,4 mil. EUR, asistenţă tehnică - aproximativ 2,5 mil. EUR, precum şi contribuţia Guvernului în valoare de circa 34,2 mil. EUR",
+  "nota": "Procesul-verbal nr. 5 al Comitetului interministerial pentru planificare strategică (CIPS), 25.03.2026: proiectul „Moldova Drumuri VI BERD”, 400 mil. EUR în total."
+ },
+ "LP176/2024": {
+  "v": 83920000,
+  "val": "USD",
+  "u": "https://documents.worldbank.org/en/publication/documents-reports/documentdetail/099041024143026645",
+  "citat": "Total Operation Cost 189.90 · of which IBRD/IDA 105.98 · Counterpart Funding 83.92 · Borrower/Recipient 83.92 (US$, Millions)",
+  "nota": "Banca Mondială, documentul de evaluare a proiectului (PAD00071, aprilie 2024), planul de finanțare: contribuția Guvernului la tot proiectul, împrumutul BIRD și creditul AID."
+ },
+ "LP177/2024": {
+  "vezi": "LP176/2024",
+  "nota": "Același proiect, Conectivitate rurală în Moldova: contribuția Guvernului e a întregului proiect și e scrisă la împrumutul BIRD."
+ },
+ "HG384/2026": {
+  "v": 14700000,
+  "val": "EUR",
+  "u": "https://gov.md/sites/default/files/Filepdf/PV%20nr.10_CIPS_20.05.2026.pdf",
+  "citat": "Etapa I: contribuţia Guvernului din Planul de creştere - 7,2 milioane EUR … Etapa II (neangajată): contribuţia Guvernului din Planul de creştere - 7,5 milioane EUR",
+  "nota": "CIPS, procesul-verbal nr. 10 din 20.05.2026: 7,2 mil. EUR la etapa I și 7,5 mil. EUR la etapa a II-a (încă neangajată), bani din Planul de creștere al UE trecuți prin buget.",
+  "scutiri": "287,6 mil. lei (≈14,29 mil. EUR) la etapa I și 305,6 mil. lei (≈15,19 mil. EUR) la etapa a II-a, pentru facilități fiscale și vamale (CIPS, 20.05.2026)."
+ },
+ "HG562/2026": {
+  "v": 40000000,
+  "val": "EUR",
+  "u": "https://gov.md/sites/default/files/users-media/media-16/cips/PV%20nr.9_CIPS_2026.pdf",
+  "citat": "80 milioane EUR … 33 milioane EUR împrumut, 7 milioane EUR grant NIP și 40 milioane EUR cofinanţare a Republicii Moldova prin Mecanismul de Reformă şi Creştere",
+  "nota": "CIPS, procesul-verbal nr. 9 din 23.04.2026: cofinanțarea Republicii Moldova, din banii Mecanismului de reformă și creștere al UE trecuți prin buget."
+ },
+ "HG301/2026": {
+  "v": 8000000,
+  "val": "EUR",
+  "u": "https://gov.md/ro/comunicate-de-presa/peste-60-de-milioane-de-euro-pentru-scoli-moderne-si-spitale-eficiente",
+  "citat": "împrumutul de 40 de milioane de euro acordat de BEI, un grant al Uniunii Europene de 3,5 milioane de euro … și o contribuție de 8 milioane de euro din partea Republicii Moldova, sprijinită prin Planul de Creștere",
+  "nota": "Comunicatul Guvernului la semnarea contractului (2026): programul mobilizează până la 51,5 mil. EUR; contribuția Moldovei vine din banii Planului de creștere al UE trecuți prin buget."
+ },
+ "LP14/2025": {
+  "fara": true,
+  "u": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2025-05/NU-381-MEn-2025_0.pdf",
+  "citat": "valoare totală de 326 milioane EUR, care se va finanța din următoarele surse: BERD 143,5 mil. EUR (44%); BEI 143,5 mil. EUR (44%); EU-NIP 24,54 mil. EUR (7,5%); E5P 15 mil. EUR (4,5%)",
+  "nota": "Nota Ministerului Energiei (mai 2025): finanțarea celor 326 mil. EUR nu are o parte de la bugetul de stat; împrumuturile BERD și BEI sunt recreditate S.A. „Termoelectrica”.",
+  "scutiri": "Scutire de TVA fără drept de deducere și facilități vamale la importuri pentru proiect (regulament aprobat de Guvern, nr. unic 700/MF/2025); suma lor nu e dată."
+ },
+ "LP203/2025": {
+  "vezi": "LP14/2025",
+  "nota": "Același proiect, „Optimizarea sistemului de alimentare centralizată cu energie termică din mun. Chișinău”: structura de finanțare e scrisă la împrumutul BERD."
+ },
+ "LP104/2025": {
+  "vezi": "LP14/2025",
+  "nota": "Grantul E5P al aceluiași proiect de termoficare din Chișinău: structura de finanțare e scrisă la împrumutul BERD."
+ },
+ "LP105/2025": {
+  "vezi": "LP14/2025",
+  "nota": "Grantul EU-NIP al aceluiași proiect de termoficare din Chișinău: structura de finanțare e scrisă la împrumutul BERD."
+ },
+ "LP179/2019": {
+  "v": 5000000,
+  "val": "USD",
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P160829?lang=en",
+  "citat": "IDA Credit 70.00 · Borrower/Recipient 5.00 (Total Project Financing, US$ Millions)",
+  "nota": "Banca Mondială, fișa proiectului P160829 (Dezvoltarea sistemului electroenergetic): planul de finanțare, contribuția Împrumutatului la tot proiectul, pentru ambele credite AID (6380-MD și 6381-MD)."
+ },
+ "LP177/2019": {
+  "vezi": "LP179/2019",
+  "nota": "Al doilea credit AID (6381-MD) al aceluiași proiect de dezvoltare a sistemului electroenergetic: contribuția Guvernului e a întregului proiect."
+ },
+ "LP248/2026": {
+  "vezi": "LP179/2019",
+  "nota": "Amendamentul la acordurile de finanțare ale aceluiași proiect de dezvoltare a sistemului electroenergetic: contribuția Guvernului e scrisă la creditul de bază."
+ },
+ "LP251/2024": {
+  "fara": true,
+  "u": "https://ewsdata.rightsindevelopment.org/files/documents/60/WB-P500560_4FL8oPw.pdf",
+  "citat": "Total Operation Cost 54.50 · Total Financing 54.50 · of which IBRD/IDA 50.00 · Financing Gap 0.00 · IBRD 50.00 · Trust Funds 4.50 (US$ millions)",
+  "nota": "Banca Mondială, documentul de informare la evaluare (PID, P500560, aprilie 2024): proiectul STEEM e finanțat integral de BIRD și dintr-un fond fiduciar; planul nu are o parte a Guvernului."
+ },
+ "LP193/2020": {
+  "fara": true,
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P172668",
+  "citat": "Total Project Financing (US$ Millions): IBRD Commitment 100.00 · IBRD + IDA Commitment 100.00 · Total Project Cost 100.00",
+  "nota": "Banca Mondială, fișa proiectului P172668 (al doilea proiect de eficiență a termoficării din Chișinău): costul total e egal cu împrumutul BIRD, fără o parte a Guvernului."
+ },
+ "LP137/2026": {
+  "nu_se_aplica": "sprijin bugetar",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (sprijin bugetar): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP148/2015": {
+  "v": 20600000,
+  "val": "USD",
+  "u": "https://ewsdata.rightsindevelopment.org/files/documents/43/WB-P132443_Bc7RJUd.pdf",
+  "citat": "Total Project Cost: 61.10 · Total Bank Financing: 40.50 · Borrower 20.60 (Project Financing Data, US$ millions)",
+  "nota": "Banca Mondială, documentul de evaluare PAD567 (30.10.2014), proiectul P132443 (termoficarea din Chișinău): partea Împrumutatului; documentul nu spune dacă e din buget sau din fondurile întreprinderii beneficiare."
+ },
+ "LP103/2020": {
+  "fara": true,
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P167790?lang=en",
+  "citat": "IDA Credit 39.40 · Total Project Financing (US$ Millions): IDA Commitment 39.40 · Total Project Cost 39.40",
+  "nota": "Banca Mondială, fișa proiectului P167790 (Învățământul superior): costul total e egal cu creditul AID, fără o parte a Guvernului."
+ },
+ "LP148/2025": {
+  "vezi": "LP103/2020",
+  "nota": "Finanțarea suplimentară BIRD (32,46 mil. USD) a aceluiași proiect: documentul de informare din 12.11.2024 arată doar BIRD și AID în planul de finanțare."
+ },
+ "LP224/2023": {
+  "fara": true,
+  "u": "https://globalcff.org/wp-content/uploads/2023/06/Education-Quality-Improvement-Project.pdf",
+  "citat": "Total Project Cost 58.90 · IBRD 40.00 · Trust Funds 18.90: Concessional Financing Facility 9.20, Early Learning Partnership 5.00, Global Partnership for Education Fund 4.70",
+  "nota": "Banca Mondială, documentul de informare la evaluare (PIDA35366, 20.03.2023), proiectul P179363: costul e acoperit de BIRD și de trei fonduri fiduciare; planul nu are o parte a Guvernului."
+ },
+ "LP223/2023": {
+  "vezi": "LP224/2023",
+  "nota": "Grantul ELP al aceluiași proiect, Îmbunătățirea calității educației: planul de finanțare e scris la împrumutul BIRD."
+ },
+ "LP222/2023": {
+  "vezi": "LP224/2023",
+  "nota": "Grantul GPE al aceluiași proiect, Îmbunătățirea calității educației: planul de finanțare e scris la împrumutul BIRD."
+ },
+ "LP217/2023": {
+  "fara": true,
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P170035",
+  "citat": "Agriculture Governance, Growth and Resilience Investment Project … Total Project Cost** 55.00 (US$ Millions; IBRD loan US$ 55 million)",
+  "nota": "Banca Mondială, fișa proiectului P170035 (AGGRI): costul total e egal cu împrumutul BIRD de 55 mil. USD, fără o parte a Guvernului."
+ },
+ "LP176/2012": {
+  "v": 2000000,
+  "val": "USD",
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P118518?lang=en",
+  "citat": "Borrower/Recipient 2.00 · Local Beneficiaries 19.66 · Moldova Agriculture Competitiveness Project Trust Fund 2.26 · IDA Credit 55.00 · Total Project Cost 83.94",
+  "nota": "Banca Mondială, fișa proiectului P118518 (MAC-P), planul de finanțare pentru tot proiectul, cu finanțările suplimentare AID (US$ milioane).",
+  "alte": "Beneficiarii locali (fermieri, întreprinderi): 19,66 mil. USD."
+ },
+ "LP168/2022": {
+  "vezi": "LP176/2012",
+  "nota": "Grantul GEF al aceluiași proiect MAC-P: fișa finanțării suplimentare P170853 arată GEF 3,10, beneficiari locali 8,00 și Borrower/Recipient 2,00 mil. USD."
+ },
+ "LP68/2020": {
+  "fara": true,
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P173776",
+  "citat": "IDA Credit 57.90 · Total Project Financing (US$ Millions): IDA Commitment 57.90 · Total Project Cost 57.90",
+  "nota": "Banca Mondială, fișa proiectului P173776 (Răspuns de urgență la COVID-19): costul total e egal cu creditul AID, fără o parte a Guvernului."
+ },
+ "LP139/2021": {
+  "vezi": "LP68/2020",
+  "nota": "Finanțarea suplimentară AID (P175816) a aceluiași proiect de răspuns la COVID-19."
+ },
+ "DP1875/2020": {
+  "vezi": "LP68/2020",
+  "nota": "Grantul pentru pandemie (P174761) al aceluiași proiect de răspuns la COVID-19."
+ },
+ "LP89/2013": {
+  "fara": true,
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P127388?lang=en",
+  "citat": "Financier | Commitments: IDA Credit 40.00 · IDA Commitment 40.00 · Total Project Cost** 40.00 (US$ Millions)",
+  "nota": "Banca Mondială, fișa proiectului P127388 (Reforma învățământului): costul total e egal cu creditul AID, fără o parte a Guvernului."
+ },
+ "LP88/2018": {
+  "fara": true,
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P156657?lang=en",
+  "citat": "Financier Commitments: IDA Credit 10.00 · IDA Commitment 10.00 · Total Project Cost** 10.00 (US$ Millions)",
+  "nota": "Banca Mondială, fișa finanțării suplimentare P156657 (Reforma învățământului, 2018): costul e egal cu creditul AID."
+ },
+ "LP137/2017": {
+  "v": 2430000,
+  "val": "USD",
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P148537",
+  "citat": "Financier Commitments: Borrower/Recipient 2.43 · IDA Credit 15.00 · International Bank for Reconstruction and Development 5.00 · Total Project Cost** 22.43",
+  "nota": "Banca Mondială, fișa proiectului P148537 (Modernizarea serviciilor guvernamentale), planul de finanțare: contribuția Împrumutatului, în mil. USD."
+ },
+ "LP67/2025": {
+  "fara": true,
+  "u": "https://documents1.worldbank.org/curated/en/099081624133015448/text/BOSIB-f3b87424-1d10-4f0f-a6b9-e341f80293fd.txt",
+  "citat": "SUMMARY Total Operation Cost 40.00 Total Financing 40.00 of which IBRD/IDA 40.00 Financing Gap 0.00 DETAILS World Bank Group Financing International Bank for Reconstruction and Development (IBRD) 40.00",
+  "nota": "Banca Mondială, documentul de evaluare PADHI00372 (13.08.2024), proiectul P504278 (managementul riscurilor de dezastre): costul e egal cu împrumutul BIRD."
+ },
+ "LP240/2018": {
+  "fara": true,
+  "u": "https://ewsdata.rightsindevelopment.org/files/documents/38/WB-P161238.pdf",
+  "citat": "PROJECT FINANCING DATA (US$, Millions) Total Project Cost 35.00 Total Financing 35.00 of which IBRD/IDA 35.00 Financing Gap 0.00 … International Development Association (IDA) 35.00",
+  "nota": "Banca Mondială, documentul de informare (PID, 24.05.2018), proiectul P161238 (Înregistrarea și evaluarea funciară): costul e egal cu creditul AID."
+ },
+ "LP155/2016": {
+  "v": 7500000,
+  "val": "USD",
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P150357",
+  "citat": "Financier | Commitments: Borrower/Recipient 7.50 · IDA Credit 80.00 (US$ Millions)",
+  "nota": "Banca Mondială, fișa proiectului P150357 (Îmbunătățirea drumurilor locale), planul de finanțare: contribuția Împrumutatului."
+ },
+ "DPRM1659/2015": {
+  "vezi": "LP155/2016",
+  "nota": "Același proiect, Îmbunătățirea drumurilor locale: contribuția Guvernului e scrisă la acordul de finanțare principal."
+ },
+ "LP225/2016": {
+  "fara": true,
+  "u": "https://ewsdata.rightsindevelopment.org/files/documents/34/WB-P127734_LCg5VPF.pdf",
+  "citat": "Total Project Cost: 20.00 Total Bank Financing: 20.00 … BORROWER/RECIPIENT 0.00 · International Bank for Reconstruction and Development 12.58 · International Development Association (IDA) 7.42",
+  "nota": "Banca Mondială, documentul de evaluare (PAD), proiectul P127734 (Modernizarea administrării fiscale, TAMP): partea Împrumutatului e 0."
+ },
+ "LP44/2015": {
+  "vezi": "LP225/2016",
+  "nota": "Grantul de pregătire al aceluiași proiect TAMP: planul de finanțare al proiectului e scris la acordurile BIRD/AID."
+ },
+ "LP35/2015": {
+  "v": 82900000,
+  "val": "USD",
+  "u": "https://documents1.worldbank.org/curated/en/686281468277758125/text/847930PAD0P144010Box385199B00OUO090.txt",
+  "citat": "Total Program Cost: 113.7 · Total Bank Financing: 30.8 · BORROWER/RECIPIENT 82.9 · IBRD/IDA 30.8 (28.7 PforR and 2.1 IPF)",
+  "nota": "Banca Mondială, documentul de evaluare al programului P144892 (sănătate, finanțare pe rezultate, 2014): cheltuielile Guvernului pentru programul de sănătate susținut de credit, în mil. USD."
+ },
+ "LP567/2003": {
+  "v": 4330000,
+  "val": "USD",
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P040558?lang=en",
+  "citat": "Financier | Commitments: IDA Credit 35.00 · Borrower/Recipient 4.33 · SWEDEN: Swedish Intl. Dev. Cooperation Agency (SIDA) 0.60 · Total Project Cost** 39.93",
+  "nota": "Banca Mondială, fișa proiectului P040558 (Proiectul energetic II, aprobat în 2003), planul de finanțare, în mil. USD."
+ },
+ "LP22/2009": {
+  "vezi": "LP567/2003",
+  "nota": "Finanțarea suplimentară (P113569: AID 10, SIDA 1 mil. USD) a Proiectului energetic II; contribuția Guvernului e scrisă la creditul de bază."
+ },
+ "LP285/2004": {
+  "v": 1530000,
+  "val": "USD",
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P079314",
+  "citat": "IDA Credit 45.00 · US: SOROS Foundation 0.20 · Borrower/Recipient 1.53 · SWEDEN: SIDA 3.70 · Local Communities 3.74 · Total Project Cost** 54.17",
+  "nota": "Banca Mondială, fișa proiectului P079314 (Fondul de investiții sociale II, cu finanțările suplimentare): planul de finanțare, în mil. USD.",
+  "alte": "Comunitățile locale: 3,74 mil. USD."
+ },
+ "LP58/2010": {
+  "vezi": "LP285/2004",
+  "nota": "A doua finanțare suplimentară a Fondului de investiții sociale II (P079314): contribuția Guvernului e a întregului proiect."
+ },
+ "LP21/2009": {
+  "vezi": "LP285/2004",
+  "nota": "Finanțare suplimentară a Fondului de investiții sociale II (P079314): contribuția Guvernului e a întregului proiect."
+ },
+ "LP190/2006": {
+  "v": 190000,
+  "val": "USD",
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P090340?lang=en",
+  "citat": "Financier | Commitments: IDA Grant 5.00 · IDA Credit 5.00 · Borrower/Recipient 0.19 · Total Project Cost** 10.19 (US$ Millions)",
+  "nota": "Banca Mondială, fișa proiectului P090340 (Educație de calitate în mediul rural, 2006): planul de finanțare."
+ },
+ "LP138/2017": {
+  "v": 2946000,
+  "val": "USD",
+  "u": "https://webapps.ifad.org/members/lapse-of-time/docs/english/EB-2016-LOT-P-13-Rev-1.pdf",
+  "citat": "Total project cost: US$38,735,000 · Amount of IFAD loan: US$18.2 million · Contribution of borrower: US$2,946,000",
+  "nota": "FIDA, raportul Președintelui pentru Proiectul de reziliență rurală (IFAD VII, 2016), rezumatul finanțării.",
+  "alte": "Beneficiarii: 9,519 mil. USD; instituțiile financiare participante: 2,57 mil. USD."
+ },
+ "LP132/2014": {
+  "v": 11000000,
+  "val": "USD",
+  "u": "https://webapps.ifad.org/members/lapse-of-time/docs/english/EB-2013-LOT-P-17-Rev-1.pdf",
+  "citat": "Total programme cost: US$46.3 million · Amount of IFAD loan: SDR 10.5 million … Contribution of borrower/recipient: US$11 million",
+  "nota": "FIDA, raportul Președintelui pentru Programul rural de reziliență economico-climatică incluzivă (IFAD VI, 2013), rezumatul finanțării.",
+  "alte": "Beneficiarii: 7,5 mil. USD."
+ },
+ "LP45/2015": {
+  "vezi": "LP132/2014",
+  "nota": "Grantul danez al aceluiași program IFAD VI (IRECR): contribuția Guvernului e scrisă la împrumutul FIDA."
+ },
+ "LP18/2005": {
+  "v": 274500,
+  "val": "USD",
+  "u": "https://webapps.ifad.org/members/eb/80/docs/EB-2003-80-R-31-Rev-1.pdf?attach=1",
+  "citat": "TOTAL PROJECT COST: USD 18.2 million · COFINANCIERS: None · CONTRIBUTION OF BORROWER: USD 274 500 · CONTRIBUTION OF BENEFICIARIES: USD 3.0 million",
+  "nota": "FIDA, raportul Președintelui pentru Proiectul revitalizarea agriculturii (2003), rezumatul împrumutului.",
+  "alte": "Beneficiarii: 3,0 mil. USD."
+ },
+ "LP108/2011": {
+  "v": 1500000,
+  "val": "USD",
+  "u": "https://webapps.ifad.org/members/eb/101/docs/EB-2010-101-R-33.pdf?attach=1",
+  "citat": "Rural Financial Services and Agribusiness Development Project · Financing summary · Contribution of borrower: US$1.5 million · Contribution of beneficiaries: US$11.7 million",
+  "nota": "FIDA, raportul Președintelui pentru proiectul IFAD V (2010), rezumatul finanțării.",
+  "alte": "Beneficiarii: 11,7 mil. USD."
+ },
+ "LP282/2008": {
+  "v": 1430000,
+  "val": "USD",
+  "u": "https://webapps.ifad.org/members/eb/94/docs/EB-2008-94-R-22-Rev-1.pdf?attach=1",
+  "citat": "Total programme cost: US$18.95 million · Amount of IFAD loan: SDR 8.10 million … Contribution of borrower: US$1.43 million",
+  "nota": "FIDA, raportul Președintelui pentru Programul de servicii financiare rurale și marketing (IFAD IV, 2008), rezumatul finanțării.",
+  "alte": "Instituțiile financiare participante: 1,54 mil. USD; beneficiarii: 2,74 mil. USD."
+ },
+ "LP194/2020": {
+  "v": 5500000,
+  "val": "USD",
+  "u": "https://webapps.ifad.org/members/lapse-of-time/docs/english/EB-2020-LOT-P-3-Rev-1.pdf?attach=1",
+  "citat": "Total project cost: US$50.51 million · Contribution of borrower/recipient: Government of the Republic of Moldova: US$3.8 million · Agency for Intervention and Payments in Agriculture (AIPA): US$1.7million",
+  "nota": "FIDA, raportul Președintelui pentru proiectul IFAD VIII (2020): Guvernul 3,8 mil. USD plus AIPA 1,7 mil. USD (subvenții din bugetul de stat).",
+  "alte": "Instituțiile financiare participante: 15,3 mil. USD."
+ },
+ "LP158/2006": {
+  "v": 290000,
+  "val": "USD",
+  "u": "https://members.ifad.org/eb/86/docs/en/EB-2005-86-R-28-Rev-1.pdf?attach=1",
+  "citat": "Total programme cost: USD 20.31 million · IFAD loan: SDR 9.1 million · Cofinanciers: None · Contribution of borrower: USD 290 000",
+  "nota": "FIDA, raportul Președintelui pentru Programul de dezvoltare a afacerilor rurale (2005), rezumatul împrumutului.",
+  "alte": "Clienții programului: 4,18 mil. USD; instituțiile financiare participante: 2,81 mil. USD."
+ },
+ "HG163/2006": {
+  "vezi": "LP158/2006",
+  "nota": "Același acord de împrumut FIDA pentru Programul de dezvoltare a afacerilor rurale (2006)."
+ },
+ "HP965/2000": {
+  "v": 540000,
+  "val": "USD",
+  "u": "https://webapps.ifad.org/members/eb/68/docs/EB-99-68-R-28-Rev-1.pdf?attach=1",
+  "citat": "TOTAL PROJECT COST: USD 15.06 million · AMOUNT OF IFAD LOAN: SDR 5.80 million · CONTRIBUTION OF BORROWER: USD 0.54 million",
+  "nota": "FIDA, raportul Președintelui pentru Proiectul finanțarea rurală și dezvoltarea întreprinderilor mici (1999), rezumatul împrumutului.",
+  "alte": "Beneficiarii: 0,97 mil. USD; cofinanțator CNFA, cu bani USAID: 5,55 mil. USD."
+ },
+ "LP219/2025": {
+  "v": 18000000,
+  "val": "EUR",
+  "u": "https://particip.gov.md/index.php/ro/download_attachment/28145",
+  "citat": "The total cost of the Project (excluding VAT), as estimated by the Bank, is EUR 209,000,000.00 … Credit from the Bank 101.00 · CEB 86.00 · Borrower’s own resources Approx. 18.00 · NIP Grant (CEB) 3.00",
+  "nota": "Contractul de finanțare BEI „Moldova Regional Hospitals” (Cahul și Bălți), planul de finanțare: resursele proprii ale Împrumutatului, cca 18 mil. EUR, pentru ambele spitale."
+ },
+ "LP328/2023": {
+  "vezi": "LP219/2025",
+  "nota": "Spitalul Bălți face parte din programul spitalelor regionale (BEI + CEB). CIPS (PV nr. 9/2025) a fixat ulterior pentru Bălți 21 mil. EUR din Planul de creștere."
+ },
+ "HG107/2025": {
+  "vezi": "LP219/2025",
+  "nota": "Grantul UE (prin CEB) pentru proiectarea Spitalului Regional Bălți, parte a aceluiași program al spitalelor regionale."
+ },
+ "LP89/2022": {
+  "fara": true,
+  "u": "https://www.zdg.md/en/?p=8853",
+  "citat": "a loan of 30 million euros from the EIB, another loan of 30 million euros from the EBRD, a grant of 15 million euros from the Commission’s Neighborhood Investment Platform, as well as a grant of 500,000 euros",
+  "nota": "Sursele proiectului „Eficiența energetică în Republica Moldova” (75,5 mil. EUR, cât spune și contractul BEI) sunt doar băncile și granturile UE; costul e fără taxe."
+ },
+ "LP68/2022": {
+  "vezi": "LP89/2022",
+  "nota": "Împrumutul BERD al aceluiași proiect „Eficiența energetică în Republica Moldova”."
+ },
+ "LP294/2022": {
+  "vezi": "LP89/2022",
+  "nota": "Grantul NIP (prin BEI) al aceluiași proiect „Eficiența energetică în Republica Moldova”."
+ },
+ "HG373/2021": {
+  "vezi": "LP89/2022",
+  "nota": "Asistența tehnică BEI a aceluiași proiect „Eficiența energetică în Republica Moldova”."
+ },
+ "LP206/2022": {
+  "fara": true,
+  "u": "https://ewsdata.rightsindevelopment.org/projects/EBRD-53417/pdf/",
+  "citat": "RLF - Moldova Gas Security Supply · Investment Amount (USD) $ 298.59 million · Project Cost (USD) $ 298.59 million",
+  "nota": "Fișa BERD a proiectului din 2022 (preluată de EWS): costul e egal cu împrumutul, recreditat S.A. Energocom pentru achiziții de gaze; nu are o parte a Guvernului. Majorarea din 2023 nu e acoperită de fișă."
+ },
+ "LP424/2023": {
+  "vezi": "LP206/2022",
+  "nota": "Grantul Norvegiei, prin BERD, pentru același proiect „Securitatea furnizării gazelor naturale”."
+ },
+ "LP162/2025": {
+  "nu_se_aplica": "capital de lucru pentru achiziții de energie",
+  "u": "https://www.ebrd.com/content/dam/ebrd_dxp/documents/project/56466/Moldova%20Energy%20Security.pdf",
+  "nota": "BERD: împrumut de capital de lucru (300 mil. EUR) și scrisori de credit stand-by (100 mil. EUR) pentru S.A. Energocom, garantate de stat, pentru cumpărarea de gaze și electricitate; nu e un proiect cofinanțat."
+ },
+ "LP79/2011": {
+  "fara": true,
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "Contract de finanțare N 25.852 Nr.2010-0154 din 23.11.2010 · 2010-2023 75,00 Împrumut 0,00 71,80 1,80",
+  "nota": "MIDR, raportul tabelar privind valorificarea asistenței externe în 2024, rândul proiectului „Moldova Drumuri II”: coloana „Contribuția Guvernului” are 0,00 (mil. EUR).",
+  "scutiri": "Proiectele de drumuri au scutire de TVA și de taxe vamale; suma nu e dată în raport."
+ },
+ "LP190/2013": {
+  "fara": true,
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "Contract de finanțare N 81.723 Nr.20110650 din 25.06.2013 · 2013-2024 150,00 Împrumut 0,00 148,44 3,81",
+  "nota": "MIDR, raportul tabelar privind valorificarea asistenței externe în 2024, rândul proiectului „Moldova Drumuri III”: coloana „Contribuția Guvernului” are 0,00 (mil. EUR).",
+  "scutiri": "Proiectele de drumuri au scutire de TVA și de taxe vamale; suma nu e dată în raport."
+ },
+ "LP362/2022": {
+  "fara": true,
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "Contractul de Finanțare nr. 96156, semnat la 15 decembrie 2022 · 2022-2028 100,00 Împrumut 0,00 13,20 13,20",
+  "nota": "MIDR, raportul tabelar privind valorificarea asistenței externe în 2024, rândul proiectului „Moldova Drumuri IIIB”: coloana „Contribuția Guvernului” are 0,00 (mil. EUR).",
+  "scutiri": "Proiectele de drumuri au scutire de TVA și de taxe vamale; suma nu e dată în raport."
+ },
+ "LP205/2022": {
+  "fara": true,
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "(Serapis N°) 2020-0537, semnat la 31 martie 2022 · 2022-2028 150,00 Împrumut 0,00 0,00 0,00",
+  "nota": "MIDR, raportul tabelar privind valorificarea asistenței externe în 2024, rândul proiectului „Moldova Drumuri IV”: coloana „Contribuția Guvernului” are 0,00 (mil. EUR).",
+  "scutiri": "Proiectele de drumuri au scutire de TVA și de taxe vamale; suma nu e dată în raport."
+ },
+ "LP77/2011": {
+  "fara": true,
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "Acord de Împrumut Nr. 41442 din 29.10.2010 · 2010-2023 75,00 Împrumut 0,00 74,30 4,30",
+  "nota": "MIDR, raportul tabelar privind valorificarea asistenței externe în 2024, rândul proiectului „Proiectul de reabilitare a Drumurilor III”: coloana „Contribuția Guvernului” are 0,00 (mil. EUR).",
+  "scutiri": "Proiectele de drumuri au scutire de TVA și de taxe vamale; suma nu e dată în raport."
+ },
+ "LP191/2013": {
+  "fara": true,
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "Acord de Împrumut Nr. 45094 din 28.06.2013 · 2013-2023 250,00 Împrumut 0,00 174,00 50,49",
+  "nota": "MIDR, raportul tabelar privind valorificarea asistenței externe în 2024, rândul proiectului „Proiectul de reabilitare a Drumurilor IV”: coloana „Contribuția Guvernului” are 0,00 (mil. EUR).",
+  "scutiri": "Proiectele de drumuri au scutire de TVA și de taxe vamale; suma nu e dată în raport."
+ },
+ "LP53/2024": {
+  "fara": true,
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "Acord de Împrumut Nr. 54423 din 22 ianuarie 2024 · 2024-2030 150,00 Împrumut 0,00 0,00 0,00",
+  "nota": "MIDR, raportul tabelar privind valorificarea asistenței externe în 2024, rândul proiectului „Proiectul de reabilitare a Drumurilor V”: coloana „Contribuția Guvernului” are 0,00 (mil. EUR).",
+  "scutiri": "Proiectele de drumuri au scutire de TVA și de taxe vamale; suma nu e dată în raport."
+ },
+ "HG787/2018": {
+  "fara": true,
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "2018-2024 46,40 46,40 (grant) 0,00 0,00 0,00",
+  "nota": "MIDR, raportul tabelar privind valorificarea asistenței externe în 2024, rândul proiectului „Aprovizionarea cu apă și canalizare în raionul Cahul”: coloana „Contribuția Guvernului” are 0,00 (mil. EUR)."
+ },
+ "LP101/2024": {
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "Împrumut acordat de Banca de Dezvoltare a Consiliului Europei · 2023-2030 27,22 … 7,22 0,28 0,28",
+  "nota": "MIDR, raportul tabelar 2024: buget 27,22 mil. EUR, împrumut CEB 20,0; restul de 7,22 e trecut la „Contribuția Guvernului”, dar proiectul e cofinanțat de autoritățile locale.",
+  "alte": "7,22 mil. EUR în coloana „Contribuția Guvernului” a tabelului MIDR 2024; lista MIDR 2025 are rubrica „Valoarea contribuției APL” pentru același proiect."
+ },
+ "LP102/2024": {
+  "vezi": "LP101/2024",
+  "nota": "Grantul CEB pentru eficiență energetică al aceluiași proiect „Locuințe Publice III” (în raportul MIDR: contribuția Guvernului 0,00 la grant)."
+ },
+ "LP184/2024": {
+  "vezi": "LP101/2024",
+  "nota": "Grantul E5P (prin CEB) al aceluiași proiect „Locuințe Publice III” (în raportul MIDR: contribuția Guvernului 0,00 la grant)."
+ },
+ "LP182/2012": {
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "Proiect- Construcția Locuințelor Sociale II · 2013-2023 22,40 Împrumut acordat de … 9,00 13,40 0,00",
+  "nota": "MIDR, raportul tabelar 2024: buget 22,40 mil. EUR, împrumut CEB 13,40; restul îl dau autoritățile locale, nu bugetul de stat.",
+  "alte": "Autoritățile publice locale: 35% din bugetul proiectului (lista MIDR 2025); tabelul MIDR 2024 trece 9,00 mil. EUR la „Contribuția Guvernului”."
+ },
+ "LP169/2022": {
+  "v": 880000,
+  "val": "EUR",
+  "u": "https://midr.gov.md/files/shares/Raport_tabelar_valorificarea_asisten__ei_externe_2024__Completat_Final.pdf",
+  "citat": "Acordul de finanțare și Acordul de grant pentru Securitatea aprovizionării cu apă · 2022-2027 46,50 44,1 Împrumut 1,5 Grant 0,88 0,49 1,06",
+  "nota": "MIDR, raportul tabelar 2024: buget 46,50 mil. EUR, credit AID 44,1, grant 1,5, „Contribuția Guvernului” 0,88."
+ },
+ "DP275/2021": {
+  "vezi": "LP169/2022",
+  "nota": "Grantul aceluiași proiect „Securitatea aprovizionării cu apă și sanitație în Moldova”."
+ },
+ "LP307/2022": {
+  "nu_se_aplica": "sprijin bugetar",
+  "u": "https://old.gov.md/en/node/42533",
+  "nota": "Împrumut AFD pentru politici (sprijin bugetar): banii intră direct în bugetul de stat, eliberați pentru reformele convenite; nu finanțează un proiect pe care Guvernul să-l cofinanțeze."
+ },
+ "LP192/2022": {
+  "nu_se_aplica": "sprijin bugetar",
+  "u": "https://botswana.afd.fr/en/actualites/communique-de-presse/moldova-afd-sustainable-energy-and-railway-sectors",
+  "nota": "Împrumut AFD de sprijin bugetar (cu cel de 60 mil. EUR, cei 75 mil. EUR de sprijin bugetar din 2022, spune AFD): banii intră direct în buget; nu e un proiect cofinanțat de Guvern."
+ },
+ "LP324/2023": {
+  "nu_se_aplica": "sprijin bugetar",
+  "u": "https://eu4moldova.eu/en/afd-and-the-eu-support-the-republic-of-moldova-s-energy-security-and-reform-in-the-perspective-of-eu-accession/",
+  "nota": "Prima tranșă (40 mil. EUR, 2023) a programului AFD de reforme în energie, cu debursări legate de reformele convenite: sprijin bugetar, nu un proiect cofinanțat de Guvern."
+ },
+ "LP115/2024": {
+  "nu_se_aplica": "sprijin bugetar",
+  "u": "https://www.infomarket.md/en/pwengineering/327484",
+  "nota": "Împrumut AFD pentru politici (din programul cerut de MF pentru reforme în energie și silvicultură), cu debursări legate de reforme: sprijin bugetar, nu un proiect cofinanțat de Guvern."
+ },
+ "LP250/2024": {
+  "nu_se_aplica": "sprijin bugetar",
+  "u": "https://eu4moldova.eu/en/afd-and-the-eu-support-the-republic-of-moldova-s-energy-security-and-reform-in-the-perspective-of-eu-accession/",
+  "nota": "Tranșă a programului AFD pentru tranziția energetică, cu debursări legate de reformele convenite: sprijin bugetar, nu un proiect cofinanțat de Guvern."
+ },
+ "LP292/2025": {
+  "nu_se_aplica": "sprijin bugetar",
+  "u": "https://eu4moldova.eu/en/afd-and-the-eu-support-the-republic-of-moldova-s-energy-security-and-reform-in-the-perspective-of-eu-accession/",
+  "nota": "Tranșă a programului AFD pentru tranziția energetică, cu debursări legate de reformele convenite: sprijin bugetar, nu un proiect cofinanțat de Guvern."
+ },
+ "HG596/2026": {
+  "nu_se_aplica": "sprijin bugetar",
+  "u": "https://eu4moldova.eu/en/afd-and-the-eu-support-the-republic-of-moldova-s-energy-security-and-reform-in-the-perspective-of-eu-accession/",
+  "nota": "Tranșă a programului AFD pentru tranziția energetică, cu debursări legate de reformele convenite: sprijin bugetar, nu un proiect cofinanțat de Guvern."
+ },
+ "LP249/2024": {
+  "nu_se_aplica": "sprijin bugetar",
+  "u": "https://www.infomarket.md/en/investment/352742",
+  "nota": "Împrumut al Canadei (120 mil. CAD) pentru nevoile bugetului de stat, alături de operațiunea de politici de dezvoltare a Băncii Mondiale: sprijin bugetar, nu un proiect cofinanțat de Guvern."
+ },
+ "LP127/2018": {
+  "nu_se_aplica": "sprijin bugetar",
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P156963",
+  "nota": "Operațiune de politici de dezvoltare a Băncii Mondiale (DPO-3, guvernanța economică): banii intră direct în bugetul de stat, pentru reformele convenite; nu finanțează un proiect cofinanțat de Guvern."
+ },
+ "HG1313/2016": {
+  "u": "https://www.mf.gov.md/sites/default/files/Raport%20ODA%202021.pdf",
+  "nota": "Programul Operațional Comun România–Republica Moldova 2014–2020: raportul MF dă doar cofinanțarea minimă a beneficiarilor proiectelor; o parte în bani a Guvernului nu e spusă.",
+  "alte": "Beneficiarii proiectelor: cofinanțare minimă de 10% (raportul MF privind asistența externă în 2021, tabelul 2)."
+ },
+ "HG1312/2016": {
+  "u": "https://www.mf.gov.md/sites/default/files/Raport%20ODA%202021.pdf",
+  "nota": "Programul Operațional Comun Bazinul Mării Negre 2014–2020: raportul MF dă doar cofinanțarea minimă a beneficiarilor proiectelor; o parte în bani a Guvernului nu e spusă.",
+  "alte": "Beneficiarii proiectelor: cofinanțare minimă de 8% (raportul MF privind asistența externă în 2021, tabelul 3)."
+ },
+ "LP194/2007": {
+  "v": 2560000,
+  "val": "USD",
+  "u": "https://projects.worldbank.org/en/projects-operations/project-detail/P095250?lang=en",
+  "citat": "Global Food Crisis Response Program 7.00 · IDA Credit 27.20 · Borrower/Recipient 2.56 · Bilateral Agencies (unidentified) 24.80",
+  "nota": "Banca Mondială, fișa proiectului P095250 (Servicii de sănătate și asistență socială), planul de finanțare în milioane USD: contribuția Împrumutatului. Creditul AID de 17,9 mil. DST apare acolo ca 27,2 mil. USD."
+ },
+ "LP173/2011": {
+  "v": 3000000,
+  "val": "USD",
+  "u": "https://ewsdata.rightsindevelopment.org/files/documents/31/WB-P121231_fvclfDx.pdf",
+  "citat": "Total Project Cost: $23.0 million · Borrower: $3.0 million · Total Bank Financing (IDA): $20.0 million",
+  "nota": "Banca Mondială, documentul de evaluare (PAD) al proiectului e-Transformare a guvernării (P121231), 2011; evaluarea IEG confirmă că Împrumutatul a contribuit cu 3 mil. USD, cum era planificat."
+ },
+ "LP173/2024": {
+  "v": 100000,
+  "val": "USD",
+  "u": "https://ewsdata.rightsindevelopment.org/files/documents/06/WB-P180306_Qy9tJ7u.pdf",
+  "citat": "Total Operation Cost 51.21 · IBRD 40.00 · Counterpart Funding 0.10 · Borrower/Recipient 0.10 · Financing Gap 11.11 (US$, Millions)",
+  "nota": "Banca Mondială, documentul de evaluare (PAD) al proiectului P180306, 2024: contribuția Împrumutatului. Restul, 11,11 mil. USD, e un gol de finanțare, acoperit în parte de un grant al Fondului pentru pandemii."
+ },
+ "HG512/2025": {
+  "vezi": "LP173/2024",
+  "nota": "Grantul pentru același proiect de modernizare a serviciilor de reabilitare: contribuția Guvernului e scrisă la împrumutul BIRD."
+ },
+ "LP277/2006": {
+  "v": 750000,
+  "val": "USD",
+  "u": "https://documents1.worldbank.org/curated/en/116821468054247452/text/541360PJPR0v201ucturing0Data0sheet.txt",
+  "citat": "P099841: AVIAN FLU - MD · Revised Financing Plan: AID 0.35 · BORR 0.75 · ECEU 0.60 · IDA 4.00 · IDAT 4.00 · JPN 0.50 · Total 10.20",
+  "nota": "Banca Mondială, fișa de restructurare a proiectului de control al gripei aviare (P099841): planul de finanțare, în milioane USD; BORR e partea Împrumutatului."
+ },
+ "LP157/2006": {
+  "v": 2500000,
+  "val": "USD",
+  "u": "https://documents1.worldbank.org/curated/en/491691468054248508/text/626870PJPR0v200ructuring0Data0sheet-doc.txt",
+  "citat": "Revised Financing Plan (US$m) Source Original Revised BORR 1.00 2.50 IDA 7.50 23.50 IDAT 7.50 7.50 OLBC 4.22 9.07 ZBIL 5.76 5.76 Total 25.98 48.33",
+  "nota": "Banca Mondială, fișa de restructurare a RISP II: partea Împrumutatului, 1 mil. USD la început și 2,5 mil. USD după cele două finanțări suplimentare (2008, 2009), pentru tot proiectul."
+ },
+ "LP166/2008": {
+  "vezi": "LP157/2006",
+  "nota": "Prima finanțare suplimentară a RISP II: contribuția Guvernului pentru tot proiectul e scrisă la acordul de bază din 2006."
+ },
+ "LP18/2009": {
+  "vezi": "LP157/2006",
+  "nota": "A doua finanțare suplimentară a RISP II: contribuția Guvernului pentru tot proiectul e scrisă la acordul de bază din 2006."
+ },
+ "LP167/2022": {
+  "fara": true,
+  "u": "https://ewsdata.rightsindevelopment.org/files/documents/84/WB-P171284.pdf",
+  "citat": "Total Project Cost 15.00 · Total Financing 15.00 · of which IBRD/IDA 15.00 · Financing Gap 0.00",
+  "nota": "Banca Mondială, documentul de informare al finanțării suplimentare pentru gestionarea subproduselor de origine animală (P171284), 2020: costul e acoperit în întregime de BIRD."
+ },
+ "LP295/2013": {
+  "v": 25900000,
+  "val": "EUR",
+  "u": "https://gov.md/sites/default/files/document/attachments/nu-458-mj-2024_0.pdf",
+  "citat": "1 milion - contribuție de grant din partea CEB, iar restul contribuția Guvernului … majora contribuția sa la Proiect prin acoperirea deficitului de finanțarea în valoare de 19 millioane Euro",
+  "nota": "Nota MJ la amendamentul nr. 2 (2024): bugetul a crescut de la 56,8 la 75,9 mil. EUR, iar Guvernul acoperă și deficitul; contribuția: 75,9 − 49 (împrumut) − 1 (grant BDCE) = 25,9 mil. EUR."
+ },
+ "LP195/2019": {
+  "nu_se_aplica": "garanție pentru achiziții de gaze în caz de urgență",
+  "u": "https://www.ebrd.com/news/2019/ebrd-helps-moldova-secure-winter-gas-supplies.html",
+  "nota": "BERD: scrisoare de credit stand-by de până la 50 mil. USD, care garantează plățile S.A. Energocom pentru gazele cumpărate în caz de urgență; nu e un proiect cofinanțat."
+ },
+ "LP150/2018": {
+  "fara": true,
+  "u": "https://ipn.md/en/ebrd-bei-offer-270m-for-moldova-romania-power-interconnection-7966_1038951.html",
+  "citat": "The package includes EIB and EBRD loans of EUR 80m each, a EUR 70m loan from the World Bank and a EUR 40m investment grant from EU funds.",
+  "nota": "Interconectarea cu România, faza I: pachetul de 270 mil. EUR acoperă costul total, tot 270 mil. EUR pe pagina BEI a proiectului; sursele nu arată bani din bugetul de stat."
+ },
+ "LP128/2018": {
+  "vezi": "LP150/2018",
+  "nota": "Împrumutul BEI pentru aceeași interconectare cu România, faza I: contribuția Guvernului e scrisă la împrumutul BERD."
+ },
+ "LP104/2024": {
+  "fara": true,
+  "u": "https://www.ebrd.com/home/news-and-events/news/2024/supporting-moldovas-energy-security-with-308-million-loan-for-electricity-network-development.html",
+  "citat": "The Balti-Suceava project, costing a total of €77 million, is co-funded by the European Investment Bank (EIB), which is also lending €30.8 million.",
+  "nota": "BERD, 2024: 30,8 mil. EUR BERD + 30,8 mil. EUR BEI + 15,4 mil. EUR grant UE (NIP) = 77 mil. EUR, cât costă proiectul; fără bani din bugetul de stat."
+ },
+ "HG296/2013": {
+  "vezi": "LP191/2013",
+  "nota": "Hotărârea pentru acordurile BERD și BEI pentru drumuri din 2013: contribuția Guvernului e scrisă la acordul BERD (0, doar scutiri de taxe), la fel la contractul BEI."
+ },
+ "HG169/2020": {
+  "nu_se_aplica": "împrumut de stat pentru suport bugetar",
+  "u": "https://www.mf.gov.md/sites/default/files/Acod%20Guvernul%20RM%20si%20a%20FR.docx",
+  "nota": "Art. 1 din acord: împrumut financiar de stat de până la 200 mil. EUR pentru suportul bugetar, în două tranșe; nu e un proiect cofinanțat. Curtea Constituțională l-a declarat neconstituțional (HCC nr. 12/2020)."
+ },
+ "LP184/2015": {
+  "nu_se_aplica": "împrumut de stat pentru finanțarea deficitului bugetar",
+  "u": "https://profit.ro/stiri/economie/romania-va-vira-in-august-prima-transa-de-60-mil-euro-din-imprumutul-acordat-republicii-moldova-15535650",
+  "nota": "România: 150 mil. EUR în trei tranșe, date cu condiții de reformă, pentru că sursele nu ajungeau pentru finanțarea deficitului bugetar; nu e un proiect cofinanțat."
+ },
+ "LP134/2022": {
+  "nu_se_aplica": "împrumut de stat pentru nevoile bugetului",
+  "u": "https://ipn.md/en/print/parliament-ratifies-20m-loan-agreement-with-poland--7966_1090022.html",
+  "nota": "Polonia: 20 mil. EUR pentru nevoile bugetului de stat, inclusiv pentru gestionarea crizei refugiaților din Ucraina; nu e un proiect cofinanțat."
+ },
+ "HG567/2026": {
+  "fara": true,
+  "u": "https://ewsdata.rightsindevelopment.org/projects/WB-P510426/pdf/",
+  "citat": "Loan Amount (USD) $ 50.00 million · Grant Amount (USD) $ 2.00 million · Project Cost (USD) $ 52.00 million",
+  "nota": "Fișa proiectului P510426 (Banca Mondială, la propunere, 2026): costul e acoperit de împrumutul BIRD și de un grant de 2 mil. USD; economiile instituțiilor se întorc în fondul revolving."
+ }
+}
