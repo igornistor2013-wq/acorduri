@@ -4446,6 +4446,42 @@
       "editie_id": "3368",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3368"
+    },
+    "nr. 610, 12 noiembrie 2026|3376": {
+      "act": "nr. 610, 12 noiembrie 2026",
+      "titlu": "Hotărâre cu privire la aprobarea semnării Amendamentului nr. 2 la Memorandumul de înțelegere dintre Ministerul Muncii și Protecției Sociale al Republicii Moldova, Ministerul Muncii și Aspectelor Sociale al Republicii Cehe și Agenția Cehă pentru Dezvoltare privind implementarea Proiectului „Sprijin pentru implementarea reformei RESTART în Republica Moldova” în cadrul cooperării pentru dezvoltare dintre Republica Cehă și Republica Moldova, semnat la 15 octombrie 2025",
+      "categorie": "Asistență tehnică",
+      "partener": "Cehia",
+      "semnat": "15.10.2025",
+      "editie": "569-570",
+      "data_editie": "13.11.2026",
+      "editie_id": "3376",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3376"
+    },
+    "nr. 625, 12 noiembrie 2026|3376": {
+      "act": "nr. 625, 12 noiembrie 2026",
+      "titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Acordului, întocmit prin schimb de scrisori, dintre Guvernul Republicii Moldova și Guvernul Republicii Populare Chineze privind studiul de fezabilitate al Proiectului „Dezvoltarea socioeconomică a raioanelor Republicii Moldova prin utilizarea surselor de energie regenerabilă și a sistemelor de stocare a energiei”",
+      "categorie": "Asistență financiară",
+      "partener": "China",
+      "semnat": "",
+      "editie": "569-570",
+      "data_editie": "13.11.2026",
+      "editie_id": "3376",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3376"
+    },
+    "nr. 626, 12 noiembrie 2026|3376": {
+      "act": "nr. 626, 12 noiembrie 2026",
+      "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de împrumut dintre Guvernul Republicii Moldova și Agenția Japoneză pentru Cooperare Internațională pentru realizarea Proiectului „Modernizarea tehnicii și echipamentelor agricole (etapa a II-a)”",
+      "categorie": "Împrumut",
+      "partener": "JICA",
+      "semnat": "",
+      "editie": "569-570",
+      "data_editie": "13.11.2026",
+      "editie_id": "3376",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3376"
     }
   },
   "editii_vazute": [
@@ -4509,9 +4545,11 @@
     "3371",
     "3372",
     "3373",
-    "3374"
+    "3374",
+    "3375",
+    "3376"
   ],
-  "ultima_rulare": "12.11.2026 16:49",
+  "ultima_rulare": "13.11.2026 16:08",
   "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5,
