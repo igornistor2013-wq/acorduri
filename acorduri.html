@@ -1150,14 +1150,14 @@
   /* Totalurile pe tipuri de finanțare, în euro.
 
      Cursuri orientative, unități pentru 1 EUR: cursurile de referință ale Băncii
-     Centrale Europene din 12 noiembrie 2026. DST (drepturi speciale de tragere) e calculat
-     din coșul FMI la aceleași cursuri: 1 DST = 1,2170 EUR. Marca germană are cursul
+     Centrale Europene din 13 noiembrie 2026. DST (drepturi speciale de tragere) e calculat
+     din coșul FMI la aceleași cursuri: 1 DST = 1,2188 EUR. Marca germană are cursul
      fix de trecere la euro, ECU e 1:1, iar leii românești vechi trec prin leul nou
      (1 RON = 10 000 ROL). Toate sumele, și cele din anii '90, sunt trecute la cursul
      de azi: e un ordin de mărime, nu valoarea de la semnare. */
-  var CURS_DATA = '12 noiembrie 2026';
-  var PER_EUR = { EUR: 1, USD: 1.1081, JPY: 176.96, CHF: 0.9232, SEK: 11.0628, CAD: 1.5789, DKK: 7.4754,
-                  GBP: 0.83595, PLN: 4.4088, RON: 5.3473, CNY: 7.3891, CZK: 24.379, DEM: 1.95583, ECU: 1, ROL: 53473, DST: 0.82166 };
+  var CURS_DATA = '13 noiembrie 2026';
+  var PER_EUR = { EUR: 1, USD: 1.1052, JPY: 176.83, CHF: 0.9266, SEK: 11.1075, CAD: 1.5758, DKK: 7.4756,
+                  GBP: 0.83559, PLN: 4.4113, RON: 5.3494, CNY: 7.3738, CZK: 24.424, DEM: 1.95583, ECU: 1, ROL: 53494, DST: 0.82046 };
   var ORDINE_TIP = ['Grant', 'Împrumut', 'Asistență tehnică', 'Asistență financiară'];
   function sumaAfisata(g){ return g.sumaA || g.suma || g.sumaT || g.sumaG || null; }
 
