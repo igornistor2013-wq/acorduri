@@ -1,5 +1,5 @@
 {
-"actualizat": "2026-11-09 17:47",
+"actualizat": "2026-11-16 17:25",
 "istoric_complet": true,
 "puncte": {
 "1/MDED/2026": {
@@ -65,6 +65,15 @@
 ],
 "titlu": "Hotărâre cu privire la aprobarea proiectului de lege pentru ratificarea Înțelegerii, întocmite prin schimb de note, dintre Guvernul Republicii Moldova și Guvernul Japoniei privind cooperarea tehnică pentru finanțarea Proiectului „Îmbunătățirea echipamentelor de producție a programelor de televiziune la Instituția Publică Compania «Teleradio-Moldova»”, semnată la Chișinău la 4 decembrie 2025"
 },
+"1051/MEn/2026": {
+"categorie": "Grant",
+"data": "2026-11-18",
+"partener": "BIRD",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-11/NU-1051-MEn-2026.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-18-noiembrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la aprobarea semnării Acordului de grant dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare în vederea implementării proiectului „Mecanismul de Eficiență Energetică Revolving din Moldova (MEERM)”"
+},
 "1070/MEn/2024": {
 "categorie": "Împrumut",
 "data": "2025-01-15",
@@ -92,6 +101,35 @@
 }
 ],
 "titlu": "Hotărâre cu privire la aprobarea proiectului de lege pentru ratificarea Acordului de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare privind realizarea Proiectului „Optimizarea sistemului de alimentare centralizată cu energie termică din mun. Chișinău”, semnat la Chișinău la 29 noiembrie 2024"
+},
+"1081/MJ/2026": {
+"categorie": "Împrumut",
+"data": "2026-11-18",
+"modificare": true,
+"partener": "CEB",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-11/NU-1081-MJ-2026_0.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-18-noiembrie-2026-ora-1000",
+"sume": [
+{
+"f": "…Acordul-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei (CEB/Banca), în sumă de 39 milioane euro, destinat finanțării Proiectului de construcție a penitenci…",
+"s": 9,
+"v": 39000000,
+"val": "EUR"
+},
+{
+"f": "…ementării proiectului, Guvernul Republicii Moldova a solicitat Băncii acordarea unui împrumut suplimentar în valoare de 10 milioane euro. Ca urmare, la 25 noiembrie 2019 a fost semnat Amendamentul…",
+"s": 9,
+"v": 10000000,
+"val": "EUR"
+},
+{
+"f": "…lioane euro, iar bugetul total al proiectului a fost revizuit la 56,8 milioane euro (inclusiv grantul CEB în valoare de 1 milion euro și contribuția Guvernului Republicii Moldova). Totodată, a…",
+"s": 9,
+"v": 1000000,
+"val": "EUR"
+}
+],
+"titlu": "Hotărâre pentru aprobarea proiectului de lege cu privire la ratificarea Amendamentului nr. 3 la Acordul-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei pentru realizarea Proiectului de construcție a penitenciarului din Chișinău, semnat la Paris la 14 octombrie 2026 și la Chișinău la 2 noiembrie 2026"
 },
 "110/MEn/MAE/2025": {
 "categorie": "Grant",
@@ -1806,6 +1844,34 @@
 "sume": [],
 "titlu": "Hotărâre privind aprobarea Acordului de grant dintre Instituția Publică Organizația pentru Dezvoltarea Antreprenoriatului și Agenția Executivă pentru Consiliul European pentru Inovare și IMM-uri în vederea implementării proiectului „REC4SMEs – Sprijinirea IMM-urilor prin Comunități de Energie Regenerabilă pentru un viitor durabil”, semnat la Chișinău la 28 noiembrie 2025 și la Bruxelles la 3 decembrie 2025"
 },
+"988/MAIA/2026": {
+"categorie": "Împrumut",
+"data": "2026-11-18",
+"partener": "BERD",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-11/NU-988-MAIA-2026.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-18-noiembrie-2026-ora-1000",
+"sume": [
+{
+"f": "…cordarea unui împrumut investițional din partea Băncii Europene pentru Reconstrucție și Dezvoltare (BERD) în valoare de 102,9 milioane EUR. Bugetul total estimativ al proiectului constituie 129,975…",
+"s": 9,
+"v": 102900000,
+"val": "EUR"
+},
+{
+"f": "…e instrumente juridice distincte: • Deja semnate, la data prezentului Acord: Va fi acordată o cofinanțare în valoare de 7,2 milioane EUR pentru Tranșa 1 din mijloacele financiare disponibile în ca…",
+"s": 9,
+"v": 7200000,
+"val": "EUR"
+},
+{
+"f": "….000 EUR per Tranșă) între BERD și Republica Moldova și Acordurile de Grant investițional (inclusiv grant în valoare de 4,8 milioane EUR pentru Tranșa 1 finanțat din Platforma de Investiții pentru…",
+"s": 9,
+"v": 4800000,
+"val": "EUR"
+}
+],
+"titlu": "Hotărâre cu privire la aprobarea proiectului de lege pentru ratificarea Acordului de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare pentru realizarea Proiectului „Moldova – Proiect de alimentare durabilă cu apă (irigații)”"
+},
 "991/MAIA/2025": {
 "categorie": "Împrumut",
 "data": "2026-03-04",
@@ -1823,6 +1889,34 @@
 "sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-29-decembrie-2025-ora-1000",
 "sume": [],
 "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de grant dintre Instituția Publică Organizația pentru Dezvoltarea Antreprenoriatului și Agenția de Cooperare Internațională a Germaniei pentru implementarea Proiectului „Întreprinderi și comune puternice pentru Moldova”"
+},
+"999/MEC/2026": {
+"categorie": "Împrumut",
+"data": "2026-11-18",
+"partener": "CEB",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-11/NU-999-MEC-2026.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-18-noiembrie-2026-ora-1000",
+"sume": [
+{
+"f": "…ul Acordului constă în acordarea de către Banca de Dezvoltare a Consiliului Europei (CEB) a unui împrumut în valoare de 33 milioane euro, destinat implementării Proiectului „Modernizarea instituți…",
+"s": 9,
+"v": 33000000,
+"val": "EUR"
+},
+{
+"f": "…ilor de învățământ profesional tehnic” (subclauza 4.1 din Acord). Finanțarea va fi completată de un grant în valoare de 7 milioane de euro, acordat prin Platforma de Investiții pentru Vecinătate, și…",
+"s": 9,
+"v": 7000000,
+"val": "EUR"
+},
+{
+"f": "…NIP, în valoare de 7.000.000 EUR (șapte milioane de euro); și (c) contribuția națională a Împrumutatului, în valoare de 40.000.000 EUR (patruzeci de milioane de euro), care urmează a fi finanțat…",
+"s": 9,
+"v": 40000000,
+"val": "EUR"
+}
+],
+"titlu": "Hotărâre cu privire la aprobarea proiectului de lege pentru ratificarea Acordului-cadru de împrumut dintre Republica Moldova și Banca de Dezvoltare a Consiliului Europei „Modernizarea instituțiilor de învățământ profesional tehnic”, semnat la Paris la 13 octombrie 2026 și la Chișinău la 19 octombrie 2026"
 }
 },
 "sedinte": {
@@ -1953,6 +2047,10 @@
 "sedinta-guvernului-din-18-martie-2026-ora-1000": {
 "acorduri": 1,
 "data": "2026-03-18"
+},
+"sedinta-guvernului-din-18-noiembrie-2026-ora-1000": {
+"acorduri": 4,
+"data": "2026-11-18"
 },
 "sedinta-guvernului-din-19-august-2026-ora-1000": {
 "acorduri": 0,
