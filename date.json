@@ -4482,6 +4482,18 @@
       "editie_id": "3376",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3376"
+    },
+    "nr. 648, 18 noiembrie 2026|3378": {
+      "act": "nr. 648, 18 noiembrie 2026",
+      "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de grant dintre Republica Moldova și Banca Internațională pentru Reconstrucție și Dezvoltare, acționând în calitate de administrator al Fondului fiduciar multidonator al Programului „Creștere, reziliență și oportunități pentru bunăstare în Moldova (M-Grow)”, în vederea implementării proiectului „Mecanismul de eficiență energetică Revolving din Moldova” (MEERM)",
+      "categorie": "Grant",
+      "partener": "BIRD",
+      "semnat": "",
+      "editie": "574",
+      "data_editie": "18.11.2026",
+      "editie_id": "3378",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3378"
     }
   },
   "editii_vazute": [
@@ -4548,9 +4560,10 @@
     "3374",
     "3375",
     "3376",
-    "3377"
+    "3377",
+    "3378"
   ],
-  "ultima_rulare": "17.11.2026 17:39",
+  "ultima_rulare": "18.11.2026 17:18",
   "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5,
