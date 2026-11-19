@@ -65,6 +65,14 @@
    ],
    "nume": "Asistența financiară a Federației Ruse: grant și împrumuturi de stat",
    "motiv": "Cele trei acorduri cu Federația Rusă (grantul din 2020, împrumutul din 2020 și creditul de stat din 2009) sunt componentele aceluiași proiect, după cum a hotărât proprietarul paginii. În registru au denumiri diferite, deci nu se pot uni singure după denumire."
+  },
+  {
+   "acte": [
+    "HG348/2024",
+    "DP1668/2024"
+   ],
+   "nume": "Tranziție durabilă prin eficiență energetică în Moldova (STEEM): împrumut și grant",
+   "motiv": "Grantul de 4,5 mil. USD din Fondul fiduciar multidonator M-GROW cofinanțează Proiectul STEEM, finanțat în principal prin împrumutul BIRD de 46,7 mil. EUR: titlurile actelor grantului (DP1451/2024, DP1537/2024, HG735/2024, LP260/2024, DP1668/2024) spun „pentru cofinanțarea Proiectului «Tranziția durabilă către eficiența energetică în Moldova (STEEM)»”. În registru au denumiri ușor diferite („Tranziția durabilă către…” și „Tranziție durabilă prin…”), deci nu se unesc singure după denumire."
   }
  ],
  "proiecte": [
@@ -269,6 +277,22 @@
    "sursa": "https://documents1.worldbank.org/curated/en/099080824125542711/pdf/P500560-6857c1a6-21a5-43fa-a85b-8b3d35f2ecb9.pdf",
    "citat": "The objective of the Project is to enhance energy efficiency in existing public buildings and the district heating sector in Moldova and provide immediate and effective response to an Eligible Crisis or Emergency.",
    "nota": "Sustainable Transition through Energy Efficiency in Moldova (STEEM, Banca Mondială, P500560). Textul e din anexa 1 a acordului de împrumut nr. 9696-MD (BIRD, 46,7 mil. EUR), semnat la 8 august 2024."
+  },
+  {
+   "acte": [
+    "DP1668/2024",
+    "LP260/2024",
+    "HG735/2024",
+    "DP1537/2024",
+    "DP1451/2024"
+   ],
+   "obiective": {
+    "ro": "Îmbunătățirea eficienței energetice în clădirile publice existente și în sectorul încălzirii centralizate din Moldova și asigurarea unui răspuns imediat și eficient în cazul unei crize sau urgențe eligibile.",
+    "en": "To enhance energy efficiency in existing public buildings and the district heating sector in Moldova and provide immediate and effective response to an Eligible Crisis or Emergency."
+   },
+   "sursa": "https://documents1.worldbank.org/curated/en/099080824125542711/pdf/P500560-6857c1a6-21a5-43fa-a85b-8b3d35f2ecb9.pdf",
+   "citat": "The objective of the Project is to enhance energy efficiency in existing public buildings and the district heating sector in Moldova and provide immediate and effective response to an Eligible Crisis or Emergency.",
+   "nota": "Sustainable Transition through Energy Efficiency in Moldova (STEEM, Banca Mondială, P500560). Grantul de 4,5 mil. USD din Fondul fiduciar multidonator M-GROW (BIRD / AID) cofinanțează acest proiect: titlurile actelor lui spun „pentru cofinanțarea Proiectului «Tranziția durabilă către eficiența energetică în Moldova (STEEM)»”, deci are aceleași obiective ca împrumutul. Textul e din anexa 1 a acordului de împrumut nr. 9696-MD (BIRD, 46,7 mil. EUR), semnat la 8 august 2024."
   },
   {
    "acte": [
@@ -1732,20 +1756,6 @@
    "sursa": "https://documents1.worldbank.org/curated/en/729481653597358984/pdf/Moldova-Second-Development-Policy-Operation-Project.pdf",
    "citat": "The proposed operation is built around three pillars, which are also the PDOs: … Pillar A: Strengthen the regulatory framework to improve predictability of the business environment, facilitate competition, and reduce regulatory compliance costs … Pillar B: Strengthen financial sector stability, promote transparency of shareholding, and ease conditions for access to finance … Pillar C: Improve the public investment management framework, make investment subsidies in agriculture more efficient and equitable, and improve the coverage of well-targeted social assistance programs … IBRD Loan: US$27.2 million … IDA Credit: Regular; Amount: SDR 10 million; Hard: SDR 3 million",
    "nota": "Second Moldova Development Policy Operation (Banca Mondială, P149555), document de program din 15 noiembrie 2016: împrumut BIRD de 27,2 mil. USD și credit AID de 10 + 3 mil. DST, adică cele 13 mil. DST din registru. Al doilea rând (HG1214/2016) e hotărârea Guvernului privind același program."
-  },
-  {
-   "acte": [
-    "DP1668/2024",
-    "LP260/2024",
-    "HG735/2024"
-   ],
-   "obiective": {
-    "ro": "Fond fiduciar multidonator al Băncii Mondiale pentru sprijinirea Guvernului în investiții și în consolidarea instituțiilor, ca țara să devină mai competitivă, mai rezilientă și mai incluzivă în procesul de aderare la UE; mecanism coordonat de finanțare pentru mobilizarea finanțării proiectelor transformatoare.",
-    "en": "A multi-donor trust fund program to support the Government of Moldova in investing and strengthening its institutions to become more competitive, resilient, and inclusive as the country pursues EU accession; a coordinated financing mechanism to help mobilize financing for transformative projects."
-   },
-   "sursa": "https://www.worldbank.org/en/news/press-release/2024/03/25/new-trust-fund-for-resilience-and-opportunities-for-well-being-established-for-moldova",
-   "citat": "a multi-donor trust fund program aimed at supporting the Government of Moldova in investing and strengthening its institutions to become more competitive, resilient, and inclusive as the country is pursuing the EU accession … to assist the Government of Moldova in mobilizing financing for transformative projects … contributed the equivalent of $23.8 million",
-   "nota": "Programul M-GROW (Moldova Growth, Resilience and Opportunities for Well-Being), fond fiduciar multidonator al Băncii Mondiale; donatori fondatori: Irlanda, Norvegia și Regatul Unit (23,8 mil. USD echivalent). Rândul se leagă de program prin denumire; suma din registru (4,5 mil. USD) nu apare în comunicat."
   },
   {
    "acte": [
