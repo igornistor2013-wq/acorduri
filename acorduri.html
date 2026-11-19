@@ -1054,10 +1054,28 @@
     for (i = 0; i < ALIAS.length; i++)
       if (ALIAS[i].m.some(function(x){ return f.indexOf(x) > -1; })) return ALIAS[i].nume;
 
-    var quotes = t.match(/[„"]([^"”„]{6,200})[”"]/g);
-    if (quotes && quotes.length){
-      var best = quotes.map(function(s){ return s.replace(/^[„"]|[”"]$/g,'').trim(); })
-        .filter(function(s){ return !INSTITUTIE.test(s); })
+    /* Ghilimelele conțin de obicei numele proiectului. Când sunt două, cel mai lung nu e
+       neapărat al proiectului: „…Programului Fondului fiduciar multidonator „Creștere,
+       reziliență și oportunități pentru bunăstare în Moldova (M-Grow)”, în vederea
+       implementării proiectului „Mecanismul de eficiență energetică Revolving din Moldova”
+       (MEERM)” are două, iar programul-umbrelă (75 de caractere) bătea proiectul (57) și
+       actul din 18.11.2026 intra pe rândul grantului M-GROW din 2024, al altui proiect. Un
+       citat precedat de „fond fiduciar” e programul care finanțează, nu proiectul: la o
+       alegere între mai multe, e lăsat la urmă. Acronimul pus după ghilimele, „… Moldova”
+       (MEERM), face parte din denumire, ca la acordul de împrumut al aceluiași proiect. */
+    var qre = /[„"]([^"”„]{6,200})[”"]/g, cand = [], mq, dupa = 0;
+    while ((mq = qre.exec(t))){
+      var nm = mq[1].trim();
+      var intre = t.slice(dupa, mq.index);          // textul dintre citatul precedent și acesta
+      dupa = mq.index + mq[0].length;
+      if (INSTITUTIE.test(nm)) continue;
+      var ac = /^\s*\(([A-Z][A-Z0-9\-]{2,9})\)/.exec(t.slice(dupa));
+      if (ac && !/\)\s*$/.test(nm)) nm += ' (' + ac[1] + ')';
+      cand.push({ s: nm, umbrela: /fiduciar/i.test(intre) });
+    }
+    if (cand.length){
+      var proprii = cand.filter(function(x){ return !x.umbrela; });
+      var best = (proprii.length ? proprii : cand).map(function(x){ return x.s; })
         .sort(function(a,b){ return b.length - a.length; })[0];
       if (best) return best;
     }

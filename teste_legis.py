@@ -1372,6 +1372,19 @@ if '--browser' in sys.argv:
     verifica('creditul trei pentru ajustări structurale (2002): hotărârea și legea pe un rând; creditul din 1999 (29,6 mil. DST) e alt rând',
              len(_c3) == 1 and len(_c2) == 1 and _c3[0]['id'] != _c2[0]['id'] and {'HG846/2002', 'LP1175/2002'} <= _ac(_c3[0])
              and _c3[0]['suma']['v'] == 24100000 and _c2[0]['suma']['v'] == 29600000, [(a['scurt'], a['suma']) for a in _c3 + _c2])
+    # 18.11.2026: HG648/2026 (grant BIRD pentru „Mecanismul de eficiență energetică Revolving din Moldova", MEERM) intra pe rândul
+    # grantului M-GROW din 2024 (al proiectului STEEM). Titlul are două denumiri în ghilimele, iar cea mai lungă — programul-umbrelă
+    # „Creștere, reziliență și oportunități pentru bunăstare în Moldova (M-Grow)", după „Fondului fiduciar" — bătea proiectul.
+    _meerm, _stg, _meerm_i = _rd('HG648/2026'), _rd('DP1668/2024'), _rd('HG567/2026')
+    verifica('MEERM: hotărârea din 18.11.2026 (grant BIRD, Fondul fiduciar M-GROW) stă pe un rând al ei, cu numele proiectului, nu pe rândul grantului STEEM din 2024',
+             len(_meerm) == 1 and len(_stg) == 1 and _meerm[0]['id'] != _stg[0]['id'] and _ac(_meerm[0]) == {'HG648/2026'}
+             and 'HG648/2026' not in _ac(_stg[0]) and 'MEERM' in _meerm[0]['scurt'] and 'M-GROW' not in _meerm[0]['scurt'].upper(),
+             [(a['scurt'], sorted(_ac(a))) for a in _meerm + _stg])
+    verifica('STEEM: grantul din Fondul fiduciar M-GROW (4,5 mil. USD) poartă numele proiectului pe care îl cofinanțează, nu al programului-umbrelă',
+             len(_stg) == 1 and 'STEEM' in _stg[0]['scurt'] and 'M-GROW' not in _stg[0]['scurt'].upper(), [a['scurt'] for a in _stg])
+    verifica('MEERM: grantul (HG648/2026) și împrumutul (HG567/2026) au aceeași denumire, ca „debursari.html” să le arate un singur proiect, cu două componente',
+             len(_meerm_i) == 1 and _meerm_i[0]['scurt'] == _meerm[0]['scurt'] and _meerm_i[0]['categorie'] == 'Împrumut' and _meerm[0]['categorie'] == 'Grant',
+             [(a['scurt'], a['categorie']) for a in _meerm + _meerm_i])
     _cbm, _cbm2 = _rd('HG8/2012'), _rd('HG10/2014')
     verifica('Măsuri de Consolidare a Încrederii: programul din 2011 (12 mil. EUR, sursă externă) și cel din 2013 (semnat în 2014) sunt rânduri diferite',
              len(_cbm) == 1 and len(_cbm2) == 1 and _cbm[0]['id'] != _cbm2[0]['id'] and _ac(_cbm[0]) == {'HG8/2012'} and _cbm[0]['suma']['v'] == 12000000

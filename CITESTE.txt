@@ -1,0 +1,20 @@
+Pachetul iati17: corecția pentru HG648/2026 (proiectul MEERM, 18.11.2026). (Fișierul acesta e doar nota pachetului: NU îl urca în repository.)
+
+Bagul: hotărârea HG648/2026 (grant BIRD pentru „Mecanismul de eficiență energetică Revolving din Moldova”, MEERM) a fost pusă pe rândul grantului M-GROW din 2024, care e al altui proiect (STEEM). Titlul ei are două denumiri în ghilimele, iar pagina o alegea pe cea mai lungă: programul-umbrelă M-GROW (75 de caractere), nu proiectul (57).
+
+URCĂ aceste 6 fișiere, la aceleași căi:
+  acorduri.html             regula de alegere a denumirii (șablonul registrului)
+  legis_acorduri.html       regenerată din acorduri.html
+  date/acorduri_legare.json regenerat: HG648/2026 are rând propriu (grant, „… Revolving din Moldova (MEERM)”, în total 497 de rânduri în loc de 496)
+  date/proiecte_manual.json obiectivele grantului din 2024 sunt cele ale proiectului STEEM, nu ale programului M-GROW; grantul și împrumutul STEEM sunt unite într-un proiect
+  teste_legis.py            trei teste noi (pică pe codul vechi, trec pe cel nou)
+  README.md                 descrierea
+
+Ce se schimbă pe pagini:
+  - MEERM: rând nou „grant” (fără sumă încă); în „Debursări” împreună cu împrumutul HG567/2026 formează un singur proiect, cu două componente.
+  - Rândul grantului din 2024 se numește acum „Tranziția durabilă către eficiența energetică în Moldova (STEEM)”, nu „Creștere, Reziliență… (M-GROW)”, și apare în „Debursări” într-un proiect cu împrumutul STEEM.
+  - Alt rând nu se schimbă (am comparat toate cele 496).
+
+După urcare pornește singur workflow-ul „Legături acord ↔ proiect AMP” și rescrie cele două fișiere generate, cu același rezultat. Apoi Ctrl+F5.
+
+Verificări: browser Debursări 624, logica 381, AMP 54, legătura 58, legis (+ cu --browser: aceleași 2 teste care pică și pe versiunea de pe GitHub, fără legătură cu corecția: aspectul cardurilor de sume la lățimi mari și un test cu cursul CZK), cursul, colectarea, sectoarele, Excel.
