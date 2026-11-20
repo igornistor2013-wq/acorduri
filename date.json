@@ -4530,6 +4530,18 @@
       "editie_id": "3379",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3379"
+    },
+    "nr. 171, 17 noiembrie 2026|3380": {
+      "act": "nr. 171, 17 noiembrie 2026",
+      "titlu": "Ordin cu privire la aducerea la cunoștința publică a datei intrării în vigoare a Acordului de grant dintre Cancelaria de Stat și Comisia Europeană în vederea implementării proiectului „Consolidarea capacității Republicii Moldova de a pune în aplicare politica de coeziune a Uniunii Europene”",
+      "categorie": "Grant",
+      "partener": "UE",
+      "semnat": "",
+      "editie": "577-580",
+      "data_editie": "20.11.2026",
+      "editie_id": "3380",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3380"
     }
   },
   "editii_vazute": [
@@ -4598,9 +4610,10 @@
     "3376",
     "3377",
     "3378",
-    "3379"
+    "3379",
+    "3380"
   ],
-  "ultima_rulare": "19.11.2026 17:25",
+  "ultima_rulare": "20.11.2026 17:02",
   "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5,
