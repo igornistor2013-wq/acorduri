@@ -1,5 +1,5 @@
 {
-"actualizat": "2026-11-16 17:25",
+"actualizat": "2026-11-24 19:05",
 "istoric_complet": true,
 "puncte": {
 "1/MDED/2026": {
@@ -101,6 +101,15 @@
 }
 ],
 "titlu": "Hotărâre cu privire la aprobarea proiectului de lege pentru ratificarea Acordului de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare privind realizarea Proiectului „Optimizarea sistemului de alimentare centralizată cu energie termică din mun. Chișinău”, semnat la Chișinău la 29 noiembrie 2024"
+},
+"1078/MF/2026": {
+"categorie": "Împrumut",
+"data": "2026-11-25",
+"partener": "AFD",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-11/NU-1078-MF-2026%28%29.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-25-noiembrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la aprobarea semnării Acordului de facilitate de credit dintre Republica Moldova și Agenția Franceză pentru Dezvoltare nr. CMD 1023 01 E „Programul pentru tranziția energetică verde”"
 },
 "1081/MJ/2026": {
 "categorie": "Împrumut",
@@ -1835,6 +1844,16 @@
 "sume": [],
 "titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Amendamentului nr. 1 la Acordul de finanțare dintre Guvernul Republicii Moldova și Comisia Europeană privind Programul „Sprijin pentru integrarea în UE”, semnat la Chișinău la 28 noiembrie 2024"
 },
+"973/MM/2026": {
+"categorie": "Împrumut",
+"data": "2026-11-25",
+"modificare": true,
+"partener": "BERD",
+"pdf": "https://gov.md/sites/default/files/media/documents/sedinte-de-guvern/2026-11/NU-973-MM-2026%28%29.pdf",
+"sedinta": "https://gov.md/ro/sedinte-de-guvern/sedinta-guvernului-din-25-noiembrie-2026-ora-1000",
+"sume": [],
+"titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Amendamentului nr. 1 la Acordul de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare în vederea realizării Proiectului „Deșeuri solide în Republica Moldova”, semnat la Chișinău la 4 ianuarie 2023"
+},
 "987/MDED/2025": {
 "categorie": "Grant",
 "data": "2025-12-17",
@@ -2139,6 +2158,10 @@
 "sedinta-guvernului-din-25-martie-2026-ora-1000": {
 "acorduri": 1,
 "data": "2026-03-25"
+},
+"sedinta-guvernului-din-25-noiembrie-2026-ora-1000": {
+"acorduri": 2,
+"data": "2026-11-25"
 },
 "sedinta-guvernului-din-26-august-2025-ora-1000": {
 "acorduri": 0,
