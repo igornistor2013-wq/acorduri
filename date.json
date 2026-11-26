@@ -4542,6 +4542,30 @@
       "editie_id": "3380",
       "suport": false,
       "url": "https://monitorul.gov.md/ro/monitor/3380"
+    },
+    "nr. 667, 25 noiembrie 2026|3388": {
+      "act": "nr. 667, 25 noiembrie 2026",
+      "titlu": "Hotărâre cu privire la aprobarea semnării Acordului de facilitate de credit dintre Republica Moldova și Agenția Franceză pentru Dezvoltare nr. CMD 1023 01 E „Programul pentru tranziția energetică verde”",
+      "categorie": "Împrumut",
+      "partener": "AFD",
+      "semnat": "",
+      "editie": "602-605",
+      "data_editie": "26.11.2026",
+      "editie_id": "3388",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3388"
+    },
+    "nr. 668, 25 noiembrie 2026|3388": {
+      "act": "nr. 668, 25 noiembrie 2026",
+      "titlu": "Hotărâre cu privire la inițierea negocierilor și aprobarea semnării Amendamentului nr. 1 la Acordul de împrumut dintre Republica Moldova și Banca Europeană pentru Reconstrucție și Dezvoltare în vederea realizării Proiectului „Deșeuri solide în Republica Moldova”, semnat la Chișinău la 4 ianuarie 2023",
+      "categorie": "Împrumut",
+      "partener": "BERD",
+      "semnat": "04.01.2023",
+      "editie": "602-605",
+      "data_editie": "26.11.2026",
+      "editie_id": "3388",
+      "suport": false,
+      "url": "https://monitorul.gov.md/ro/monitor/3388"
     }
   },
   "editii_vazute": [
@@ -4618,9 +4642,10 @@
     "3384",
     "3385",
     "3386",
-    "3387"
+    "3387",
+    "3388"
   ],
-  "ultima_rulare": "25.11.2026 18:55",
+  "ultima_rulare": "26.11.2026 18:34",
   "editii_lipsa": [],
   "editii_esuate": {
     "3333": 5,
